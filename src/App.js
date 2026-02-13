@@ -20,6 +20,7 @@ export default function HearthApp() {
     handleAddItem,
     handleBulkDelete,
     handleCreateSpace,
+    handleDeleteAll,
     handleDelete,
     handleExportItems,
     handleImportItems,
@@ -35,6 +36,7 @@ export default function HearthApp() {
     isDeciding,
     isImportOpen,
     isSpaceSetupRunning,
+    isWipingSpace,
     isSigningIn,
     items,
     joinError,
@@ -141,6 +143,7 @@ export default function HearthApp() {
             onImport={() => setIsImportOpen(true)}
             onExport={handleExportItems}
             onInvite={handleInvite}
+            onDeleteAll={handleDeleteAll}
             onDecide={(pool) => startDecision(pool)}
             onToggleStatus={handleMarkWatched}
             onRefreshMetadata={handleRefreshMetadata}
@@ -148,6 +151,7 @@ export default function HearthApp() {
             goToShelf={() => setView('shelf')}
             spaceId={spaceId}
             spaceName={spaceName}
+            isDeletingAll={isWipingSpace}
             onSignOut={handleSignOut}
           />
         )}

@@ -5,7 +5,10 @@ import {
   mapWatchlistUpdatesForWrite,
 } from '../domain/media/adapters.js';
 import { buildWatchlistPayload } from '../domain/media/schema.js';
-import { SPACE_ID_STORAGE_KEY } from '../config/constants.js';
+import {
+  DAILY_TRAY_STORAGE_PREFIX,
+  SPACE_ID_STORAGE_KEY,
+} from '../config/constants.js';
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -123,6 +126,19 @@ const buildTitleYearKey = (item = {}) => {
   return `${title}::${year}`;
 };
 
+const clearSpaceTrayCache = (targetSpaceId) => {
+  if (typeof localStorage === 'undefined' || !targetSpaceId) return;
+  const storagePrefix = `${DAILY_TRAY_STORAGE_PREFIX}:${targetSpaceId}:`;
+  const keysToRemove = [];
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key && key.startsWith(storagePrefix)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
+};
+
 export const useAppState = () => {
   const {
     autoReloadCountdown,
@@ -154,6 +170,7 @@ export const useAppState = () => {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isWipingSpace, setIsWipingSpace] = useState(false);
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
@@ -927,6 +944,42 @@ export const useAppState = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!db || !spaceId) {
+      notifyError('Database not available. Please check your connection.');
+      return false;
+    }
+
+    const itemIds = items.map((item) => item.id).filter(Boolean);
+    setIsWipingSpace(true);
+
+    try {
+      if (itemIds.length > 0) {
+        await bulkDeleteWatchlistItems({
+          db,
+          appId,
+          spaceId,
+          itemIds,
+        });
+      }
+
+      clearSpaceTrayCache(spaceId);
+      setItems([]);
+      setContextItems([]);
+      setDecisionResult(null);
+      setIsImportOpen(false);
+      setView('tonight');
+      notifyUpdate('Space wiped clean.');
+      return true;
+    } catch (err) {
+      console.error('Error wiping space:', err);
+      notifyError("Couldn't clear this space. Try again.");
+      return false;
+    } finally {
+      setIsWipingSpace(false);
+    }
+  };
+
   const startDecision = (poolOfItems) => {
     const pool =
       poolOfItems && poolOfItems.length > 0
@@ -956,6 +1009,7 @@ export const useAppState = () => {
     handleAddItem,
     handleBulkDelete,
     handleCreateSpace,
+    handleDeleteAll,
     handleDelete,
     handleExportItems,
     handleImportItems,
@@ -971,6 +1025,7 @@ export const useAppState = () => {
     isDeciding,
     isImportOpen,
     isSpaceSetupRunning,
+    isWipingSpace,
     isSigningIn,
     items,
     joinError,

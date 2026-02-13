@@ -23,6 +23,7 @@ const AddView = ({ onBack, onSubmit }) => {
   const [enrichedPayload, setEnrichedPayload] = useState(null);
   const [isEnriching, setIsEnriching] = useState(false);
   const [enrichError, setEnrichError] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const { results, loading, error, hasQuery } = useMediaSearch({
     query: searchQuery,
@@ -74,6 +75,7 @@ const AddView = ({ onBack, onSubmit }) => {
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
     setTitle(result.title || '');
+    setSubmitError('');
     setType(result.type === 'show' ? 'show' : 'movie');
     setRuntimeMinutes('');
     setEnrichError('');
@@ -123,10 +125,16 @@ const AddView = ({ onBack, onSubmit }) => {
     setSelectedResult(null);
     setEnrichedPayload(null);
     setEnrichError('');
+    setSubmitError('');
+    setTitle('');
   };
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
+    if (!selectedResult) {
+      setSubmitError('Select a movie or show from Live Search before saving.');
+      return;
+    }
+    setSubmitError('');
 
     const payload = {
       title: title.trim(),
@@ -211,13 +219,11 @@ const AddView = ({ onBack, onSubmit }) => {
       <div className="p-6 space-y-8 flex-1 overflow-y-auto">
         {/* Live Search */}
         <div className="space-y-3">
-          <div className="text-[10px] uppercase tracking-widest text-stone-400">
-            Live Search (Optional)
-          </div>
+          <div className="text-[10px] uppercase tracking-widest text-stone-400">Title</div>
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search titles to auto-fill metadata..."
+            placeholder="Search movie or show title..."
             data-testid="live-search-input"
           />
           {loading && (
@@ -284,16 +290,9 @@ const AddView = ({ onBack, onSubmit }) => {
           {enrichError && (
             <div className="text-xs text-red-400">{enrichError}</div>
           )}
-        </div>
-
-        {/* Title Input */}
-        <div className="space-y-4">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Movie or Show Title..."
-            autoFocus
-          />
+          {submitError && (
+            <div className="text-xs text-red-400">{submitError}</div>
+          )}
         </div>
 
         {/* Type */}

@@ -29,7 +29,7 @@ const AddView = ({ onBack, onSubmit }) => {
     type,
   });
 
-  const visibleResults = useMemo(() => results.slice(0, 6), [results]);
+  const visibleResults = useMemo(() => results.slice(0, 5), [results]);
 
   const hydrateShowData = async (provider, providerId) => {
     const seasonResponse = await getShowSeasons({ provider, providerId });
@@ -230,11 +230,37 @@ const AddView = ({ onBack, onSubmit }) => {
                 <button
                   key={`${result.provider}-${result.providerId}`}
                   onClick={() => handleSelectResult(result)}
-                  className="w-full text-left px-3 py-2 hover:bg-stone-800/60 transition-colors"
+                  className="w-full text-left px-3 py-3 hover:bg-stone-800/60 transition-colors"
                 >
-                  <div className="text-sm text-stone-200">{result.title}</div>
-                  <div className="text-[11px] text-stone-500 uppercase tracking-wider">
-                    {result.type} {result.year ? `• ${result.year}` : ''}
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded border border-stone-700 bg-stone-800">
+                      <div className="absolute inset-0 flex items-center justify-center text-stone-500">
+                        {result.type === 'show' ? (
+                          <Tv className="h-4 w-4" />
+                        ) : (
+                          <Film className="h-4 w-4" />
+                        )}
+                      </div>
+                      {result.posterUrl ? (
+                        <img
+                          src={result.posterUrl}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate text-base text-stone-200">
+                        {result.title}
+                      </div>
+                      <div className="mt-0.5 text-xs text-stone-500 uppercase tracking-wider">
+                        {result.type} {result.year ? `• ${result.year}` : ''}
+                      </div>
+                    </div>
                   </div>
                 </button>
               ))}

@@ -136,6 +136,10 @@ export const useAppState = () => {
 
     const initAuth = async () => {
       if (!auth || !auth.app) {
+        if (typeof window !== 'undefined' && window.__firebase_config) {
+          // Config exists; auth state is still settling.
+          return;
+        }
         console.log('Firebase auth not available, skipping authentication');
         setAuthResolved(true);
         setLoading(false);
@@ -291,6 +295,7 @@ export const useAppState = () => {
     if (!firebaseInitResolved) return;
     if (!user || !spaceId || !db) {
       if (!db) {
+        if (typeof window !== 'undefined' && window.__firebase_config) return;
         console.log('Firebase not available, using local storage only');
         setLoading(false);
       }
@@ -330,10 +335,28 @@ export const useAppState = () => {
   const handleCreateSpace = async (name) => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-    if (!user || !db) {
+    if (!user || !db || !auth || !auth.app) {
       notifyError('Sign in with Google to create or join a space.');
       return;
     }
+
+    const authUser = auth.currentUser;
+    if (!authUser || authUser.uid !== user.uid) {
+      notifyError('Auth session is still syncing. Please try again.');
+      return;
+    }
+
+    try {
+      await authUser.getIdToken(true);
+    } catch (tokenErr) {
+      console.error(
+        'Error refreshing auth token before space create:',
+        tokenErr,
+      );
+      notifyError("Couldn't verify your sign-in session. Try again.");
+      return;
+    }
+
     setIsSpaceSetupRunning(true);
     try {
       const existingSpace = await findUserSpaceByName({
@@ -357,7 +380,12 @@ export const useAppState = () => {
       setSpaceName(space.name || trimmedName);
       setView('tonight');
     } catch (err) {
-      console.error('Error creating space:', err);
+      console.error('Error creating space:', {
+        code: err?.code,
+        message: err?.message,
+        appId,
+        userUid: user?.uid,
+      });
       notifyError("Couldn't create space. Try again.");
     } finally {
       setIsSpaceSetupRunning(false);

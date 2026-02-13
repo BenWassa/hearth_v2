@@ -12,7 +12,10 @@ const MEDIA_ASSET_BASE_URL = (
 const maybeResolveStorageUrl = (pathValue) => {
   if (!MEDIA_ASSET_BASE_URL) return '';
   if (!pathValue || !pathValue.startsWith('/')) return '';
-  if (pathValue.startsWith(`${POSTER_DIR}/`) || pathValue.startsWith(`${BACKDROP_DIR}/`)) {
+  if (
+    pathValue.startsWith(`${POSTER_DIR}/`) ||
+    pathValue.startsWith(`${BACKDROP_DIR}/`)
+  ) {
     return `${MEDIA_ASSET_BASE_URL}${pathValue}`;
   }
   return '';

@@ -53,7 +53,10 @@ const DecisionView = ({ isDeciding, result, onClose, onReroll }) => {
                     decoding="async"
                     fetchPriority="low"
                     fallback={
-                      <PosterPlaceholder title={result.title} type={result.type} />
+                      <PosterPlaceholder
+                        title={result.title}
+                        type={result.type}
+                      />
                     }
                   />
                 ) : (

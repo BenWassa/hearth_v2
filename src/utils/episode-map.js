@@ -9,7 +9,7 @@ const cachedShowPromises = new Map();
 
 const normalizeKey = (value) => {
   if (!value) return '';
-    return `${value}`.trim();
+  return `${value}`.trim();
 };
 
 const normalizeTitle = (value) => {

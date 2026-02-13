@@ -255,7 +255,9 @@ const AddView = ({ onBack, onSubmit }) => {
               </button>
             </div>
           )}
-          {enrichError && <div className="text-xs text-red-400">{enrichError}</div>}
+          {enrichError && (
+            <div className="text-xs text-red-400">{enrichError}</div>
+          )}
         </div>
 
         {/* Title Input */}

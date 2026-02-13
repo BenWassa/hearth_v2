@@ -40,25 +40,37 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
   const source = asObject(payload.source);
   const media = asObject(payload.media);
   const showData = asObject(payload.showData);
-  const genres = asArray(media.genres).length ? asArray(media.genres) : asArray(payload.genres);
-  const cast = asArray(media.cast).length ? asArray(media.cast) : asArray(payload.actors);
+  const genres = asArray(media.genres).length
+    ? asArray(media.genres)
+    : asArray(payload.genres);
+  const cast = asArray(media.cast).length
+    ? asArray(media.cast)
+    : asArray(payload.actors);
   const seasons = asArray(showData.seasons).length
     ? asArray(showData.seasons)
     : asArray(payload.seasons);
-  const seasonCount = asNumberOrNull(showData.seasonCount ?? payload.totalSeasons);
+  const seasonCount = asNumberOrNull(
+    showData.seasonCount ?? payload.totalSeasons,
+  );
 
   const title = asString(media.title || payload.title);
   const type = asString(media.type || payload.type || 'movie');
   const year = asString(media.year || payload.year);
-  const runtimeMinutes = asNumberOrNull(media.runtimeMinutes ?? payload.runtimeMinutes);
+  const runtimeMinutes = asNumberOrNull(
+    media.runtimeMinutes ?? payload.runtimeMinutes,
+  );
   const poster = asString(media.poster || payload.poster);
   const backdrop = asString(media.backdrop || payload.backdrop);
 
   return {
     mediaId,
     source: {
-      provider: asString(source.provider || media.provider || payload.provider || 'tmdb'),
-      providerId: asString(source.providerId || media.providerId || payload.providerId),
+      provider: asString(
+        source.provider || media.provider || payload.provider || 'tmdb',
+      ),
+      providerId: asString(
+        source.providerId || media.providerId || payload.providerId,
+      ),
       fetchedAt: asNumberOrNull(source.fetchedAt) || Date.now(),
       staleAfter: asNumberOrNull(source.staleAfter),
       locale: asString(source.locale || 'en-US'),
@@ -102,13 +114,19 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
   };
 };
 
-const buildWatchlistPayload = (payload = {}, mediaId, preserveCreatedAt = false) => {
+const buildWatchlistPayload = (
+  payload = {},
+  mediaId,
+  preserveCreatedAt = false,
+) => {
   const userState = asObject(payload.userState);
   const status = asString(userState.status || payload.status || 'unwatched');
   const vibe = asString(userState.vibe || payload.vibe);
   const energy = asString(userState.energy || payload.energy);
   const note = asString(userState.note || payload.note);
-  const episodeProgress = asObject(userState.episodeProgress || payload.episodeProgress);
+  const episodeProgress = asObject(
+    userState.episodeProgress || payload.episodeProgress,
+  );
 
   const base = {
     schemaVersion: 2,
@@ -154,9 +172,14 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
     type: asString(media.type || catalogData.type || watchData.type),
     year: asString(media.year || catalogData.year || watchData.year),
     poster: asString(media.poster || catalogData.poster || watchData.poster),
-    backdrop: asString(media.backdrop || catalogData.backdrop || watchData.backdrop),
-    runtimeMinutes:
-      asNumberOrNull(media.runtimeMinutes ?? catalogData.runtimeMinutes ?? watchData.runtimeMinutes),
+    backdrop: asString(
+      media.backdrop || catalogData.backdrop || watchData.backdrop,
+    ),
+    runtimeMinutes: asNumberOrNull(
+      media.runtimeMinutes ??
+        catalogData.runtimeMinutes ??
+        watchData.runtimeMinutes,
+    ),
     genres: asArray(media.genres).length
       ? asArray(media.genres)
       : asArray(catalogData.genres).length
@@ -167,8 +190,11 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
       : asArray(catalogData.actors).length
       ? asArray(catalogData.actors)
       : asArray(watchData.actors),
-    totalSeasons:
-      asNumberOrNull(showData.seasonCount ?? catalogData.totalSeasons ?? watchData.totalSeasons),
+    totalSeasons: asNumberOrNull(
+      showData.seasonCount ??
+        catalogData.totalSeasons ??
+        watchData.totalSeasons,
+    ),
     seasons: asArray(showData.seasons).length
       ? asArray(showData.seasons)
       : asArray(catalogData.seasons).length
@@ -225,7 +251,9 @@ export const subscribeWatchlist = ({ db, appId, spaceId, onNext, onError }) => {
           const mediaId = asString(watchData.mediaId || docSnap.id);
           let catalogData = {};
           if (mediaId) {
-            const catalogSnapshot = await getDoc(getCatalogDocRef(db, appId, mediaId));
+            const catalogSnapshot = await getDoc(
+              getCatalogDocRef(db, appId, mediaId),
+            );
             if (catalogSnapshot.exists()) {
               catalogData = catalogSnapshot.data();
             }
@@ -318,8 +346,11 @@ export const updateWatchlistItem = async ({
   if (Object.prototype.hasOwnProperty.call(watchlistUpdates, 'note')) {
     watchlistUpdates['userState.note'] = watchlistUpdates.note;
   }
-  if (Object.prototype.hasOwnProperty.call(watchlistUpdates, 'episodeProgress')) {
-    watchlistUpdates['userState.episodeProgress'] = watchlistUpdates.episodeProgress;
+  if (
+    Object.prototype.hasOwnProperty.call(watchlistUpdates, 'episodeProgress')
+  ) {
+    watchlistUpdates['userState.episodeProgress'] =
+      watchlistUpdates.episodeProgress;
   }
   if (Object.keys(watchlistUpdates).length > 0) {
     watchlistUpdates.updatedAt = serverTimestamp();
@@ -331,18 +362,28 @@ export const updateWatchlistItem = async ({
 
   if (Object.keys(catalogUpdates).length === 0) {
     if (Object.keys(watchlistUpdates).length === 0) return Promise.resolve();
-    return updateDoc(getWatchlistDocRef(db, appId, spaceId, itemId), watchlistUpdates);
+    return updateDoc(
+      getWatchlistDocRef(db, appId, spaceId, itemId),
+      watchlistUpdates,
+    );
   }
 
   if (Object.keys(watchlistUpdates).length === 0) {
     const batch = writeBatch(db);
-    batch.set(getCatalogDocRef(db, appId, itemId), catalogUpdates, { merge: true });
+    batch.set(getCatalogDocRef(db, appId, itemId), catalogUpdates, {
+      merge: true,
+    });
     return batch.commit();
   }
 
   const batch = writeBatch(db);
-  batch.update(getWatchlistDocRef(db, appId, spaceId, itemId), watchlistUpdates);
-  batch.set(getCatalogDocRef(db, appId, itemId), catalogUpdates, { merge: true });
+  batch.update(
+    getWatchlistDocRef(db, appId, spaceId, itemId),
+    watchlistUpdates,
+  );
+  batch.set(getCatalogDocRef(db, appId, itemId), catalogUpdates, {
+    merge: true,
+  });
   return batch.commit();
 };
 

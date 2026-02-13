@@ -84,7 +84,9 @@ const PosterCard = ({
                 loading="lazy"
                 decoding="async"
                 fetchPriority="auto"
-                fallback={<PosterPlaceholder title={item.title} type={item.type} />}
+                fallback={
+                  <PosterPlaceholder title={item.title} type={item.type} />
+                }
               />
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />
@@ -101,7 +103,9 @@ const PosterCard = ({
                 loading="lazy"
                 decoding="async"
                 fetchPriority="auto"
-                fallback={<PosterPlaceholder title={item.title} type={item.type} />}
+                fallback={
+                  <PosterPlaceholder title={item.title} type={item.type} />
+                }
               />
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />

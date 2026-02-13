@@ -75,7 +75,7 @@ export const findUserSpaceByName = async ({ db, appId, userId, name }) => {
     snapshot = await getDocs(spacesQuery);
   } catch (err) {
     if (err?.code === 'permission-denied') {
-      console.warn('Space lookup denied by Firestore rules; continuing create flow');
+      // If rules reject the lookup query, continue directly to create flow.
       return null;
     }
     throw err;

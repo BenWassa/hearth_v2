@@ -30,12 +30,20 @@ export const adaptWatchlistItem = (rawItem = {}) => {
     poster: asString(media.poster) || asString(rawItem.poster),
     backdrop: asString(media.backdrop) || asString(rawItem.backdrop),
     year: media.year || rawItem.year || '',
-    runtimeMinutes:
-      Number.isFinite(media.runtimeMinutes) ? media.runtimeMinutes : rawItem.runtimeMinutes,
-    genres: asArray(media.genres).length ? asArray(media.genres) : asArray(rawItem.genres),
-    actors: asArray(media.cast).length ? asArray(media.cast) : asArray(rawItem.actors),
+    runtimeMinutes: Number.isFinite(media.runtimeMinutes)
+      ? media.runtimeMinutes
+      : rawItem.runtimeMinutes,
+    genres: asArray(media.genres).length
+      ? asArray(media.genres)
+      : asArray(rawItem.genres),
+    actors: asArray(media.cast).length
+      ? asArray(media.cast)
+      : asArray(rawItem.actors),
     totalSeasons:
-      showData.seasonCount || rawItem.totalSeasons || asArray(showData.seasons).length || '',
+      showData.seasonCount ||
+      rawItem.totalSeasons ||
+      asArray(showData.seasons).length ||
+      '',
     seasons: asArray(showData.seasons).length
       ? asArray(showData.seasons)
       : asArray(rawItem.seasons),

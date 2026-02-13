@@ -20,7 +20,9 @@ const normalizeToken = (value) =>
 export const buildMediaId = (item = {}) => {
   const source = asObject(item.source);
   const media = asObject(item.media);
-  const provider = normalizeToken(source.provider || media.provider || item.provider);
+  const provider = normalizeToken(
+    source.provider || media.provider || item.provider,
+  );
   const providerId = normalizeToken(
     source.providerId || media.providerId || item.providerId,
   );
@@ -59,11 +61,15 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   if (item.backdrop) payload.backdrop = asString(item.backdrop);
   if (item.year) payload.year = asString(item.year);
   if (item.director) payload.director = asString(item.director);
-  if (Array.isArray(item.genres) && item.genres.length) payload.genres = item.genres;
-  if (Array.isArray(item.actors) && item.actors.length) payload.actors = item.actors;
-  if (Number.isFinite(item.runtimeMinutes)) payload.runtimeMinutes = item.runtimeMinutes;
+  if (Array.isArray(item.genres) && item.genres.length)
+    payload.genres = item.genres;
+  if (Array.isArray(item.actors) && item.actors.length)
+    payload.actors = item.actors;
+  if (Number.isFinite(item.runtimeMinutes))
+    payload.runtimeMinutes = item.runtimeMinutes;
   if (item.totalSeasons) payload.totalSeasons = item.totalSeasons;
-  if (Array.isArray(item.seasons) && item.seasons.length) payload.seasons = item.seasons;
+  if (Array.isArray(item.seasons) && item.seasons.length)
+    payload.seasons = item.seasons;
   if (item.episodeProgress) payload.episodeProgress = item.episodeProgress;
 
   return payload;
@@ -85,7 +91,9 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const energy = asString(userState.energy || item.energy);
   const note = asString(userState.note || item.note);
 
-  const runtimeMinutes = asNumberOrNull(media.runtimeMinutes ?? item.runtimeMinutes);
+  const runtimeMinutes = asNumberOrNull(
+    media.runtimeMinutes ?? item.runtimeMinutes,
+  );
   const genres = mediaGenres.length ? mediaGenres : asArray(item.genres);
   const cast = mediaCast.length ? mediaCast : asArray(item.actors);
   const seasons = showSeasons.length ? showSeasons : asArray(item.seasons);
@@ -121,7 +129,8 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
       provider: asString(source.provider || 'tmdb'),
       providerId: asString(source.providerId || ''),
       fetchedAt:
-        asNumberOrNull(source.fetchedAt) || (typeof Date.now === 'function' ? Date.now() : 0),
+        asNumberOrNull(source.fetchedAt) ||
+        (typeof Date.now === 'function' ? Date.now() : 0),
       staleAfter: asNumberOrNull(source.staleAfter),
       locale: asString(source.locale || 'en-US'),
     },

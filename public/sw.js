@@ -1,5 +1,5 @@
 // Rewritten by scripts/generateVersion.js on each build.
-const BUILD_VERSION = '3.7.1';
+const BUILD_VERSION = '3.7.2';
 const CACHE_NAME = `hearth-static-${BUILD_VERSION.replace(/\./g, '-')}`;
 
 self.addEventListener('install', (event) => {

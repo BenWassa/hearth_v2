@@ -13,6 +13,38 @@ env:
     value: production
     availability:
       - RUNTIME
+  - variable: FIREBASE_API_KEY
+    value: "AIzaSyDC0XMduLFzmIFf-hEIy8Rzjb2bEunyOlQ"
+    availability:
+      - BUILD
+  - variable: FIREBASE_AUTH_DOMAIN
+    value: "hearthv2.firebaseapp.com"
+    availability:
+      - BUILD
+  - variable: FIREBASE_PROJECT_ID
+    value: "hearthv2"
+    availability:
+      - BUILD
+  - variable: FIREBASE_STORAGE_BUCKET
+    value: "hearthv2.firebasestorage.app"
+    availability:
+      - BUILD
+  - variable: FIREBASE_MESSAGING_SENDER_ID
+    value: "1064503366600"
+    availability:
+      - BUILD
+  - variable: FIREBASE_APP_ID
+    value: "1:1064503366600:web:5256eabe8658198d7ba6fd"
+    availability:
+      - BUILD
+  - variable: MEDIA_PROVIDER_API_KEY
+    value: "a9335f8917ab3b126a4df72871bfdb27"
+    availability:
+      - RUNTIME
+  - variable: MEDIA_PROVIDER_READ_TOKEN
+    value: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhOTMzNWY4OTE3YWIzYjEyNmE0ZGY3Mjg3MWJmZGIyNyIsIm5iZiI6MTc2ODIzNzk3NC42MDYwMDAyLCJzdWIiOiI2OTY1MmI5NjY5YzU3NmY0N2RkYzRiZDMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0._7ZC9OagZNwST0JDHSOy1sEVtKSrfO3nHZxPG4KM0wc"
+    availability:
+      - RUNTIME
   - variable: API_TIMEOUT_MS
     value: "7000"
     availability:
@@ -28,8 +60,5 @@ env:
   - variable: APP_ID
     value: hearth-default
     availability:
+      - BUILD
       - RUNTIME
-
-# Set provider credentials as App Hosting secrets:
-# - MEDIA_PROVIDER_API_KEY
-# - MEDIA_PROVIDER_READ_TOKEN

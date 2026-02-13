@@ -31,7 +31,11 @@ import {
   updateWatchlistItem,
   updateWatchlistStatus,
 } from '../services/firebase/watchlist.js';
-import { refreshMediaMetadata } from '../services/mediaApi/client.js';
+import {
+  getMediaDetails,
+  refreshMediaMetadata,
+  searchMedia,
+} from '../services/mediaApi/client.js';
 
 const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
@@ -68,6 +72,46 @@ const isShowFullyWatched = (item) => {
       season.episodes.length > 0 &&
       season.episodes.every((episode) => Boolean(progress[episode.id])),
   );
+};
+
+const normalizeSearchText = (value) =>
+  String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+const scoreSearchResult = ({ result, title, type, year }) => {
+  let score = 0;
+  const wantedType = type === 'show' ? 'show' : 'movie';
+  const normalizedWantedTitle = normalizeSearchText(title);
+  const normalizedResultTitle = normalizeSearchText(result?.title);
+  const wantedYear = String(year || '').trim();
+  const resultYear = String(result?.year || '').trim();
+
+  if (result?.type === wantedType) score += 30;
+  if (normalizedResultTitle && normalizedResultTitle === normalizedWantedTitle) {
+    score += 50;
+  }
+  if (
+    normalizedResultTitle &&
+    normalizedWantedTitle &&
+    normalizedResultTitle.includes(normalizedWantedTitle)
+  ) {
+    score += 10;
+  }
+  if (wantedYear && resultYear && wantedYear === resultYear) score += 15;
+  return score;
+};
+
+const pickBestSearchResult = ({ results, title, type, year }) => {
+  if (!Array.isArray(results) || !results.length) return null;
+
+  return [...results]
+    .map((result) => ({
+      result,
+      score: scoreSearchResult({ result, title, type, year }),
+    }))
+    .sort((a, b) => b.score - a.score)[0]?.result;
 };
 
 export const useAppState = () => {
@@ -453,7 +497,87 @@ export const useAppState = () => {
       return;
     }
     try {
-      await commitImport(itemsToImport, async (item) => {
+      const enrichedItems = [];
+      let matchedCount = 0;
+      let unmatchedCount = 0;
+
+      for (const item of itemsToImport) {
+        const title = String(item?.title || '').trim();
+        const itemType = item?.type === 'show' ? 'show' : 'movie';
+
+        if (!title) {
+          unmatchedCount += 1;
+          enrichedItems.push(item);
+          continue;
+        }
+
+        try {
+          const searchData = await searchMedia({ q: title, type: itemType, page: 1 });
+          const best = pickBestSearchResult({
+            results: searchData?.results,
+            title,
+            type: itemType,
+            year: item?.year,
+          });
+
+          if (!best?.provider || !best?.providerId) {
+            unmatchedCount += 1;
+            enrichedItems.push(item);
+            continue;
+          }
+
+          const details = await getMediaDetails({
+            provider: best.provider,
+            providerId: best.providerId,
+            type: best.type || itemType,
+          });
+
+          const resolvedType = details?.type === 'show' ? 'show' : 'movie';
+          const poster = details?.posterUrl || best.posterUrl || item?.poster || '';
+          const backdrop =
+            details?.backdropUrl || best.backdropUrl || item?.backdrop || '';
+
+          enrichedItems.push({
+            ...item,
+            schemaVersion: 2,
+            title: details?.title || best.title || title,
+            type: resolvedType,
+            year: details?.year || best.year || item?.year || '',
+            runtimeMinutes: Number.isFinite(details?.runtimeMinutes)
+              ? details.runtimeMinutes
+              : item?.runtimeMinutes,
+            genres:
+              Array.isArray(details?.genres) && details.genres.length
+                ? details.genres
+                : item?.genres,
+            actors:
+              Array.isArray(details?.cast) && details.cast.length
+                ? details.cast
+                : item?.actors,
+            poster,
+            backdrop,
+            source: {
+              provider: best.provider,
+              providerId: best.providerId,
+              fetchedAt: Date.now(),
+              locale: 'en-US',
+            },
+            media: {
+              ...details,
+              type: resolvedType,
+              title: details?.title || best.title || title,
+              poster,
+              backdrop,
+            },
+          });
+          matchedCount += 1;
+        } catch (error) {
+          unmatchedCount += 1;
+          enrichedItems.push(item);
+        }
+      }
+
+      await commitImport(enrichedItems, async (item) => {
         const payload = buildWatchlistPayload(
           {
             ...item,
@@ -465,6 +589,20 @@ export const useAppState = () => {
       });
       setIsImportOpen(false);
       setView('tonight');
+      if (matchedCount > 0) {
+        notifyUpdate(
+          `Imported with metadata for ${matchedCount} title${
+            matchedCount === 1 ? '' : 's'
+          }.`,
+        );
+      }
+      if (unmatchedCount > 0) {
+        notifyError(
+          `${unmatchedCount} import item${
+            unmatchedCount === 1 ? '' : 's'
+          } could not be matched for poster/backdrop.`,
+        );
+      }
     } catch (err) {
       console.error('Error importing items:', err);
       notifyError("Something didn't save. Try again.");

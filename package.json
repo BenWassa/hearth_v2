@@ -55,13 +55,6 @@
       "last 1 safari version"
     ]
   },
-  "overrides": {
-    "nth-check": "^2.0.1",
-    "postcss": "^8.4.31",
-    "svgo": "^2.8.0",
-    "css-select": "^4.1.0",
-    "undici": "^6.21.3"
-  },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.23",

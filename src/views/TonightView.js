@@ -28,10 +28,14 @@ const TonightView = ({
   onExport,
   onInvite,
   onDeleteAll,
+  onDelete,
   onDecide,
   onToggleStatus,
-  onRefreshMetadata,
   onUpdate,
+  showDevMetadataTools = false,
+  onMetadataAudit,
+  onMetadataRepairMissing,
+  isMetadataRepairing = false,
   goToShelf,
   spaceId,
   spaceName,
@@ -207,6 +211,33 @@ const TonightView = ({
               >
                 Export
               </button>
+              {showDevMetadataTools && (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onMetadataAudit?.();
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors border-t border-stone-900"
+                    role="menuitem"
+                  >
+                    Audit Metadata (Dev)
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onMetadataRepairMissing?.();
+                    }}
+                    disabled={isMetadataRepairing}
+                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-t border-stone-900"
+                    role="menuitem"
+                  >
+                    {isMetadataRepairing
+                      ? 'Repairing Metadata...'
+                      : 'Repair Missing Metadata (Dev)'}
+                  </button>
+                </>
+              )}
               {onDeleteAll && (
                 <button
                   onClick={() => {
@@ -240,7 +271,7 @@ const TonightView = ({
 
       <div className="flex-1 px-6 space-y-8 overflow-y-auto pb-32">
         <div className="space-y-8">
-          <div className="space-y-4">
+          <div className="space-y-0">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
                 Movies
@@ -314,7 +345,7 @@ const TonightView = ({
             )}
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-0 -mt-2">
             {/* Pick for us Header */}
             <div className="flex items-center justify-center gap-2 px-2 py-1">
               <Sparkles className="w-5 h-5 text-amber-400" />
@@ -322,7 +353,7 @@ const TonightView = ({
             </div>
 
             {/* Featured Pick CTA */}
-            <div className="bg-gradient-to-br from-amber-500/15 to-amber-600/10 border border-amber-500/30 rounded-2xl p-2 mt-0 space-y-2">
+            <div className="bg-gradient-to-br from-amber-500/15 to-amber-600/10 border border-amber-500/30 rounded-2xl p-2 space-y-2">
               {/* Quick pick options: 3 columns, 1 row */}
               <div className="flex gap-4">
                 {/* Random */}
@@ -519,7 +550,7 @@ const TonightView = ({
           item={detailItem}
           onClose={closeDetails}
           onToggleStatus={onToggleStatus}
-          onRefreshMetadata={onRefreshMetadata}
+          onDelete={onDelete}
           onUpdate={onUpdate}
         />
 

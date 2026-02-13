@@ -10,7 +10,6 @@ const ShelfView = ({
   items,
   onAdd,
   onToggleStatus,
-  onRefreshMetadata,
   onUpdate,
   onDelete,
   onBulkDelete,
@@ -523,7 +522,7 @@ const ShelfView = ({
         item={detailItem}
         onClose={closeDetails}
         onToggleStatus={onToggleStatus}
-        onRefreshMetadata={onRefreshMetadata}
+        onDelete={onDelete}
         onUpdate={onUpdate}
       />
 

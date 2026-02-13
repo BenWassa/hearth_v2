@@ -26,7 +26,8 @@ export default function HearthApp() {
     handleImportItems,
     handleInvite,
     handleMarkWatched,
-    handleRefreshMetadata,
+    handleMetadataAudit,
+    handleMetadataRepairMissing,
     handleReloadNow,
     handleSignIn,
     handleSignOut,
@@ -35,6 +36,7 @@ export default function HearthApp() {
     isBulkDeleting,
     isDeciding,
     isImportOpen,
+    isMetadataRepairing,
     isSpaceSetupRunning,
     isWipingSpace,
     isSigningIn,
@@ -51,6 +53,7 @@ export default function HearthApp() {
     user,
     view,
   } = useAppState();
+  const showDevMetadataTools = Boolean(import.meta?.env?.DEV);
 
   if (!authResolved || isBootstrapping) {
     return (
@@ -146,8 +149,12 @@ export default function HearthApp() {
             onDeleteAll={handleDeleteAll}
             onDecide={(pool) => startDecision(pool)}
             onToggleStatus={handleMarkWatched}
-            onRefreshMetadata={handleRefreshMetadata}
+            onDelete={handleDelete}
             onUpdate={handleUpdateItem}
+            showDevMetadataTools={showDevMetadataTools}
+            onMetadataAudit={handleMetadataAudit}
+            onMetadataRepairMissing={handleMetadataRepairMissing}
+            isMetadataRepairing={isMetadataRepairing}
             goToShelf={() => setView('shelf')}
             spaceId={spaceId}
             spaceName={spaceName}
@@ -161,7 +168,6 @@ export default function HearthApp() {
             items={items}
             onAdd={() => setView('add')}
             onToggleStatus={handleMarkWatched}
-            onRefreshMetadata={handleRefreshMetadata}
             onUpdate={handleUpdateItem}
             onDelete={handleDelete}
             onBulkDelete={handleBulkDelete}

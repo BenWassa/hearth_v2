@@ -120,6 +120,7 @@ const buildWatchlistPayload = (
   preserveCreatedAt = false,
 ) => {
   const userState = asObject(payload.userState);
+  const media = asObject(payload.media);
   const status = asString(userState.status || payload.status || 'unwatched');
   const vibe = asString(userState.vibe || payload.vibe);
   const energy = asString(userState.energy || payload.energy);
@@ -137,6 +138,11 @@ const buildWatchlistPayload = (
     energy,
     note,
     episodeProgress,
+    title: asString(media.title || payload.title),
+    type: asString(media.type || payload.type || 'movie'),
+    year: asString(media.year || payload.year),
+    poster: asString(media.poster || payload.poster),
+    backdrop: asString(media.backdrop || payload.backdrop),
     userState: {
       status,
       vibe,

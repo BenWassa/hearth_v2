@@ -14,7 +14,7 @@ const TitleBlock = ({
   genres,
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {isEditing ? (
         <div className="space-y-3">
           <input

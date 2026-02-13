@@ -57,7 +57,11 @@ const findBestTitleMatch = (title, entries) => {
 };
 
 const resolveEpisodeKey = (item) => {
-  const tmdbId = item?.tmdb_id ?? item?.tmdbId;
+  const tmdbId =
+    item?.tmdb_id ??
+    item?.tmdbId ??
+    item?.source?.providerId ??
+    item?.media?.providerId;
   const tmdbKey = normalizeKey(tmdbId);
   if (tmdbKey) return tmdbKey;
   return normalizeKey(item?.title);
@@ -132,12 +136,21 @@ export const getEpisodeSeasons = async (item) => {
   if (legacyMap) return getSeasonsFromLegacyMap(legacyMap, item);
 
   const key = resolveEpisodeKey(item);
+  const provider = `${item?.source?.provider || item?.media?.provider || ''}`
+    .trim()
+    .toLowerCase();
+  const hasProviderIdentity =
+    Boolean(item?.source?.providerId || item?.media?.providerId) &&
+    (!provider || provider === 'tmdb');
   const title = normalizeTitle(item?.title);
   const entries = Object.values(index || {});
   let entry = null;
 
   if (key && index?.[key]) {
     entry = index[key];
+  } else if (hasProviderIdentity) {
+    // For provider-linked items, do not fallback to title matching.
+    return null;
   } else if (title) {
     entry = entries.find(
       (candidate) => normalizeTitle(candidate?.title) === title,

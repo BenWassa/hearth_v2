@@ -1,0 +1,35 @@
+# Firebase App Hosting default configuration
+# This mirrors production defaults and is used by the default backend environment.
+
+runConfig:
+  minInstances: 0
+
+scripts:
+  buildCommand: npm run build
+  runCommand: npm run start:apphosting
+
+env:
+  - variable: NODE_ENV
+    value: production
+    availability:
+      - RUNTIME
+  - variable: API_TIMEOUT_MS
+    value: "7000"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_WINDOW_MS
+    value: "60000"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_MAX
+    value: "60"
+    availability:
+      - RUNTIME
+  - variable: APP_ID
+    value: hearth-default
+    availability:
+      - RUNTIME
+
+# Set provider credentials as App Hosting secrets:
+# - MEDIA_PROVIDER_API_KEY
+# - MEDIA_PROVIDER_READ_TOKEN

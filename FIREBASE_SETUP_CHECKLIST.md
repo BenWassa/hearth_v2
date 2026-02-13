@@ -10,7 +10,7 @@ This checklist is tailored to this repository's current architecture.
 ## Audit Status (as of February 13, 2026)
 
 Completed in repo/local validation:
-- [x] Core config files present: `firebase.json`, `firestore.rules`, `firestore.indexes.json`, `apphosting.yaml`
+- [x] Core config files present: `firebase.json`, `firestore.rules`, `firestore.indexes.json`, `apphosting.yaml`, `apphosting.production.yaml`
 - [x] Client config pattern present and configured: `public/firebase-config.js` + `window.__firebase_config`
 - [x] `.firebaserc` default project alias set (`hearthv2`)
 - [x] Auth integration wired (`src/views/OnboardingView.js`, `src/services/firebase/auth.js`, `src/app/useAppState.js`)
@@ -24,7 +24,7 @@ Still required (manual/remote steps):
 - [ ] Confirm Firebase Console project settings (Auth Google provider, Firestore, App Hosting)
 - [ ] Confirm authorized domains for all environments
 - [ ] Deploy Firestore rules/indexes to target project
-- [ ] Configure App Hosting runtime env/secrets in Firebase Console
+- [ ] Configure App Hosting runtime env/secrets in Firebase Console (especially `MEDIA_PROVIDER_API_KEY` or `MEDIA_PROVIDER_READ_TOKEN`)
 - [ ] Trigger App Hosting deployment and run production smoke tests
 - [ ] Verify end-to-end auth + space creation/join + watchlist writes against deployed backend
 
@@ -75,11 +75,11 @@ firebase deploy --project <PROJECT_ID> --only firestore:rules,firestore:indexes
 ```
 
 ## 4. App Hosting Config and Runtime
-- [ ] Confirm `apphosting.yaml` exists and references:
+- [x] Confirm `apphosting.yaml` exists and references:
   - `buildCommand: npm run build`
   - `runCommand: npm run start:apphosting`
-- [ ] For environment-specific config, use `apphosting.production.yaml` for production.
-- [ ] Confirm runtime entrypoint exists: `server/index.js`
+- [x] Environment-specific config available at `apphosting.production.yaml`.
+- [x] Confirm runtime entrypoint exists: `server/index.js`
 
 ## 5. App Hosting Environment and Secrets
 Set these in Firebase App Hosting (runtime/build environment as needed):

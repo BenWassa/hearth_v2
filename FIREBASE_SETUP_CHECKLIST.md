@@ -2,6 +2,36 @@
 
 This checklist is tailored to this repository's current architecture.
 
+## Project Reference
+- Project name: `hearthv2`
+- Project ID: `hearthv2`
+- Project number: `1064503366600`
+
+## Audit Status (as of February 13, 2026)
+
+Completed in repo/local validation:
+- [x] Core config files present: `firebase.json`, `firestore.rules`, `firestore.indexes.json`, `apphosting.yaml`
+- [x] Client config pattern present and configured: `public/firebase-config.js` + `window.__firebase_config`
+- [x] `.firebaserc` default project alias set (`hearthv2`)
+- [x] Auth integration wired (`src/views/OnboardingView.js`, `src/services/firebase/auth.js`, `src/app/useAppState.js`)
+- [x] Space-scoped Firestore rule model implemented (`artifacts/{appId}/spaces/{spaceId}`)
+- [x] Local verification commands passed:
+  - [x] `npm run lint:ci`
+  - [x] `npm run test:api`
+  - [x] `npm run build`
+
+Still required (manual/remote steps):
+- [ ] Confirm Firebase Console project settings (Auth Google provider, Firestore, App Hosting)
+- [ ] Confirm authorized domains for all environments
+- [ ] Deploy Firestore rules/indexes to target project
+- [ ] Configure App Hosting runtime env/secrets in Firebase Console
+- [ ] Trigger App Hosting deployment and run production smoke tests
+- [ ] Verify end-to-end auth + space creation/join + watchlist writes against deployed backend
+
+Notes:
+- `npm run build` updated version artifacts: `public/version.json`, `src/version.js`.
+- Firebase Storage/CORS setup remains not required for current code because Storage APIs are not used.
+
 ## 1. Firebase Project Setup
 - [ ] Create or select your Firebase project in Firebase Console.
 - [ ] Enable Authentication and Google provider.
@@ -48,6 +78,7 @@ firebase deploy --project <PROJECT_ID> --only firestore:rules,firestore:indexes
 - [ ] Confirm `apphosting.yaml` exists and references:
   - `buildCommand: npm run build`
   - `runCommand: npm run start:apphosting`
+- [ ] For environment-specific config, use `apphosting.production.yaml` for production.
 - [ ] Confirm runtime entrypoint exists: `server/index.js`
 
 ## 5. App Hosting Environment and Secrets
@@ -58,6 +89,10 @@ Set these in Firebase App Hosting (runtime/build environment as needed):
 - [ ] `API_RATE_LIMIT_WINDOW_MS`
 - [ ] `API_RATE_LIMIT_MAX`
 - [ ] `APP_ID`
+
+Recommended production source of truth:
+- `apphosting.production.yaml`
+- Keep `APP_ID` aligned with `window.__app_id` in `public/firebase-config.js` (currently `hearth-default`)
 
 Optional local backend config template:
 - `.env.api.example`

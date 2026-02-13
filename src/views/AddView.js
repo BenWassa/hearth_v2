@@ -134,6 +134,16 @@ const AddView = ({ onBack, onSubmit }) => {
       setSubmitError('Select a movie or show from Live Search before saving.');
       return;
     }
+    if (isEnriching) {
+      setSubmitError('Wait for metadata to finish loading before saving.');
+      return;
+    }
+    if (!enrichedPayload?.source?.providerId || !enrichedPayload?.media) {
+      setSubmitError(
+        'Could not verify this title metadata. Re-select the title and try again.',
+      );
+      return;
+    }
     setSubmitError('');
 
     const payload = {
@@ -426,7 +436,12 @@ const AddView = ({ onBack, onSubmit }) => {
       <div className="p-6 border-t border-stone-900 bg-stone-950/95 backdrop-blur">
         <Button
           onClick={handleSubmit}
-          disabled={!title.trim() || isEnriching}
+          disabled={
+            !title.trim() ||
+            isEnriching ||
+            !selectedResult ||
+            !enrichedPayload?.source?.providerId
+          }
           className="w-full"
         >
           {isEnriching ? 'Loading Metadata...' : 'Put on Shelf'}

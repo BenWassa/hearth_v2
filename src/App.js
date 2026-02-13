@@ -189,6 +189,7 @@ export default function HearthApp() {
             onImport={handleImportItems}
             validVibes={VIBES.map((v) => v.id)}
             validEnergies={ENERGIES.map((e) => e.id)}
+            existingItems={items}
           />
         )}
       </div>

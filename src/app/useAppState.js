@@ -492,6 +492,35 @@ export const useAppState = () => {
         },
         user.uid,
       );
+
+      const hasProviderIdentity = Boolean(
+        payload?.source?.provider && payload?.source?.providerId,
+      );
+      if (hasProviderIdentity) {
+        const duplicateExists = items.some((existingItem) => {
+          if (payload.mediaId && existingItem?.mediaId === payload.mediaId) {
+            return true;
+          }
+          const existingProvider = String(
+            existingItem?.source?.provider || '',
+          ).toLowerCase();
+          const existingProviderId = String(existingItem?.source?.providerId || '');
+          const nextProvider = String(payload.source.provider || '').toLowerCase();
+          const nextProviderId = String(payload.source.providerId || '');
+          return (
+            existingProvider &&
+            existingProviderId &&
+            existingProvider === nextProvider &&
+            existingProviderId === nextProviderId
+          );
+        });
+
+        if (duplicateExists) {
+          notifyError('That title is already on your shelf.');
+          return;
+        }
+      }
+
       await addWatchlistItem({ db, appId, spaceId, payload });
       setView('tonight');
     } catch (err) {

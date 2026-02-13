@@ -11,7 +11,13 @@ import { copyToClipboard } from '../utils/clipboard.js';
 import Button from '../components/ui/Button.js';
 import TextArea from '../components/ui/TextArea.js';
 
-const ImportModal = ({ onClose, onImport, validVibes, validEnergies }) => {
+const ImportModal = ({
+  onClose,
+  onImport,
+  validVibes,
+  validEnergies,
+  existingItems = [],
+}) => {
   const defaults = { vibe: 'comfort', energy: 'balanced' };
   const [rawText, setRawText] = useState('');
   const [rows, setRows] = useState([]);
@@ -188,6 +194,48 @@ Titles:
   };
 
   const selectedRows = rows.filter((row) => row.include);
+  const buildTitleYearKey = (entry) => {
+    const title = String(entry?.title || '')
+      .trim()
+      .toLowerCase();
+    const year = String(entry?.year || '').trim();
+    if (!title || !year) return '';
+    return `${title}::${year}`;
+  };
+  const existingKeys = new Set(
+    existingItems.map((item) => buildTitleYearKey(item)).filter(Boolean),
+  );
+  const selectedUniqueInImportCount = (() => {
+    const seen = new Set();
+    let count = 0;
+    selectedRows.forEach((row) => {
+      const key = buildTitleYearKey(row?.data || {});
+      if (!key) {
+        count += 1;
+        return;
+      }
+      if (seen.has(key)) return;
+      seen.add(key);
+      count += 1;
+    });
+    return count;
+  })();
+  const selectedDuplicateCount = selectedRows.length - selectedUniqueInImportCount;
+  const selectedAlreadyExistingCount = (() => {
+    const seen = new Set();
+    let count = 0;
+    selectedRows.forEach((row) => {
+      const key = buildTitleYearKey(row?.data || {});
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      if (existingKeys.has(key)) count += 1;
+    });
+    return count;
+  })();
+  const selectedImportableCount = Math.max(
+    selectedUniqueInImportCount - selectedAlreadyExistingCount,
+    0,
+  );
   const needsAttention = selectedRows.some(
     (row) => row.errors.length > 0 || row.missing.length > 0,
   );
@@ -645,6 +693,20 @@ Titles:
               Importing... this can take a moment.
             </div>
           )}
+          {selectedDuplicateCount > 0 && (
+            <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-2">
+              {selectedDuplicateCount} duplicate row
+              {selectedDuplicateCount === 1 ? '' : 's'} in this import (same
+              title and year) will be skipped.
+            </div>
+          )}
+          {selectedAlreadyExistingCount > 0 && (
+            <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-2">
+              {selectedAlreadyExistingCount} row
+              {selectedAlreadyExistingCount === 1 ? '' : 's'} already in your
+              shelf (same title and year) will be skipped.
+            </div>
+          )}
           <div className="flex items-center justify-between gap-3">
             <Button variant="ghost" onClick={onClose}>
               Cancel
@@ -676,22 +738,25 @@ Titles:
                   disabled={
                     !hasPreview ||
                     needsAttention ||
-                    selectedRows.length === 0 ||
+                    selectedImportableCount === 0 ||
                     isImporting
                   }
-                  className={
-                    selectedRows.length > 0 && !needsAttention
+                  className={`min-w-[14rem] ${
+                    selectedImportableCount > 0 && !needsAttention
                       ? '!shadow-lg !shadow-amber-900/30'
                       : ''
-                  }
+                  }`}
                 >
                   {isImporting ? (
                     'Importing...'
-                  ) : selectedRows.length > 0 && !needsAttention ? (
-                    <>
-                      ✓ Import {selectedRows.length}{' '}
-                      {selectedRows.length === 1 ? 'Item' : 'Items'}
-                    </>
+                  ) : selectedImportableCount > 0 && !needsAttention ? (
+                    <span className="inline-grid grid-cols-[auto_3ch_auto] items-center gap-1">
+                      <span>Import</span>
+                      <span className="inline-block min-w-[3ch] text-right tabular-nums">
+                        {selectedImportableCount}
+                      </span>
+                      <span>{selectedImportableCount === 1 ? 'Item' : 'Items'}</span>
+                    </span>
                   ) : (
                     'Import'
                   )}

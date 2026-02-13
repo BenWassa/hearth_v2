@@ -1,18 +1,50 @@
-const toError = async (response) => {
+const buildInvalidJsonError = ({ url, contentType, raw }) => {
+  const snippet = raw.slice(0, 40).replace(/\s+/g, ' ').trim();
+  const looksLikeMisroutedApi =
+    snippet.startsWith('const {') ||
+    snippet.startsWith('<!doctype') ||
+    snippet.startsWith('<html');
+
+  const hint = looksLikeMisroutedApi
+    ? 'This usually means `/api` is not routed to the backend server.'
+    : '';
+
+  return new Error(
+    `Invalid API response for ${url}. Expected JSON but received ${
+      contentType || 'unknown content type'
+    }${snippet ? ` (starts with: "${snippet}")` : ''}${hint ? ` ${hint}` : ''}`,
+  );
+};
+
+const parseJsonResponse = async (response, url) => {
+  const contentType = response.headers.get('content-type') || '';
+  const raw = await response.text();
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw buildInvalidJsonError({ url, contentType, raw });
+  }
+};
+
+const toError = async (response, url) => {
   let message = `Request failed (${response.status})`;
   try {
-    const payload = await response.json();
+    const payload = await parseJsonResponse(response, url);
     if (payload?.error?.message) message = payload.error.message;
   } catch (err) {
-    // Ignore parse errors and keep status-based fallback.
+    if (err instanceof Error) {
+      return err;
+    }
   }
   return new Error(message);
 };
 
 const getJson = async (url) => {
   const response = await fetch(url);
-  if (!response.ok) throw await toError(response);
-  const payload = await response.json();
+  if (!response.ok) throw await toError(response, url);
+  const payload = await parseJsonResponse(response, url);
   if (!payload?.ok) {
     throw new Error(payload?.error?.message || 'Request failed');
   }
@@ -65,8 +97,8 @@ export const refreshMediaMetadata = async ({
       locale,
     }),
   });
-  if (!response.ok) throw await toError(response);
-  const payload = await response.json();
+  if (!response.ok) throw await toError(response, '/api/media/refresh');
+  const payload = await parseJsonResponse(response, '/api/media/refresh');
   if (!payload?.ok) {
     throw new Error(payload?.error?.message || 'Refresh failed');
   }

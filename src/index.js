@@ -13,7 +13,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 );
 
+const isDev = Boolean(import.meta?.env?.DEV);
+
 if ('serviceWorker' in navigator) {
+  if (isDev) {
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) =>
+        Promise.all(registrations.map((registration) => registration.unregister())),
+      )
+      .catch(() => {});
+  }
+
+  if (!isDev) {
   window.addEventListener('load', () => {
     const swUrl = '/sw.js';
     navigator.serviceWorker
@@ -50,4 +62,5 @@ if ('serviceWorker' in navigator) {
         console.warn('Service worker registration failed:', err);
       });
   });
+  }
 }

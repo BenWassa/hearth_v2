@@ -114,6 +114,15 @@ const pickBestSearchResult = ({ results, title, type, year }) => {
     .sort((a, b) => b.score - a.score)[0]?.result;
 };
 
+const buildTitleYearKey = (item = {}) => {
+  const title = String(item?.title || '')
+    .trim()
+    .toLowerCase();
+  const year = String(item?.year || '').trim();
+  if (!title || !year) return '';
+  return `${title}::${year}`;
+};
+
 export const useAppState = () => {
   const {
     autoReloadCountdown,
@@ -500,6 +509,7 @@ export const useAppState = () => {
       const enrichedItems = [];
       let matchedCount = 0;
       let unmatchedCount = 0;
+      let duplicateCount = 0;
 
       for (const item of itemsToImport) {
         const title = String(item?.title || '').trim();
@@ -554,6 +564,10 @@ export const useAppState = () => {
               Array.isArray(details?.cast) && details.cast.length
                 ? details.cast
                 : item?.actors,
+            director:
+              (Array.isArray(details?.directors) && details.directors[0]) ||
+              item?.director ||
+              '',
             poster,
             backdrop,
             source: {
@@ -577,7 +591,27 @@ export const useAppState = () => {
         }
       }
 
-      await commitImport(enrichedItems, async (item) => {
+      const existingKeys = new Set(
+        items.map((existingItem) => buildTitleYearKey(existingItem)).filter(Boolean),
+      );
+      const importKeys = new Set();
+      const itemsToCommit = [];
+
+      for (const enrichedItem of enrichedItems) {
+        const dedupeKey = buildTitleYearKey(enrichedItem);
+        if (!dedupeKey) {
+          itemsToCommit.push(enrichedItem);
+          continue;
+        }
+        if (existingKeys.has(dedupeKey) || importKeys.has(dedupeKey)) {
+          duplicateCount += 1;
+          continue;
+        }
+        importKeys.add(dedupeKey);
+        itemsToCommit.push(enrichedItem);
+      }
+
+      await commitImport(itemsToCommit, async (item) => {
         const payload = buildWatchlistPayload(
           {
             ...item,
@@ -589,9 +623,16 @@ export const useAppState = () => {
       });
       setIsImportOpen(false);
       setView('tonight');
+      if (itemsToCommit.length > 0) {
+        notifyUpdate(
+          `Imported ${itemsToCommit.length} title${
+            itemsToCommit.length === 1 ? '' : 's'
+          }.`,
+        );
+      }
       if (matchedCount > 0) {
         notifyUpdate(
-          `Imported with metadata for ${matchedCount} title${
+          `Found metadata for ${matchedCount} imported title${
             matchedCount === 1 ? '' : 's'
           }.`,
         );
@@ -601,6 +642,13 @@ export const useAppState = () => {
           `${unmatchedCount} import item${
             unmatchedCount === 1 ? '' : 's'
           } could not be matched for poster/backdrop.`,
+        );
+      }
+      if (duplicateCount > 0) {
+        notifyError(
+          `Skipped ${duplicateCount} duplicate import item${
+            duplicateCount === 1 ? '' : 's'
+          } (same title and year).`,
         );
       }
     } catch (err) {

@@ -32,7 +32,6 @@ const ItemDetailsModal = ({
   item: rawItem,
   onClose,
   onToggleStatus,
-  onRefreshMetadata,
   onUpdate,
 }) => {
   const [backdropMissing, setBackdropMissing] = useState(false);
@@ -48,7 +47,6 @@ const ItemDetailsModal = ({
   const [revealedEpisodeIds, setRevealedEpisodeIds] = useState({});
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
-  const [isRefreshingMetadata, setIsRefreshingMetadata] = useState(false);
   const seasonScrollRef = useRef(null);
   const [seasonScrollState, setSeasonScrollState] = useState({
     canScrollLeft: false,
@@ -477,18 +475,6 @@ const ItemDetailsModal = ({
     }
   };
 
-  const handleRefreshMetadata = async () => {
-    if (!item?.id || !onRefreshMetadata || isRefreshingMetadata) return;
-    try {
-      setIsRefreshingMetadata(true);
-      await onRefreshMetadata(item.id);
-    } catch (err) {
-      console.error('Error refreshing metadata:', err);
-    } finally {
-      setIsRefreshingMetadata(false);
-    }
-  };
-
   const handleCancelEdit = () => {
     setEditedTitle(item.title);
     setIsEditing(false);
@@ -656,8 +642,6 @@ const ItemDetailsModal = ({
           <ActionBar
             item={item}
             onToggleStatus={onToggleStatus}
-            onRefreshMetadata={handleRefreshMetadata}
-            isRefreshing={isRefreshingMetadata}
           />
         </div>
       </div>

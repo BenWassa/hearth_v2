@@ -13,6 +13,8 @@ public/posters
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+*firebase-adminsdk-*.json
+*serviceAccountKey*.json
 
 # Virtual environment
 .venv

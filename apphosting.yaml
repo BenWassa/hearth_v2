@@ -12,7 +12,6 @@ env:
   - variable: NODE_ENV
     value: production
     availability:
-      - BUILD
       - RUNTIME
   - variable: API_TIMEOUT_MS
     value: "7000"

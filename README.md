@@ -74,8 +74,17 @@ npm install
 
 ### Configure Firebase
 
-`npm run setup` creates `public/firebase-config.js` from `public/firebase-config.example.js`
-if it does not already exist. Replace the placeholders with your Firebase project values.
+`npm run setup` generates `public/firebase-config.js` from Firebase env vars when present
+(`FIREBASE_*` or `VITE_FIREBASE_*`). If env vars are missing, it falls back to
+`public/firebase-config.example.js` in dev.
+
+For Firebase App Hosting production builds, set these build env vars:
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
 
 ### Run (Dev)
 
@@ -94,7 +103,7 @@ npm run build
 ## Scripts (Common)
 
 - `npm run dev` - start the dev server
-- `npm run setup` - create `public/firebase-config.js` if missing
+- `npm run setup` - generate `public/firebase-config.js` from env vars (or dev example fallback)
 - `npm run lint` - ESLint
 - `npm run format` - Prettier
 - `npm run test` - tests

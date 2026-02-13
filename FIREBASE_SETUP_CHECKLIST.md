@@ -44,17 +44,17 @@ Current repo references:
 - Firebase config file: `firebase.json`
 
 ## 2. Client Firebase Config (Required for Frontend)
-This repo does not use `VITE_FIREBASE_*` variables for client initialization.
-It loads config from `public/firebase-config.js` via `window.__firebase_config`.
+This repo loads config from `public/firebase-config.js` via `window.__firebase_config`.
+During build, `npm run setup` will generate that file from env vars when available.
 
-- [ ] Create `public/firebase-config.js` from `public/firebase-config.example.js`.
-- [ ] Fill:
-  - [ ] `apiKey`
-  - [ ] `authDomain`
-  - [ ] `projectId`
-  - [ ] `storageBucket`
-  - [ ] `messagingSenderId`
-  - [ ] `appId`
+- [ ] For App Hosting production builds, set build env vars:
+  - [ ] `FIREBASE_API_KEY`
+  - [ ] `FIREBASE_AUTH_DOMAIN`
+  - [ ] `FIREBASE_PROJECT_ID`
+  - [ ] `FIREBASE_STORAGE_BUCKET`
+  - [ ] `FIREBASE_MESSAGING_SENDER_ID`
+  - [ ] `FIREBASE_APP_ID`
+- [ ] For local-only dev, you can still create `public/firebase-config.js` from `public/firebase-config.example.js`.
 - [ ] Set `window.__app_id` to your app scope (example: `hearth-default`).
 - [ ] Ensure `public/firebase-config.js` stays uncommitted (already in `.gitignore`).
 

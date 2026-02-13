@@ -13,6 +13,10 @@ const isValidFirebaseConfig = (config) => {
   if (typeof config.apiKey !== 'string' || !config.apiKey.trim()) return false;
   if (typeof config.projectId !== 'string' || !config.projectId.trim())
     return false;
+  const looksLikePlaceholder = (value) =>
+    /^YOUR_|YOUR_/i.test(String(value || '').trim());
+  if (looksLikePlaceholder(config.apiKey)) return false;
+  if (looksLikePlaceholder(config.projectId)) return false;
   return true;
 };
 

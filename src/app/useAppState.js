@@ -83,6 +83,7 @@ export const useAppState = () => {
   const [auth, setAuth] = useState(null);
   const [db, setDb] = useState(null);
   const [user, setUser] = useState(null);
+  const [firebaseInitResolved, setFirebaseInitResolved] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authResolved, setAuthResolved] = useState(false);
   const [spaceId, setSpaceId] = useState(
@@ -123,6 +124,7 @@ export const useAppState = () => {
     const onReady = (client) => {
       setAuth(client.auth);
       setDb(client.db);
+      setFirebaseInitResolved(true);
     };
     const client = initializeFirebase(onReady);
     setAuth(client.auth);
@@ -130,6 +132,8 @@ export const useAppState = () => {
   }, []);
 
   useEffect(() => {
+    if (!firebaseInitResolved) return undefined;
+
     const initAuth = async () => {
       if (!auth || !auth.app) {
         console.log('Firebase auth not available, skipping authentication');
@@ -165,7 +169,7 @@ export const useAppState = () => {
 
     setLoading(false);
     return undefined;
-  }, [auth]);
+  }, [auth, firebaseInitResolved]);
 
   useEffect(() => {
     if (!user) return;
@@ -284,6 +288,7 @@ export const useAppState = () => {
   }, [db, joinSpaceId, spaceId, user]);
 
   useEffect(() => {
+    if (!firebaseInitResolved) return;
     if (!user || !spaceId || !db) {
       if (!db) {
         console.log('Firebase not available, using local storage only');
@@ -320,7 +325,7 @@ export const useAppState = () => {
     });
 
     return () => unsubscribe();
-  }, [db, spaceId, user]);
+  }, [db, firebaseInitResolved, spaceId, user]);
 
   const handleCreateSpace = async (name) => {
     const trimmedName = name.trim();

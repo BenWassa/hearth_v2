@@ -65,9 +65,21 @@ export const findUserSpaceByName = async ({ db, appId, userId, name }) => {
   const trimmedName = typeof name === 'string' ? name.trim() : '';
   if (!trimmedName) return null;
 
-  const spacesRef = collection(db, 'artifacts', appId, 'spaces');
-  const spacesQuery = query(spacesRef, where('members', 'array-contains', userId));
-  const snapshot = await getDocs(spacesQuery);
+  let snapshot;
+  try {
+    const spacesRef = collection(db, 'artifacts', appId, 'spaces');
+    const spacesQuery = query(
+      spacesRef,
+      where('members', 'array-contains', userId),
+    );
+    snapshot = await getDocs(spacesQuery);
+  } catch (err) {
+    if (err?.code === 'permission-denied') {
+      console.warn('Space lookup denied by Firestore rules; continuing create flow');
+      return null;
+    }
+    throw err;
+  }
 
   const targetLower = trimmedName.toLowerCase();
   const match = snapshot.docs.find((docSnap) => {

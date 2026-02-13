@@ -89,6 +89,7 @@ export const initializeFirebase = (onReady) => {
       if (onReady) onReady(result);
     } else {
       console.log('Firebase config still not loaded, running in offline mode');
+      if (onReady) onReady({ app, auth, db });
     }
   }, 500);
 

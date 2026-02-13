@@ -64,6 +64,7 @@ const OnboardingView = ({
 }) => {
   const [name, setName] = useState('');
   const trimmedName = name.trim();
+  const isAuthenticated = Boolean(user);
   return (
     <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center gap-8 sm:gap-10 overflow-hidden bg-[#0c0a09] text-stone-200 font-sans selection:bg-amber-500/30 px-6 pt-8 pb-24 sm:px-8 sm:pt-12 sm:pb-28">
       {/* Dynamic Background */}
@@ -116,70 +117,72 @@ const OnboardingView = ({
             )}
 
             <div className="space-y-5 sm:space-y-6">
-              {!user && (
-                <Button
-                  onClick={onSignIn}
-                  disabled={isSigningIn}
-                  className="w-full"
-                >
-                  {isSigningIn ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <LogIn className="w-4 h-4" />
-                      <span>Sign in with Google</span>
-                    </>
-                  )}
-                </Button>
+              {!isAuthenticated ? (
+                <>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1">
+                    Step 1 of 2 - Sign in
+                  </div>
+                  <Button
+                    onClick={onSignIn}
+                    disabled={isSigningIn}
+                    className="w-full"
+                  >
+                    {isSigningIn ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <LogIn className="w-4 h-4" />
+                        <span>Sign in with Google</span>
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1">
+                    Step 2 of 2 - Name your space
+                  </div>
+                  <div className="text-[11px] text-stone-500 uppercase tracking-widest font-semibold ml-1">
+                    Signed in as {user.email || user.displayName || user.uid}
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="space-name"
+                      className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1"
+                    >
+                      Space Name
+                    </label>
+                    <Input
+                      id="space-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="The Living Room..."
+                      maxLength={100}
+                      autoFocus
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' &&
+                        trimmedName &&
+                        onCreate(trimmedName)
+                      }
+                      disabled={isBusy}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => onCreate(trimmedName)}
+                    disabled={!trimmedName || isBusy}
+                    className="w-full"
+                  >
+                    {isBusy ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <span>Create Your Space</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </>
               )}
-
-              {user && (
-                <div className="text-[11px] text-stone-500 uppercase tracking-widest font-semibold ml-1">
-                  Signed in as {user.email || user.displayName || user.uid}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="space-name"
-                  className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1"
-                >
-                  Space Name
-                </label>
-                <Input
-                  id="space-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="The Living Room..."
-                  maxLength={100} // increased to allow longer names
-                  autoFocus
-                  onKeyDown={(e) =>
-                    e.key === 'Enter' && user && trimmedName && onCreate(trimmedName)
-                  }
-                  disabled={!user || isBusy}
-                />
-              </div>
-
-              <Button
-                onClick={() => onCreate(trimmedName)}
-                disabled={!user || !trimmedName || isBusy}
-                className="w-full"
-              >
-                {isBusy ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <span>Create Your Space</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
-
-              <div className="pt-2 sm:pt-4 text-center">
-                <button className="text-[11px] text-stone-500 hover:text-amber-500/80 transition-colors uppercase tracking-widest font-bold">
-                  Join with invite link
-                </button>
-              </div>
             </div>
           </div>
         </div>

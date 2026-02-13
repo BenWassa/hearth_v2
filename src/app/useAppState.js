@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { commitImport } from '../domain/import/importer.js';
+import { buildImportDedupeKey, commitImport } from '../domain/import/importer.js';
 import {
   adaptWatchlistItem,
   mapWatchlistUpdatesForWrite,
@@ -107,23 +107,21 @@ const scoreSearchResult = ({ result, title, type, year }) => {
   return score;
 };
 
+const MIN_AUTO_MATCH_SCORE = 50;
+
 const pickBestSearchResult = ({ results, title, type, year }) => {
   if (!Array.isArray(results) || !results.length) return null;
 
-  return [...results]
+  const ranked = [...results]
     .map((result) => ({
       result,
       score: scoreSearchResult({ result, title, type, year }),
     }))
-    .sort((a, b) => b.score - a.score)[0]?.result;
-};
+    .sort((a, b) => b.score - a.score);
 
-const buildTitleKey = (item = {}) => {
-  const title = String(item?.title || '')
-    .trim()
-    .toLowerCase();
-  if (!title) return '';
-  return title;
+  const top = ranked[0];
+  if (!top || top.score < MIN_AUTO_MATCH_SCORE) return null;
+  return top.result;
 };
 
 const getMetadataGaps = (item = {}) => {
@@ -132,6 +130,25 @@ const getMetadataGaps = (item = {}) => {
   const sourceProviderId = String(item?.source?.providerId || '').trim();
   const poster = String(item?.poster || item?.media?.poster || '').trim();
   const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
+  const runtimeMinutes = Number(
+    item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
+  );
+  const year = String(item?.year || item?.media?.year || '').trim();
+  const genres = Array.isArray(item?.genres)
+    ? item.genres
+    : Array.isArray(item?.media?.genres)
+    ? item.media.genres
+    : [];
+  const actors = Array.isArray(item?.actors)
+    ? item.actors
+    : Array.isArray(item?.media?.cast)
+    ? item.media.cast
+    : [];
+  const director =
+    String(item?.director || '').trim() ||
+    (Array.isArray(item?.media?.directors)
+      ? String(item.media.directors[0] || '').trim()
+      : '');
   const isShow = item?.type === 'show';
   const seasonCount = Number(
     item?.totalSeasons ??
@@ -147,12 +164,75 @@ const getMetadataGaps = (item = {}) => {
   if (!sourceProvider || !sourceProviderId) gaps.push('source');
   if (!poster) gaps.push('poster');
   if (!backdrop) gaps.push('backdrop');
+  if (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0) {
+    gaps.push('runtimeMinutes');
+  }
+  if (!year) gaps.push('year');
+  if (!genres.length) gaps.push('genres');
+  if (!actors.length) gaps.push('actors');
+  if (!director) gaps.push('director');
   if (isShow) {
     if (!Number.isFinite(seasonCount) || seasonCount < 1) gaps.push('seasonCount');
     if (!seasons.length) gaps.push('seasons');
   }
 
   return gaps;
+};
+
+const buildMetadataAuditReport = (items = []) => {
+  const rows = items.map((item) => {
+    const gaps = getMetadataGaps(item);
+    return {
+      id: item.id,
+      title: item.title || '[untitled]',
+      type: item.type || 'unknown',
+      gaps,
+    };
+  });
+
+  const itemsWithGaps = rows.filter((row) => row.gaps.length > 0);
+  const gapCounts = itemsWithGaps.reduce(
+    (acc, row) => {
+      row.gaps.forEach((gap) => {
+        acc[gap] = (acc[gap] || 0) + 1;
+      });
+      return acc;
+    },
+    {
+      source: 0,
+      poster: 0,
+      backdrop: 0,
+      runtimeMinutes: 0,
+      year: 0,
+      genres: 0,
+      actors: 0,
+      director: 0,
+      seasonCount: 0,
+      seasons: 0,
+    },
+  );
+
+  const movieRows = rows.filter((row) => row.type === 'movie');
+  const showRows = rows.filter((row) => row.type === 'show');
+
+  return {
+    generatedAt: Date.now(),
+    totalItems: rows.length,
+    completeItems: rows.length - itemsWithGaps.length,
+    itemsWithGaps: itemsWithGaps.length,
+    gapCounts,
+    byType: {
+      movie: {
+        total: movieRows.length,
+        withGaps: movieRows.filter((row) => row.gaps.length > 0).length,
+      },
+      show: {
+        total: showRows.length,
+        withGaps: showRows.filter((row) => row.gaps.length > 0).length,
+      },
+    },
+    missingRows: itemsWithGaps,
+  };
 };
 
 const clearSpaceTrayCache = (targetSpaceId) => {
@@ -583,14 +663,14 @@ export const useAppState = () => {
     }
     try {
       const existingKeys = new Set(
-        items.map((existingItem) => buildTitleKey(existingItem)).filter(Boolean),
+        items.map((existingItem) => buildImportDedupeKey(existingItem)).filter(Boolean),
       );
       const importKeys = new Set();
       const itemsForLookup = [];
       let duplicateCount = 0;
 
       for (const item of itemsToImport) {
-        const dedupeKey = buildTitleKey(item);
+        const dedupeKey = buildImportDedupeKey(item);
         if (!dedupeKey) {
           itemsForLookup.push(item);
           continue;
@@ -739,7 +819,7 @@ export const useAppState = () => {
         notifyError(
           `Skipped ${duplicateCount} duplicate import item${
             duplicateCount === 1 ? '' : 's'
-          } (same title).`,
+          } (same title/type/year or provider).`,
         );
       }
     } catch (err) {
@@ -964,46 +1044,19 @@ export const useAppState = () => {
   };
 
   const handleMetadataAudit = () => {
-    if (!items.length) {
+    const report = buildMetadataAuditReport(items);
+    if (!report.totalItems) {
       notifyUpdate('Metadata audit: no titles to check.');
-      return;
+      return report;
     }
-
-    const entries = items
-      .map((item) => ({
-        item,
-        gaps: getMetadataGaps(item),
-      }))
-      .filter((entry) => entry.gaps.length > 0);
-
-    if (!entries.length) {
-      notifyUpdate(`Metadata audit: all ${items.length} title(s) look complete.`);
-      return;
+    if (!report.itemsWithGaps) {
+      notifyUpdate(`Metadata audit: all ${report.totalItems} title(s) look complete.`);
+      return report;
     }
-
-    const counts = entries.reduce(
-      (acc, entry) => {
-        entry.gaps.forEach((gap) => {
-          acc[gap] = (acc[gap] || 0) + 1;
-        });
-        return acc;
-      },
-      {},
-    );
     notifyUpdate(
-      `Metadata audit: ${entries.length}/${items.length} need repair (${Object.entries(
-        counts,
-      )
-        .map(([gap, count]) => `${gap}:${count}`)
-        .join(', ')}).`,
+      `Metadata audit: ${report.itemsWithGaps}/${report.totalItems} need repair.`,
     );
-    console.table(
-      entries.slice(0, 50).map(({ item, gaps }) => ({
-        title: item.title,
-        type: item.type,
-        gaps: gaps.join(', '),
-      })),
-    );
+    return report;
   };
 
   const handleMetadataRepairMissing = async () => {

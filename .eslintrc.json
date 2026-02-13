@@ -1,0 +1,13 @@
+{
+  "extends": ["react-app"],
+  "globals": {
+    "__firebase_config": "readonly",
+    "__app_id": "readonly",
+    "__initial_auth_token": "readonly"
+  },
+  "rules": {
+    "no-undef": "error",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "react-hooks/exhaustive-deps": "off"
+  }
+}

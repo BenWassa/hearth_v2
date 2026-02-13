@@ -1,0 +1,776 @@
+{
+  "title": "Abbott Elementary",
+  "tmdb_id": "125935",
+  "keyType": "tmdb_id",
+  "seasons": [
+    {
+      "id": 195960,
+      "number": 1,
+      "name": "Season 1",
+      "airDate": "2021-12-07",
+      "episodeCount": 13,
+      "episodes": [
+        {
+          "id": 2962777,
+          "number": 1,
+          "title": "Pilot",
+          "airDate": "2021-12-07",
+          "description": "When the staff relates their needs, Principal Ava presents alternative options.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3317578,
+          "number": 2,
+          "title": "Light Bulb",
+          "airDate": "2022-01-04",
+          "description": "Janine takes it upon herself to fix every problem when she notices a flicking light bulb in the hallway. Gregory asks Barbara for help talking to a parent, which leads him to spend his lunch period in an unexpected way.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3394414,
+          "number": 3,
+          "title": "Wishlist",
+          "airDate": "2022-01-11",
+          "description": "The teachers to ask the local community for new school supplies. Janine takes to TikTok and with Ava’s assistance, her video is a success and goes viral. Janine encourages Gregory to decorate his classroom.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3394415,
+          "number": 4,
+          "title": "New Tech",
+          "airDate": "2022-01-18",
+          "description": "When a new computer program is introduced at Abbott, Janine is excited to finally help Barbara with something. Barbara is reluctant to accept change and finds herself in a tricky situation. Melissa surprises Jacob.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3441241,
+          "number": 5,
+          "title": "Student Transfer",
+          "airDate": "2022-01-25",
+          "description": "After a negative teacher review, Janine gets a confidence boost when a student gets transferred from Melissa's class into hers. Jacob tries to forge a friendship with an uninterested Gregory.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3449449,
+          "number": 6,
+          "title": "Gifted Program",
+          "airDate": "2022-02-01",
+          "description": "Janine convinces Ava to start a gifted program at Abbott led by Jacob. However, when some students begin to feel left out, Gregory and Janine put their heads together and come up with a solution. Elsewhere, Barbara pushes a hesitant Melissa to start dating again.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3460646,
+          "number": 7,
+          "title": "Art Teacher",
+          "airDate": "2022-02-08",
+          "description": "When the school’s art teacher retires, Janine is thrilled when the replacement ends up being her best friend from college, but things quickly turn sour when Sahar gets in the way of Melissa’s class traditions. Meanwhile, Jacob and Barbara bond over their love for gardening and decide to start a school garden; but when it turns out they don’t know how to successfully grow anything, Gregory secretly gets involved to fix all of their mistakes",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3478311,
+          "number": 8,
+          "title": "Work Family",
+          "airDate": "2022-02-15",
+          "description": "After Jacob reveals a detail about his personal life, Janine realizes she doesn't know the other teachers as well as she thought; Gregory's stern teaching approach is causing his whole class to underperform.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3478312,
+          "number": 9,
+          "title": "Step Class",
+          "airDate": "2022-02-22",
+          "description": "Janine is thrilled when Ava asks to help her teach the after-school step class, but the two don’t see eye to eye on how to run the program. Later, when Barbara, Melissa and Jacob plan an “eat-off” to decide who makes the best pizza in Philadelphia, Gregory is forced to reveal a secret",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3549729,
+          "number": 10,
+          "title": "Open House",
+          "airDate": "2022-03-22",
+          "description": "It’s Open House night at Abbott Elementary, and while Janine prepares to meet her struggling student’s mother, the rest of the faculty uses the time to relax. Gregory is taken aback when he learns how Ava got the principal job, and later, Barbara’s daughter’s visit creates a commotion in more ways than one when",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3593474,
+          "number": 11,
+          "title": "Desking",
+          "airDate": "2022-03-29",
+          "description": "When the students start participating in a new online trend that causes disruption to the school, the teachers band together to put an end to it. Meanwhile, Mr. Johnson provides comforting life advice to Gregory; and later, the teachers finally meet Jacob’s boyfriend, Zach, who joins in to help stop the students “desking.”",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3603251,
+          "number": 12,
+          "title": "Ava vs. Superintendent",
+          "airDate": "2022-04-05",
+          "description": "With the school board threatening to pull their funds, Janine and Gregory decide to help Ava out with her presentation in front of the Superintendent. However, their plan is derailed when a curveball is thrown at Ava. Meanwhile, Barbara offends Melissa when she doesn’t agree with her blackmail idea.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3618995,
+          "number": 13,
+          "title": "Zoo Balloon",
+          "airDate": "2022-04-12",
+          "description": "While on Abbott's annual zoo field trip, Tariq reveals that he has been offered a job in New York; Janine struggles with a big choice; Barbara starts questioning her future after finding out her favorite tuatara has been retired because of old age.",
+          "runtimeMinutes": 22
+        }
+      ]
+    },
+    {
+      "id": 297657,
+      "number": 2,
+      "name": "Season 2",
+      "airDate": "2022-09-21",
+      "episodeCount": 22,
+      "episodes": [
+        {
+          "id": 3789575,
+          "number": 1,
+          "title": "Development Day",
+          "airDate": "2022-09-21",
+          "description": "The teachers are back for development week, a time to prepare for the upcoming year. Janine is determined to start the year off right and leave her problems at home. Ava runs a side hustle out of the school parking lot.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3924835,
+          "number": 2,
+          "title": "Wrong Delivery",
+          "airDate": "2022-09-28",
+          "description": "After Janine gets a look at the new charter school down the street, she becomes determined to fix up Abbott and make it just as good. As Gregory goes out of his way to avoid Barbara due to an awkward situation with his personal life, and Ava takes to the school library to host a “Shark Tank”-style pitch to decide what to do with the rest of the funds from the grant.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3924836,
+          "number": 3,
+          "title": "Story Samurai",
+          "airDate": "2022-10-05",
+          "description": "A traveling storytelling troupe Jacob used to be in visits Abbott Elementary for a day of education and entertainment. Jacob can’t wait to share this part of his past with his colleagues; but when he realizes they think the performers are corny, Janine does her best to help him embrace his nerdy side. Meanwhile, Melissa struggles with the new normal of her combined second and third grade class.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3924837,
+          "number": 4,
+          "title": "The Principal's Office",
+          "airDate": "2022-10-12",
+          "description": "After Gregory sends a disruptive student to the principal’s office, he’s dismayed to find out the kids actually enjoy spending the supposed disciplinary time with Ava. Meanwhile, Melissa invites Janine over to her house to teach her how to cook, but Janine becomes determined to reunite Melissa with her estranged sister",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3924838,
+          "number": 5,
+          "title": "Juice",
+          "airDate": "2022-10-19",
+          "description": "Janine is thrilled to help introduce a new beverage to the cafeteria, but it ends up causing unexpected consequences for the students, teachers and school plumbing system. Elsewhere, Melissa clashes with her new aide, Ashley, who brings more disruption than help to the classroom.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 3947560,
+          "number": 6,
+          "title": "Candy Zombies",
+          "airDate": "2022-10-26",
+          "description": "It’s Halloween at Abbott Elementary! When a student steals a bag of candy meant to be given out to the kids at the end of the day and starts distributing it during school hours, the teachers band together to find the culprit. Meanwhile, Janine is invited to a Halloween party by an old friend and starts to reconsider her personal life.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4002256,
+          "number": 7,
+          "title": "Attack Ad",
+          "airDate": "2022-11-02",
+          "description": "The teachers are appalled after seeing a commercial in support of charter schools criticizing Abbott Elementary. When students begin to transfer schools, Jacob, Ava and Melissa invite the leader of the charter school organization to Abbott and ask him to take down the ad. Elsewhere, Janine and Gregory talk about Janine’s relationship with Tariq .",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4002258,
+          "number": 8,
+          "title": "Egg Drop",
+          "airDate": "2022-11-16",
+          "description": "When the eighth-grade science class participates in an egg drop activity, Janine insists her second-grade class joins in. Even when the science teacher and Gregory tell her that her students aren’t ready for physics lessons, Janine is determined to prove them wrong. Then, when Barbara is shocked at the clothing one of her student’s parents wears, she learns to not judge someone solely based on their appearance.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4024387,
+          "number": 9,
+          "title": "Sick Day",
+          "airDate": "2022-11-30",
+          "description": "Janine is out sick for the day; but with the substitute teacher shortage, Ava grows desperate and must step in herself to help out. She starts the day in an unconventional fashion, disrupting the students’ typical routine as well as neighboring classrooms. Meanwhile, Barbara and Melissa revel in the quieter-than-normal teacher’s lounge.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4002268,
+          "number": 10,
+          "title": "Holiday Hookah",
+          "airDate": "2022-12-07",
+          "description": "On the last day of school before winter break, Janine is convinced by her friend to go to a popular hookah club where she runs into unexpected colleagues. Elsewhere, Jacob crashes Barbara and Melissa's traditional holiday dinner and in the process begins to learn the true meaning of Christmas.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4024388,
+          "number": 11,
+          "title": "Read-a-Thon",
+          "airDate": "2023-01-04",
+          "description": "The competition heats up between Melissa and Janine as their classrooms go head-to-head in a read-a-thon sponsored by a local pizza shop. Both teachers encourage their students to hit the books hard but face some unexpected obstacles on their path to pizza glory. Meanwhile, Jacob and Gregory join forces and attempt to get their student-podcasting club off the ground.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4024389,
+          "number": 12,
+          "title": "Fight",
+          "airDate": "2023-01-11",
+          "description": "During a day of touchdowns and missed plays, the Abbott Elementary faculty find themselves learning lessons in teamwork. Two of Janine’s students aren’t getting along in class, leading her to seek advice from her colleagues on how to help repair their friendship. Meanwhile, Melissa and Ava plot to bring down Mr. Johnson in fantasy football.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4024390,
+          "number": 13,
+          "title": "Fundraiser",
+          "airDate": "2023-01-18",
+          "description": "Barbara organizes a candy-selling fundraiser to raise money for a school field trip to the science museum. When sales don’t go as planned, Ava steps in to teach the students new, unconventional selling tactics. Elsewhere, Mr. Johnson and Jacob butt heads about how to take care of a cat found in the janitor’s closet.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4141266,
+          "number": 14,
+          "title": "Valentine's Day",
+          "airDate": "2023-02-08",
+          "description": "On Valentine’s Day, the Abbott teachers discuss their relationships and plans for the holiday. Janine finds out one of her students has a crush on her and when turning to a colleague for advice, she inadvertently learns a secret about another teacher. Elsewhere, Ava sits in on Jacob’s Black History class after receiving a complaint",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4174569,
+          "number": 15,
+          "title": "Fire",
+          "airDate": "2023-02-15",
+          "description": "Barbara’s candle accidentally starts a small fire in the teacher’s lounge and a counselor suggests that she might not be handling the aftermath well. Meanwhile, Melissa rekindles her childhood dream of being a firefighter.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4174570,
+          "number": 16,
+          "title": "Teacher Conference",
+          "airDate": "2023-02-22",
+          "description": "The Abbott staff heads to the Pennsylvania Educational Conference. Gregory reluctantly attends after a disagreement with Amber and bonds with Janine over their similarities. Jacob finds himself charmed by the Addington teachers.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4232358,
+          "number": 17,
+          "title": "Mural Arts",
+          "airDate": "2023-03-01",
+          "description": "Jacob secures a visit from a mural arts program for his students but doesn’t agree with their chosen design and attempts to influence their decision. Barbara and Melissa learn parents are petitioning to turn Abbott into a Legendary charter school.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4237639,
+          "number": 18,
+          "title": "Teacher Appreciation",
+          "airDate": "2023-03-08",
+          "description": "It’s Teacher Appreciation Day. When the district gives Abbott two courtside tickets to a 76ers game, the teachers must decide who deserves them. Later, Janine invites the teachers to her house for game night and her sister, Ayesha, comes to visit.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4262421,
+          "number": 19,
+          "title": "Festival",
+          "airDate": "2023-03-15",
+          "description": "Abbott Elementary rallies together to fight the threat from Legendary Charter Schools. Ava pitches a festival to draw parents to school and collect their signatures for a petition. However, Draemond shows up with the intention of derailing the event.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4302308,
+          "number": 20,
+          "title": "Educator of the Year",
+          "airDate": "2023-04-05",
+          "description": "Gregory is named Educator of the Year. Later, Janine deals with a difficult student, and it's revealed that Barbara hasn't completed her teaching requirements.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4313752,
+          "number": 21,
+          "title": "Mom",
+          "airDate": "2023-04-12",
+          "description": "Janine's plan for a Memorial Day weekend solo trip is derailed when her mother shows up unannounced asking for help; Gregory notices his colleagues are great at small talk and realizes he needs to brush up on his people skills.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 4324850,
+          "number": 22,
+          "title": "Franklin Institute",
+          "airDate": "2023-04-19",
+          "description": "Abbott Elementary takes a field trip to the Franklin Institute; Gregory is eager to spend time with a reluctant Janine; Ava teaches the students about aliens, which leads to chaos.",
+          "runtimeMinutes": 22
+        }
+      ]
+    },
+    {
+      "id": 366033,
+      "number": 3,
+      "name": "Season 3",
+      "airDate": "2024-02-07",
+      "episodeCount": 13,
+      "episodes": [
+        {
+          "id": 4926701,
+          "number": 1,
+          "title": "Career Day (1) / Career Day (2)",
+          "airDate": "2024-02-07",
+          "description": "It's a new year at Abbott Elementary, and Janine is as eager as ever. She plans a district-wide initiative - Career Day - and is anxious for it to be a success. Meanwhile, Ava has a new approach to her job, and Melissa is asked a surprising question.",
+          "runtimeMinutes": 44
+        },
+        {
+          "id": 5093273,
+          "number": 3,
+          "title": "Gregory's Garden Goofballs",
+          "airDate": "2024-02-14",
+          "description": "Gregory is hesitant when kids start hanging out in his classroom at lunch, looking to him for advice; Barbara is shocked to find Tariq is dating the mother of one of her students; Janine and Jacob try to hire an ASL interpreter.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5093274,
+          "number": 4,
+          "title": "Smoking",
+          "airDate": "2024-02-21",
+          "description": "After a student is caught smoking, the Abbott staff come together to revamp the outdated drug policy. Meanwhile, Janine tries to prep the new substitute teacher for her class but finds it challenging to give up her former role.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5124465,
+          "number": 5,
+          "title": "Breakup",
+          "airDate": "2024-02-28",
+          "description": "When Barbara's church choir uses the gym for rehearsals, Ava notices tension in the group. Jacob's eagerness for a full social calendar worries Gregory. Melissa and Janine investigate a new substitute.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138548,
+          "number": 6,
+          "title": "Willard R. Abbott",
+          "airDate": "2024-03-10",
+          "description": "Abbott Elementary is deemed a Philadelphia historical landmark, much to Ava and Janine’s delight; however, Barbara and Melissa are not as impressed. The school plans a celebration in honor of its namesake, but not everything goes as planned.",
+          "runtimeMinutes": 21
+        },
+        {
+          "id": 5138549,
+          "number": 7,
+          "title": "Librarian",
+          "airDate": "2024-03-13",
+          "description": "Janine spearheads a pilot program that brings a librarian to Abbott; however, when friction arises with one of the teachers, it strains Janine's relationships with both parties. Meanwhile, both Melissa and Jacob deal with some big changes at home.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138550,
+          "number": 8,
+          "title": "Panel",
+          "airDate": "2024-03-20",
+          "description": "Ava and Gregory are invited to speak on a panel about public schools. Elsewhere, the other teachers must complete CPR training, and Janine faces challenges securing district approval for her librarian extension program.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138551,
+          "number": 9,
+          "title": "Alex",
+          "airDate": "2024-04-10",
+          "description": "Jacob is shocked when he finds out his colleagues are not invested in his frequent email messages and haven’t even been writing their own replies. Meanwhile, Gregory turns to Janine for help with a former student.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138553,
+          "number": 10,
+          "title": "2 Ava 2 Fest",
+          "airDate": "2024-04-17",
+          "description": "Ava Fest is back, and with the help of the teachers, Ava’s set on outdoing last year by any means necessary. After Janine accepts the offer for a full-time position at the district, she just has to check off one last thing to make it official.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138554,
+          "number": 11,
+          "title": "Double Date",
+          "airDate": "2024-05-01",
+          "description": "Two teachers head out on a double date, but when they run into familiar bar patrons, it proves to be an unfortunate distraction. At Ava’s first book club meeting, the group ends up in a debate over who would be the best post-apocalyptic leader.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138555,
+          "number": 12,
+          "title": "Mother's Day",
+          "airDate": "2024-05-08",
+          "description": "Barbara invites Gregory to her family’s Mother’s Day brunch. Jacob scrambles to figure out how to organize a school field trip.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138556,
+          "number": 13,
+          "title": "Smith Playground",
+          "airDate": "2024-05-15",
+          "description": "Jacob manages to pull off a schoolwide field trip to the park; however, when Abbott must share the playground, the fun and games turn competitive. Elsewhere, Mr. Johnson enjoys having an empty school to himself.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5138558,
+          "number": 14,
+          "title": "Party",
+          "airDate": "2024-05-22",
+          "description": "It’s the last day of school! Ahead of summer vacation, Janine throws the perfect end-of-year party for her colleagues and friends, taking all their interests into consideration.",
+          "runtimeMinutes": 22
+        }
+      ]
+    },
+    {
+      "id": 401697,
+      "number": 4,
+      "name": "Season 4",
+      "airDate": "2024-10-09",
+      "episodeCount": 22,
+      "episodes": [
+        {
+          "id": 5469752,
+          "number": 1,
+          "title": "Back to School",
+          "airDate": "2024-10-09",
+          "description": "The neighboring construction site of a new golf course causes issues at Abbott, forcing the teachers to find creative solutions; an HR representative visits the school; following their kiss, Janine and Gregory's relationship status is revealed.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5469753,
+          "number": 2,
+          "title": "Ringworm",
+          "airDate": "2024-10-16",
+          "description": "When it’s revealed that a student in Jacob’s class has ringworm, the faculty must band together to stop it from spreading through the entire school.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5622809,
+          "number": 3,
+          "title": "Class Pet",
+          "airDate": "2024-10-23",
+          "description": "Janine gets a budget for class pets, but Melissa is resistant to taking on the added work and responsibility for her room's guinea pig; an IT rep from the school district arrives to set up new computers.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5641850,
+          "number": 4,
+          "title": "Costume Contest",
+          "airDate": "2024-10-30",
+          "description": "It’s Halloween at Abbott Elementary! Janine and Gregory proudly show off their couple’s costume, but it fails to translate. Meanwhile, Barbara faces pushback from parents concerned about hygiene and her beloved apple-bobbing tradition.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5656638,
+          "number": 5,
+          "title": "Dad Fight",
+          "airDate": "2024-11-06",
+          "description": "Gregory forms a bond with one of his students, but the student’s dad becomes jealous of their relationship and seeks a confrontation. Melissa suffers a fall but avoids receiving medical attention for the injury.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5698768,
+          "number": 6,
+          "title": "The Deli",
+          "airDate": "2024-11-13",
+          "description": "When the neighborhood deli is forced to close to make room for a trendy smoothie place, Melissa, Barbara and Jacob team up to fight the gentrification. Meanwhile, the district asks Ava to give a presentation to fellow principals.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5722360,
+          "number": 7,
+          "title": "Winter Show",
+          "airDate": "2024-12-04",
+          "description": "Despite a few setbacks, Barbara is determined to make Abbott Elementary’s first-ever holiday show a success. Meanwhile, Jacob’s brother arrives for his visit earlier than planned.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5722361,
+          "number": 8,
+          "title": "Winter Break",
+          "airDate": "2024-12-04",
+          "description": "Melissa hosts the Schemmenti family Christmas Eve dinner and goes to great lengths to make sure everything is perfect. Meanwhile, Janine and Gregory get an unexpected guest.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5747908,
+          "number": 9,
+          "title": "Volunteers",
+          "airDate": "2025-01-08",
+          "description": "Ava announces the school district is sending a group of volunteers to help out at Abbott. However, when they arrive, things don’t go as planned.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5793413,
+          "number": 10,
+          "title": "Testing",
+          "airDate": "2025-01-15",
+          "description": "Janine must rethink her lesson plans after her class performs poorly on a practice test, while Jacob struggles to engage a disinterested student. The district sends a new custodian to train under Mr. Johnson.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5868659,
+          "number": 11,
+          "title": "Strike",
+          "airDate": "2025-01-22",
+          "description": "City buses have stopped running due to a strike, resulting in many students being absent from school. The teachers at Abbott try to find creative solutions and adapt to hybrid learning. Meanwhile, Gregory and O’Shon strike up a friendship.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5868660,
+          "number": 12,
+          "title": "Girard Creek",
+          "airDate": "2025-01-29",
+          "description": "The Abbott Elementary students and staff are invited to a special grand opening preview of the Girard Creek Golf Club.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5868661,
+          "number": 13,
+          "title": "The Science Fair",
+          "airDate": "2025-02-05",
+          "description": "While supervising the kids making their science fair projects, the teachers' competitive sides come out.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5868662,
+          "number": 14,
+          "title": "District Budget Meeting",
+          "airDate": "2025-02-12",
+          "description": "Ava and the Abbott teachers plan for the annual school district budget meeting. Janine and Gregory prepare for Valentine's Day as a couple",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5868663,
+          "number": 15,
+          "title": "100th Day of School",
+          "airDate": "2025-02-26",
+          "description": "During Abbott's 100th day of school celebrations, Barbara receives a surprise from her daughter. Jacob and Mr. Johnson join forces to conduct a search party.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890149,
+          "number": 16,
+          "title": "Books",
+          "airDate": "2025-03-05",
+          "description": "A debate over a controversial book leads Ava to remove it from the library, but some parents push for its return.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890151,
+          "number": 17,
+          "title": "Karaoke",
+          "airDate": "2025-03-12",
+          "description": "When the teachers hit a karaoke bar for a night of fun, Jacob bumps into an old friend.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890152,
+          "number": 18,
+          "title": "Audit",
+          "airDate": "2025-03-19",
+          "description": "Ava and the teachers must band together to hide the golf-course contraband.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890153,
+          "number": 19,
+          "title": "Music Class",
+          "airDate": "2025-03-26",
+          "description": "Barbara and Gregory are in over their heads when they find themselves in new roles at Abbott Elementary.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890154,
+          "number": 20,
+          "title": "Ava Fest: Tokyo Drift",
+          "airDate": "2025-04-02",
+          "description": "The Abbott teachers turn their open house into a car wash to help raise money for the school.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890155,
+          "number": 21,
+          "title": "Rally",
+          "airDate": "2025-04-09",
+          "description": "Ava and the Abbott teachers go to the district to plead for Ava’s job back. Meanwhile, Gregory handles duties as interim principal.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 5890156,
+          "number": 22,
+          "title": "Please Touch Museum",
+          "airDate": "2025-04-16",
+          "description": "Abbott Elementary goes on a schoolwide field trip to the Please Touch Museum, which has some of the older kids skeptical.",
+          "runtimeMinutes": 22
+        }
+      ]
+    },
+    {
+      "id": 450836,
+      "number": 5,
+      "name": "Season 5",
+      "airDate": "2025-10-01",
+      "episodeCount": 22,
+      "episodes": [
+        {
+          "id": 6388496,
+          "number": 1,
+          "title": "Team Building",
+          "airDate": "2025-10-01",
+          "description": "The teachers prepare for the upcoming school year with new faces and big changes on the horizon.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6388538,
+          "number": 2,
+          "title": "Cheating",
+          "airDate": "2025-10-08",
+          "description": "Melissa tries to outsmart her students; Tariq causes chaos in Janine's class; a new guidance counselor joins the school.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6529895,
+          "number": 3,
+          "title": "Ballgame",
+          "airDate": "2025-10-15",
+          "description": "The Abbott crew heads to the ballpark for Teachers' Appreciation Night at the Philadelphia Phillies game.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6547555,
+          "number": 4,
+          "title": "Game Night",
+          "airDate": "2025-10-22",
+          "description": "Gregory steps in to host game night at his apartment. Mr. Johnson, Ava, Barbara and Melissa head to the DMV to renew their licenses.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6564565,
+          "number": 5,
+          "title": "Camping",
+          "airDate": "2025-10-29",
+          "description": "Barbara organizes a Halloween camping trip for older kids.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6582613,
+          "number": 6,
+          "title": "No Phones",
+          "airDate": "2025-11-05",
+          "description": "Abbott Elementary participates in the district’s \"No Phones Day\" initiative.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6625649,
+          "number": 7,
+          "title": "Goofgirl",
+          "airDate": "2025-12-03",
+          "description": "A new member joins Gregory's Garden Goofballs, and Janine pitches a new club idea to Ava.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6638540,
+          "number": 8,
+          "title": "Birthday",
+          "airDate": "2025-12-10",
+          "description": "Jacob takes the lead on organizing Abbott's annual winter show, and Janine celebrates her 30th birthday.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6638541,
+          "number": 9,
+          "title": "Mall (1)",
+          "airDate": "2026-01-07",
+          "description": "Abbott Elementary returns from winter break at their new temporary school: an abandoned mall. The teachers deal with unique challenges that come with teaching in the new location.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6721030,
+          "number": 10,
+          "title": "Mall (2): Questions & Concerns",
+          "airDate": "2026-01-14",
+          "description": "Growing pains hit Abbott Elementary as the PTA pressures Janine and Gregory for answers. Meanwhile, Jacob and Barbara become suspicious of Mr. Morton.",
+          "runtimeMinutes": 22
+        },
+        {
+          "id": 6723679,
+          "number": 11,
+          "title": "Mall (3): Heroes",
+          "airDate": "2026-01-21",
+          "description": "After the faculty finds surprising success operating the school in the mall, they quickly realize they are being taken advantage of. Meanwhile, a new custodian arrives to join Mr. Johnson."
+        },
+        {
+          "id": 6772467,
+          "number": 12,
+          "title": "Picture Day",
+          "airDate": "2026-01-28",
+          "description": "When picture day catches the teachers at Abbott by surprise, chaos ensues."
+        },
+        {
+          "id": 6787923,
+          "number": 13,
+          "title": "Candygrams",
+          "airDate": "2026-02-04",
+          "description": ""
+        },
+        {
+          "id": 6772465,
+          "number": 14,
+          "title": "Aide",
+          "airDate": "2026-03-04",
+          "description": ""
+        },
+        {
+          "id": 6840080,
+          "number": 15,
+          "title": "Safety Day",
+          "airDate": "2026-03-11",
+          "description": ""
+        },
+        {
+          "id": 6847467,
+          "number": 16,
+          "title": "Episode 16",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847468,
+          "number": 17,
+          "title": "Episode 17",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847469,
+          "number": 18,
+          "title": "Episode 18",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847470,
+          "number": 19,
+          "title": "Episode 19",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847471,
+          "number": 20,
+          "title": "Episode 20",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847472,
+          "number": 21,
+          "title": "Episode 21",
+          "airDate": null,
+          "description": ""
+        },
+        {
+          "id": 6847473,
+          "number": 22,
+          "title": "Episode 22",
+          "airDate": null,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "97546": {
+    "title": "Ted Lasso",
+    "tmdb_id": "97546",
+    "keyType": "tmdb_id",
+    "seasonCount": 4,
+    "episodeCount": 34
+  },
+  "136315": {
+    "title": "The Bear",
+    "tmdb_id": "136315",
+    "keyType": "tmdb_id",
+    "seasonCount": 4,
+    "episodeCount": 38
+  },
+  "125935": {
+    "title": "Abbott Elementary",
+    "tmdb_id": "125935",
+    "keyType": "tmdb_id",
+    "seasonCount": 5,
+    "episodeCount": 92
+  },
+  "95396": {
+    "title": "Severance",
+    "tmdb_id": "95396",
+    "keyType": "tmdb_id",
+    "seasonCount": 3,
+    "episodeCount": 19
+  },
+  "246": {
+    "title": "Avatar: The Last Airbender",
+    "tmdb_id": "246",
+    "keyType": "tmdb_id",
+    "seasonCount": 3,
+    "episodeCount": 61
+  },
+  "44217": {
+    "title": "Vikings",
+    "tmdb_id": "44217",
+    "keyType": "tmdb_id",
+    "seasonCount": 6,
+    "episodeCount": 89
+  }
+}

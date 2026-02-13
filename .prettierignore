@@ -1,0 +1,9 @@
+# Ignore generated build output
+/docs
+/docs/**
+/docs/static/**
+# Ignore other generated files
+public/firebase-config.js
+# Ignore binary icons in public
+public/*.png
+public/icons/**

@@ -1,0 +1,35 @@
+# Firebase App Hosting configuration
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  minInstances: 0
+
+scripts:
+  buildCommand: npm run build
+  runCommand: npm run start:apphosting
+
+env:
+  - variable: NODE_ENV
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: API_TIMEOUT_MS
+    value: "7000"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_WINDOW_MS
+    value: "60000"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_MAX
+    value: "60"
+    availability:
+      - RUNTIME
+  - variable: APP_ID
+    value: hearth-app-hosting
+    availability:
+      - RUNTIME
+
+# Set secrets in Firebase App Hosting for provider credentials:
+# MEDIA_PROVIDER_API_KEY or MEDIA_PROVIDER_READ_TOKEN

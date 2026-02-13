@@ -1,0 +1,858 @@
+{
+  "Abbott Elementary": {
+    "type": "show",
+    "year": "2021",
+    "genres": ["Comedy"],
+    "director": "Quinta Brunson",
+    "actors": [
+      "Quinta Brunson",
+      "Tyler James Williams",
+      "Sheryl Lee Ralph",
+      "Lisa Ann Walter",
+      "Chris Perfetti",
+      "Janelle James"
+    ],
+    "poster": "/posters/abbott-elementary.jpg",
+    "backdrop": "/backdrops/125935-backdrop.jpg",
+    "totalSeasons": 5
+  },
+  "Avatar: The Last Airbender": {
+    "type": "show",
+    "year": "2005",
+    "genres": ["Animation", "Action & Adventure", "Sci-Fi & Fantasy"],
+    "director": "Michael Dante DiMartino",
+    "actors": [
+      "Zach Tyler Eisen",
+      "Mae Whitman",
+      "Jack De Sena",
+      "Dante Basco",
+      "Jessie Flower",
+      "Dee Bradley Baker"
+    ],
+    "runtimeMinutes": 24,
+    "poster": "/posters/avatar-the-last-airbender.jpg",
+    "backdrop": "/backdrops/246-backdrop.jpg",
+    "totalSeasons": 3
+  },
+  "Back to the Future": {
+    "type": "movie",
+    "year": "1985",
+    "genres": ["Adventure", "Comedy", "Science Fiction"],
+    "director": "Robert Zemeckis",
+    "actors": [
+      "Michael J. Fox",
+      "Christopher Lloyd",
+      "Crispin Glover",
+      "Lea Thompson",
+      "Claudia Wells",
+      "Thomas F. Wilson"
+    ],
+    "runtimeMinutes": 116,
+    "poster": "/posters/back-to-the-future.jpg",
+    "backdrop": "/backdrops/105-backdrop.jpg"
+  },
+  "Blood Diamond": {
+    "type": "movie",
+    "year": "2006",
+    "genres": ["Drama", "Thriller", "Action"],
+    "director": "Edward Zwick",
+    "actors": [
+      "Leonardo DiCaprio",
+      "Djimon Hounsou",
+      "Jennifer Connelly",
+      "Kagiso Kuypers",
+      "Arnold Vosloo",
+      "Antony Coleman"
+    ],
+    "runtimeMinutes": 143,
+    "poster": "/posters/blood-diamond.jpg",
+    "backdrop": "/backdrops/1372-backdrop.jpg"
+  },
+  "Casino Royale": {
+    "type": "movie",
+    "year": "1967",
+    "genres": ["Adventure", "Action", "Comedy"],
+    "director": "Robert Parrish",
+    "actors": [
+      "David Niven",
+      "Peter Sellers",
+      "Ursula Andress",
+      "Orson Welles",
+      "Joanna Pettet",
+      "Daliah Lavi"
+    ],
+    "runtimeMinutes": 131,
+    "poster": "/posters/casino-royale.jpg",
+    "backdrop": "/backdrops/12208-backdrop.jpg"
+  },
+  "Death at a Funeral": {
+    "type": "movie",
+    "year": "2007",
+    "genres": ["Comedy", "Drama"],
+    "director": "Frank Oz",
+    "actors": [
+      "Matthew Macfadyen",
+      "Peter Dinklage",
+      "Ewen Bremner",
+      "Keeley Hawes",
+      "Andy Nyman",
+      "Daisy Donovan"
+    ],
+    "runtimeMinutes": 91,
+    "poster": "/posters/death-at-a-funeral.jpg",
+    "backdrop": "/backdrops/2196-backdrop.jpg"
+  },
+  "Dinosaur": {
+    "type": "movie",
+    "year": "2000",
+    "genres": ["Animation", "Family", "Adventure", "Drama"],
+    "director": "Ralph Zondag",
+    "actors": [
+      "D. B. Sweeney",
+      "Alfre Woodard",
+      "Ossie Davis",
+      "Max Casella",
+      "Hayden Panettiere",
+      "Samuel E. Wright"
+    ],
+    "runtimeMinutes": 82,
+    "poster": "/posters/dinosaur.jpg",
+    "backdrop": "/backdrops/10567-backdrop.jpg"
+  },
+  "F1": {
+    "type": "movie",
+    "year": "2025",
+    "genres": ["Action", "Drama"],
+    "director": "Joseph Kosinski",
+    "actors": [
+      "Brad Pitt",
+      "Damson Idris",
+      "Javier Bardem",
+      "Kerry Condon",
+      "Tobias Menzies",
+      "Kim Bodnia"
+    ],
+    "runtimeMinutes": 156,
+    "poster": "/posters/f1.jpg",
+    "backdrop": "/backdrops/911430-backdrop.jpg"
+  },
+  "Fantasia": {
+    "type": "movie",
+    "year": "1940",
+    "genres": ["Animation", "Family", "Fantasy"],
+    "director": "Wilfred Jackson",
+    "actors": [
+      "Deems Taylor",
+      "Walt Disney",
+      "Julietta Novis",
+      "Leopold Stokowski"
+    ],
+    "runtimeMinutes": 124,
+    "poster": "/posters/fantasia.jpg",
+    "backdrop": "/backdrops/756-backdrop.jpg"
+  },
+  "Fantastic Beasts and Where to Find Them": {
+    "type": "movie",
+    "year": "2016",
+    "genres": ["Fantasy", "Adventure"],
+    "director": "David Yates",
+    "actors": [
+      "Eddie Redmayne",
+      "Katherine Waterston",
+      "Dan Fogler",
+      "Alison Sudol",
+      "Colin Farrell",
+      "Jon Voight"
+    ],
+    "runtimeMinutes": 133,
+    "poster": "/posters/fantastic-beasts-and-where-to-find-them.jpg",
+    "backdrop": "/backdrops/259316-backdrop.jpg"
+  },
+  "Guardians of the Galaxy": {
+    "type": "movie",
+    "year": "2014",
+    "genres": ["Action", "Science Fiction", "Adventure"],
+    "director": "James Gunn",
+    "actors": [
+      "Chris Pratt",
+      "Zoe Saldaña",
+      "Dave Bautista",
+      "Vin Diesel",
+      "Bradley Cooper",
+      "Lee Pace"
+    ],
+    "runtimeMinutes": 121,
+    "poster": "/posters/guardians-of-the-galaxy.jpg",
+    "backdrop": "/backdrops/118340-backdrop.jpg"
+  },
+  "Harry Potter and the Chamber of Secrets": {
+    "type": "movie",
+    "year": "2002",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "Chris Columbus",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Kenneth Branagh",
+      "Toby Jones",
+      "Robbie Coltrane"
+    ],
+    "runtimeMinutes": 161,
+    "poster": "/posters/harry-potter-and-the-chamber-of-secrets.jpg",
+    "backdrop": "/backdrops/672-backdrop.jpg"
+  },
+  "Harry Potter and the Deathly Hallows Part 1": {
+    "type": "movie",
+    "year": "2010",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "David Yates",
+    "actors": [
+      "Daniel Radcliffe",
+      "Emma Watson",
+      "Rupert Grint",
+      "Toby Jones",
+      "Helena Bonham Carter",
+      "Alan Rickman"
+    ],
+    "runtimeMinutes": 146,
+    "poster": "/posters/harry-potter-and-the-deathly-hallows-part-1.jpg",
+    "backdrop": "/backdrops/12444-backdrop.jpg"
+  },
+  "Harry Potter and the Deathly Hallows Part 2": {
+    "type": "movie",
+    "year": "2011",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "David Yates",
+    "actors": [
+      "Daniel Radcliffe",
+      "Emma Watson",
+      "Rupert Grint",
+      "Ralph Fiennes",
+      "Alan Rickman",
+      "Michael Gambon"
+    ],
+    "runtimeMinutes": 130,
+    "poster": "/posters/harry-potter-and-the-deathly-hallows-part-2.jpg",
+    "backdrop": "/backdrops/12445-backdrop.jpg"
+  },
+  "Harry Potter and the Goblet of Fire": {
+    "type": "movie",
+    "year": "2005",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "Mike Newell",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Brendan Gleeson",
+      "Michael Gambon",
+      "Robert Pattinson"
+    ],
+    "runtimeMinutes": 157,
+    "poster": "/posters/harry-potter-and-the-goblet-of-fire.jpg",
+    "backdrop": "/backdrops/674-backdrop.jpg"
+  },
+  "Harry Potter and the Half-Blood Prince": {
+    "type": "movie",
+    "year": "2009",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "David Yates",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Jim Broadbent",
+      "Michael Gambon",
+      "Tom Felton"
+    ],
+    "runtimeMinutes": 153,
+    "poster": "/posters/harry-potter-and-the-half-blood-prince.jpg",
+    "backdrop": "/backdrops/767-backdrop.jpg"
+  },
+  "Harry Potter and the Order of the Phoenix": {
+    "type": "movie",
+    "year": "2007",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "David Yates",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Imelda Staunton",
+      "Helena Bonham Carter",
+      "Robbie Coltrane"
+    ],
+    "runtimeMinutes": 138,
+    "poster": "/posters/harry-potter-and-the-order-of-the-phoenix.jpg",
+    "backdrop": "/backdrops/675-backdrop.jpg"
+  },
+  "Harry Potter and the Prisoner of Azkaban": {
+    "type": "movie",
+    "year": "2004",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "Alfonso Cuarón",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Robbie Coltrane",
+      "Michael Gambon",
+      "Gary Oldman"
+    ],
+    "runtimeMinutes": 141,
+    "poster": "/posters/harry-potter-and-the-prisoner-of-azkaban.jpg",
+    "backdrop": "/backdrops/673-backdrop.jpg"
+  },
+  "Harry Potter and the Sorcerer's Stone": {
+    "type": "movie",
+    "year": "2001",
+    "genres": ["Adventure", "Fantasy"],
+    "director": "Chris Columbus",
+    "actors": [
+      "Daniel Radcliffe",
+      "Rupert Grint",
+      "Emma Watson",
+      "Richard Harris",
+      "Tom Felton",
+      "Alan Rickman"
+    ],
+    "runtimeMinutes": 152,
+    "poster": "/posters/harry-potter-and-the-sorcerers-stone.jpg",
+    "backdrop": "/backdrops/671-backdrop.jpg"
+  },
+  "Hero": {
+    "type": "movie",
+    "year": "2007",
+    "genres": ["Mystery"],
+    "director": "Masayuki Suzuki",
+    "actors": [
+      "Takuya Kimura",
+      "Takako Matsu",
+      "Nene Otsuka",
+      "Hiroshi Abe",
+      "Masanobu Katsumura",
+      "Fumiyo Kohinata"
+    ],
+    "runtimeMinutes": 130,
+    "poster": "/posters/hero.jpg",
+    "backdrop": "/backdrops/51550-backdrop.jpg"
+  },
+  "Knives Out": {
+    "type": "movie",
+    "year": "2019",
+    "genres": ["Comedy", "Crime", "Mystery"],
+    "director": "Rian Johnson",
+    "actors": [
+      "Daniel Craig",
+      "Chris Evans",
+      "Ana de Armas",
+      "Jamie Lee Curtis",
+      "Michael Shannon",
+      "Don Johnson"
+    ],
+    "runtimeMinutes": 131,
+    "poster": "/posters/knives-out.jpg",
+    "backdrop": "/backdrops/546554-backdrop.jpg"
+  },
+  "Mamma Mia!": {
+    "type": "movie",
+    "year": "2008",
+    "genres": ["Comedy", "Romance"],
+    "director": "Phyllida Lloyd",
+    "actors": [
+      "Meryl Streep",
+      "Amanda Seyfried",
+      "Pierce Brosnan",
+      "Colin Firth",
+      "Stellan Skarsgård",
+      "Julie Walters"
+    ],
+    "runtimeMinutes": 108,
+    "poster": "/posters/mamma-mia.jpg",
+    "backdrop": "/backdrops/11631-backdrop.jpg"
+  },
+  "Mr. Bean's Holiday": {
+    "type": "movie",
+    "year": "2007",
+    "genres": ["Family", "Comedy"],
+    "director": "Steve Bendelack",
+    "actors": [
+      "Rowan Atkinson",
+      "Willem Dafoe",
+      "Maxim Baldry",
+      "Karel Roden",
+      "Emma de Caunes",
+      "Steve Pemberton"
+    ],
+    "runtimeMinutes": 90,
+    "poster": "/posters/mr-beans-holiday.jpg",
+    "backdrop": "/backdrops/1268-backdrop.jpg"
+  },
+  "Paddington 2": {
+    "type": "movie",
+    "year": "2017",
+    "genres": ["Adventure", "Comedy", "Family"],
+    "director": "Paul King",
+    "actors": [
+      "Ben Whishaw",
+      "Sally Hawkins",
+      "Hugh Bonneville",
+      "Madeleine Harris",
+      "Samuel Joslin",
+      "Julie Walters"
+    ],
+    "runtimeMinutes": 104,
+    "poster": "/posters/paddington-2.jpg",
+    "backdrop": "/backdrops/346648-backdrop.jpg"
+  },
+  "Ray": {
+    "type": "movie",
+    "year": "2004",
+    "genres": ["Drama", "Music"],
+    "director": "Taylor Hackford",
+    "actors": [
+      "Jamie Foxx",
+      "Kerry Washington",
+      "Regina King",
+      "Harry Lennix",
+      "Clifton Powell",
+      "Bokeem Woodbine"
+    ],
+    "runtimeMinutes": 152,
+    "poster": "/posters/ray.jpg",
+    "backdrop": "/backdrops/1677-backdrop.jpg"
+  },
+  "Robots": {
+    "type": "movie",
+    "year": "2005",
+    "genres": ["Animation", "Comedy", "Family", "Science Fiction"],
+    "director": "Chris Wedge",
+    "actors": [
+      "Ewan McGregor",
+      "Halle Berry",
+      "Greg Kinnear",
+      "Mel Brooks",
+      "Drew Carey",
+      "Amanda Bynes"
+    ],
+    "runtimeMinutes": 90,
+    "poster": "/posters/robots.jpg",
+    "backdrop": "/backdrops/9928-backdrop.jpg"
+  },
+  "Severance": {
+    "type": "show",
+    "year": "2022",
+    "genres": ["Drama", "Mystery", "Sci-Fi & Fantasy"],
+    "director": "Dan Erickson",
+    "actors": [
+      "Adam Scott",
+      "Britt Lower",
+      "Tramell Tillman",
+      "Zach Cherry",
+      "Jen Tullock",
+      "Dichen Lachman"
+    ],
+    "poster": "/posters/severance.jpg",
+    "backdrop": "/backdrops/95396-backdrop.jpg",
+    "totalSeasons": 3
+  },
+  "Sinbad: Legend of the Seven Seas": {
+    "type": "movie",
+    "year": "2003",
+    "genres": [
+      "Family",
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Fantasy",
+      "Action"
+    ],
+    "director": "Tim Johnson",
+    "actors": [
+      "Brad Pitt",
+      "Catherine Zeta-Jones",
+      "Michelle Pfeiffer",
+      "Joseph Fiennes",
+      "Dennis Haysbert",
+      "Timothy West"
+    ],
+    "runtimeMinutes": 86,
+    "poster": "/posters/sinbad-legend-of-the-seven-seas.jpg",
+    "backdrop": "/backdrops/14411-backdrop.jpg"
+  },
+  "Speed Racer": {
+    "type": "movie",
+    "year": "2008",
+    "genres": ["Family", "Action", "Adventure", "Comedy"],
+    "director": "Lana Wachowski",
+    "actors": [
+      "Emile Hirsch",
+      "Christina Ricci",
+      "John Goodman",
+      "Susan Sarandon",
+      "Matthew Fox",
+      "Benno Fürmann"
+    ],
+    "runtimeMinutes": 135,
+    "poster": "/posters/speed-racer.jpg",
+    "backdrop": "/backdrops/7459-backdrop.jpg"
+  },
+  "Spirited Away": {
+    "type": "movie",
+    "year": "2001",
+    "genres": ["Animation", "Family", "Fantasy"],
+    "director": "Hayao Miyazaki",
+    "actors": [
+      "Rumi Hiiragi",
+      "Miyu Irino",
+      "Mari Natsuki",
+      "Takashi Naito",
+      "Yasuko Sawaguchi",
+      "Tatsuya Gashûin"
+    ],
+    "runtimeMinutes": 125,
+    "poster": "/posters/spirited-away.jpg",
+    "backdrop": "/backdrops/129-backdrop.jpg"
+  },
+  "Star Trek Beyond": {
+    "type": "movie",
+    "year": "2016",
+    "genres": ["Action", "Adventure", "Science Fiction"],
+    "director": "Justin Lin",
+    "actors": [
+      "Chris Pine",
+      "Zachary Quinto",
+      "Karl Urban",
+      "Zoe Saldaña",
+      "Simon Pegg",
+      "John Cho"
+    ],
+    "runtimeMinutes": 122,
+    "poster": "/posters/star-trek-beyond.jpg",
+    "backdrop": "/backdrops/188927-backdrop.jpg"
+  },
+  "Star Trek Into Darkness": {
+    "type": "movie",
+    "year": "2013",
+    "genres": ["Action", "Adventure", "Science Fiction"],
+    "director": "J.J. Abrams",
+    "actors": [
+      "Chris Pine",
+      "Zachary Quinto",
+      "Zoe Saldaña",
+      "Benedict Cumberbatch",
+      "Karl Urban",
+      "Simon Pegg"
+    ],
+    "runtimeMinutes": 132,
+    "poster": "/posters/star-trek-into-darkness.jpg",
+    "backdrop": "/backdrops/54138-backdrop.jpg"
+  },
+  "Star Wars: Episode I - The Phantom Menace": {
+    "type": "movie",
+    "year": "1999",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "George Lucas",
+    "actors": [
+      "Liam Neeson",
+      "Ewan McGregor",
+      "Natalie Portman",
+      "Jake Lloyd",
+      "Ian McDiarmid",
+      "Pernilla August"
+    ],
+    "runtimeMinutes": 136,
+    "poster": "/posters/star-wars-episode-i-the-phantom-menace.jpg",
+    "backdrop": "/backdrops/1893-backdrop.jpg"
+  },
+  "Star Wars: Episode II - Attack of the Clones": {
+    "type": "movie",
+    "year": "2002",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "George Lucas",
+    "actors": [
+      "Hayden Christensen",
+      "Ewan McGregor",
+      "Natalie Portman",
+      "Christopher Lee",
+      "Samuel L. Jackson",
+      "Frank Oz"
+    ],
+    "runtimeMinutes": 142,
+    "poster": "/posters/star-wars-episode-ii-attack-of-the-clones.jpg",
+    "backdrop": "/backdrops/1894-backdrop.jpg"
+  },
+  "Star Wars: Episode III - Revenge of the Sith": {
+    "type": "movie",
+    "year": "2005",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "George Lucas",
+    "actors": [
+      "Hayden Christensen",
+      "Ewan McGregor",
+      "Natalie Portman",
+      "Ian McDiarmid",
+      "Samuel L. Jackson",
+      "Jimmy Smits"
+    ],
+    "runtimeMinutes": 140,
+    "poster": "/posters/star-wars-episode-iii-revenge-of-the-sith.jpg",
+    "backdrop": "/backdrops/1895-backdrop.jpg"
+  },
+  "Star Wars: Episode V - The Empire Strikes Back": {
+    "type": "movie",
+    "year": "1980",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "Irvin Kershner",
+    "actors": [
+      "Mark Hamill",
+      "Harrison Ford",
+      "Carrie Fisher",
+      "Billy Dee Williams",
+      "Anthony Daniels",
+      "David Prowse"
+    ],
+    "runtimeMinutes": 124,
+    "poster": "/posters/star-wars-episode-v-the-empire-strikes-back.jpg",
+    "backdrop": "/backdrops/1891-backdrop.jpg"
+  },
+  "Star Wars: Episode VI - Return of the Jedi": {
+    "type": "movie",
+    "year": "1983",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "Richard Marquand",
+    "actors": [
+      "Mark Hamill",
+      "Harrison Ford",
+      "Carrie Fisher",
+      "Billy Dee Williams",
+      "Anthony Daniels",
+      "Peter Mayhew"
+    ],
+    "runtimeMinutes": 132,
+    "poster": "/posters/star-wars-episode-vi-return-of-the-jedi.jpg",
+    "backdrop": "/backdrops/1892-backdrop.jpg"
+  },
+  "Ted Lasso": {
+    "type": "show",
+    "year": "2020",
+    "genres": ["Drama", "Comedy"],
+    "director": "Jason Sudeikis",
+    "actors": [
+      "Jason Sudeikis",
+      "Hannah Waddingham",
+      "Jeremy Swift",
+      "Phil Dunster",
+      "Brett Goldstein",
+      "Brendan Hunt"
+    ],
+    "poster": "/posters/ted-lasso.jpg",
+    "backdrop": "/backdrops/97546-backdrop.jpg",
+    "totalSeasons": 4
+  },
+  "The Bear": {
+    "type": "show",
+    "year": "2022",
+    "genres": ["Drama", "Comedy"],
+    "director": "Christopher Storer",
+    "actors": [
+      "Jeremy Allen White",
+      "Ebon Moss-Bachrach",
+      "Ayo Edebiri",
+      "Lionel Boyce",
+      "Abby Elliott",
+      "Matty Matheson"
+    ],
+    "poster": "/posters/the-bear.jpg",
+    "backdrop": "/backdrops/136315-backdrop.jpg",
+    "totalSeasons": 4
+  },
+  "The Cat Returns": {
+    "type": "movie",
+    "year": "2002",
+    "genres": ["Adventure", "Fantasy", "Animation", "Drama", "Family"],
+    "director": "Hiroyuki Morita",
+    "actors": [
+      "Chizuru Ikewaki",
+      "Yoshihiko Hakamada",
+      "Aki Maeda",
+      "Tetsu Watanabe",
+      "Yousuke Saito",
+      "Takayuki Yamada"
+    ],
+    "runtimeMinutes": 75,
+    "poster": "/posters/the-cat-returns.jpg",
+    "backdrop": "/backdrops/15370-backdrop.jpg"
+  },
+  "The Grand Budapest Hotel": {
+    "type": "movie",
+    "year": "2014",
+    "genres": ["Comedy", "Drama"],
+    "director": "Wes Anderson",
+    "actors": [
+      "Ralph Fiennes",
+      "F. Murray Abraham",
+      "Mathieu Amalric",
+      "Adrien Brody",
+      "Willem Dafoe",
+      "Jeff Goldblum"
+    ],
+    "runtimeMinutes": 100,
+    "poster": "/posters/the-grand-budapest-hotel.jpg",
+    "backdrop": "/backdrops/120467-backdrop.jpg"
+  },
+  "The Hunger Games: The Ballad of Songbirds and Snakes": {
+    "type": "movie",
+    "year": "2023",
+    "genres": ["Science Fiction", "Action"],
+    "director": "Francis Lawrence",
+    "actors": [
+      "Tom Blyth",
+      "Rachel Zegler",
+      "Peter Dinklage",
+      "Jason Schwartzman",
+      "Hunter Schafer",
+      "Josh Rivera"
+    ],
+    "runtimeMinutes": 157,
+    "poster": "/posters/the-hunger-games-the-ballad-of-songbirds-and-snakes.jpg",
+    "backdrop": "/backdrops/695721-backdrop.jpg"
+  },
+  "The Incredibles": {
+    "type": "movie",
+    "year": "2004",
+    "genres": ["Action", "Adventure", "Animation", "Family"],
+    "director": "Brad Bird",
+    "actors": [
+      "Craig T. Nelson",
+      "Holly Hunter",
+      "Sarah Vowell",
+      "Spencer Fox",
+      "Jason Lee",
+      "Samuel L. Jackson"
+    ],
+    "runtimeMinutes": 115,
+    "poster": "/posters/the-incredibles.jpg",
+    "backdrop": "/backdrops/9806-backdrop.jpg"
+  },
+  "The Pink Panther": {
+    "type": "movie",
+    "year": "2006",
+    "genres": ["Comedy", "Mystery", "Crime", "Adventure", "Family"],
+    "director": "Shawn Levy",
+    "actors": [
+      "Steve Martin",
+      "Jean Reno",
+      "Kevin Kline",
+      "Beyoncé",
+      "Emily Mortimer",
+      "Henry Czerny"
+    ],
+    "runtimeMinutes": 93,
+    "poster": "/posters/the-pink-panther.jpg",
+    "backdrop": "/backdrops/12096-backdrop.jpg"
+  },
+  "The Rainmaker": {
+    "type": "movie",
+    "year": "1997",
+    "genres": ["Drama", "Crime", "Thriller"],
+    "director": "Francis Ford Coppola",
+    "actors": [
+      "Matt Damon",
+      "Claire Danes",
+      "Danny DeVito",
+      "Jon Voight",
+      "Mary Kay Place",
+      "Dean Stockwell"
+    ],
+    "runtimeMinutes": 135,
+    "poster": "/posters/the-rainmaker.jpg",
+    "backdrop": "/backdrops/11975-backdrop.jpg"
+  },
+  "Toy Story": {
+    "type": "movie",
+    "year": "1995",
+    "genres": ["Family", "Comedy", "Animation", "Adventure"],
+    "director": "John Lasseter",
+    "actors": [
+      "Tom Hanks",
+      "Tim Allen",
+      "Don Rickles",
+      "Jim Varney",
+      "Wallace Shawn",
+      "John Ratzenberger"
+    ],
+    "runtimeMinutes": 81,
+    "poster": "/posters/toy-story.jpg",
+    "backdrop": "/backdrops/862-backdrop.jpg"
+  },
+  "Undercover Brother": {
+    "type": "movie",
+    "year": "2002",
+    "genres": ["Action", "Comedy"],
+    "director": "Malcolm D. Lee",
+    "actors": [
+      "Eddie Griffin",
+      "Chris Kattan",
+      "Denise Richards",
+      "Aunjanue Ellis-Taylor",
+      "Chi McBride",
+      "Neil Patrick Harris"
+    ],
+    "runtimeMinutes": 86,
+    "poster": "/posters/undercover-brother.jpg",
+    "backdrop": "/backdrops/12277-backdrop.jpg"
+  },
+  "Vikings": {
+    "type": "show",
+    "year": "2013",
+    "genres": ["Action & Adventure", "Drama", "War & Politics"],
+    "director": "Michael Hirst",
+    "actors": [
+      "Alex Høgh Andersen",
+      "Jordan Patrick Smith",
+      "Marco Ilsø",
+      "Peter Franzén",
+      "Georgia Hirst",
+      "Danila Kozlovsky"
+    ],
+    "poster": "/posters/vikings.jpg",
+    "backdrop": "/backdrops/44217-backdrop.jpg",
+    "totalSeasons": 6
+  },
+  "Wake Up Dead Man: A Knives Out Mystery": {
+    "type": "movie",
+    "year": "2025",
+    "genres": ["Thriller", "Mystery", "Comedy"],
+    "director": "Rian Johnson",
+    "actors": [
+      "Daniel Craig",
+      "Josh O'Connor",
+      "Glenn Close",
+      "Josh Brolin",
+      "Mila Kunis",
+      "Jeremy Renner"
+    ],
+    "runtimeMinutes": 145,
+    "poster": "/posters/wake-up-dead-man-a-knives-out-mystery.jpg",
+    "backdrop": "/backdrops/812583-backdrop.jpg"
+  },
+  "X-Men Origins: Wolverine": {
+    "type": "movie",
+    "year": "2009",
+    "genres": ["Adventure", "Action", "Science Fiction"],
+    "director": "Gavin Hood",
+    "actors": [
+      "Hugh Jackman",
+      "Liev Schreiber",
+      "Danny Huston",
+      "Lynn Collins",
+      "Kevin Durand",
+      "Dominic Monaghan"
+    ],
+    "runtimeMinutes": 107,
+    "poster": "/posters/x-men-origins-wolverine.jpg",
+    "backdrop": "/backdrops/2080-backdrop.jpg"
+  }
+}

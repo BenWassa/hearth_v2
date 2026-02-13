@@ -1,0 +1,347 @@
+{
+  "title": "The Bear",
+  "tmdb_id": "136315",
+  "keyType": "tmdb_id",
+  "seasons": [
+    {
+      "id": 215540,
+      "number": 1,
+      "name": "Season 1",
+      "airDate": "2022-06-23",
+      "episodeCount": 8,
+      "episodes": [
+        {
+          "id": 3281115,
+          "number": 1,
+          "title": "System",
+          "airDate": "2022-06-23",
+          "description": "Carmy attempts to retrain the employees of The Original Beef of Chicagoland, but is faced with resistance; in need of back-up, he brings on a talented young chef to help.",
+          "runtimeMinutes": 28
+        },
+        {
+          "id": 3720502,
+          "number": 2,
+          "title": "Hands",
+          "airDate": "2022-06-23",
+          "description": "A surprise health inspection reveals the cracks in the restaurant's foundation. Carmy goes head-to-head with Richie.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 3720503,
+          "number": 3,
+          "title": "Brigade",
+          "airDate": "2022-06-23",
+          "description": "Carmy attends Al-Anon. Sydney struggles to gain the respect of the staff.",
+          "runtimeMinutes": 30
+        },
+        {
+          "id": 3720504,
+          "number": 4,
+          "title": "Dogs",
+          "airDate": "2022-06-23",
+          "description": "Carmy and Richie cater a kid's birthday party. Tina and Sydney work together while Marcus makes donuts.",
+          "runtimeMinutes": 31
+        },
+        {
+          "id": 3720506,
+          "number": 5,
+          "title": "Sheridan",
+          "airDate": "2022-06-23",
+          "description": "Things go wrong in the kitchen. Sydney finds solutions.",
+          "runtimeMinutes": 26
+        },
+        {
+          "id": 3720508,
+          "number": 6,
+          "title": "Ceres",
+          "airDate": "2022-06-23",
+          "description": "Richie notices the neighborhood is changing. Sugar and Carmy clean up the office.",
+          "runtimeMinutes": 31
+        },
+        {
+          "id": 3720509,
+          "number": 7,
+          "title": "Review",
+          "airDate": "2022-06-23",
+          "description": "A bad day in the kitchen causes tensions to rise.",
+          "runtimeMinutes": 21
+        },
+        {
+          "id": 3720511,
+          "number": 8,
+          "title": "Braciole",
+          "airDate": "2022-06-23",
+          "description": "Things get out of control. Carmy is faced with a decision.",
+          "runtimeMinutes": 48
+        }
+      ]
+    },
+    {
+      "id": 332307,
+      "number": 2,
+      "name": "Season 2",
+      "airDate": "2023-06-22",
+      "episodeCount": 10,
+      "episodes": [
+        {
+          "id": 4423391,
+          "number": 1,
+          "title": "Beef",
+          "airDate": "2023-06-22",
+          "description": "Faced with the reality of opening a new restaurant, the crew must make a plan.",
+          "runtimeMinutes": 30
+        },
+        {
+          "id": 4423392,
+          "number": 2,
+          "title": "Pasta",
+          "airDate": "2023-06-22",
+          "description": "The crew splits up to work towards their new vision.",
+          "runtimeMinutes": 31
+        },
+        {
+          "id": 4423393,
+          "number": 3,
+          "title": "Sundae",
+          "airDate": "2023-06-22",
+          "description": "Sydney searches Chicago for culinary inspiration.",
+          "runtimeMinutes": 27
+        },
+        {
+          "id": 4423394,
+          "number": 4,
+          "title": "Honeydew",
+          "airDate": "2023-06-22",
+          "description": "Marcus challenges himself.",
+          "runtimeMinutes": 30
+        },
+        {
+          "id": 4423395,
+          "number": 5,
+          "title": "Pop",
+          "airDate": "2023-06-22",
+          "description": "The renovation gets off track.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 4423396,
+          "number": 6,
+          "title": "Fishes",
+          "airDate": "2023-06-22",
+          "description": "Feast of the Seven Fishes.",
+          "runtimeMinutes": 67
+        },
+        {
+          "id": 4423397,
+          "number": 7,
+          "title": "Forks",
+          "airDate": "2023-06-22",
+          "description": "Richie stages.",
+          "runtimeMinutes": 36
+        },
+        {
+          "id": 4423398,
+          "number": 8,
+          "title": "Bolognese",
+          "airDate": "2023-06-22",
+          "description": "The crew awaits a do-or-die fire suppression test.",
+          "runtimeMinutes": 33
+        },
+        {
+          "id": 4423399,
+          "number": 9,
+          "title": "Omelette",
+          "airDate": "2023-06-22",
+          "description": "Final preparations are made for The Bear's first service.",
+          "runtimeMinutes": 40
+        },
+        {
+          "id": 4423400,
+          "number": 10,
+          "title": "The Bear",
+          "airDate": "2023-06-22",
+          "description": "Friends & Family night at The Bear.",
+          "runtimeMinutes": 41
+        }
+      ]
+    },
+    {
+      "id": 392941,
+      "number": 3,
+      "name": "Season 3",
+      "airDate": "2024-06-26",
+      "episodeCount": 10,
+      "episodes": [
+        {
+          "id": 5334913,
+          "number": 1,
+          "title": "Tomorrow",
+          "airDate": "2024-06-26",
+          "description": "The next day and the days that led to it.",
+          "runtimeMinutes": 37
+        },
+        {
+          "id": 5334914,
+          "number": 2,
+          "title": "Next",
+          "airDate": "2024-06-26",
+          "description": "Carmy sets a new standard.",
+          "runtimeMinutes": 28
+        },
+        {
+          "id": 5334917,
+          "number": 3,
+          "title": "Doors",
+          "airDate": "2024-06-26",
+          "description": "The staff slogs through a month of service.",
+          "runtimeMinutes": 30
+        },
+        {
+          "id": 5334918,
+          "number": 4,
+          "title": "Violet",
+          "airDate": "2024-06-26",
+          "description": "Sydney gets a new apartment. Marcus finds inspiration.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 5334919,
+          "number": 5,
+          "title": "Children",
+          "airDate": "2024-06-26",
+          "description": "The Computer gives The Bear its odds.",
+          "runtimeMinutes": 35
+        },
+        {
+          "id": 5334920,
+          "number": 6,
+          "title": "Napkins",
+          "airDate": "2024-06-26",
+          "description": "Tina looks for a new opportunity.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 5334921,
+          "number": 7,
+          "title": "Legacy",
+          "airDate": "2024-06-26",
+          "description": "The restaurant is out of C-Folds. Sydney is presented with an opportunity.",
+          "runtimeMinutes": 29
+        },
+        {
+          "id": 5334925,
+          "number": 8,
+          "title": "Ice Chips",
+          "airDate": "2024-06-26",
+          "description": "Sugar finds support in an unexpected place.",
+          "runtimeMinutes": 40
+        },
+        {
+          "id": 5334929,
+          "number": 9,
+          "title": "Apologies",
+          "airDate": "2024-06-26",
+          "description": "Carmy thinks about apologizing.",
+          "runtimeMinutes": 44
+        },
+        {
+          "id": 5334931,
+          "number": 10,
+          "title": "Forever",
+          "airDate": "2024-06-26",
+          "description": "Another funeral.",
+          "runtimeMinutes": 44
+        }
+      ]
+    },
+    {
+      "id": 456296,
+      "number": 4,
+      "name": "Season 4",
+      "airDate": "2025-06-25",
+      "episodeCount": 10,
+      "episodes": [
+        {
+          "id": 6231138,
+          "number": 1,
+          "title": "Groundhogs",
+          "airDate": "2025-06-25",
+          "description": "Today looks like yesterday.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 6231141,
+          "number": 2,
+          "title": "Soubise",
+          "airDate": "2025-06-25",
+          "description": "Gears start to turn.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 6231143,
+          "number": 3,
+          "title": "Scallop",
+          "airDate": "2025-06-25",
+          "description": "Opportunity.",
+          "runtimeMinutes": 38
+        },
+        {
+          "id": 6231151,
+          "number": 4,
+          "title": "Worms",
+          "airDate": "2025-06-25",
+          "description": "Decisions.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 6231152,
+          "number": 5,
+          "title": "Replicants",
+          "airDate": "2025-06-25",
+          "description": "The team resets.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 6231153,
+          "number": 6,
+          "title": "Sophie",
+          "airDate": "2025-06-25",
+          "description": "Sophie's here.",
+          "runtimeMinutes": 30
+        },
+        {
+          "id": 6231155,
+          "number": 7,
+          "title": "Bears",
+          "airDate": "2025-06-25",
+          "description": "The wedding.",
+          "runtimeMinutes": 70
+        },
+        {
+          "id": 6231156,
+          "number": 8,
+          "title": "Green",
+          "airDate": "2025-06-25",
+          "description": "Everyone keeps going.",
+          "runtimeMinutes": 37
+        },
+        {
+          "id": 6231157,
+          "number": 9,
+          "title": "Tonnato",
+          "airDate": "2025-06-25",
+          "description": "Carmy takes a ride.",
+          "runtimeMinutes": 39
+        },
+        {
+          "id": 6231158,
+          "number": 10,
+          "title": "Goodbye",
+          "airDate": "2025-06-25",
+          "description": "Time waits for no one.",
+          "runtimeMinutes": 34
+        }
+      ]
+    }
+  ]
+}

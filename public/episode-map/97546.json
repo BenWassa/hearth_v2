@@ -1,0 +1,313 @@
+{
+  "title": "Ted Lasso",
+  "tmdb_id": "97546",
+  "keyType": "tmdb_id",
+  "seasons": [
+    {
+      "id": 140381,
+      "number": 1,
+      "name": "Season 1",
+      "airDate": "2020-08-14",
+      "episodeCount": 10,
+      "episodes": [
+        {
+          "id": 2043514,
+          "number": 1,
+          "title": "Pilot",
+          "airDate": "2020-08-14",
+          "description": "American football coach Ted Lasso is hired by a wealthy divorcée to coach the English soccer team AFC Richmond.",
+          "runtimeMinutes": 33
+        },
+        {
+          "id": 2350781,
+          "number": 2,
+          "title": "Biscuits",
+          "airDate": "2020-08-14",
+          "description": "It's Ted's first day of coaching, and fans aren't happy. He makes little headway but remains undeterred as the team plays its first match.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 2350783,
+          "number": 3,
+          "title": "Trent Crimm: The Independent",
+          "airDate": "2020-08-14",
+          "description": "To arrange an in-depth exposé, Rebecca pairs cynical journalist Trent Crimm with Ted for a day. Ted and Roy venture into the community.",
+          "runtimeMinutes": 33
+        },
+        {
+          "id": 2350786,
+          "number": 4,
+          "title": "For the Children",
+          "airDate": "2020-08-21",
+          "description": "Rebecca hosts the team's annual charity benefit, where Ted stages a reconciliation between Roy and Jamie.",
+          "runtimeMinutes": 36
+        },
+        {
+          "id": 2397461,
+          "number": 5,
+          "title": "Tan Lines",
+          "airDate": "2020-08-28",
+          "description": "With his wife and son visiting from America, Ted makes drastic changes to the lineup during a critical match.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 2405194,
+          "number": 6,
+          "title": "Two Aces",
+          "airDate": "2020-09-04",
+          "description": "When Jamie refuses to train, Ted turns to talented new signing Dani Rojas—and the team is struck by an age-old curse.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 2413910,
+          "number": 7,
+          "title": "Make Rebecca Great Again",
+          "airDate": "2020-09-11",
+          "description": "Rebecca celebrates her first anniversary as a divorcée as the team plays a match in Liverpool.",
+          "runtimeMinutes": 35
+        },
+        {
+          "id": 2423205,
+          "number": 8,
+          "title": "The Diamond Dogs",
+          "airDate": "2020-09-18",
+          "description": "Ted and Roy are both having relationship problems. Ted consults the Diamond Dogs while Roy has a talk with Keeley.",
+          "runtimeMinutes": 32
+        },
+        {
+          "id": 2431342,
+          "number": 9,
+          "title": "All Apologies",
+          "airDate": "2020-09-25",
+          "description": "After a series of mistakes on the pitch, pressure mounts to bench Roy. Rebecca drops a bombshell.",
+          "runtimeMinutes": 34
+        },
+        {
+          "id": 2440612,
+          "number": 10,
+          "title": "The Hope That Kills You",
+          "airDate": "2020-10-02",
+          "description": "Richmond plays a climactic match that will determine the fates of Ted and his club.",
+          "runtimeMinutes": 36
+        }
+      ]
+    },
+    {
+      "id": 191511,
+      "number": 2,
+      "name": "Season 2",
+      "airDate": "2021-07-23",
+      "episodeCount": 12,
+      "episodes": [
+        {
+          "id": 2891253,
+          "number": 1,
+          "title": "Goodbye Earl",
+          "airDate": "2021-07-23",
+          "description": "AFC Richmond brings in a sports psychologist to help the team overcome their unprecedented seven game tie-streak.",
+          "runtimeMinutes": 39
+        },
+        {
+          "id": 3037725,
+          "number": 2,
+          "title": "Lavender",
+          "airDate": "2021-07-30",
+          "description": "Ted is surprised by the reappearance of a familiar face. Roy tries out a new gig.",
+          "runtimeMinutes": 37
+        },
+        {
+          "id": 3037726,
+          "number": 3,
+          "title": "Do the Right-est Thing",
+          "airDate": "2021-08-06",
+          "description": "Rebecca has a special visitor shadow her at work. A player's return is not welcomed by the team.",
+          "runtimeMinutes": 40
+        },
+        {
+          "id": 3089818,
+          "number": 4,
+          "title": "Carol of the Bells",
+          "airDate": "2021-08-13",
+          "description": "It's Christmas in Richmond. Rebecca enlists Ted for a secret mission, Roy and Keeley search for a miracle, and the Higginses open up their home.",
+          "runtimeMinutes": 33
+        },
+        {
+          "id": 3125400,
+          "number": 5,
+          "title": "Rainbow",
+          "airDate": "2021-08-20",
+          "description": "Nate learns how to be assertive from Keeley and Rebecca. Ted asks Roy for a favor.",
+          "runtimeMinutes": 41
+        },
+        {
+          "id": 3125557,
+          "number": 6,
+          "title": "The Signal",
+          "airDate": "2021-08-27",
+          "description": "Ted is fired up that the new team dynamic seems to be working. But will they have a chance in the quarterfinal?",
+          "runtimeMinutes": 38
+        },
+        {
+          "id": 3144061,
+          "number": 7,
+          "title": "Headspace",
+          "airDate": "2021-09-03",
+          "description": "With things turning around for Richmond, it's time for everyone to work on their issues—like Ted's discomfort, Nate's confidence, and Roy's attention.",
+          "runtimeMinutes": 38
+        },
+        {
+          "id": 3179056,
+          "number": 8,
+          "title": "Man City",
+          "airDate": "2021-09-10",
+          "description": "Ted and Dr. Sharon realize they might have to meet each other halfway. Tensions are high as the team prepares for the semifinal.",
+          "runtimeMinutes": 48
+        },
+        {
+          "id": 3205724,
+          "number": 9,
+          "title": "Beard After Hours",
+          "airDate": "2021-09-17",
+          "description": "After the semifinal, Beard sets out on an all-night odyssey through London in an effort to collect his thoughts.",
+          "runtimeMinutes": 46
+        },
+        {
+          "id": 3222407,
+          "number": 10,
+          "title": "No Weddings and a Funeral",
+          "airDate": "2021-09-24",
+          "description": "Rebecca is stunned by a sudden loss. The team rallies to show their support, but Ted finds himself grappling with a piece of his past.",
+          "runtimeMinutes": 49
+        },
+        {
+          "id": 3222408,
+          "number": 11,
+          "title": "Midnight Train to Royston",
+          "airDate": "2021-10-01",
+          "description": "A billionaire football enthusiast from Ghana makes Sam an unbelievable offer. Ted plans something special for Dr. Sharon's last day with the team.",
+          "runtimeMinutes": 45
+        },
+        {
+          "id": 3222409,
+          "number": 12,
+          "title": "Inverting the Pyramid of Success",
+          "airDate": "2021-10-08",
+          "description": "Richmond gets their final chance to win promotion as Ted deals with the fallout of Trent Crimm's painfully honest exposé.",
+          "runtimeMinutes": 53
+        }
+      ]
+    },
+    {
+      "id": 328941,
+      "number": 3,
+      "name": "Season 3",
+      "airDate": "2023-03-14",
+      "episodeCount": 12,
+      "episodes": [
+        {
+          "id": 4234077,
+          "number": 1,
+          "title": "Smells Like Mean Spirit",
+          "airDate": "2023-03-14",
+          "description": "The newly promoted AFC Richmond face mockery as pundits predict they'll finish dead last this season.",
+          "runtimeMinutes": 47
+        },
+        {
+          "id": 4234078,
+          "number": 2,
+          "title": "(I Don't Want to Go to) Chelsea",
+          "airDate": "2023-03-21",
+          "description": "News of a top player looking to move to London sends the English clubs into a frenzy. Richmond play their first game back in the Premier League.",
+          "runtimeMinutes": 50
+        },
+        {
+          "id": 4234079,
+          "number": 3,
+          "title": "4-5-1",
+          "airDate": "2023-03-28",
+          "description": "Richmond adjust to an exciting change, but Jamie has reservations. Ted learns there's something new going on back in Kansas as well.",
+          "runtimeMinutes": 50
+        },
+        {
+          "id": 4234080,
+          "number": 4,
+          "title": "Big Week",
+          "airDate": "2023-04-04",
+          "description": "Everyone's feeling the pressure as Richmond gear up to play West Ham. Ted is reunited with an old friend.",
+          "runtimeMinutes": 53
+        },
+        {
+          "id": 4234081,
+          "number": 5,
+          "title": "Signs",
+          "airDate": "2023-04-11",
+          "description": "With their season in a tailspin, Richmond try to right the ship against mighty Manchester City. Off the pitch, everyone faces their own setbacks.",
+          "runtimeMinutes": 53
+        },
+        {
+          "id": 4234082,
+          "number": 6,
+          "title": "Sunflowers",
+          "airDate": "2023-04-18",
+          "description": "A friendly match takes the team to Amsterdam, where one night out unlocks truths for many.",
+          "runtimeMinutes": 66
+        },
+        {
+          "id": 4234084,
+          "number": 7,
+          "title": "The Strings That Bind Us",
+          "airDate": "2023-04-25",
+          "description": "The Greyhounds try a new strategy that has everyone thinking outside the box. Sam prepares to host a VIP guest at Ola's.",
+          "runtimeMinutes": 61
+        },
+        {
+          "id": 4234085,
+          "number": 8,
+          "title": "We'll Never Have Paris",
+          "airDate": "2023-05-02",
+          "description": "While watching Henry, Ted fights the urge to spiral when Michelle and Dr. Jacob go on a romantic trip. An online leak has massive implications for Keeley.",
+          "runtimeMinutes": 58
+        },
+        {
+          "id": 4234087,
+          "number": 9,
+          "title": "La Locker Room Aux Folles",
+          "airDate": "2023-05-09",
+          "description": "Colin and Isaac's friendship is tested. Roy is asked to do a press conference.",
+          "runtimeMinutes": 47
+        },
+        {
+          "id": 4234088,
+          "number": 10,
+          "title": "International Break",
+          "airDate": "2023-05-16",
+          "description": "While some of the Greyhounds head home to play for their countries in international matches, Edwin Akufo brings a business proposal to Rebecca.",
+          "runtimeMinutes": 67
+        },
+        {
+          "id": 4234090,
+          "number": 11,
+          "title": "Mom City",
+          "airDate": "2023-05-23",
+          "description": "An unexpected guest has Ted on edge. When Richmond travel to Manchester for a big match, Roy and Keeley become concerned about Jamie.",
+          "runtimeMinutes": 73
+        },
+        {
+          "id": 4234091,
+          "number": 12,
+          "title": "So Long, Farewell",
+          "airDate": "2023-05-30",
+          "description": "AFC Richmond play their final game of the season.",
+          "runtimeMinutes": 79
+        }
+      ]
+    },
+    {
+      "id": 466392,
+      "number": 4,
+      "name": "Season 4",
+      "airDate": null,
+      "episodeCount": 0
+    }
+  ]
+}

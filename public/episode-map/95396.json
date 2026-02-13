@@ -1,0 +1,184 @@
+{
+  "title": "Severance",
+  "tmdb_id": "95396",
+  "keyType": "tmdb_id",
+  "seasons": [
+    {
+      "id": 135726,
+      "number": 1,
+      "name": "Season 1",
+      "airDate": "2022-02-17",
+      "episodeCount": 9,
+      "episodes": [
+        {
+          "id": 1982925,
+          "number": 1,
+          "title": "Good News About Hell",
+          "airDate": "2022-02-17",
+          "description": "Mark is promoted to lead a team who've had their memories surgically divided between their work and personal lives.",
+          "runtimeMinutes": 57
+        },
+        {
+          "id": 3396429,
+          "number": 2,
+          "title": "Half Loop",
+          "airDate": "2022-02-17",
+          "description": "The team train new hire Helly on macrodata refinement. Mark takes a day off to meet with a mysterious former colleague.",
+          "runtimeMinutes": 53
+        },
+        {
+          "id": 3396430,
+          "number": 3,
+          "title": "In Perpetuity",
+          "airDate": "2022-02-24",
+          "description": "Mark takes the team on a field trip, but Helly continues to rebel. A deteriorating Petey struggles to tell Mark about Lumon’s misdeeds.",
+          "runtimeMinutes": 56
+        },
+        {
+          "id": 3396431,
+          "number": 4,
+          "title": "The You You Are",
+          "airDate": "2022-03-03",
+          "description": "Irving finds an intriguing book at work. Helly aggressively pursues a meeting with her Outie. Mark attends a funeral with Ms. Selvig.",
+          "runtimeMinutes": 46
+        },
+        {
+          "id": 3396432,
+          "number": 5,
+          "title": "The Grim Barbarity of Optics and Design",
+          "airDate": "2022-03-10",
+          "description": "Irving and Dylan confront Burt about his lies. Mark and Helly discover a strange new department.",
+          "runtimeMinutes": 43
+        },
+        {
+          "id": 3396433,
+          "number": 6,
+          "title": "Hide and Seek",
+          "airDate": "2022-03-17",
+          "description": "The team angers Cobel by forming an alliance.",
+          "runtimeMinutes": 40
+        },
+        {
+          "id": 3396434,
+          "number": 7,
+          "title": "Defiant Jazz",
+          "airDate": "2022-03-24",
+          "description": "Mark and the team encounter new security measures from Cobel.",
+          "runtimeMinutes": 49
+        },
+        {
+          "id": 3396435,
+          "number": 8,
+          "title": "What's for Dinner?",
+          "airDate": "2022-03-31",
+          "description": "The team prepares a plan. Mark attends Devon and Ricken’s party.",
+          "runtimeMinutes": 46
+        },
+        {
+          "id": 3396436,
+          "number": 9,
+          "title": "The We We Are",
+          "airDate": "2022-04-07",
+          "description": "The team discovers troubling revelations.",
+          "runtimeMinutes": 40
+        }
+      ]
+    },
+    {
+      "id": 401674,
+      "number": 2,
+      "name": "Season 2",
+      "airDate": "2025-01-16",
+      "episodeCount": 10,
+      "episodes": [
+        {
+          "id": 5469028,
+          "number": 1,
+          "title": "Hello, Ms. Cobel",
+          "airDate": "2025-01-16",
+          "description": "Mark returns to work under different circumstances. Secrets from the Outie world come to light.",
+          "runtimeMinutes": 54
+        },
+        {
+          "id": 5469115,
+          "number": 2,
+          "title": "Goodbye, Mrs. Selvig",
+          "airDate": "2025-01-23",
+          "description": "Mark contemplates the meaning of a message.",
+          "runtimeMinutes": 49
+        },
+        {
+          "id": 5469117,
+          "number": 3,
+          "title": "Who Is Alive?",
+          "airDate": "2025-01-30",
+          "description": "Mark, Helly, Irving, and Dylan search for answers.",
+          "runtimeMinutes": 57
+        },
+        {
+          "id": 5469118,
+          "number": 4,
+          "title": "Woe's Hollow",
+          "airDate": "2025-02-06",
+          "description": "The team participates in a group activity.",
+          "runtimeMinutes": 54
+        },
+        {
+          "id": 5469120,
+          "number": 5,
+          "title": "Trojan's Horse",
+          "airDate": "2025-02-13",
+          "description": "Tensions emerge after the team suffers a loss.",
+          "runtimeMinutes": 50
+        },
+        {
+          "id": 5469123,
+          "number": 6,
+          "title": "Attila",
+          "airDate": "2025-02-20",
+          "description": "Bonds are tested. Mark continues on his path of discovery.",
+          "runtimeMinutes": 52
+        },
+        {
+          "id": 5469128,
+          "number": 7,
+          "title": "Chikhai Bardo",
+          "airDate": "2025-02-27",
+          "description": "An old romance intersects with a deadly present threat.",
+          "runtimeMinutes": 53
+        },
+        {
+          "id": 5469133,
+          "number": 8,
+          "title": "Sweet Vitriol",
+          "airDate": "2025-03-06",
+          "description": "Discoveries are made.",
+          "runtimeMinutes": 41
+        },
+        {
+          "id": 5469139,
+          "number": 9,
+          "title": "The After Hours",
+          "airDate": "2025-03-13",
+          "description": "Mark and Devon team with an ally. Helly investigates further.",
+          "runtimeMinutes": 48
+        },
+        {
+          "id": 5469142,
+          "number": 10,
+          "title": "Cold Harbor",
+          "airDate": "2025-03-20",
+          "description": "Mark forms a shaky alliance in an all-or-nothing play, while the team makes a dangerous last stand.",
+          "runtimeMinutes": 80
+        }
+      ]
+    },
+    {
+      "id": 447475,
+      "number": 3,
+      "name": "Season 3",
+      "airDate": null,
+      "episodeCount": 0
+    }
+  ]
+}

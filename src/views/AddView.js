@@ -4,19 +4,16 @@ import { ENERGIES, VIBES } from '../config/constants.js';
 import Button from '../components/ui/Button.js';
 import Input from '../components/ui/Input.js';
 import TextArea from '../components/ui/TextArea.js';
-import {
-  getMediaDetails,
-  getSeasonEpisodes,
-  getShowSeasons,
-} from '../services/mediaApi/client.js';
+import { getMediaDetails } from '../services/mediaApi/client.js';
+import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
 
 const AddView = ({ onBack, onSubmit }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [title, setTitle] = useState('');
   const [type, setType] = useState('movie');
-  const [vibe, setVibe] = useState(VIBES[0].id);
-  const [energy, setEnergy] = useState('balanced');
+  const [vibe, setVibe] = useState('');
+  const [energy, setEnergy] = useState('');
   const [runtimeMinutes, setRuntimeMinutes] = useState('');
   const [note, setNote] = useState('');
   const [selectedResult, setSelectedResult] = useState(null);
@@ -31,46 +28,6 @@ const AddView = ({ onBack, onSubmit }) => {
   });
 
   const visibleResults = useMemo(() => results.slice(0, 5), [results]);
-
-  const hydrateShowData = async (provider, providerId) => {
-    const seasonResponse = await getShowSeasons({ provider, providerId });
-    const seasons = Array.isArray(seasonResponse?.seasons)
-      ? seasonResponse.seasons
-      : [];
-
-    const seasonData = await Promise.all(
-      seasons.map(async (season) => {
-        const episodesData = await getSeasonEpisodes({
-          provider,
-          providerId,
-          seasonNumber: season.seasonNumber,
-        });
-        return {
-          seasonNumber: season.seasonNumber,
-          name: season.name || `Season ${season.seasonNumber}`,
-          episodeCount: season.episodeCount || 0,
-          airDate: season.airDate || '',
-          poster: season.posterUrl || '',
-          episodes: Array.isArray(episodesData?.episodes)
-            ? episodesData.episodes.map((episode) => ({
-                id: episode.episodeId,
-                episodeNumber: episode.episodeNumber,
-                name: episode.name,
-                description: episode.overview,
-                airDate: episode.airDate,
-                runtimeMinutes: episode.runtimeMinutes,
-                still: episode.stillUrl,
-              }))
-            : [],
-        };
-      }),
-    );
-
-    return {
-      seasonCount: seasonResponse?.seasonCount || seasonData.length,
-      seasons: seasonData,
-    };
-  };
 
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
@@ -240,7 +197,7 @@ const AddView = ({ onBack, onSubmit }) => {
             <div className="text-xs text-stone-500">Searching catalog...</div>
           )}
           {error && <div className="text-xs text-red-400">{error}</div>}
-          {hasQuery && !loading && visibleResults.length > 0 && (
+          {!selectedResult && hasQuery && !loading && visibleResults.length > 0 && (
             <div className="rounded-xl border border-stone-800 bg-stone-900/40 divide-y divide-stone-800">
               {visibleResults.map((result) => (
                 <button

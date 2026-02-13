@@ -39,6 +39,7 @@ import {
   refreshMediaMetadata,
   searchMedia,
 } from '../services/mediaApi/client.js';
+import { hydrateShowData } from '../services/mediaApi/showData.js';
 
 const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
@@ -117,13 +118,41 @@ const pickBestSearchResult = ({ results, title, type, year }) => {
     .sort((a, b) => b.score - a.score)[0]?.result;
 };
 
-const buildTitleYearKey = (item = {}) => {
+const buildTitleKey = (item = {}) => {
   const title = String(item?.title || '')
     .trim()
     .toLowerCase();
-  const year = String(item?.year || '').trim();
-  if (!title || !year) return '';
-  return `${title}::${year}`;
+  if (!title) return '';
+  return title;
+};
+
+const getMetadataGaps = (item = {}) => {
+  const gaps = [];
+  const sourceProvider = String(item?.source?.provider || '').trim();
+  const sourceProviderId = String(item?.source?.providerId || '').trim();
+  const poster = String(item?.poster || item?.media?.poster || '').trim();
+  const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
+  const isShow = item?.type === 'show';
+  const seasonCount = Number(
+    item?.totalSeasons ??
+      item?.showData?.seasonCount ??
+      (Array.isArray(item?.seasons) ? item.seasons.length : 0),
+  );
+  const seasons = Array.isArray(item?.seasons)
+    ? item.seasons
+    : Array.isArray(item?.showData?.seasons)
+    ? item.showData.seasons
+    : [];
+
+  if (!sourceProvider || !sourceProviderId) gaps.push('source');
+  if (!poster) gaps.push('poster');
+  if (!backdrop) gaps.push('backdrop');
+  if (isShow) {
+    if (!Number.isFinite(seasonCount) || seasonCount < 1) gaps.push('seasonCount');
+    if (!seasons.length) gaps.push('seasons');
+  }
+
+  return gaps;
 };
 
 const clearSpaceTrayCache = (targetSpaceId) => {
@@ -171,6 +200,7 @@ export const useAppState = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [isWipingSpace, setIsWipingSpace] = useState(false);
+  const [isMetadataRepairing, setIsMetadataRepairing] = useState(false);
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
@@ -552,12 +582,32 @@ export const useAppState = () => {
       return;
     }
     try {
-      const enrichedItems = [];
-      let matchedCount = 0;
-      let unmatchedCount = 0;
+      const existingKeys = new Set(
+        items.map((existingItem) => buildTitleKey(existingItem)).filter(Boolean),
+      );
+      const importKeys = new Set();
+      const itemsForLookup = [];
       let duplicateCount = 0;
 
       for (const item of itemsToImport) {
+        const dedupeKey = buildTitleKey(item);
+        if (!dedupeKey) {
+          itemsForLookup.push(item);
+          continue;
+        }
+        if (existingKeys.has(dedupeKey) || importKeys.has(dedupeKey)) {
+          duplicateCount += 1;
+          continue;
+        }
+        importKeys.add(dedupeKey);
+        itemsForLookup.push(item);
+      }
+
+      const enrichedItems = [];
+      let matchedCount = 0;
+      let unmatchedCount = 0;
+
+      for (const item of itemsForLookup) {
         const title = String(item?.title || '').trim();
         const itemType = item?.type === 'show' ? 'show' : 'movie';
 
@@ -592,6 +642,18 @@ export const useAppState = () => {
           const poster = details?.posterUrl || best.posterUrl || item?.poster || '';
           const backdrop =
             details?.backdropUrl || best.backdropUrl || item?.backdrop || '';
+          let showData = { seasonCount: null, seasons: [] };
+
+          if (resolvedType === 'show') {
+            try {
+              showData = await hydrateShowData({
+                provider: best.provider,
+                providerId: best.providerId,
+              });
+            } catch {
+              showData = { seasonCount: null, seasons: [] };
+            }
+          }
 
           enrichedItems.push({
             ...item,
@@ -629,6 +691,7 @@ export const useAppState = () => {
               poster,
               backdrop,
             },
+            showData,
           });
           matchedCount += 1;
         } catch (error) {
@@ -637,25 +700,7 @@ export const useAppState = () => {
         }
       }
 
-      const existingKeys = new Set(
-        items.map((existingItem) => buildTitleYearKey(existingItem)).filter(Boolean),
-      );
-      const importKeys = new Set();
-      const itemsToCommit = [];
-
-      for (const enrichedItem of enrichedItems) {
-        const dedupeKey = buildTitleYearKey(enrichedItem);
-        if (!dedupeKey) {
-          itemsToCommit.push(enrichedItem);
-          continue;
-        }
-        if (existingKeys.has(dedupeKey) || importKeys.has(dedupeKey)) {
-          duplicateCount += 1;
-          continue;
-        }
-        importKeys.add(dedupeKey);
-        itemsToCommit.push(enrichedItem);
-      }
+      const itemsToCommit = enrichedItems;
 
       await commitImport(itemsToCommit, async (item) => {
         const payload = buildWatchlistPayload(
@@ -694,7 +739,7 @@ export const useAppState = () => {
         notifyError(
           `Skipped ${duplicateCount} duplicate import item${
             duplicateCount === 1 ? '' : 's'
-          } (same title and year).`,
+          } (same title).`,
         );
       }
     } catch (err) {
@@ -820,22 +865,69 @@ export const useAppState = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, options = {}) => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
       return;
     }
+    const shouldConfirm = !options?.skipConfirm;
     if (
+      shouldConfirm &&
       typeof window !== 'undefined' &&
-      window.confirm('Remove this memory?')
+      !window.confirm('Remove this memory?')
     ) {
-      try {
-        await deleteWatchlistItem({ db, appId, spaceId, itemId: id });
-      } catch (err) {
-        console.error('Error deleting:', err);
-        notifyError("Couldn't remove that. Try again.");
-      }
+      return;
     }
+    try {
+      await deleteWatchlistItem({ db, appId, spaceId, itemId: id });
+    } catch (err) {
+      console.error('Error deleting:', err);
+      notifyError("Couldn't remove that. Try again.");
+    }
+  };
+
+  const buildUpdatesFromRefreshed = (refreshed = {}) => {
+    const updates = {
+      schemaVersion: 2,
+      source: refreshed.source,
+      media: {
+        ...refreshed.media,
+        poster: refreshed.media?.poster || refreshed.media?.posterUrl || '',
+        backdrop:
+          refreshed.media?.backdrop || refreshed.media?.backdropUrl || '',
+      },
+      showData: refreshed.showData || { seasonCount: null, seasons: [] },
+    };
+
+    if (refreshed.media?.title) updates.title = refreshed.media.title;
+    if (refreshed.media?.type) updates.type = refreshed.media.type;
+    if (refreshed.media?.year) updates.year = refreshed.media.year;
+    if (Number.isFinite(refreshed.media?.runtimeMinutes)) {
+      updates.runtimeMinutes = refreshed.media.runtimeMinutes;
+    }
+    if (Array.isArray(refreshed.media?.genres)) {
+      updates.genres = refreshed.media.genres;
+    }
+    if (Array.isArray(refreshed.media?.cast)) {
+      updates.actors = refreshed.media.cast;
+    }
+    if (Array.isArray(refreshed.media?.directors) && refreshed.media.directors[0]) {
+      updates.director = refreshed.media.directors[0];
+    }
+    if (refreshed.media?.poster || refreshed.media?.posterUrl) {
+      updates.poster = refreshed.media.poster || refreshed.media.posterUrl;
+    }
+    if (refreshed.media?.backdrop || refreshed.media?.backdropUrl) {
+      updates.backdrop = refreshed.media.backdrop || refreshed.media.backdropUrl;
+    }
+    if (Number.isFinite(refreshed.showData?.seasonCount) && refreshed.showData.seasonCount > 0) {
+      updates.totalSeasons = refreshed.showData.seasonCount;
+    }
+    if (Array.isArray(refreshed.showData?.seasons)) {
+      updates.seasons = refreshed.showData.seasons;
+    }
+
+    return updates;
   };
 
   const handleRefreshMetadata = async (id) => {
@@ -857,55 +949,132 @@ export const useAppState = () => {
         type: item.type || 'auto',
       });
 
-      const updates = {
-        schemaVersion: 2,
-        source: refreshed.source,
-        media: {
-          ...refreshed.media,
-          poster: refreshed.media?.poster || refreshed.media?.posterUrl || '',
-          backdrop:
-            refreshed.media?.backdrop || refreshed.media?.backdropUrl || '',
-        },
-        showData: refreshed.showData || { seasonCount: null, seasons: [] },
-      };
-
-      if (refreshed.media?.title) updates.title = refreshed.media.title;
-      if (refreshed.media?.type) updates.type = refreshed.media.type;
-      if (refreshed.media?.year) updates.year = refreshed.media.year;
-      if (Number.isFinite(refreshed.media?.runtimeMinutes)) {
-        updates.runtimeMinutes = refreshed.media.runtimeMinutes;
-      }
-      if (Array.isArray(refreshed.media?.genres)) {
-        updates.genres = refreshed.media.genres;
-      }
-      if (Array.isArray(refreshed.media?.cast)) {
-        updates.actors = refreshed.media.cast;
-      }
-      if (refreshed.media?.poster || refreshed.media?.posterUrl) {
-        updates.poster = refreshed.media.poster || refreshed.media.posterUrl;
-      }
-      if (refreshed.media?.backdrop || refreshed.media?.backdropUrl) {
-        updates.backdrop =
-          refreshed.media.backdrop || refreshed.media.backdropUrl;
-      }
-      if (refreshed.showData?.seasonCount) {
-        updates.totalSeasons = refreshed.showData.seasonCount;
-      }
-      if (Array.isArray(refreshed.showData?.seasons)) {
-        updates.seasons = refreshed.showData.seasons;
-      }
-
       await updateWatchlistItem({
         db,
         appId,
         spaceId,
         itemId: id,
-        updates,
+        updates: buildUpdatesFromRefreshed(refreshed),
       });
       notifyUpdate('Metadata refreshed.');
     } catch (err) {
       console.error('Error refreshing metadata:', err);
       notifyError('Could not refresh metadata right now.');
+    }
+  };
+
+  const handleMetadataAudit = () => {
+    if (!items.length) {
+      notifyUpdate('Metadata audit: no titles to check.');
+      return;
+    }
+
+    const entries = items
+      .map((item) => ({
+        item,
+        gaps: getMetadataGaps(item),
+      }))
+      .filter((entry) => entry.gaps.length > 0);
+
+    if (!entries.length) {
+      notifyUpdate(`Metadata audit: all ${items.length} title(s) look complete.`);
+      return;
+    }
+
+    const counts = entries.reduce(
+      (acc, entry) => {
+        entry.gaps.forEach((gap) => {
+          acc[gap] = (acc[gap] || 0) + 1;
+        });
+        return acc;
+      },
+      {},
+    );
+    notifyUpdate(
+      `Metadata audit: ${entries.length}/${items.length} need repair (${Object.entries(
+        counts,
+      )
+        .map(([gap, count]) => `${gap}:${count}`)
+        .join(', ')}).`,
+    );
+    console.table(
+      entries.slice(0, 50).map(({ item, gaps }) => ({
+        title: item.title,
+        type: item.type,
+        gaps: gaps.join(', '),
+      })),
+    );
+  };
+
+  const handleMetadataRepairMissing = async () => {
+    if (!db || !spaceId) {
+      notifyError('Database not available. Please check your connection.');
+      return;
+    }
+    if (isMetadataRepairing) return;
+
+    const candidates = items.filter((item) => getMetadataGaps(item).length > 0);
+    if (!candidates.length) {
+      notifyUpdate('No missing metadata found to repair.');
+      return;
+    }
+
+    setIsMetadataRepairing(true);
+    let repaired = 0;
+    let failed = 0;
+    try {
+      for (const item of candidates) {
+        try {
+          let provider = String(item?.source?.provider || '').trim();
+          let providerId = String(item?.source?.providerId || '').trim();
+          let refreshed = null;
+
+          if (!provider || !providerId) {
+            const itemType = item?.type === 'show' ? 'show' : 'movie';
+            const searchData = await searchMedia({ q: item.title, type: itemType, page: 1 });
+            const best = pickBestSearchResult({
+              results: searchData?.results,
+              title: item.title,
+              type: itemType,
+              year: item?.year,
+            });
+            provider = String(best?.provider || '').trim();
+            providerId = String(best?.providerId || '').trim();
+          }
+
+          if (!provider || !providerId) {
+            failed += 1;
+            continue;
+          }
+
+          refreshed = await refreshMediaMetadata({
+            provider,
+            providerId,
+            type: item?.type || 'auto',
+          });
+
+          await updateWatchlistItem({
+            db,
+            appId,
+            spaceId,
+            itemId: item.id,
+            updates: buildUpdatesFromRefreshed(refreshed),
+          });
+          repaired += 1;
+        } catch (error) {
+          console.warn('Metadata repair failed for item:', item?.title, error);
+          failed += 1;
+        }
+      }
+    } finally {
+      setIsMetadataRepairing(false);
+    }
+
+    if (repaired > 0) {
+      notifyUpdate(`Metadata repair completed for ${repaired} title(s).`);
+    }
+    if (failed > 0) {
+      notifyError(`${failed} title(s) still missing metadata after repair.`);
     }
   };
 
@@ -1015,6 +1184,8 @@ export const useAppState = () => {
     handleImportItems,
     handleInvite,
     handleMarkWatched,
+    handleMetadataAudit,
+    handleMetadataRepairMissing,
     handleRefreshMetadata,
     handleReloadNow,
     handleSignIn,
@@ -1024,6 +1195,7 @@ export const useAppState = () => {
     isBootstrapping,
     isDeciding,
     isImportOpen,
+    isMetadataRepairing,
     isSpaceSetupRunning,
     isWipingSpace,
     isSigningIn,

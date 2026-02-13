@@ -53,7 +53,11 @@ export default function HearthApp() {
     user,
     view,
   } = useAppState();
-  const showDevMetadataTools = Boolean(import.meta?.env?.DEV);
+  const isLocalHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1');
+  const showDevMetadataTools = Boolean(import.meta?.env?.DEV) || isLocalHost;
 
   if (!authResolved || isBootstrapping) {
     return (

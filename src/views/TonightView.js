@@ -1,26 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  BarChart3,
-  AlertTriangle,
-  Sparkles,
-  Moon,
-  Menu,
-  X,
-  Check,
-  Plus,
-  BookOpen,
-  Zap,
-  Trash2,
-} from 'lucide-react';
-import {
-  VIBES,
-  ENERGIES,
-  DAILY_TRAY_STORAGE_PREFIX,
-} from '../config/constants.js';
-import { APP_VERSION } from '../version';
+import { DAILY_TRAY_STORAGE_PREFIX } from '../config/constants.js';
 import { buildTonightTray } from '../domain/watchlist.js';
-import ItemCard from '../components/cards/ItemCard.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
+import BottomNav from './components/tonight/BottomNav.js';
+import EnergyPickModal from './components/tonight/EnergyPickModal.js';
+import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
+import PickForUsCard from './components/tonight/PickForUsCard.js';
+import SuggestionSection from './components/tonight/SuggestionSection.js';
+import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
+import VibePickModal from './components/tonight/VibePickModal.js';
+import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
 
 const TonightView = ({
   items,
@@ -52,15 +41,14 @@ const TonightView = ({
     () => unwatched.filter((i) => i.type === 'show'),
     [unwatched],
   );
-  const spaceLabel =
-    spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPickModalOpen, setIsPickModalOpen] = useState(false);
-  const [pickFilterMode, setPickFilterMode] = useState(null); // 'vibe', 'energy', or null
+  const [pickFilterMode, setPickFilterMode] = useState(null);
   const [pickFilters, setPickFilters] = useState({
     vibe: null,
     energy: null,
-    type: null, // 'movie' or 'show'
+    type: null,
   });
   const [detailItem, setDetailItem] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -70,10 +58,20 @@ const TonightView = ({
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [auditReport, setAuditReport] = useState(null);
+
+  const spaceLabel =
+    spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
   const todayKey = new Date().toISOString().slice(0, 10);
   const wipePhrase = 'WIPE';
   const canConfirmWipe =
     wipeConfirmText.trim().toUpperCase() === wipePhrase && !isDeletingAll;
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  }, []);
 
   const openDetails = (item) => {
     setDetailItem(item);
@@ -90,11 +88,7 @@ const TonightView = ({
     setIsAuditLoading(true);
     try {
       const report = await onMetadataAudit?.();
-      if (report) {
-        setAuditReport(report);
-      } else {
-        setAuditReport(null);
-      }
+      setAuditReport(report || null);
     } finally {
       setIsAuditLoading(false);
     }
@@ -113,6 +107,7 @@ const TonightView = ({
     const storageKey = `${DAILY_TRAY_STORAGE_PREFIX}:${
       spaceId || 'anon'
     }:${type}:${todayKey}`;
+
     try {
       const cached = JSON.parse(localStorage.getItem(storageKey) || 'null');
       const ids = Array.isArray(cached?.ids) ? cached.ids : [];
@@ -137,432 +132,157 @@ const TonightView = ({
     return tray;
   };
 
-  // Logic to generate the "Tonight Tray"
-  // We want 1 Light, 1 Balanced, 1 Focused if available, otherwise fallback to random
   const movieSuggestions = useMemo(() => {
     return buildDailyTray(unwatchedMovies, 'movie');
   }, [unwatchedMovies, spaceId, todayKey]);
+
   const showSuggestions = useMemo(() => {
     return buildDailyTray(unwatchedShows, 'show');
   }, [unwatchedShows, spaceId, todayKey]);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 6 && hour < 12) return 'Good Morning';
-    if (hour >= 12 && hour < 18) return 'Good Afternoon';
-    return 'Good Evening';
+  const closePickModal = (mode) => {
+    setPickFilterMode(null);
+    setIsPickModalOpen(false);
+    setPickFilters((prev) => ({ ...prev, [mode]: null }));
+  };
+
+  const handleSelectVibe = (vibeId) => {
+    const newVibe = pickFilters.vibe === vibeId ? null : vibeId;
+    setPickFilters((prev) => ({ ...prev, vibe: newVibe }));
+
+    if (!newVibe) return;
+    const filtered = [...unwatchedMovies, ...unwatchedShows].filter(
+      (item) => item.vibe === newVibe,
+    );
+
+    if (filtered.length > 0) {
+      const pickedItem = filtered[Math.floor(Math.random() * filtered.length)];
+      onDecide([pickedItem]);
+      setPickFilters({ vibe: null, energy: null, type: null });
+      setPickFilterMode(null);
+      setIsPickModalOpen(false);
+      return;
+    }
+
+    setLocalPickError('No items match that vibe yet.');
+    setTimeout(() => setLocalPickError(''), 2500);
+  };
+
+  const handleSelectEnergy = (energyId) => {
+    const newEnergy = pickFilters.energy === energyId ? null : energyId;
+    setPickFilters((prev) => ({ ...prev, energy: newEnergy }));
+
+    if (!newEnergy) return;
+    const filtered = [...unwatchedMovies, ...unwatchedShows].filter(
+      (item) => item.energy === newEnergy,
+    );
+
+    if (filtered.length > 0) {
+      const pickedItem = filtered[Math.floor(Math.random() * filtered.length)];
+      onDecide([pickedItem]);
+      setPickFilters({ vibe: null, energy: null, type: null });
+      setPickFilterMode(null);
+      setIsPickModalOpen(false);
+      return;
+    }
+
+    setLocalPickError('No items match that energy level yet.');
+    setTimeout(() => setLocalPickError(''), 2500);
+  };
+
+  const handleOpenDeleteAll = () => {
+    setWipeConfirmText('');
+    setIsWipeConfirmOpen(true);
+  };
+
+  const closeWipeModal = () => {
+    if (isDeletingAll) return;
+    setIsWipeConfirmOpen(false);
+    setWipeConfirmText('');
+  };
+
+  const confirmDeleteAll = async () => {
+    if (!canConfirmWipe || !onDeleteAll) return;
+    const didDelete = await onDeleteAll();
+    if (didDelete) {
+      setIsWipeConfirmOpen(false);
+      setWipeConfirmText('');
+    }
   };
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500">
-      {isMenuOpen && (
-        <button
-          className="fixed inset-0 z-20 cursor-default"
-          onClick={() => setIsMenuOpen(false)}
-          aria-label="Close menu"
-        />
-      )}
-      <header className="px-6 py-8 flex justify-between items-start">
-        <div className="space-y-1 min-w-0">
-          <p className="text-xs text-amber-700 font-bold uppercase tracking-widest">
-            {getGreeting()}
-          </p>
-          <h2
-            className="text-3xl font-serif text-stone-100 max-w-full"
-            title={spaceLabel}
-            aria-label={spaceLabel}
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {spaceLabel}
-          </h2>
-        </div>
-        <div className="relative">
-          <button
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className={`p-2 rounded-full transition-colors ${
-              isMenuOpen
-                ? 'bg-stone-900 text-amber-400'
-                : 'bg-stone-900/50 text-stone-400 hover:text-stone-200'
-            }`}
-            aria-expanded={isMenuOpen}
-            aria-haspopup="menu"
-            title="Menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          {isMenuOpen && (
-            <div
-              className="absolute right-0 mt-2 w-48 bg-stone-950 border border-stone-800 rounded-xl shadow-2xl overflow-hidden z-30"
-              role="menu"
-            >
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  onInvite();
-                }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
-                role="menuitem"
-              >
-                Invite partner
-              </button>
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  onImport();
-                }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
-                role="menuitem"
-              >
-                Import
-              </button>
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  onExport();
-                }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
-                role="menuitem"
-              >
-                Export
-              </button>
-              {showDevMetadataTools && (
-                <>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      openAuditModal();
-                    }}
-                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors border-t border-stone-900"
-                    role="menuitem"
-                  >
-                    Audit Metadata (Dev)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      onMetadataRepairMissing?.();
-                    }}
-                    disabled={isMetadataRepairing}
-                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-t border-stone-900"
-                    role="menuitem"
-                  >
-                    {isMetadataRepairing
-                      ? 'Repairing Metadata...'
-                      : 'Repair Missing Metadata (Dev)'}
-                  </button>
-                </>
-              )}
-              {onDeleteAll && (
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    setWipeConfirmText('');
-                    setIsWipeConfirmOpen(true);
-                  }}
-                  className="w-full px-4 py-3 text-left text-sm text-rose-300 hover:bg-rose-950/30 hover:text-rose-200 transition-colors border-t border-stone-900"
-                  role="menuitem"
-                >
-                  Delete all titles
-                </button>
-              )}
-              <div className="px-4 py-3 text-xs text-stone-400 border-t border-stone-900">
-                Version {APP_VERSION}
-              </div>
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  onSignOut();
-                }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-200 transition-colors border-t border-stone-900"
-                role="menuitem"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
+      <TonightHeaderMenu
+        greeting={greeting}
+        spaceLabel={spaceLabel}
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        onInvite={onInvite}
+        onImport={onImport}
+        onExport={onExport}
+        showDevMetadataTools={showDevMetadataTools}
+        openAuditModal={openAuditModal}
+        onMetadataRepairMissing={onMetadataRepairMissing}
+        isMetadataRepairing={isMetadataRepairing}
+        onDeleteAll={onDeleteAll}
+        onOpenDeleteAll={handleOpenDeleteAll}
+        onSignOut={onSignOut}
+      />
 
       <div className="flex-1 px-6 space-y-8 overflow-y-auto pb-32">
         <div className="space-y-8">
-          <div className="space-y-0">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
-                Movies
-              </h3>
-              {unwatchedMovies.length > 0 && (
-                <button
-                  onClick={() => onDecide(unwatchedMovies)}
-                  className="text-xs text-amber-600 hover:text-amber-500 flex items-center gap-1"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  Pick for us
-                </button>
-              )}
-            </div>
-            {movieSuggestions.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {movieSuggestions.map((item) => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    onToggle={() => onToggleStatus(item.id, item.status)}
-                    minimal={false}
-                    onOpenDetails={openDetails}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 space-y-3 opacity-70 bg-stone-900/30 border border-stone-800 rounded-xl">
-                <div className="w-12 h-12 bg-stone-900 rounded-full flex items-center justify-center mx-auto text-stone-400">
-                  <Moon className="w-5 h-5" />
-                </div>
-                <p className="text-xs text-stone-400">No movies queued yet.</p>
-              </div>
-            )}
-          </div>
+          <SuggestionSection
+            title="Movies"
+            pool={unwatchedMovies}
+            suggestions={movieSuggestions}
+            emptyLabel="No movies queued yet."
+            onDecide={onDecide}
+            onToggleStatus={onToggleStatus}
+            onOpenDetails={openDetails}
+          />
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
-                TV Shows
-              </h3>
-              {unwatchedShows.length > 0 && (
-                <button
-                  onClick={() => onDecide(unwatchedShows)}
-                  className="text-xs text-amber-600 hover:text-amber-500 flex items-center gap-1"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  Pick for us
-                </button>
-              )}
-            </div>
-            {showSuggestions.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {showSuggestions.map((item) => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    onToggle={() => onToggleStatus(item.id, item.status)}
-                    minimal={false}
-                    onOpenDetails={openDetails}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 space-y-3 opacity-70 bg-stone-900/30 border border-stone-800 rounded-xl">
-                <div className="w-12 h-12 bg-stone-900 rounded-full flex items-center justify-center mx-auto text-stone-400">
-                  <Moon className="w-5 h-5" />
-                </div>
-                <p className="text-xs text-stone-400">No shows queued yet.</p>
-              </div>
-            )}
-          </div>
+          <SuggestionSection
+            title="TV Shows"
+            pool={unwatchedShows}
+            suggestions={showSuggestions}
+            emptyLabel="No shows queued yet."
+            onDecide={onDecide}
+            onToggleStatus={onToggleStatus}
+            onOpenDetails={openDetails}
+          />
 
-          <div className="space-y-0 -mt-2">
-            {/* Pick for us Header */}
-            <div className="flex items-center justify-center gap-2 px-2 py-1">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <h4 className="text-sm font-serif text-amber-200">Pick for us</h4>
-            </div>
-
-            {/* Featured Pick CTA */}
-            <div className="bg-gradient-to-br from-amber-500/15 to-amber-600/10 border border-amber-500/30 rounded-2xl p-2 space-y-2">
-              {/* Quick pick options: 3 columns, 1 row */}
-              <div className="flex gap-4">
-                {/* Random */}
-                <button
-                  onClick={() => {
-                    onDecide();
-                  }}
-                  className="flex-1 min-h-[56px] py-0 px-5 rounded-lg bg-amber-600/20 border border-amber-600/40 text-amber-300 hover:bg-amber-600/30 text-sm font-semibold uppercase tracking-wide transition-colors active:scale-95"
-                  title="Pick a random item from all unwatched"
-                >
-                  Random
-                </button>
-
-                {/* Vibe */}
-                <button
-                  onClick={() => {
-                    setLocalPickError('');
-                    setPickFilterMode('vibe');
-                    setIsPickModalOpen(true);
-                  }}
-                  className="flex-1 min-h-[56px] py-0 px-5 rounded-lg bg-stone-900/40 border border-stone-700 text-stone-300 hover:bg-stone-900/60 hover:text-stone-200 text-sm font-semibold uppercase tracking-wide transition-colors active:scale-95"
-                  title="Pick by vibe preference"
-                >
-                  Vibe
-                </button>
-
-                {/* Energy */}
-                <button
-                  onClick={() => {
-                    setPickFilterMode('energy');
-                    setIsPickModalOpen(true);
-                  }}
-                  className="flex-1 min-h-[56px] py-0 px-5 rounded-lg bg-stone-900/40 border border-stone-700 text-stone-300 hover:bg-stone-900/60 hover:text-stone-200 text-sm font-semibold uppercase tracking-wide transition-colors active:scale-95"
-                  title="Pick by energy level"
-                >
-                  Energy
-                </button>
-              </div>
-            </div>
-          </div>
+          <PickForUsCard
+            onPickRandom={() => onDecide()}
+            onPickVibe={() => {
+              setLocalPickError('');
+              setPickFilterMode('vibe');
+              setIsPickModalOpen(true);
+            }}
+            onPickEnergy={() => {
+              setLocalPickError('');
+              setPickFilterMode('energy');
+              setIsPickModalOpen(true);
+            }}
+          />
         </div>
 
-        {/* Bottom Nav - Add, Tonight & Library */}
-        <nav
-          className="fixed left-1/2 -translate-x-1/2 bottom-6 z-40 max-w-md w-[calc(100%-3rem)]"
-          style={{
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
-        >
-          <div className="bg-stone-900/40 backdrop-blur-2xl border border-stone-700/50 rounded-3xl shadow-2xl shadow-black/40 p-2">
-            <div className="flex items-center justify-around gap-2">
-              {/* Add Button */}
-              <button
-                onClick={onAdd}
-                className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
-                title="Add new item"
-              >
-                <Plus className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-colors" />
-                <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
-                  Add
-                </span>
-              </button>
+        <BottomNav onAdd={onAdd} goToShelf={goToShelf} />
 
-              {/* Tonight Button - Current Page (inactive) */}
-              <button
-                disabled
-                className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-default"
-                title="Tonight"
-              >
-                <Moon className="w-6 h-6 text-amber-400" />
-                <span className="text-xs font-bold tracking-wide text-amber-300">
-                  Tonight
-                </span>
-              </button>
+        <VibePickModal
+          isOpen={isPickModalOpen && pickFilterMode === 'vibe'}
+          selectedVibe={pickFilters.vibe}
+          onClose={() => closePickModal('vibe')}
+          onSelectVibe={handleSelectVibe}
+          localPickError={localPickError}
+        />
 
-              {/* Library Button */}
-              <button
-                onClick={goToShelf}
-                className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
-                title="Go to Library"
-              >
-                <BookOpen className="w-6 h-6 text-stone-300 group-hover:text-stone-100 transition-colors" />
-                <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
-                  Library
-                </span>
-              </button>
-            </div>
-          </div>
-        </nav>
-
-        {/* Vibe Filter Modal */}
-        {isPickModalOpen && pickFilterMode === 'vibe' && (
-          <>
-            <button
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm cursor-default"
-              onClick={() => {
-                setPickFilterMode(null);
-                setIsPickModalOpen(false);
-                setPickFilters((prev) => ({ ...prev, vibe: null }));
-              }}
-              aria-label="Close modal"
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500/30 rounded-2xl p-6 max-w-md w-full space-y-6 shadow-2xl">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-amber-400" />
-                    <h3 className="text-xl font-serif text-amber-200">
-                      Choose a Vibe
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setPickFilterMode(null);
-                      setIsPickModalOpen(false);
-                      setPickFilters((prev) => ({ ...prev, vibe: null }));
-                    }}
-                    className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-                    aria-label="Close"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-stone-400 -mt-2">
-                  Pick the mood you're in for tonight
-                </p>
-                {localPickError && (
-                  <div className="text-xs text-amber-300 mt-1">
-                    {localPickError}
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-3">
-                  {VIBES.map((vibe, idx) => (
-                    <button
-                      key={vibe.id}
-                      onClick={() => {
-                        const newVibe =
-                          pickFilters.vibe === vibe.id ? null : vibe.id;
-                        setPickFilters((prev) => ({ ...prev, vibe: newVibe }));
-
-                        // If the user just selected a vibe, immediately pick for them
-                        if (newVibe) {
-                          const filtered = [
-                            ...unwatchedMovies,
-                            ...unwatchedShows,
-                          ].filter((item) => item.vibe === newVibe);
-
-                          if (filtered.length > 0) {
-                            const pickedItem =
-                              filtered[
-                                Math.floor(Math.random() * filtered.length)
-                              ];
-                            onDecide([pickedItem]);
-                            setPickFilters({
-                              vibe: null,
-                              energy: null,
-                              type: null,
-                            });
-                            setPickFilterMode(null);
-                            setIsPickModalOpen(false);
-                            return;
-                          }
-
-                          setLocalPickError('No items match that vibe yet.');
-                          setTimeout(() => setLocalPickError(''), 2500);
-                        }
-                      }}
-                      className={`p-4 rounded-xl text-sm font-medium transition-all flex flex-col items-center gap-2 ${
-                        pickFilters.vibe === vibe.id
-                          ? 'bg-amber-600/40 text-amber-50 border-2 border-amber-500/80 shadow-lg scale-105'
-                          : 'bg-stone-800/60 text-stone-300 border-2 border-stone-700/50 hover:bg-stone-800 hover:border-amber-600/30 hover:text-amber-200'
-                      } ${
-                        idx === VIBES.length - 1 && VIBES.length % 2 === 1
-                          ? 'col-span-2'
-                          : ''
-                      }`}
-                    >
-                      {vibe.icon && <vibe.icon className="w-6 h-6" />}
-                      <span>{vibe.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Submit button removed — selecting a vibe picks immediately */}
-              </div>
-            </div>
-          </>
-        )}
+        <EnergyPickModal
+          isOpen={isPickModalOpen && pickFilterMode === 'energy'}
+          selectedEnergy={pickFilters.energy}
+          onClose={() => closePickModal('energy')}
+          onSelectEnergy={handleSelectEnergy}
+          localPickError={localPickError}
+        />
 
         <ItemDetailsModal
           isOpen={isDetailOpen}
@@ -573,310 +293,22 @@ const TonightView = ({
           onUpdate={onUpdate}
         />
 
-        {isAuditModalOpen && (
-          <>
-            <button
-              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm cursor-default"
-              onClick={() => setIsAuditModalOpen(false)}
-              aria-label="Close metadata audit"
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-stone-700 rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-4 shadow-2xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-amber-400" />
-                    <h3 className="text-lg font-serif text-stone-100">
-                      Metadata Audit
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => setIsAuditModalOpen(false)}
-                    className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-                    aria-label="Close metadata audit"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+        <MetadataAuditModal
+          isOpen={isAuditModalOpen}
+          onClose={() => setIsAuditModalOpen(false)}
+          isAuditLoading={isAuditLoading}
+          auditReport={auditReport}
+        />
 
-                {isAuditLoading ? (
-                  <div className="text-sm text-stone-400">Running audit...</div>
-                ) : !auditReport ? (
-                  <div className="text-sm text-stone-400">
-                    Audit data is unavailable right now.
-                  </div>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                        <div className="text-[10px] uppercase tracking-widest text-stone-500">
-                          Total
-                        </div>
-                        <div className="text-lg font-semibold text-stone-100">
-                          {auditReport.totalItems}
-                        </div>
-                      </div>
-                      <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                        <div className="text-[10px] uppercase tracking-widest text-stone-500">
-                          Complete
-                        </div>
-                        <div className="text-lg font-semibold text-emerald-300">
-                          {auditReport.completeItems}
-                        </div>
-                      </div>
-                      <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                        <div className="text-[10px] uppercase tracking-widest text-stone-500">
-                          Missing
-                        </div>
-                        <div className="text-lg font-semibold text-amber-300">
-                          {auditReport.itemsWithGaps}
-                        </div>
-                      </div>
-                      <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                        <div className="text-[10px] uppercase tracking-widest text-stone-500">
-                          Shows Missing
-                        </div>
-                        <div className="text-lg font-semibold text-amber-300">
-                          {auditReport.byType.show.withGaps}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg bg-stone-900/30 border border-stone-800 px-3 py-3 text-xs text-stone-300 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <div>Source: {auditReport.gapCounts.source || 0}</div>
-                      <div>Poster: {auditReport.gapCounts.poster || 0}</div>
-                      <div>Backdrop: {auditReport.gapCounts.backdrop || 0}</div>
-                      <div>Runtime: {auditReport.gapCounts.runtimeMinutes || 0}</div>
-                      <div>Year: {auditReport.gapCounts.year || 0}</div>
-                      <div>Genres: {auditReport.gapCounts.genres || 0}</div>
-                      <div>Actors: {auditReport.gapCounts.actors || 0}</div>
-                      <div>Director: {auditReport.gapCounts.director || 0}</div>
-                      <div>Season Count: {auditReport.gapCounts.seasonCount || 0}</div>
-                      <div>Seasons: {auditReport.gapCounts.seasons || 0}</div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="text-[10px] uppercase tracking-widest text-stone-500">
-                        Missing Items ({auditReport.missingRows.length})
-                      </div>
-                      {auditReport.missingRows.length === 0 ? (
-                        <div className="text-sm text-stone-400">
-                          No missing metadata found.
-                        </div>
-                      ) : (
-                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                          {auditReport.missingRows.slice(0, 100).map((row) => (
-                            <div
-                              key={row.id}
-                              className="rounded-lg border border-stone-800 bg-stone-900/30 px-3 py-2"
-                            >
-                              <div className="text-sm text-stone-200">
-                                {row.title}
-                              </div>
-                              <div className="text-[11px] text-stone-500 uppercase tracking-wider">
-                                {row.type}
-                              </div>
-                              <div className="text-xs text-amber-300 mt-1">
-                                Missing: {row.gaps.join(', ')}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Energy Filter Modal */}
-        {isPickModalOpen && pickFilterMode === 'energy' && (
-          <>
-            <button
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm cursor-default"
-              onClick={() => {
-                setPickFilterMode(null);
-                setIsPickModalOpen(false);
-                setPickFilters((prev) => ({ ...prev, energy: null }));
-              }}
-              aria-label="Close modal"
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500/30 rounded-2xl p-6 max-w-md w-full space-y-6 shadow-2xl">
-                <div className="flex items-center justify-between pb-2 border-b border-stone-800">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-amber-400" />
-                    <h3 className="text-xl font-serif text-amber-200">
-                      Choose Energy Level
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setPickFilterMode(null);
-                      setIsPickModalOpen(false);
-                      setPickFilters((prev) => ({ ...prev, energy: null }));
-                    }}
-                    className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-                    aria-label="Close"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-stone-400 -mt-2">
-                  How much attention do you want to give?
-                </p>
-                {localPickError && (
-                  <div className="text-xs text-amber-300 mt-1">
-                    {localPickError}
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  {ENERGIES.map((energy) => (
-                    <button
-                      key={energy.id}
-                      onClick={() => {
-                        const newEnergy =
-                          pickFilters.energy === energy.id ? null : energy.id;
-                        setPickFilters((prev) => ({
-                          ...prev,
-                          energy: newEnergy,
-                        }));
-
-                        // If the user selects an energy level, pick immediately
-                        if (newEnergy) {
-                          const filtered = [
-                            ...unwatchedMovies,
-                            ...unwatchedShows,
-                          ].filter((item) => item.energy === newEnergy);
-
-                          if (filtered.length > 0) {
-                            const pickedItem =
-                              filtered[
-                                Math.floor(Math.random() * filtered.length)
-                              ];
-                            onDecide([pickedItem]);
-                            setPickFilters({
-                              vibe: null,
-                              energy: null,
-                              type: null,
-                            });
-                            setPickFilterMode(null);
-                            setIsPickModalOpen(false);
-                            return;
-                          }
-
-                          setLocalPickError(
-                            'No items match that energy level yet.',
-                          );
-                          setTimeout(() => setLocalPickError(''), 2500);
-                        }
-                      }}
-                      className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-4 ${
-                        pickFilters.energy === energy.id
-                          ? 'bg-amber-600/40 text-amber-50 border-2 border-amber-500/80 shadow-lg scale-[1.02]'
-                          : 'bg-stone-800/60 text-stone-300 border-2 border-stone-700/50 hover:bg-stone-800 hover:border-amber-600/30 hover:text-amber-200'
-                      }`}
-                    >
-                      {energy.icon && (
-                        <energy.icon className="w-6 h-6 flex-shrink-0" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-base">
-                          {energy.label}
-                        </div>
-                        {energy.desc && (
-                          <div className="text-xs opacity-80 mt-0.5">
-                            {energy.desc}
-                          </div>
-                        )}
-                      </div>
-                      {pickFilters.energy === energy.id && (
-                        <Check className="w-5 h-5 flex-shrink-0" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Submit button removed — selecting an energy picks immediately */}
-              </div>
-            </div>
-          </>
-        )}
-
-        {isWipeConfirmOpen && (
-          <>
-            <button
-              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm cursor-default"
-              onClick={() => {
-                if (!isDeletingAll) {
-                  setIsWipeConfirmOpen(false);
-                  setWipeConfirmText('');
-                }
-              }}
-              aria-label="Close delete confirmation"
-            />
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-rose-500/40 rounded-2xl p-6 max-w-md w-full space-y-6 shadow-2xl">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 w-10 h-10 rounded-full bg-rose-900/40 border border-rose-500/30 flex items-center justify-center text-rose-300">
-                    <AlertTriangle className="w-5 h-5" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-serif text-rose-200">
-                      Delete all titles?
-                    </h3>
-                    <p className="text-sm text-stone-300">
-                      This permanently clears every title in this space for
-                      everyone.
-                    </p>
-                    <p className="text-xs text-rose-300/90 uppercase tracking-wider font-semibold">
-                      Type WIPE to confirm
-                    </p>
-                  </div>
-                </div>
-
-                <input
-                  value={wipeConfirmText}
-                  onChange={(event) => setWipeConfirmText(event.target.value)}
-                  placeholder="WIPE"
-                  autoComplete="off"
-                  className="w-full px-4 py-3 bg-stone-950/80 border border-stone-700 rounded-xl text-sm tracking-wider uppercase text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-rose-500/70 focus:ring-2 focus:ring-rose-500/20"
-                />
-
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setIsWipeConfirmOpen(false);
-                      setWipeConfirmText('');
-                    }}
-                    disabled={Boolean(isDeletingAll)}
-                    className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-stone-900 border border-stone-700 text-stone-300 hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={async () => {
-                      if (!canConfirmWipe || !onDeleteAll) return;
-                      const didDelete = await onDeleteAll();
-                      if (didDelete) {
-                        setIsWipeConfirmOpen(false);
-                        setWipeConfirmText('');
-                      }
-                    }}
-                    disabled={!canConfirmWipe}
-                    className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-rose-600/90 text-white hover:bg-rose-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    {isDeletingAll ? 'Deleting...' : 'Delete all'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+        <WipeConfirmModal
+          isOpen={isWipeConfirmOpen}
+          isDeletingAll={isDeletingAll}
+          wipeConfirmText={wipeConfirmText}
+          setWipeConfirmText={setWipeConfirmText}
+          canConfirmWipe={canConfirmWipe}
+          onClose={closeWipeModal}
+          onConfirm={confirmDeleteAll}
+        />
       </div>
     </div>
   );

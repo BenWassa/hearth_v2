@@ -1,5 +1,10 @@
 const VALID_TYPES = ['movie', 'show'];
 
+const normalizeToken = (value) =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
+
 const normalizeEnum = (value, aliases = {}) => {
   if (!value || typeof value !== 'string') return '';
   const trimmed = value.trim().toLowerCase();
@@ -276,4 +281,19 @@ export const commitImport = async (items, writeItem) => {
     results.push(await writeItem(item));
   }
   return results;
+};
+
+export const buildImportDedupeKey = (item = {}) => {
+  const sourceProvider = normalizeToken(item?.source?.provider);
+  const sourceProviderId = normalizeToken(item?.source?.providerId);
+  if (sourceProvider && sourceProviderId) {
+    return `provider:${sourceProvider}:${sourceProviderId}`;
+  }
+
+  const title = normalizeToken(item?.title);
+  if (!title) return '';
+
+  const type = normalizeToken(item?.type) === 'show' ? 'show' : 'movie';
+  const year = normalizeToken(item?.year) || 'na';
+  return `title:${title}:${type}:${year}`;
 };

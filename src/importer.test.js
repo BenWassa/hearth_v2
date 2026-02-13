@@ -1,4 +1,5 @@
 import {
+  buildImportDedupeKey,
   parseText,
   normalizeItem,
   validateItem,
@@ -104,5 +105,22 @@ describe('importer', () => {
 
     expect(calls).toEqual(['Item A', 'Item B']);
     expect(results).toHaveLength(2);
+  });
+
+  it('builds dedupe key using title + type + year when provider is missing', () => {
+    const key = buildImportDedupeKey({
+      title: 'Dune',
+      type: 'movie',
+      year: '2021',
+    });
+    expect(key).toBe('title:dune:movie:2021');
+  });
+
+  it('builds dedupe key from provider identity when available', () => {
+    const key = buildImportDedupeKey({
+      title: 'Anything',
+      source: { provider: 'tmdb', providerId: '123' },
+    });
+    expect(key).toBe('provider:tmdb:123');
   });
 });

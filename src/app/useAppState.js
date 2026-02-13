@@ -124,6 +124,26 @@ const pickBestSearchResult = ({ results, title, type, year }) => {
   return top.result;
 };
 
+const pickPrimaryPerson = (values) => {
+  if (!Array.isArray(values)) return '';
+  return String(values[0] || '').trim();
+};
+
+const getPrimaryCredit = ({ item = {}, isShow = false } = {}) => {
+  const direct = String(item?.director || '').trim();
+  if (direct) return direct;
+
+  const mediaDirectors = pickPrimaryPerson(item?.media?.directors);
+  if (mediaDirectors) return mediaDirectors;
+
+  if (isShow) {
+    const mediaCreators = pickPrimaryPerson(item?.media?.creators);
+    if (mediaCreators) return mediaCreators;
+  }
+
+  return '';
+};
+
 const getMetadataGaps = (item = {}) => {
   const gaps = [];
   const sourceProvider = String(item?.source?.provider || '').trim();
@@ -144,12 +164,8 @@ const getMetadataGaps = (item = {}) => {
     : Array.isArray(item?.media?.cast)
     ? item.media.cast
     : [];
-  const director =
-    String(item?.director || '').trim() ||
-    (Array.isArray(item?.media?.directors)
-      ? String(item.media.directors[0] || '').trim()
-      : '');
   const isShow = item?.type === 'show';
+  const director = getPrimaryCredit({ item, isShow });
   const seasonCount = Number(
     item?.totalSeasons ??
       item?.showData?.seasonCount ??
@@ -753,9 +769,16 @@ export const useAppState = () => {
                 ? details.cast
                 : item?.actors,
             director:
-              (Array.isArray(details?.directors) && details.directors[0]) ||
-              item?.director ||
-              '',
+              String(
+                (Array.isArray(details?.directors) && details.directors[0]) ||
+                  (resolvedType === 'show' &&
+                  Array.isArray(details?.creators) &&
+                  details.creators[0]
+                    ? details.creators[0]
+                    : '') ||
+                  item?.director ||
+                  '',
+              ).trim(),
             poster,
             backdrop,
             source: {
@@ -991,8 +1014,15 @@ export const useAppState = () => {
     if (Array.isArray(refreshed.media?.cast)) {
       updates.actors = refreshed.media.cast;
     }
-    if (Array.isArray(refreshed.media?.directors) && refreshed.media.directors[0]) {
-      updates.director = refreshed.media.directors[0];
+    const refreshedType = refreshed.media?.type || refreshed.type || '';
+    const isShow = refreshedType === 'show';
+    const primaryCredit =
+      (Array.isArray(refreshed.media?.directors) && refreshed.media.directors[0]) ||
+      (isShow && Array.isArray(refreshed.media?.creators)
+        ? refreshed.media.creators[0]
+        : '');
+    if (primaryCredit) {
+      updates.director = String(primaryCredit).trim();
     }
     if (refreshed.media?.poster || refreshed.media?.posterUrl) {
       updates.poster = refreshed.media.poster || refreshed.media.posterUrl;

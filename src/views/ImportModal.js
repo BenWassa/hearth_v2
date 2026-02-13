@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Film, MessageSquare, Tv, X } from 'lucide-react';
 import { ENERGIES, PRESET_SUGGESTIONS, VIBES } from '../config/constants.js';
 import {
+  buildImportDedupeKey,
   normalizeItem,
   parseText,
   resolveDefaults,
@@ -194,21 +195,14 @@ Titles:
   };
 
   const selectedRows = rows.filter((row) => row.include);
-  const buildTitleKey = (entry) => {
-    const title = String(entry?.title || '')
-      .trim()
-      .toLowerCase();
-    if (!title) return '';
-    return title;
-  };
   const existingKeys = new Set(
-    existingItems.map((item) => buildTitleKey(item)).filter(Boolean),
+    existingItems.map((item) => buildImportDedupeKey(item)).filter(Boolean),
   );
   const selectedUniqueInImportCount = (() => {
     const seen = new Set();
     let count = 0;
     selectedRows.forEach((row) => {
-      const key = buildTitleKey(row?.data || {});
+      const key = buildImportDedupeKey(row?.data || {});
       if (!key) {
         count += 1;
         return;
@@ -224,7 +218,7 @@ Titles:
     const seen = new Set();
     let count = 0;
     selectedRows.forEach((row) => {
-      const key = buildTitleKey(row?.data || {});
+      const key = buildImportDedupeKey(row?.data || {});
       if (!key || seen.has(key)) return;
       seen.add(key);
       if (existingKeys.has(key)) count += 1;
@@ -700,15 +694,15 @@ Titles:
           {selectedDuplicateCount > 0 && (
             <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-2">
               {selectedDuplicateCount} duplicate row
-              {selectedDuplicateCount === 1 ? '' : 's'} in this import (same title)
-              will be skipped.
+              {selectedDuplicateCount === 1 ? '' : 's'} in this import (same
+              title/type/year or provider) will be skipped.
             </div>
           )}
           {selectedAlreadyExistingCount > 0 && (
             <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-2">
               {selectedAlreadyExistingCount} row
               {selectedAlreadyExistingCount === 1 ? '' : 's'} already in your
-              shelf (same title) will be skipped.
+              shelf (same title/type/year or provider) will be skipped.
             </div>
           )}
           <div className="flex items-center justify-between gap-3">

@@ -11,6 +11,11 @@ const asArray = (value) => (Array.isArray(value) ? value : []);
 const asObject = (value) =>
   value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 
+const normalizeCredits = (values) =>
+  asArray(values)
+    .map((value) => asString(value))
+    .filter(Boolean);
+
 const normalizeToken = (value) =>
   asString(value)
     .toLowerCase()
@@ -87,6 +92,21 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const status = asString(userState.status || item.status || 'unwatched');
   const title = asString(media.title || item.title);
   const type = asString(media.type || item.type || 'movie');
+  const primaryDirector = asString(item.director);
+  const directors = normalizeCredits(media.directors);
+  const creators = normalizeCredits(media.creators);
+  const normalizedDirectors =
+    directors.length > 0
+      ? directors
+      : primaryDirector
+      ? [primaryDirector]
+      : [];
+  const normalizedCreators =
+    creators.length > 0
+      ? creators
+      : type === 'show' && primaryDirector
+      ? [primaryDirector]
+      : [];
   const vibe = asString(userState.vibe || item.vibe);
   const energy = asString(userState.energy || item.energy);
   const note = asString(userState.note || item.note);
@@ -119,6 +139,10 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
     poster: asString(media.poster || item.poster),
     backdrop: asString(media.backdrop || item.backdrop),
     year: asString(media.year || item.year),
+    director:
+      asString(item.director) ||
+      normalizedDirectors[0] ||
+      (type === 'show' ? normalizedCreators[0] || '' : ''),
     runtimeMinutes,
     genres,
     actors: cast,
@@ -145,8 +169,8 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
       backdrop: asString(media.backdrop || item.backdrop),
       genres,
       cast,
-      creators: asArray(media.creators),
-      directors: asArray(media.directors),
+      creators: normalizedCreators,
+      directors: normalizedDirectors,
       language: asString(media.language),
       country: asArray(media.country),
       rating:

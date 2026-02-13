@@ -18,6 +18,25 @@ const asArray = (value) => (Array.isArray(value) ? value : []);
 
 const asString = (value) => (typeof value === 'string' ? value.trim() : '');
 
+const pickPrimaryCredit = ({ payload = {}, media = {}, type = '' }) => {
+  const direct = asString(payload.director);
+  if (direct) return direct;
+
+  const mediaDirectors = asArray(media.directors)
+    .map((value) => asString(value))
+    .find(Boolean);
+  if (mediaDirectors) return mediaDirectors;
+
+  if (type === 'show') {
+    const mediaCreators = asArray(media.creators)
+      .map((value) => asString(value))
+      .find(Boolean);
+    if (mediaCreators) return mediaCreators;
+  }
+
+  return '';
+};
+
 const asNumberOrNull = (value) => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   const parsed = Number.parseInt(value, 10);
@@ -59,6 +78,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
   const runtimeMinutes = asNumberOrNull(
     media.runtimeMinutes ?? payload.runtimeMinutes,
   );
+  const director = pickPrimaryCredit({ payload, media, type });
   const poster = asString(media.poster || payload.poster);
   const backdrop = asString(media.backdrop || payload.backdrop);
 
@@ -87,7 +107,11 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
       genres,
       cast,
       creators: asArray(media.creators),
-      directors: asArray(media.directors),
+      directors: asArray(media.directors).length
+        ? asArray(media.directors)
+        : director
+        ? [director]
+        : [],
       language: asString(media.language),
       country: asArray(media.country),
       rating:
@@ -104,6 +128,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
     type,
     year,
     runtimeMinutes,
+    director,
     genres,
     actors: cast,
     poster,
@@ -165,6 +190,12 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
   const source = asObject(catalogData.source);
   const showData = asObject(catalogData.showData);
   const userState = asObject(watchData.userState);
+  const type = asString(media.type || catalogData.type || watchData.type);
+  const director = pickPrimaryCredit({
+    payload: watchData,
+    media,
+    type,
+  });
 
   return {
     ...watchData,
@@ -175,8 +206,9 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
     showData,
     userState,
     title: asString(media.title || catalogData.title || watchData.title),
-    type: asString(media.type || catalogData.type || watchData.type),
+    type,
     year: asString(media.year || catalogData.year || watchData.year),
+    director,
     poster: asString(media.poster || catalogData.poster || watchData.poster),
     backdrop: asString(
       media.backdrop || catalogData.backdrop || watchData.backdrop,

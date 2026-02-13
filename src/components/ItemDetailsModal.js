@@ -96,6 +96,10 @@ const ItemDetailsModal = ({
           '[add year]',
         director:
           rawItem.director?.toString().trim() ||
+          rawItem.media?.directors?.[0]?.toString().trim() ||
+          (rawItem.type === 'show'
+            ? rawItem.media?.creators?.[0]?.toString().trim() || ''
+            : '') ||
           mediaDetails?.director?.toString().trim() ||
           '[add director]',
         note: rawItem.note?.toString().trim() || '',

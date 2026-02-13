@@ -7,6 +7,25 @@ const asArray = (value) => (Array.isArray(value) ? value : []);
 
 const asString = (value) => (typeof value === 'string' ? value : '');
 
+const pickPrimaryCredit = ({ rawItem = {}, media = {}, type = '' }) => {
+  const direct = asString(rawItem.director).trim();
+  if (direct) return direct;
+
+  const mediaDirectors = asArray(media.directors)
+    .map((value) => asString(value).trim())
+    .find(Boolean);
+  if (mediaDirectors) return mediaDirectors;
+
+  if (type === 'show') {
+    const mediaCreators = asArray(media.creators)
+      .map((value) => asString(value).trim())
+      .find(Boolean);
+    if (mediaCreators) return mediaCreators;
+  }
+
+  return '';
+};
+
 export const adaptWatchlistItem = (rawItem = {}) => {
   if (rawItem?.schemaVersion !== WATCHLIST_SCHEMA_VERSION) return rawItem;
 
@@ -14,6 +33,7 @@ export const adaptWatchlistItem = (rawItem = {}) => {
   const media = asObject(rawItem.media);
   const showData = asObject(rawItem.showData);
   const userState = asObject(rawItem.userState);
+  const type = asString(media.type) || asString(rawItem.type);
 
   return {
     ...rawItem,
@@ -23,10 +43,11 @@ export const adaptWatchlistItem = (rawItem = {}) => {
     userState,
     status: asString(userState.status) || asString(rawItem.status),
     title: asString(media.title) || asString(rawItem.title),
-    type: asString(media.type) || asString(rawItem.type),
+    type,
     vibe: asString(userState.vibe) || asString(rawItem.vibe),
     energy: asString(userState.energy) || asString(rawItem.energy),
     note: asString(userState.note) || asString(rawItem.note),
+    director: pickPrimaryCredit({ rawItem, media, type }),
     poster: asString(media.poster) || asString(rawItem.poster),
     backdrop: asString(media.backdrop) || asString(rawItem.backdrop),
     year: media.year || rawItem.year || '',

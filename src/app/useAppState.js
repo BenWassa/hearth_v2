@@ -1161,13 +1161,15 @@ export const useAppState = () => {
     }
   };
 
-  const handleBulkDelete = async (ids) => {
+  const handleBulkDelete = async (ids, options = {}) => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
       return false;
     }
     if (!ids || ids.length === 0) return false;
+    const shouldConfirm = !options?.skipConfirm;
     if (
+      shouldConfirm &&
       typeof window !== 'undefined' &&
       !window.confirm(
         `Delete ${ids.length} item${

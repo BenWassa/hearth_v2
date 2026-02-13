@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { AlertTriangle, Calendar, Film, Tv, X } from 'lucide-react';
+import { Calendar, Film } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { getBackdropSrc } from '../utils/poster.js';
 import { getMediaDetailsByTitle } from '../utils/media-details.js';
@@ -32,13 +32,10 @@ const ItemDetailsModal = ({
   item: rawItem,
   onClose,
   onToggleStatus,
-  onDelete,
   onUpdate,
 }) => {
   const [backdropMissing, setBackdropMissing] = useState(false);
   const [now, setNow] = useState(new Date());
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState('');
   const [activeSeasonNum, setActiveSeasonNum] = useState(null);
   const [expandedEpisodeId, setExpandedEpisodeId] = useState(null);
   const [localEpisodeProgress, setLocalEpisodeProgress] = useState({});
@@ -48,7 +45,6 @@ const ItemDetailsModal = ({
   const [revealedEpisodeIds, setRevealedEpisodeIds] = useState({});
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const seasonScrollRef = useRef(null);
   const [seasonScrollState, setSeasonScrollState] = useState({
     canScrollLeft: false,
@@ -58,10 +54,8 @@ const ItemDetailsModal = ({
   useEffect(() => {
     if (isOpen) {
       setBackdropMissing(false);
-      setIsEditing(false);
-      setEditedTitle(rawItem?.title || '');
     }
-  }, [isOpen, rawItem?.id, rawItem?.title]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -354,9 +348,6 @@ const ItemDetailsModal = ({
 
   const vibeDef = VIBES.find((v) => v.id === item.vibe);
   const energyDef = ENERGIES.find((e) => e.id === item.energy);
-  const typeLabel = item.type === 'show' ? 'Show' : 'Movie';
-  const TypeIcon = item.type === 'show' ? Tv : Film;
-
   const isShowComplete = (progress) => {
     if (!seasons.length) return false;
     return seasons.every(
@@ -467,32 +458,6 @@ const ItemDetailsModal = ({
     });
   };
 
-  const handleSaveEdit = async () => {
-    if (!editedTitle.trim() || !onUpdate) return;
-    try {
-      await onUpdate(item.id, { title: editedTitle.trim() });
-      setIsEditing(false);
-    } catch (err) {
-      console.error('Error updating title:', err);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditedTitle(item.title);
-    setIsEditing(false);
-  };
-
-  const handleDeleteTitle = async () => {
-    if (!item?.id || !onDelete) return;
-    setIsDeleteConfirmOpen(false);
-    try {
-      await onDelete(item.id, { skipConfirm: true });
-      onClose?.();
-    } catch (err) {
-      console.error('Error deleting title:', err);
-    }
-  };
-
   const handleRetryEpisodeFetch = () => {
     setEpisodeFetchSeed((seed) => seed + 1);
   };
@@ -582,15 +547,6 @@ const ItemDetailsModal = ({
               {/* Title Block */}
               <TitleBlock
                 item={item}
-                TypeIcon={TypeIcon}
-                typeLabel={typeLabel}
-                isEditing={isEditing}
-                editedTitle={editedTitle}
-                setEditedTitle={setEditedTitle}
-                handleSaveEdit={handleSaveEdit}
-                handleCancelEdit={handleCancelEdit}
-                setIsEditing={setIsEditing}
-                onUpdate={onUpdate}
                 metadataChips={metadataChips}
                 genres={genres}
               />
@@ -655,58 +611,9 @@ const ItemDetailsModal = ({
           <ActionBar
             item={item}
             onToggleStatus={onToggleStatus}
-            onDeleteTitle={onDelete ? () => setIsDeleteConfirmOpen(true) : null}
-            isEditing={isEditing}
           />
         </div>
       </div>
-
-      {isDeleteConfirmOpen && (
-        <>
-          <button
-            className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm cursor-default"
-            onClick={() => setIsDeleteConfirmOpen(false)}
-            aria-label="Close confirmation"
-          />
-          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-            <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-red-800/60 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-300" />
-                  <h3 className="text-lg font-serif text-red-100">
-                    Delete This Title?
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setIsDeleteConfirmOpen(false)}
-                  className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-                  aria-label="Close confirmation"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-sm text-stone-300">
-                This will remove <span className="font-medium">{item?.title}</span>{' '}
-                from your shelf.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
-                <button
-                  onClick={() => setIsDeleteConfirmOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteTitle}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-700 text-white hover:bg-red-600 transition-colors"
-                >
-                  Delete Title
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

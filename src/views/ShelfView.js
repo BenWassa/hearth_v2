@@ -1,5 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BookOpen, Film, Heart, Moon, Plus, Search, Tv, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  BookOpen,
+  Film,
+  Heart,
+  Moon,
+  Plus,
+  Search,
+  Tv,
+  X,
+} from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { normalizeSearchText } from '../utils/text.js';
 import Button from '../components/ui/Button.js';
@@ -26,6 +36,7 @@ const ShelfView = ({
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [detailItem, setDetailItem] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
   const [sortBy, setSortBy] = useState('vibe'); // 'vibe', 'energy', or 'alphabetical'
   const [showMovies, setShowMovies] = useState(true);
   const [showShows, setShowShows] = useState(true);
@@ -79,11 +90,19 @@ const ShelfView = ({
 
   const handleBulkDelete = async () => {
     if (!onBulkDelete) return;
-    const didDelete = await onBulkDelete(Array.from(selectedIds));
+    const didDelete = await onBulkDelete(Array.from(selectedIds), {
+      skipConfirm: true,
+    });
     if (didDelete) {
       setSelectedIds(new Set());
       setSelectionMode(false);
+      setIsBulkDeleteConfirmOpen(false);
     }
+  };
+
+  const requestBulkDelete = () => {
+    if (selectedCount === 0 || isBulkDeleting) return;
+    setIsBulkDeleteConfirmOpen(true);
   };
 
   // Apply type filters to unwatched items
@@ -369,7 +388,7 @@ const ShelfView = ({
                   <Button
                     className="w-full sm:w-auto"
                     variant="danger"
-                    onClick={handleBulkDelete}
+                    onClick={requestBulkDelete}
                     disabled={selectedCount === 0 || isBulkDeleting}
                   >
                     {isBulkDeleting ? 'Deleting...' : 'Delete Selected'}
@@ -522,9 +541,60 @@ const ShelfView = ({
         item={detailItem}
         onClose={closeDetails}
         onToggleStatus={onToggleStatus}
-        onDelete={onDelete}
         onUpdate={onUpdate}
       />
+
+      {isBulkDeleteConfirmOpen && (
+        <>
+          <button
+            className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm cursor-default"
+            onClick={() => setIsBulkDeleteConfirmOpen(false)}
+            aria-label="Close confirmation"
+          />
+          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+            <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-red-800/60 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-red-300" />
+                  <h3 className="text-lg font-serif text-red-100">
+                    Delete Selected Titles?
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsBulkDeleteConfirmOpen(false)}
+                  className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
+                  aria-label="Close confirmation"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-sm text-stone-300">
+                This will remove{' '}
+                <span className="font-medium">
+                  {selectedCount} selected title{selectedCount === 1 ? '' : 's'}
+                </span>{' '}
+                from your shelf.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+                <button
+                  onClick={() => setIsBulkDeleteConfirmOpen(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors"
+                  disabled={isBulkDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-700 text-white hover:bg-red-600 transition-colors disabled:opacity-60"
+                  disabled={isBulkDeleting}
+                >
+                  {isBulkDeleting ? 'Deleting...' : 'Delete Selected'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Bottom Nav */}
       <div
@@ -544,7 +614,7 @@ const ShelfView = ({
                 Cancel
               </button>
               <button
-                onClick={handleBulkDelete}
+                onClick={requestBulkDelete}
                 disabled={selectedCount === 0 || isBulkDeleting}
                 className="px-4 py-2 bg-red-900/30 text-red-400 rounded-lg hover:bg-red-900/50 disabled:opacity-50 transition-colors"
               >

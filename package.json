@@ -22,7 +22,7 @@
     "dev": "vite",
     "start": "vite",
     "start:apphosting": "node server/index.js",
-    "prebuild": "node scripts/setupFirebaseConfig.js && node scripts/versioning.js check && node scripts/versioning.js generate",
+    "prebuild": "node scripts/setupFirebaseConfig.js --require-env && node scripts/versioning.js check && node scripts/versioning.js generate",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.{js,jsx}\"",

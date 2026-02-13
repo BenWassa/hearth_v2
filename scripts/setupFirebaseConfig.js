@@ -5,6 +5,8 @@ const publicDir = path.resolve(__dirname, '../public');
 const firebaseConfigPath = path.join(publicDir, 'firebase-config.js');
 const firebaseConfigExamplePath = path.join(publicDir, 'firebase-config.example.js');
 const APP_ID_DEFAULT = 'hearth-default';
+const args = new Set(process.argv.slice(2));
+const requireEnv = args.has('--require-env');
 
 const readFirst = (...keys) => {
   for (const key of keys) {
@@ -55,7 +57,7 @@ const isProductionBuild =
   process.env.CI === 'true' ||
   process.env.FIREBASE_APP_HOSTING === 'true';
 
-if (isProductionBuild) {
+if (requireEnv || isProductionBuild) {
   console.error('✖ Missing required Firebase env vars for production build.');
   console.error(
     '  Set FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, and FIREBASE_APP_ID.',

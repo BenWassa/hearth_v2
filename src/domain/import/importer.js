@@ -1,4 +1,25 @@
 const VALID_TYPES = ['movie', 'show'];
+const PLACEHOLDER_ID_TOKENS = new Set([
+  'na',
+  'n/a',
+  'none',
+  'null',
+  'undefined',
+  'unknown',
+  'tbd',
+  'id',
+  '-',
+  '--',
+  '0',
+]);
+const PLACEHOLDER_PROVIDER_TOKENS = new Set([
+  'na',
+  'n/a',
+  'none',
+  'null',
+  'undefined',
+  'unknown',
+]);
 
 const normalizeToken = (value) =>
   String(value || '')
@@ -23,6 +44,33 @@ const normalizeTextOrNumber = (value) => {
   }
   if (typeof value === 'string') return value.trim();
   return '';
+};
+
+const hasMeaningfulToken = (value, placeholders = PLACEHOLDER_ID_TOKENS) => {
+  const token = normalizeToken(value);
+  if (!token) return false;
+  return !placeholders.has(token);
+};
+
+export const hasUsableProviderIdentity = ({
+  provider = '',
+  providerId = '',
+} = {}) => {
+  const providerToken = normalizeToken(provider);
+  const providerIdToken = normalizeToken(providerId);
+
+  if (!providerToken || PLACEHOLDER_PROVIDER_TOKENS.has(providerToken)) {
+    return false;
+  }
+  if (!hasMeaningfulToken(providerIdToken, PLACEHOLDER_ID_TOKENS)) {
+    return false;
+  }
+
+  if (providerToken === 'tmdb') {
+    return /^\d+$/.test(providerIdToken) && providerIdToken !== '0';
+  }
+
+  return true;
 };
 
 const normalizeStatus = (value) => {
@@ -57,7 +105,7 @@ const parseProviderIdentityFromMediaId = (value) => {
   const [providerRaw = '', providerIdRaw = ''] = normalized.split(':');
   const provider = normalizeText(providerRaw).toLowerCase();
   const providerId = normalizeText(providerIdRaw);
-  if (!provider || !providerId) return null;
+  if (!hasUsableProviderIdentity({ provider, providerId })) return null;
   return { provider, providerId };
 };
 
@@ -369,7 +417,12 @@ export const commitImport = async (items, writeItem) => {
 export const buildImportDedupeKey = (item = {}) => {
   const sourceProvider = normalizeToken(item?.source?.provider);
   const sourceProviderId = normalizeToken(item?.source?.providerId);
-  if (sourceProvider && sourceProviderId) {
+  if (
+    hasUsableProviderIdentity({
+      provider: sourceProvider,
+      providerId: sourceProviderId,
+    })
+  ) {
     return `provider:${sourceProvider}:${sourceProviderId}`;
   }
   const mediaIdentity = parseProviderIdentityFromMediaId(item?.mediaId);

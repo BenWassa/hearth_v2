@@ -1,5 +1,6 @@
 import {
   buildImportDedupeKey,
+  hasUsableProviderIdentity,
   parseText,
   normalizeItem,
   validateItem,
@@ -151,5 +152,36 @@ describe('importer', () => {
       mediaId: 'tmdb:438631',
     });
     expect(key).toBe('provider:tmdb:438631');
+  });
+
+  it('falls back to title dedupe when providerId is a placeholder token', () => {
+    const key = buildImportDedupeKey({
+      title: 'Dune',
+      type: 'movie',
+      year: '2021',
+      source: { provider: 'tmdb', providerId: 'N/A' },
+    });
+    expect(key).toBe('title:dune:movie:2021');
+  });
+
+  it('rejects unusable provider identities', () => {
+    expect(
+      hasUsableProviderIdentity({
+        provider: 'tmdb',
+        providerId: 'N/A',
+      }),
+    ).toBe(false);
+    expect(
+      hasUsableProviderIdentity({
+        provider: 'tmdb',
+        providerId: '0',
+      }),
+    ).toBe(false);
+    expect(
+      hasUsableProviderIdentity({
+        provider: 'tmdb',
+        providerId: '603',
+      }),
+    ).toBe(true);
   });
 });

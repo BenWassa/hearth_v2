@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { buildImportDedupeKey } from '../domain/import/importer.js';
+import {
+  buildImportDedupeKey,
+  hasUsableProviderIdentity,
+} from '../domain/import/importer.js';
 import {
   adaptWatchlistItem,
   mapWatchlistUpdatesForWrite,
@@ -142,7 +145,12 @@ const resolveProviderIdentityFromImport = (item = {}) => {
     const [mediaProvider = '', mediaProviderId = ''] = mediaId.split(':');
     const normalizedProvider = mediaProvider.trim().toLowerCase();
     const normalizedProviderId = mediaProviderId.trim();
-    if (normalizedProvider && normalizedProviderId) {
+    if (
+      hasUsableProviderIdentity({
+        provider: normalizedProvider,
+        providerId: normalizedProviderId,
+      })
+    ) {
       return {
         provider: normalizedProvider,
         providerId: normalizedProviderId,
@@ -150,9 +158,18 @@ const resolveProviderIdentityFromImport = (item = {}) => {
     }
   }
 
-  if (!providerId) return null;
+  const normalizedProvider = provider || 'tmdb';
+  if (
+    !hasUsableProviderIdentity({
+      provider: normalizedProvider,
+      providerId,
+    })
+  ) {
+    return null;
+  }
+
   return {
-    provider: provider || 'tmdb',
+    provider: normalizedProvider,
     providerId,
   };
 };

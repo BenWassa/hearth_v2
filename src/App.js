@@ -36,6 +36,7 @@ export default function HearthApp() {
     isBulkDeleting,
     isDeciding,
     isImportOpen,
+    importProgress,
     isMetadataRepairing,
     isSpaceSetupRunning,
     isWipingSpace,
@@ -201,6 +202,7 @@ export default function HearthApp() {
           <ImportModal
             onClose={() => setIsImportOpen(false)}
             onImport={handleImportItems}
+            importProgress={importProgress}
             validVibes={VIBES.map((v) => v.id)}
             validEnergies={ENERGIES.map((e) => e.id)}
             existingItems={items}

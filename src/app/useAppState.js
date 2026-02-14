@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { buildImportDedupeKey, commitImport } from '../domain/import/importer.js';
+import { buildImportDedupeKey } from '../domain/import/importer.js';
 import {
   adaptWatchlistItem,
   mapWatchlistUpdatesForWrite,
@@ -263,6 +263,13 @@ const clearSpaceTrayCache = (targetSpaceId) => {
   keysToRemove.forEach((key) => localStorage.removeItem(key));
 };
 
+const IMPORT_PREVIEW_LIMIT = 6;
+
+const appendPreviewCard = (cards = [], card) => {
+  const withoutDuplicate = cards.filter((existing) => existing.id !== card.id);
+  return [card, ...withoutDuplicate].slice(0, IMPORT_PREVIEW_LIMIT);
+};
+
 export const useAppState = () => {
   const {
     autoReloadCountdown,
@@ -297,6 +304,7 @@ export const useAppState = () => {
   const [isWipingSpace, setIsWipingSpace] = useState(false);
   const [isMetadataRepairing, setIsMetadataRepairing] = useState(false);
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
+  const [importProgress, setImportProgress] = useState(null);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
 
@@ -671,6 +679,19 @@ export const useAppState = () => {
       notifyError('Database not available. Please check your connection.');
       return;
     }
+    const hydratedShowCache = new Map();
+    const loadHydratedShowData = async ({ provider, providerId }) => {
+      const cacheKey = `${provider}:${providerId}`;
+      if (!hydratedShowCache.has(cacheKey)) {
+        const pending = hydrateShowData({ provider, providerId }).catch((err) => {
+          hydratedShowCache.delete(cacheKey);
+          throw err;
+        });
+        hydratedShowCache.set(cacheKey, pending);
+      }
+      return hydratedShowCache.get(cacheKey);
+    };
+
     try {
       const existingKeys = new Set(
         items.map((existingItem) => buildImportDedupeKey(existingItem)).filter(Boolean),
@@ -693,141 +714,180 @@ export const useAppState = () => {
         itemsForLookup.push(item);
       }
 
-      const enrichedItems = [];
+      if (!itemsForLookup.length) {
+        if (duplicateCount > 0) {
+          notifyError(
+            `Skipped ${duplicateCount} duplicate import item${
+              duplicateCount === 1 ? '' : 's'
+            } (same title/type/year or provider).`,
+          );
+        }
+        return;
+      }
+
       let matchedCount = 0;
       let unmatchedCount = 0;
-      const hydratedShowCache = new Map();
+      let importedCount = 0;
+      const showHydrationQueue = [];
 
-      const loadHydratedShowData = async ({ provider, providerId }) => {
-        const cacheKey = `${provider}:${providerId}`;
-        if (!hydratedShowCache.has(cacheKey)) {
-          const pending = hydrateShowData({ provider, providerId }).catch((err) => {
-            hydratedShowCache.delete(cacheKey);
-            throw err;
-          });
-          hydratedShowCache.set(cacheKey, pending);
-        }
-        return hydratedShowCache.get(cacheKey);
-      };
+      setImportProgress({
+        phase: 'matching',
+        startedAt: Date.now(),
+        total: itemsForLookup.length,
+        processed: 0,
+        imported: 0,
+        matched: 0,
+        unmatched: 0,
+        duplicateCount,
+        hydrationTotal: 0,
+        hydrationCompleted: 0,
+        previewCards: [],
+      });
 
-      for (const item of itemsForLookup) {
+      for (let index = 0; index < itemsForLookup.length; index += 1) {
+        const item = itemsForLookup[index];
         const title = String(item?.title || '').trim();
         const itemType = item?.type === 'show' ? 'show' : 'movie';
+        let nextItem = item;
+        let resolvedType = itemType;
+        let provider = '';
+        let providerId = '';
 
         if (!title) {
           unmatchedCount += 1;
-          enrichedItems.push(item);
-          continue;
-        }
+        } else {
+          try {
+            const searchData = await searchMedia({
+              q: title,
+              type: itemType,
+              page: 1,
+            });
+            const best = pickBestSearchResult({
+              results: searchData?.results,
+              title,
+              type: itemType,
+              year: item?.year,
+            });
 
-        try {
-          const searchData = await searchMedia({ q: title, type: itemType, page: 1 });
-          const best = pickBestSearchResult({
-            results: searchData?.results,
-            title,
-            type: itemType,
-            year: item?.year,
-          });
-
-          if (!best?.provider || !best?.providerId) {
-            unmatchedCount += 1;
-            enrichedItems.push(item);
-            continue;
-          }
-
-          const details = await getMediaDetails({
-            provider: best.provider,
-            providerId: best.providerId,
-            type: best.type || itemType,
-          });
-
-          const resolvedType = details?.type === 'show' ? 'show' : 'movie';
-          const poster = details?.posterUrl || best.posterUrl || item?.poster || '';
-          const backdrop =
-            details?.backdropUrl || best.backdropUrl || item?.backdrop || '';
-          let showData = { seasonCount: null, seasons: [] };
-
-          if (resolvedType === 'show') {
-            try {
-              showData = await loadHydratedShowData({
+            if (best?.provider && best?.providerId) {
+              const details = await getMediaDetails({
                 provider: best.provider,
                 providerId: best.providerId,
+                type: best.type || itemType,
               });
-            } catch {
-              showData = { seasonCount: null, seasons: [] };
+              resolvedType = details?.type === 'show' ? 'show' : 'movie';
+              provider = best.provider;
+              providerId = best.providerId;
+
+              const poster =
+                details?.posterUrl || best.posterUrl || item?.poster || '';
+              const backdrop =
+                details?.backdropUrl || best.backdropUrl || item?.backdrop || '';
+
+              nextItem = {
+                ...item,
+                schemaVersion: 2,
+                title: details?.title || best.title || title,
+                type: resolvedType,
+                year: details?.year || best.year || item?.year || '',
+                runtimeMinutes: Number.isFinite(details?.runtimeMinutes)
+                  ? details.runtimeMinutes
+                  : item?.runtimeMinutes,
+                genres:
+                  Array.isArray(details?.genres) && details.genres.length
+                    ? details.genres
+                    : item?.genres,
+                actors:
+                  Array.isArray(details?.cast) && details.cast.length
+                    ? details.cast
+                    : item?.actors,
+                director:
+                  String(
+                    (Array.isArray(details?.directors) && details.directors[0]) ||
+                      (resolvedType === 'show' &&
+                      Array.isArray(details?.creators) &&
+                      details.creators[0]
+                        ? details.creators[0]
+                        : '') ||
+                      item?.director ||
+                      '',
+                  ).trim(),
+                poster,
+                backdrop,
+                source: {
+                  provider: best.provider,
+                  providerId: best.providerId,
+                  fetchedAt: Date.now(),
+                  locale: 'en-US',
+                },
+                media: {
+                  ...details,
+                  type: resolvedType,
+                  title: details?.title || best.title || title,
+                  poster,
+                  backdrop,
+                },
+                showData: { seasonCount: null, seasons: [] },
+              };
+              matchedCount += 1;
+            } else {
+              unmatchedCount += 1;
             }
+          } catch {
+            unmatchedCount += 1;
           }
-
-          enrichedItems.push({
-            ...item,
-            schemaVersion: 2,
-            title: details?.title || best.title || title,
-            type: resolvedType,
-            year: details?.year || best.year || item?.year || '',
-            runtimeMinutes: Number.isFinite(details?.runtimeMinutes)
-              ? details.runtimeMinutes
-              : item?.runtimeMinutes,
-            genres:
-              Array.isArray(details?.genres) && details.genres.length
-                ? details.genres
-                : item?.genres,
-            actors:
-              Array.isArray(details?.cast) && details.cast.length
-                ? details.cast
-                : item?.actors,
-            director:
-              String(
-                (Array.isArray(details?.directors) && details.directors[0]) ||
-                  (resolvedType === 'show' &&
-                  Array.isArray(details?.creators) &&
-                  details.creators[0]
-                    ? details.creators[0]
-                    : '') ||
-                  item?.director ||
-                  '',
-              ).trim(),
-            poster,
-            backdrop,
-            source: {
-              provider: best.provider,
-              providerId: best.providerId,
-              fetchedAt: Date.now(),
-              locale: 'en-US',
-            },
-            media: {
-              ...details,
-              type: resolvedType,
-              title: details?.title || best.title || title,
-              poster,
-              backdrop,
-            },
-            showData,
-          });
-          matchedCount += 1;
-        } catch (error) {
-          unmatchedCount += 1;
-          enrichedItems.push(item);
         }
-      }
 
-      const itemsToCommit = enrichedItems;
-
-      await commitImport(itemsToCommit, async (item) => {
         const payload = buildWatchlistPayload(
           {
-            ...item,
-            status: item?.status || 'unwatched',
+            ...nextItem,
+            status: nextItem?.status || 'unwatched',
           },
           user.uid,
         );
-        return addWatchlistItem({ db, appId, spaceId, payload });
-      });
+
+        await addWatchlistItem({ db, appId, spaceId, payload });
+        importedCount += 1;
+
+        if (resolvedType === 'show' && provider && providerId) {
+          showHydrationQueue.push({
+            itemId: payload.mediaId,
+            provider,
+            providerId,
+            title: payload.title || title,
+          });
+        }
+
+        const previewId = payload.mediaId || `${index}`;
+        const progressSnapshot = {
+          imported: importedCount,
+          matched: matchedCount,
+          unmatched: unmatchedCount,
+        };
+        setImportProgress((current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            processed: progressSnapshot.imported,
+            imported: progressSnapshot.imported,
+            matched: progressSnapshot.matched,
+            unmatched: progressSnapshot.unmatched,
+            previewCards: appendPreviewCard(current.previewCards, {
+              id: previewId,
+              title: payload.title || title || '[untitled]',
+              poster: payload.poster || '',
+              type: payload.type || itemType,
+            }),
+          };
+        });
+      }
+
       setIsImportOpen(false);
       setView('tonight');
-      if (itemsToCommit.length > 0) {
+      if (importedCount > 0) {
         notifyUpdate(
-          `Imported ${itemsToCommit.length} title${
-            itemsToCommit.length === 1 ? '' : 's'
+          `Imported ${importedCount} title${
+            importedCount === 1 ? '' : 's'
           }.`,
         );
       }
@@ -852,8 +912,78 @@ export const useAppState = () => {
           } (same title/type/year or provider).`,
         );
       }
+
+      if (!showHydrationQueue.length) {
+        setImportProgress(null);
+        return;
+      }
+
+      setImportProgress((current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          phase: 'hydrating',
+          hydrationTotal: showHydrationQueue.length,
+          hydrationCompleted: 0,
+        };
+      });
+
+      void (async () => {
+        let hydratedCount = 0;
+        let hydrationFailedCount = 0;
+
+        for (const show of showHydrationQueue) {
+          try {
+            const showData = await loadHydratedShowData({
+              provider: show.provider,
+              providerId: show.providerId,
+            });
+            await updateWatchlistItem({
+              db,
+              appId,
+              spaceId,
+              itemId: show.itemId,
+              updates: {
+                showData,
+                totalSeasons: showData?.seasonCount || null,
+                seasons: Array.isArray(showData?.seasons) ? showData.seasons : [],
+              },
+            });
+            hydratedCount += 1;
+          } catch (err) {
+            console.warn('Show hydration failed during import:', show.title, err);
+            hydrationFailedCount += 1;
+          } finally {
+            const hydrationProgress = hydratedCount + hydrationFailedCount;
+            setImportProgress((current) => {
+              if (!current) return current;
+              return {
+                ...current,
+                hydrationCompleted: hydrationProgress,
+              };
+            });
+          }
+        }
+
+        if (hydratedCount > 0) {
+          notifyUpdate(
+            `Loaded episode guides for ${hydratedCount} imported show${
+              hydratedCount === 1 ? '' : 's'
+            }.`,
+          );
+        }
+        if (hydrationFailedCount > 0) {
+          notifyError(
+            `${hydrationFailedCount} show${
+              hydrationFailedCount === 1 ? '' : 's'
+            } could not load full season metadata yet.`,
+          );
+        }
+        setImportProgress(null);
+      })();
     } catch (err) {
       console.error('Error importing items:', err);
+      setImportProgress(null);
       notifyError("Something didn't save. Try again.");
     }
   };
@@ -1291,6 +1421,7 @@ export const useAppState = () => {
     isSpaceSetupRunning,
     isWipingSpace,
     isSigningIn,
+    importProgress,
     items,
     joinError,
     loading,

@@ -15,6 +15,7 @@ import TextArea from '../components/ui/TextArea.js';
 const ImportModal = ({
   onClose,
   onImport,
+  importProgress,
   validVibes,
   validEnergies,
   existingItems = [],
@@ -31,6 +32,7 @@ const ImportModal = ({
   const [lastEditedId, setLastEditedId] = useState(null);
   const [highlightId, setHighlightId] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [showSlowLoadSkeletons, setShowSlowLoadSkeletons] = useState(false);
   const scrollContainerRef = useRef(null);
   const issueRefs = useRef(new Map());
   const vibeOptions = VIBES.filter((v) => validVibes?.includes(v.id));
@@ -241,6 +243,36 @@ Titles:
     (row) => row.errors.length > 0 || row.missing.length > 0,
   );
   const displayRows = showAllRows ? selectedRows : issueRows;
+  const progressTotal = Number(importProgress?.total || 0);
+  const progressProcessed = Number(importProgress?.processed || 0);
+  const hydrationTotal = Number(importProgress?.hydrationTotal || 0);
+  const hydrationCompleted = Number(importProgress?.hydrationCompleted || 0);
+  const baseProgress =
+    progressTotal > 0 ? Math.min(progressProcessed / progressTotal, 1) : 0;
+  const hasHydration = hydrationTotal > 0;
+  const hydrationProgress = hasHydration
+    ? Math.min(hydrationCompleted / hydrationTotal, 1)
+    : 0;
+  const weightedProgress = hasHydration
+    ? Math.min(baseProgress * 0.85 + hydrationProgress * 0.15, 1)
+    : baseProgress;
+  const progressPercent = Math.round(weightedProgress * 100);
+  const previewCards = Array.isArray(importProgress?.previewCards)
+    ? importProgress.previewCards
+    : [];
+  const shouldShowCoverStrip =
+    isImporting && (showSlowLoadSkeletons || previewCards.length > 0);
+
+  const importPhaseMessage = (() => {
+    if (!isImporting) return '';
+    if (importProgress?.phase === 'hydrating') {
+      return `Loading show episode guides ${hydrationCompleted}/${hydrationTotal}`;
+    }
+    if (progressTotal > 0) {
+      return `Matching titles and importing ${progressProcessed}/${progressTotal}`;
+    }
+    return 'Preparing import...';
+  })();
 
   const handleImport = async () => {
     setActionError('');
@@ -320,6 +352,17 @@ Titles:
     }
     setLastEditedId(null);
   }, [lastEditedId, rows, step]);
+
+  useEffect(() => {
+    if (!isImporting) {
+      setShowSlowLoadSkeletons(false);
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      setShowSlowLoadSkeletons(true);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [isImporting]);
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">
@@ -688,8 +731,72 @@ Titles:
             </div>
           )}
           {isImporting && (
-            <div className="text-xs text-amber-400 bg-amber-900/10 border border-amber-900/30 rounded-lg px-3 py-2">
-              Importing... this can take a moment.
+            <div className="rounded-xl border border-amber-800/40 bg-gradient-to-br from-amber-950/50 via-stone-900/70 to-stone-950/70 px-3 py-3 space-y-2">
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <span className="text-amber-300">{importPhaseMessage}</span>
+                <span className="tabular-nums font-semibold text-amber-200">
+                  {progressPercent}%
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-stone-900/90 border border-stone-800 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-700 via-amber-500 to-rose-500 transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-stone-400">
+                <span className="tabular-nums">
+                  {progressProcessed}/{progressTotal || selectedImportableCount} titles
+                </span>
+                {hydrationTotal > 0 && (
+                  <span className="tabular-nums">
+                    Shows: {hydrationCompleted}/{hydrationTotal}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+          {shouldShowCoverStrip && (
+            <div className="rounded-xl border border-stone-800 bg-stone-900/40 px-3 py-3 space-y-2">
+              <div className="text-[11px] uppercase tracking-widest text-stone-500">
+                Covers Incoming
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {(previewCards.length
+                  ? previewCards
+                  : Array.from({ length: 3 }, (_, index) => ({
+                      id: `placeholder-${index}`,
+                      title: 'Loading',
+                      poster: '',
+                      type: index % 2 ? 'show' : 'movie',
+                    }))
+                ).map((card) => (
+                  <div
+                    key={card.id}
+                    className="relative overflow-hidden rounded-lg border border-stone-800/70 bg-stone-950/70"
+                  >
+                    <div className="aspect-[2/3] w-full">
+                      {card.poster ? (
+                        <img
+                          src={card.poster}
+                          alt={`${card.title} poster`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="h-full w-full animate-pulse bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 flex items-center justify-center text-stone-500">
+                          {card.type === 'show' ? (
+                            <Tv className="w-4 h-4" />
+                          ) : (
+                            <Film className="w-4 h-4" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {selectedDuplicateCount > 0 && (

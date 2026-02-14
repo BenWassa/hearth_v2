@@ -146,6 +146,40 @@ describe('importer', () => {
     expect(normalized.status).toBe('watched');
   });
 
+  it('normalizes watched status from watched/seen boolean flags', () => {
+    const watched = normalizeItem({
+      title: 'The Matrix',
+      watched: true,
+    });
+    expect(watched.status).toBe('watched');
+
+    const seen = normalizeItem({
+      title: 'The Matrix',
+      seen: 'yes',
+    });
+    expect(seen.status).toBe('watched');
+
+    const unwatched = normalizeItem({
+      title: 'The Matrix',
+      watched: false,
+    });
+    expect(unwatched.status).toBe('unwatched');
+  });
+
+  it('maps CSV watched column to watched status', () => {
+    const input = [
+      'title,type,vibe,energy,watched',
+      'The Matrix,movie,visual,focused,true',
+    ].join('\n');
+
+    const parsed = parseText(input);
+    expect(parsed.error).toBe('');
+    expect(parsed.items).toHaveLength(1);
+
+    const normalized = normalizeItem(parsed.items[0]);
+    expect(normalized.status).toBe('watched');
+  });
+
   it('uses mediaId as dedupe identity when provider fields are missing', () => {
     const key = buildImportDedupeKey({
       title: 'Dune',

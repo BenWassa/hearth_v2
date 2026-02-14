@@ -1,6 +1,6 @@
 {
   "name": "hearth",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "private": true,
   "dependencies": {
     "clsx": "^2.1.1",

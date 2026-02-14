@@ -16,6 +16,43 @@ const buildInvalidJsonError = ({ url, contentType, raw }) => {
   );
 };
 
+const MAX_GET_RETRIES = 2;
+const BACKOFF_BASE_MS = 350;
+const MAX_BACKOFF_MS = 5000;
+
+const delay = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+const parseRetryAfterMs = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+
+  const seconds = Number.parseFloat(raw);
+  if (Number.isFinite(seconds) && seconds >= 0) {
+    return Math.round(seconds * 1000);
+  }
+
+  const dateMs = Date.parse(raw);
+  if (Number.isFinite(dateMs)) {
+    return Math.max(0, dateMs - Date.now());
+  }
+
+  return null;
+};
+
+const getRetryDelayMs = ({ attempt, retryAfterHeader }) => {
+  const serverDelay = parseRetryAfterMs(retryAfterHeader);
+  if (serverDelay !== null) {
+    return Math.min(serverDelay, MAX_BACKOFF_MS);
+  }
+
+  const exponential = BACKOFF_BASE_MS * 2 ** attempt;
+  const jitter = Math.floor(Math.random() * 200);
+  return Math.min(exponential + jitter, MAX_BACKOFF_MS);
+};
+
 const parseJsonResponse = async (response, url) => {
   const contentType = response.headers.get('content-type') || '';
   const raw = await response.text();
@@ -42,13 +79,30 @@ const toError = async (response, url) => {
 };
 
 const getJson = async (url) => {
-  const response = await fetch(url);
-  if (!response.ok) throw await toError(response, url);
-  const payload = await parseJsonResponse(response, url);
-  if (!payload?.ok) {
-    throw new Error(payload?.error?.message || 'Request failed');
+  let attempt = 0;
+  while (attempt <= MAX_GET_RETRIES) {
+    const response = await fetch(url);
+
+    if (response.ok) {
+      const payload = await parseJsonResponse(response, url);
+      if (!payload?.ok) {
+        throw new Error(payload?.error?.message || 'Request failed');
+      }
+      return payload.data;
+    }
+
+    const canRetry = response.status === 429 && attempt < MAX_GET_RETRIES;
+    if (!canRetry) {
+      throw await toError(response, url);
+    }
+
+    const retryDelayMs = getRetryDelayMs({
+      attempt,
+      retryAfterHeader: response.headers.get('Retry-After'),
+    });
+    await delay(retryDelayMs);
+    attempt += 1;
   }
-  return payload.data;
 };
 
 export const searchMedia = async ({ q, type = 'all', page = 1 }) => {

@@ -143,25 +143,6 @@ export const createOrJoinSpaceByName = async ({ db, appId, name, userId }) => {
   if (!deterministicSpaceId) return null;
 
   try {
-    const joinedSpace = await joinSpace({
-      db,
-      appId,
-      spaceId: deterministicSpaceId,
-      userId,
-    });
-    if (joinedSpace) {
-      return {
-        id: deterministicSpaceId,
-        ...joinedSpace,
-      };
-    }
-  } catch (err) {
-    if (err?.code !== 'not-found') {
-      throw err;
-    }
-  }
-
-  try {
     const createdSpace = await createSpace({
       db,
       appId,
@@ -170,8 +151,12 @@ export const createOrJoinSpaceByName = async ({ db, appId, name, userId }) => {
     });
     return createdSpace;
   } catch (err) {
-    // Race condition: another user may have created the same deterministic space.
-    if (err?.code === 'permission-denied' || err?.code === 'already-exists') {
+    // Existing deterministic space (or race): join instead.
+    if (
+      err?.code === 'permission-denied' ||
+      err?.code === 'already-exists' ||
+      err?.code === 'failed-precondition'
+    ) {
       const joinedSpace = await joinSpace({
         db,
         appId,

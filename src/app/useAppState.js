@@ -696,6 +696,19 @@ export const useAppState = () => {
       const enrichedItems = [];
       let matchedCount = 0;
       let unmatchedCount = 0;
+      const hydratedShowCache = new Map();
+
+      const loadHydratedShowData = async ({ provider, providerId }) => {
+        const cacheKey = `${provider}:${providerId}`;
+        if (!hydratedShowCache.has(cacheKey)) {
+          const pending = hydrateShowData({ provider, providerId }).catch((err) => {
+            hydratedShowCache.delete(cacheKey);
+            throw err;
+          });
+          hydratedShowCache.set(cacheKey, pending);
+        }
+        return hydratedShowCache.get(cacheKey);
+      };
 
       for (const item of itemsForLookup) {
         const title = String(item?.title || '').trim();
@@ -736,7 +749,7 @@ export const useAppState = () => {
 
           if (resolvedType === 'show') {
             try {
-              showData = await hydrateShowData({
+              showData = await loadHydratedShowData({
                 provider: best.provider,
                 providerId: best.providerId,
               });

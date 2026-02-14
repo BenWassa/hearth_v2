@@ -53,7 +53,10 @@ const AddView = ({ onBack, onSubmit }) => {
 
       const showData =
         nextType === 'show'
-          ? await hydrateShowData(result.provider, result.providerId)
+          ? await hydrateShowData({
+              provider: result.provider,
+              providerId: result.providerId,
+            })
           : null;
 
       setEnrichedPayload({

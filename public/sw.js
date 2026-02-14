@@ -1,15 +1,34 @@
-// Rewritten by scripts/generateVersion.js on each build.
-const BUILD_VERSION = '3.8.4';
-const CACHE_NAME = `hearth-static-${BUILD_VERSION.replace(/\./g, '-')}`;
+// Rewritten by scripts/versioning.js on each build.
+const BUILD_VERSION = '3.8.5';
+const BUILD_ID = '3.8.5-20260214174548-8cfe9d0';
+const CACHE_NAME = `hearth-static-${BUILD_ID.replace(/[^a-zA-Z0-9-]/g, '-')}`;
+const OFFLINE_SHELL = '/index.html';
+
+const isCriticalPath = (pathname) => {
+  return (
+    pathname === '/' ||
+    pathname === '/index.html' ||
+    pathname === '/manifest.json' ||
+    pathname === '/sw.js' ||
+    pathname === '/version.json' ||
+    pathname.startsWith('/api/')
+  );
+};
+
+const isStaticAssetPath = (pathname) => {
+  return pathname.startsWith('/assets/');
+};
+
+const isSuccessfulResponse = (response) => {
+  return Boolean(response && (response.ok || response.type === 'opaque'));
+};
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      await cache.addAll(['./', './index.html', './manifest.json']);
-      // Keep a reference on the worker instance for this activation cycle
-      self.__CURRENT_CACHE = CACHE_NAME;
+      await cache.addAll([OFFLINE_SHELL, '/manifest.json']);
     })(),
   );
 });
@@ -17,19 +36,12 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      // Claim clients immediately
       await self.clients.claim();
-
-      // Determine current cache name (prefer the one set during install, else re-fetch)
-      let currentCache = self.__CURRENT_CACHE;
-      if (!currentCache) currentCache = CACHE_NAME;
-
-      // Clean up old caches not matching the current cache name
       const cacheNames = await caches.keys();
       await Promise.all(
         cacheNames.map((cacheName) => {
           if (
-            cacheName !== currentCache &&
+            cacheName !== CACHE_NAME &&
             cacheName.startsWith('hearth-static-')
           ) {
             return caches.delete(cacheName);
@@ -41,50 +53,69 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Allow the page to message the waiting worker and request it to skipWaiting
 self.addEventListener('message', (event) => {
-  try {
-    if (!event.data) return;
-    if (event.data.type === 'SKIP_WAITING') {
-      // Activate this worker immediately
-      self.skipWaiting();
-    }
-  } catch (e) {
-    // ignore
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  const url = new URL(event.request.url);
-  // Never cache runtime API responses; always use network for live backend data.
-  if (url.pathname.startsWith('/api/')) return;
-  if (url.pathname.endsWith('/version.json') || url.pathname.endsWith('/sw.js'))
-    return;
-  event.respondWith(
-    caches.match(event.request).then(async (cached) => {
-      if (cached) return cached;
 
-      try {
-        const response = await fetch(event.request);
-        // Attempt to store in the active hearth cache (if present)
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  if (isCriticalPath(url.pathname)) return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
         try {
-          const cacheNames = await caches.keys();
-          const activeName = cacheNames.find((n) =>
-            n.startsWith('hearth-static-'),
-          );
-          if (activeName) {
-            const copy = response.clone();
-            const cache = await caches.open(activeName);
-            cache.put(event.request, copy);
+          const request = new Request(event.request.url, {
+            cache: 'no-store',
+            credentials: 'same-origin',
+            redirect: 'follow',
+          });
+          const response = await fetch(request);
+          if (response && response.ok) {
+            await cache.put(OFFLINE_SHELL, response.clone());
           }
-        } catch (e) {
-          // ignore cache write errors
+          return response;
+        } catch (error) {
+          const cachedShell = await cache.match(OFFLINE_SHELL);
+          if (cachedShell) return cachedShell;
+          throw error;
         }
-        return response;
-      } catch (err) {
-        return caches.match('./');
+      })(),
+    );
+    return;
+  }
+
+  if (!isStaticAssetPath(url.pathname)) return;
+
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(event.request);
+      if (cached) {
+        event.waitUntil(
+          fetch(event.request)
+            .then((response) => {
+              if (isSuccessfulResponse(response)) {
+                return cache.put(event.request, response.clone());
+              }
+              return null;
+            })
+            .catch(() => null),
+        );
+        return cached;
       }
-    }),
+
+      const response = await fetch(event.request);
+      if (isSuccessfulResponse(response)) {
+        await cache.put(event.request, response.clone());
+      }
+      return response;
+    })(),
   );
 });

@@ -26,41 +26,51 @@ if ('serviceWorker' in navigator) {
   }
 
   if (!isDev) {
-  window.addEventListener('load', () => {
-    const swUrl = '/sw.js';
-    navigator.serviceWorker
-      .register(swUrl)
-      .then((registration) => {
-        registration.update().catch(() => {});
-        setInterval(() => {
+    window.addEventListener('load', () => {
+      const swUrl = '/sw.js';
+      let hasRefreshedForNewWorker = false;
+
+      const forceActivateWaitingWorker = async (registration) => {
+        if (!registration) return;
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      };
+
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hasRefreshedForNewWorker) return;
+        hasRefreshedForNewWorker = true;
+        window.location.reload();
+      });
+
+      navigator.serviceWorker
+        .register(swUrl, { updateViaCache: 'none' })
+        .then((registration) => {
           registration.update().catch(() => {});
-        }, 5 * 60 * 1000);
-        // Check for updates
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
+          setInterval(() => {
+            registration.update().catch(() => {});
+          }, 60 * 1000);
+
+          forceActivateWaitingWorker(registration).catch(() => {});
+
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+
             newWorker.addEventListener('statechange', () => {
               if (
                 newWorker.state === 'installed' &&
                 navigator.serviceWorker.controller
               ) {
-                // New service worker available, dispatch custom event
                 window.dispatchEvent(new CustomEvent('sw-update-available'));
+                forceActivateWaitingWorker(registration).catch(() => {});
               }
             });
-          }
-        });
-
-        // Handle when service worker becomes active
-        if (registration.active) {
-          registration.addEventListener('controllerchange', () => {
-            window.location.reload();
           });
-        }
-      })
-      .catch((err) => {
-        console.warn('Service worker registration failed:', err);
-      });
-  });
+        })
+        .catch((err) => {
+          console.warn('Service worker registration failed:', err);
+        });
+    });
   }
 }

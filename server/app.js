@@ -53,7 +53,40 @@ app.get(
 app.post('/api/media/refresh', invoke(refreshHandler));
 
 const staticDir = path.join(__dirname, '..', 'build');
-app.use(express.static(staticDir));
+const CRITICAL_NO_STORE_FILES = new Set([
+  '/index.html',
+  '/sw.js',
+  '/version.json',
+  '/manifest.json',
+]);
+
+const setStaticCacheHeaders = (res, filePath) => {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+
+  if (normalizedPath.includes('/assets/')) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    return;
+  }
+
+  const isCritical = [...CRITICAL_NO_STORE_FILES].some((criticalPath) =>
+    normalizedPath.endsWith(criticalPath),
+  );
+  if (isCritical) {
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate',
+    );
+    return;
+  }
+
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+};
+
+app.use(
+  express.static(staticDir, {
+    setHeaders: setStaticCacheHeaders,
+  }),
+);
 
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) {
@@ -71,6 +104,10 @@ app.get('*', (req, res) => {
     return;
   }
 
+  res.setHeader(
+    'Cache-Control',
+    'no-store, no-cache, must-revalidate, proxy-revalidate',
+  );
   res.sendFile(path.join(staticDir, 'index.html'));
 });
 

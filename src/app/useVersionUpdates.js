@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { APP_VERSION } from '../version';
+import { APP_VERSION, BUILD_ID } from '../version';
 import { isProductionBuild } from '../utils/env.js';
 
 export const useVersionUpdates = () => {
@@ -8,6 +8,7 @@ export const useVersionUpdates = () => {
   const [autoReloadCountdown, setAutoReloadCountdown] = useState(null);
   const autoReloadTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
+  const updateInFlightRef = useRef(false);
 
   const clearAutoReloadTimers = useCallback(() => {
     if (autoReloadTimerRef.current) {
@@ -33,12 +34,12 @@ export const useVersionUpdates = () => {
 
   const scheduleAutoReload = useCallback(() => {
     clearAutoReloadTimers();
-    let countdown = 60;
+    let countdown = 30;
     setAutoReloadCountdown(countdown);
 
     autoReloadTimerRef.current = setTimeout(() => {
       window.location.reload();
-    }, 60000);
+    }, 30000);
 
     countdownIntervalRef.current = setInterval(() => {
       countdown -= 1;
@@ -49,6 +50,84 @@ export const useVersionUpdates = () => {
     }, 1000);
   }, [clearAutoReloadTimers]);
 
+  const requestServiceWorkerActivation = useCallback(async () => {
+    if (!('serviceWorker' in navigator)) return false;
+
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) return false;
+
+    try {
+      await registration.update();
+    } catch (error) {
+      // ignore update polling errors
+    }
+
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      return true;
+    }
+
+    if (registration.installing) {
+      await new Promise((resolve) => {
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        };
+
+        const timeoutId = setTimeout(finish, 4000);
+        registration.installing.addEventListener('statechange', () => {
+          if (registration.waiting || registration.installing?.state === 'redundant') {
+            clearTimeout(timeoutId);
+            finish();
+          }
+        });
+      });
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        return true;
+      }
+    }
+
+    return false;
+  }, []);
+
+  const applyUpdate = useCallback(
+    async ({ message, fallbackToBanner = true }) => {
+      if (updateInFlightRef.current) return;
+      updateInFlightRef.current = true;
+      clearAutoReloadTimers();
+      setAutoReloadCountdown(null);
+      setUpdateMessage(message);
+
+      try {
+        const activationRequested = await requestServiceWorkerActivation();
+        if (!activationRequested) {
+          if (fallbackToBanner) {
+            setNewVersionAvailable('manual-reload');
+            setUpdateMessage('Update ready. Reload to apply the latest version.');
+            scheduleAutoReload();
+          } else {
+            window.location.reload();
+          }
+        }
+      } catch (error) {
+        if (fallbackToBanner) {
+          setNewVersionAvailable('manual-reload');
+          setUpdateMessage('Update ready. Reload to apply the latest version.');
+          scheduleAutoReload();
+        } else {
+          window.location.reload();
+        }
+      } finally {
+        updateInFlightRef.current = false;
+      }
+    },
+    [clearAutoReloadTimers, requestServiceWorkerActivation, scheduleAutoReload],
+  );
+
   useEffect(() => {
     if (!isProductionBuild()) return undefined;
 
@@ -56,14 +135,18 @@ export const useVersionUpdates = () => {
 
     const checkForUpdate = async () => {
       try {
-        const versionUrl = '/version.json';
-        const response = await fetch(versionUrl, { cache: 'no-store' });
+        const response = await fetch('/version.json', { cache: 'no-store' });
         if (!response.ok) return;
         const data = await response.json();
-        if (isMounted && data.version && data.version !== APP_VERSION) {
-          setNewVersionAvailable(data.version);
-          setUpdateMessage(`New version available (${data.version})`);
-          scheduleAutoReload();
+
+        const versionChanged = Boolean(data.version && data.version !== APP_VERSION);
+        const buildChanged = Boolean(data.buildId && data.buildId !== BUILD_ID);
+
+        if (isMounted && (versionChanged || buildChanged)) {
+          await applyUpdate({
+            message: 'Updating to the latest version...',
+            fallbackToBanner: false,
+          });
         }
       } catch (err) {
         console.error('Error checking version:', err);
@@ -71,11 +154,14 @@ export const useVersionUpdates = () => {
     };
 
     const handleSWUpdate = () => {
-      if (isMounted) {
-        setNewVersionAvailable('service-worker');
-        setUpdateMessage('App updated! Reload to get the latest version.');
-        scheduleAutoReload();
-      }
+      if (!isMounted) return;
+      applyUpdate({
+        message: 'Applying update...',
+        fallbackToBanner: true,
+      }).catch(() => {
+        setNewVersionAvailable('manual-reload');
+        setUpdateMessage('Update ready. Reload to apply the latest version.');
+      });
     };
 
     checkForUpdate();
@@ -89,7 +175,7 @@ export const useVersionUpdates = () => {
       setAutoReloadCountdown(null);
       window.removeEventListener('sw-update-available', handleSWUpdate);
     };
-  }, [clearAutoReloadTimers, scheduleAutoReload]);
+  }, [applyUpdate, clearAutoReloadTimers]);
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return undefined;
@@ -113,50 +199,13 @@ export const useVersionUpdates = () => {
   }, []);
 
   const handleReloadNow = useCallback(async () => {
-    clearAutoReloadTimers();
-    setAutoReloadCountdown(null);
-
-    try {
-      if ('serviceWorker' in navigator) {
-        const reg = await navigator.serviceWorker.getRegistration();
-        if (reg?.waiting) {
-          setNewVersionAvailable(null);
-          setUpdateMessage('');
-          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-          return;
-        }
-
-        if (reg?.installing) {
-          await new Promise((resolve) => {
-            let settled = false;
-            const finalize = () => {
-              if (settled) return;
-              settled = true;
-              resolve();
-            };
-            const timeoutId = setTimeout(finalize, 4000);
-            reg.installing.addEventListener('statechange', () => {
-              if (reg.waiting || reg.installing?.state === 'redundant') {
-                clearTimeout(timeoutId);
-                finalize();
-              }
-            });
-          });
-
-          if (reg.waiting) {
-            setNewVersionAvailable(null);
-            setUpdateMessage('');
-            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            return;
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Error while requesting SW skipWaiting:', err);
-    }
-
-    window.location.reload();
-  }, [clearAutoReloadTimers]);
+    setNewVersionAvailable(null);
+    setUpdateMessage('Applying update...');
+    await applyUpdate({
+      message: 'Applying update...',
+      fallbackToBanner: false,
+    });
+  }, [applyUpdate]);
 
   const dismissUpdate = useCallback(() => {
     setNewVersionAvailable(null);

@@ -35,13 +35,16 @@ export const normalizeSeasons = (seasons) => {
   return seasons
     .map((season, index) => {
       if (!season || typeof season !== 'object') return null;
-      const number = toNumber(season.number ?? season.season_number, index + 1);
+      const number = toNumber(
+        season.number ?? season.seasonNumber ?? season.season_number,
+        index + 1,
+      );
       const rawEpisodes = Array.isArray(season.episodes) ? season.episodes : [];
       const episodes = rawEpisodes
         .map((episode, episodeIndex) => {
           if (!episode || typeof episode !== 'object') return null;
           const episodeNumber = toNumber(
-            episode.number ?? episode.episode_number,
+            episode.number ?? episode.episodeNumber ?? episode.episode_number,
             episodeIndex + 1,
           );
           return {
@@ -51,7 +54,9 @@ export const normalizeSeasons = (seasons) => {
             airDate: episode.airDate ?? episode.air_date ?? '',
             description: episode.description ?? episode.overview ?? '',
             runtimeMinutes: toNumber(
-              episode.runtimeMinutes ?? episode.runtime_minutes,
+              episode.runtimeMinutes ??
+                episode.runtime_minutes ??
+                episode.runtime,
               null,
             ),
           };

@@ -3,7 +3,7 @@ import { Sparkles } from 'lucide-react';
 
 const PickForUsCard = ({ onPickRandom, onPickVibe, onPickEnergy }) => {
   return (
-    <div className="space-y-0 -mt-2">
+    <div className="space-y-0 mt-0">
       <div className="flex items-center justify-center gap-2 px-2 py-1">
         <Sparkles className="w-5 h-5 text-amber-400" />
         <h4 className="text-sm font-serif text-amber-200">Pick for us</h4>

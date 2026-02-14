@@ -22,6 +22,21 @@ const yearFromDate = (dateValue) => {
   return dateValue.slice(0, 4);
 };
 
+const mapSeasonSummaries = (seasons = []) =>
+  (Array.isArray(seasons) ? seasons : [])
+    .map((season) => ({
+      seasonNumber: Number.isFinite(season?.season_number)
+        ? season.season_number
+        : null,
+      name: season?.name || '',
+      episodeCount: Number.isFinite(season?.episode_count)
+        ? season.episode_count
+        : 0,
+      airDate: season?.air_date || '',
+      posterUrl: toImageUrl(season?.poster_path, 'w342'),
+    }))
+    .filter((season) => Number.isFinite(season.seasonNumber));
+
 const mapMovieDetails = (data = {}) => ({
   provider: 'tmdb',
   providerId: String(data.id || ''),
@@ -71,6 +86,7 @@ const mapShowDetails = (data = {}) => ({
   seasonCount: Number.isFinite(data.number_of_seasons)
     ? data.number_of_seasons
     : null,
+  seasonSummaries: mapSeasonSummaries(data.seasons),
   providerUpdatedAt: new Date().toISOString(),
 });
 

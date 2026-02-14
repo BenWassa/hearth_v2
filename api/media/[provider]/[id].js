@@ -1,6 +1,6 @@
 const { logError, logInfo } = require('../../_lib/logger');
 const { getMediaDetails } = require('../../_lib/providerClient');
-const { checkRateLimit } = require('../../_lib/rateLimit');
+const { checkRateLimit, setRateLimitHeaders } = require('../../_lib/rateLimit');
 const { fail, getRequestId, ok } = require('../../_lib/response');
 
 const getParam = (value) => {
@@ -13,10 +13,9 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
 
   const rate = checkRateLimit(req, 'media-details');
+  setRateLimitHeaders(res, rate);
   if (!rate.allowed) {
-    if (rate.retryAfterMs) {
-      res.setHeader('Retry-After', String(Math.ceil(rate.retryAfterMs / 1000)));
-    }
+    logInfo('media.details.rate_limited', { requestId, scope: 'media-details' });
     return fail(req, res, 429, 'RATE_LIMITED', 'Too many requests. Try again shortly.');
   }
 
@@ -32,6 +31,9 @@ module.exports = async (req, res) => {
 
   const result = await getMediaDetails({ id, type: type || 'auto' });
   if (!result.ok) {
+    if (result.status === 429) {
+      logInfo('media.details.upstream_rate_limited', { requestId, provider, id });
+    }
     logError('media.details.error', {
       requestId,
       provider,

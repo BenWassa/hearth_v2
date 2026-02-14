@@ -123,4 +123,15 @@ describe('importer', () => {
     });
     expect(key).toBe('provider:tmdb:123');
   });
+
+  it('normalizes provider identity aliases from imported rows', () => {
+    const normalized = normalizeItem({
+      title: 'The Matrix',
+      tmdb_id: 603,
+    });
+    expect(normalized.source).toEqual({
+      provider: 'tmdb',
+      providerId: '603',
+    });
+  });
 });

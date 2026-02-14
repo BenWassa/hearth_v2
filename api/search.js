@@ -1,6 +1,6 @@
 const { logError, logInfo } = require('./_lib/logger');
 const { search } = require('./_lib/providerClient');
-const { checkRateLimit } = require('./_lib/rateLimit');
+const { checkRateLimit, setRateLimitHeaders } = require('./_lib/rateLimit');
 const { fail, getRequestId, ok } = require('./_lib/response');
 const { validateSearchQuery } = require('./_lib/validate');
 
@@ -9,10 +9,9 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
 
   const rate = checkRateLimit(req, 'search');
+  setRateLimitHeaders(res, rate);
   if (!rate.allowed) {
-    if (rate.retryAfterMs) {
-      res.setHeader('Retry-After', String(Math.ceil(rate.retryAfterMs / 1000)));
-    }
+    logInfo('search.rate_limited', { requestId, scope: 'search', remaining: rate.remaining });
     return fail(req, res, 429, 'RATE_LIMITED', 'Too many requests. Try again shortly.');
   }
 
@@ -32,6 +31,9 @@ module.exports = async (req, res) => {
 
   const result = await search({ q, type, page });
   if (!result.ok) {
+    if (result.status === 429) {
+      logInfo('search.upstream_rate_limited', { requestId, scope: 'search' });
+    }
     logError('search.error', {
       requestId,
       code: result.code,

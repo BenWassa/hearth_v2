@@ -27,6 +27,7 @@ const TonightView = ({
   onMetadataRepairMissing,
   isMetadataRepairing = false,
   goToShelf,
+  importProgress,
   spaceId,
   spaceName,
   isDeletingAll,
@@ -61,6 +62,9 @@ const TonightView = ({
 
   const spaceLabel =
     spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
+  const activeImportTotal = Number(importProgress?.total || 0);
+  const activeImportProcessed = Number(importProgress?.processed || 0);
+  const showImportBanner = activeImportTotal > 0;
   const todayKey = new Date().toISOString().slice(0, 10);
   const wipePhrase = 'WIPE';
   const canConfirmWipe =
@@ -231,6 +235,18 @@ const TonightView = ({
 
       <div className="flex-1 px-6 space-y-8 overflow-y-auto pb-32">
         <div className="space-y-8">
+          {showImportBanner && (
+            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
+              <div className="text-xs text-amber-200 tabular-nums">
+                Importing {activeImportProcessed}/{activeImportTotal}
+              </div>
+              {importProgress?.isRateLimitedBackoff && (
+                <div className="text-[11px] text-amber-300/90">
+                  Retrying after rate limit...
+                </div>
+              )}
+            </div>
+          )}
           <SuggestionSection
             title="Movies"
             pool={unwatchedMovies}

@@ -12,6 +12,10 @@ import { copyToClipboard } from '../utils/clipboard.js';
 import Button from '../components/ui/Button.js';
 import TextArea from '../components/ui/TextArea.js';
 
+const UX_PROGRESS_FAST_MS = 2500;
+const UX_PROGRESS_SETTLE_MS = 2500;
+const UX_PROGRESS_TOTAL_MS = UX_PROGRESS_FAST_MS + UX_PROGRESS_SETTLE_MS;
+
 const ImportModal = ({
   onClose,
   onImport,
@@ -32,7 +36,10 @@ const ImportModal = ({
   const [lastEditedId, setLastEditedId] = useState(null);
   const [highlightId, setHighlightId] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [uiProgressPercent, setUiProgressPercent] = useState(0);
   const [showSlowLoadSkeletons, setShowSlowLoadSkeletons] = useState(false);
+  const importStartRef = useRef(0);
+  const isMountedRef = useRef(true);
   const scrollContainerRef = useRef(null);
   const issueRefs = useRef(new Map());
   const vibeOptions = VIBES.filter((v) => validVibes?.includes(v.id));
@@ -247,16 +254,7 @@ Titles:
   const progressProcessed = Number(importProgress?.processed || 0);
   const hydrationTotal = Number(importProgress?.hydrationTotal || 0);
   const hydrationCompleted = Number(importProgress?.hydrationCompleted || 0);
-  const baseProgress =
-    progressTotal > 0 ? Math.min(progressProcessed / progressTotal, 1) : 0;
-  const hasHydration = hydrationTotal > 0;
-  const hydrationProgress = hasHydration
-    ? Math.min(hydrationCompleted / hydrationTotal, 1)
-    : 0;
-  const weightedProgress = hasHydration
-    ? Math.min(baseProgress * 0.85 + hydrationProgress * 0.15, 1)
-    : baseProgress;
-  const progressPercent = Math.round(weightedProgress * 100);
+  const progressPercent = Math.round(uiProgressPercent);
   const previewCards = Array.isArray(importProgress?.previewCards)
     ? importProgress.previewCards
     : [];
@@ -265,13 +263,13 @@ Titles:
 
   const importPhaseMessage = (() => {
     if (!isImporting) return '';
-    if (importProgress?.phase === 'hydrating') {
-      return `Loading show episode guides ${hydrationCompleted}/${hydrationTotal}`;
+    if (progressPercent < 80) {
+      return 'Preparing your Tonight tray...';
     }
-    if (progressTotal > 0) {
-      return `Matching titles and importing ${progressProcessed}/${progressTotal}`;
+    if (progressPercent < 90) {
+      return 'Pulling artwork and metadata...';
     }
-    return 'Preparing import...';
+    return 'Opening Tonight...';
   })();
 
   const handleImport = async () => {
@@ -291,14 +289,21 @@ Titles:
       return;
     }
 
+    const selectedPayload = selectedRows.map((row) => row.data);
     setIsImporting(true);
-    try {
-      await onImport(selectedRows.map((row) => row.data));
-    } catch (err) {
+    importStartRef.current = Date.now();
+    setUiProgressPercent(0);
+
+    const importTask = Promise.resolve(onImport(selectedPayload));
+    void importTask.catch(() => {
+      if (!isMountedRef.current) return;
       setActionError('Import failed. Please try again.');
-    } finally {
-      setIsImporting(false);
-    }
+    });
+
+    setTimeout(() => {
+      if (!isMountedRef.current) return;
+      onClose();
+    }, UX_PROGRESS_TOTAL_MS);
   };
 
   const jumpToFirstIssue = () => {
@@ -356,13 +361,38 @@ Titles:
   useEffect(() => {
     if (!isImporting) {
       setShowSlowLoadSkeletons(false);
+      setUiProgressPercent(0);
       return undefined;
     }
+    const tick = () => {
+      const elapsed = Date.now() - importStartRef.current;
+      let nextProgress = 0;
+      if (elapsed <= UX_PROGRESS_FAST_MS) {
+        nextProgress = (elapsed / UX_PROGRESS_FAST_MS) * 80;
+      } else if (elapsed <= UX_PROGRESS_TOTAL_MS) {
+        nextProgress =
+          80 + ((elapsed - UX_PROGRESS_FAST_MS) / UX_PROGRESS_SETTLE_MS) * 10;
+      } else {
+        nextProgress = 90;
+      }
+      setUiProgressPercent(Math.max(0, Math.min(nextProgress, 90)));
+    };
+    tick();
+    const progressTimer = setInterval(tick, 60);
     const timer = setTimeout(() => {
       setShowSlowLoadSkeletons(true);
-    }, 4500);
-    return () => clearTimeout(timer);
+    }, 1200);
+    return () => {
+      clearInterval(progressTimer);
+      clearTimeout(timer);
+    };
   }, [isImporting]);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">

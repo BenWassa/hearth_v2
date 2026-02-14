@@ -4,7 +4,7 @@ const {
   getSeasonEpisodes,
   getShowSeasons,
 } = require('../_lib/providerClient');
-const { checkRateLimit } = require('../_lib/rateLimit');
+const { checkRateLimit, setRateLimitHeaders } = require('../_lib/rateLimit');
 const { fail, getRequestId, ok } = require('../_lib/response');
 
 module.exports = async (req, res) => {
@@ -16,10 +16,9 @@ module.exports = async (req, res) => {
   }
 
   const rate = checkRateLimit(req, 'refresh');
+  setRateLimitHeaders(res, rate);
   if (!rate.allowed) {
-    if (rate.retryAfterMs) {
-      res.setHeader('Retry-After', String(Math.ceil(rate.retryAfterMs / 1000)));
-    }
+    logInfo('media.refresh.rate_limited', { requestId, scope: 'refresh' });
     return fail(req, res, 429, 'RATE_LIMITED', 'Too many refresh requests.', {
       cached: false,
       provider: 'tmdb',
@@ -43,6 +42,9 @@ module.exports = async (req, res) => {
   });
 
   if (!details.ok) {
+    if (details.status === 429) {
+      logInfo('media.refresh.upstream_rate_limited', { requestId, provider, providerId });
+    }
     logError('media.refresh.error', {
       requestId,
       provider,

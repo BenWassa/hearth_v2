@@ -57,6 +57,18 @@ env:
     value: "60"
     availability:
       - RUNTIME
+  - variable: API_RATE_LIMIT_TOKENS_PER_SEC
+    value: "30"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_BURST
+    value: "45"
+    availability:
+      - RUNTIME
+  - variable: API_RATE_LIMIT_SCOPE_WEIGHTS
+    value: "{\"search\":1,\"media-details\":1,\"media-seasons\":1,\"media-episodes\":2,\"refresh\":2}"
+    availability:
+      - RUNTIME
   - variable: APP_ID
     value: hearth-default
     availability:

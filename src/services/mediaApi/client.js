@@ -53,6 +53,28 @@ const getRetryDelayMs = ({ attempt, retryAfterHeader }) => {
   return Math.min(exponential + jitter, MAX_BACKOFF_MS);
 };
 
+const withRequestMeta = (error, meta = {}) => {
+  const nextMeta = {
+    attempts: Number(meta.attempts || 0),
+    totalRetryDelayMs: Number(meta.totalRetryDelayMs || 0),
+    status: Number(meta.status || 0) || undefined,
+    url: meta.url,
+  };
+  const suffix = ` [url=${nextMeta.url} attempts=${nextMeta.attempts} retryMs=${nextMeta.totalRetryDelayMs}]`;
+
+  if (error instanceof Error) {
+    error.requestMeta = nextMeta;
+    if (!error.message.includes('[url=')) {
+      error.message += suffix;
+    }
+    return error;
+  }
+
+  const wrapped = new Error(`Request failed${suffix}`);
+  wrapped.requestMeta = nextMeta;
+  return wrapped;
+};
+
 const parseJsonResponse = async (response, url) => {
   const contentType = response.headers.get('content-type') || '';
   const raw = await response.text();
@@ -80,20 +102,34 @@ const toError = async (response, url) => {
 
 const getJson = async (url) => {
   let attempt = 0;
+  let totalRetryDelayMs = 0;
   while (attempt <= MAX_GET_RETRIES) {
     const response = await fetch(url);
 
     if (response.ok) {
       const payload = await parseJsonResponse(response, url);
       if (!payload?.ok) {
-        throw new Error(payload?.error?.message || 'Request failed');
+        throw withRequestMeta(
+          new Error(payload?.error?.message || 'Request failed'),
+          {
+            attempts: attempt + 1,
+            totalRetryDelayMs,
+            status: response.status,
+            url,
+          },
+        );
       }
       return payload.data;
     }
 
     const canRetry = response.status === 429 && attempt < MAX_GET_RETRIES;
     if (!canRetry) {
-      throw await toError(response, url);
+      throw withRequestMeta(await toError(response, url), {
+        attempts: attempt + 1,
+        totalRetryDelayMs,
+        status: response.status,
+        url,
+      });
     }
 
     const retryDelayMs = getRetryDelayMs({
@@ -101,6 +137,7 @@ const getJson = async (url) => {
       retryAfterHeader: response.headers.get('Retry-After'),
     });
     await delay(retryDelayMs);
+    totalRetryDelayMs += retryDelayMs;
     attempt += 1;
   }
 };

@@ -10,6 +10,7 @@ import { ENERGIES, VIBES } from '../config/constants.js';
 import { getBackdropSrc } from '../utils/poster.js';
 import { getMediaDetailsByTitle } from '../utils/media-details.js';
 import { getEpisodeSeasons } from '../utils/episode-map.js';
+import { hydrateShowData } from '../services/mediaApi/showData.js';
 import {
   formatRuntime,
   formatFinishTime,
@@ -26,6 +27,62 @@ import TitleBlock from './ItemDetailsModal/components/TitleBlock.js';
 import ModalHeader from './ItemDetailsModal/components/ModalHeader.js';
 import ModalContentHeader from './ItemDetailsModal/components/ModalContentHeader.js';
 import ShowSeasonsSection from './ItemDetailsModal/components/ShowSeasonsSection.js';
+
+const hydratedShowCache = new Map();
+const hydratedShowPromises = new Map();
+
+const normalizeHydratedShowData = (showData = {}) => {
+  const seasons = Array.isArray(showData?.seasons)
+    ? showData.seasons.map((season) => ({
+        number: season?.seasonNumber,
+        seasonNumber: season?.seasonNumber,
+        name: season?.name || '',
+        episodeCount: Number(season?.episodeCount) || 0,
+        airDate: season?.airDate || '',
+        poster: season?.poster || '',
+        episodes: Array.isArray(season?.episodes)
+          ? season.episodes.map((episode) => ({
+              id: episode?.id || '',
+              number: episode?.episodeNumber,
+              episodeNumber: episode?.episodeNumber,
+              title: episode?.name || '',
+              name: episode?.name || '',
+              description: episode?.description || '',
+              overview: episode?.description || '',
+              airDate: episode?.airDate || '',
+              runtimeMinutes: episode?.runtimeMinutes,
+            }))
+          : [],
+      }))
+    : [];
+
+  return {
+    seasonCount:
+      Number.isFinite(showData?.seasonCount) && showData.seasonCount > 0
+        ? showData.seasonCount
+        : seasons.length || null,
+    seasons,
+  };
+};
+
+const fetchHydratedShowDataSingleFlight = async ({ provider, providerId }) => {
+  const key = `${provider}:${providerId}`;
+  if (hydratedShowCache.has(key)) return hydratedShowCache.get(key);
+  if (!hydratedShowPromises.has(key)) {
+    const pending = hydrateShowData({ provider, providerId }).then((data) => {
+      const normalized = normalizeHydratedShowData(data);
+      hydratedShowCache.set(key, normalized);
+      return normalized;
+    });
+    hydratedShowPromises.set(
+      key,
+      pending.finally(() => {
+        hydratedShowPromises.delete(key);
+      }),
+    );
+  }
+  return hydratedShowPromises.get(key);
+};
 
 const ItemDetailsModal = ({
   isOpen,
@@ -45,6 +102,7 @@ const ItemDetailsModal = ({
   const [revealedEpisodeIds, setRevealedEpisodeIds] = useState({});
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
+  const persistedHydrationRef = useRef(new Set());
   const seasonScrollRef = useRef(null);
   const [seasonScrollState, setSeasonScrollState] = useState({
     canScrollLeft: false,
@@ -190,17 +248,63 @@ const ItemDetailsModal = ({
       if (isActive) setEpisodeMapStatus('timeout');
     }, 10000);
 
-    getEpisodeSeasons(item)
-      .then((seasonsData) => {
-        if (!isActive) return;
-        if (Array.isArray(seasonsData) && seasonsData.length) {
-          setEpisodeMapSeasons(seasonsData);
-          setEpisodeMapStatus('ready');
-        } else {
-          setEpisodeMapSeasons(null);
-          setEpisodeMapStatus('not_found');
+    const provider = String(
+      item?.source?.provider || item?.media?.provider || '',
+    )
+      .trim()
+      .toLowerCase();
+    const providerId = String(
+      item?.source?.providerId ||
+        item?.media?.providerId ||
+        item?.tmdb_id ||
+        item?.tmdbId ||
+        '',
+    ).trim();
+    const canHydrateFromTmdb = Boolean(providerId && (!provider || provider === 'tmdb'));
+
+    const loadSeasons = async () => {
+      if (canHydrateFromTmdb) {
+        try {
+          const hydrated = await fetchHydratedShowDataSingleFlight({
+            provider: provider || 'tmdb',
+            providerId,
+          });
+          if (!isActive) return;
+          if (Array.isArray(hydrated?.seasons) && hydrated.seasons.length) {
+            setEpisodeMapSeasons(hydrated.seasons);
+            setEpisodeMapStatus('ready');
+            if (
+              item?.id &&
+              !persistedHydrationRef.current.has(item.id) &&
+              typeof onUpdate === 'function'
+            ) {
+              persistedHydrationRef.current.add(item.id);
+              onUpdate(item.id, {
+                showData: hydrated,
+                totalSeasons: hydrated.seasonCount || null,
+                seasons: hydrated.seasons,
+              });
+            }
+            return;
+          }
+        } catch (error) {
+          if (!isActive) return;
+          console.warn('TMDB episode hydration failed:', error);
         }
-      })
+      }
+
+      const seasonsData = await getEpisodeSeasons(item);
+      if (!isActive) return;
+      if (Array.isArray(seasonsData) && seasonsData.length) {
+        setEpisodeMapSeasons(seasonsData);
+        setEpisodeMapStatus('ready');
+      } else {
+        setEpisodeMapSeasons(null);
+        setEpisodeMapStatus('not_found');
+      }
+    };
+
+    loadSeasons()
       .catch((error) => {
         if (!isActive) return;
         setEpisodeMapSeasons(null);
@@ -219,7 +323,13 @@ const ItemDetailsModal = ({
     item?.title,
     item?.tmdb_id,
     item?.tmdbId,
+    item?.source?.provider,
+    item?.source?.providerId,
+    item?.media?.provider,
+    item?.media?.providerId,
     hasInlineEpisodes,
+    item?.id,
+    onUpdate,
     episodeFetchSeed,
   ]);
 

@@ -35,6 +35,11 @@ const detailsEndpointForType = (type, id) => {
   return `/movie/${id}`;
 };
 
+const DETAILS_APPEND = {
+  movie: 'credits,release_dates,images',
+  show: 'credits,content_ratings,images',
+};
+
 const mapStatusToError = (status) => {
   if (status === 404) {
     return { status: 404, code: 'NOT_FOUND', message: 'Resource not found.' };
@@ -132,7 +137,7 @@ const tmdbGet = async (path, params = {}) => {
 const tryFetchDetails = async ({ id, type }) => {
   const detailsPath = detailsEndpointForType(type, id);
   const response = await tmdbGet(detailsPath, {
-    append_to_response: 'credits',
+    append_to_response: DETAILS_APPEND[type] || DETAILS_APPEND.movie,
   });
   if (!response.ok) return response;
 

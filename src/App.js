@@ -161,6 +161,7 @@ export default function HearthApp() {
             onMetadataRepairMissing={handleMetadataRepairMissing}
             isMetadataRepairing={isMetadataRepairing}
             goToShelf={() => setView('shelf')}
+            importProgress={importProgress}
             spaceId={spaceId}
             spaceName={spaceName}
             isDeletingAll={isWipingSpace}

@@ -1,6 +1,6 @@
 const { logError, logInfo } = require('../../../_lib/logger');
 const { getShowSeasons } = require('../../../_lib/providerClient');
-const { checkRateLimit } = require('../../../_lib/rateLimit');
+const { checkRateLimit, setRateLimitHeaders } = require('../../../_lib/rateLimit');
 const { fail, getRequestId, ok } = require('../../../_lib/response');
 
 const getParam = (value) => {
@@ -13,10 +13,9 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
 
   const rate = checkRateLimit(req, 'media-seasons');
+  setRateLimitHeaders(res, rate);
   if (!rate.allowed) {
-    if (rate.retryAfterMs) {
-      res.setHeader('Retry-After', String(Math.ceil(rate.retryAfterMs / 1000)));
-    }
+    logInfo('media.seasons.rate_limited', { requestId, scope: 'media-seasons' });
     return fail(req, res, 429, 'RATE_LIMITED', 'Too many requests. Try again shortly.');
   }
 
@@ -30,6 +29,9 @@ module.exports = async (req, res) => {
   logInfo('media.seasons.request', { requestId, provider, id });
   const result = await getShowSeasons({ id });
   if (!result.ok) {
+    if (result.status === 429) {
+      logInfo('media.seasons.upstream_rate_limited', { requestId, provider, id });
+    }
     logError('media.seasons.error', {
       requestId,
       provider,

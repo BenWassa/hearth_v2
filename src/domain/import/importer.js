@@ -175,10 +175,26 @@ export const parseText = (text) => {
 
 export const normalizeItem = (raw) => {
   const typeAliases = { film: 'movie', tv: 'show', series: 'show' };
-  const source =
+  const rawSource =
     raw?.source && typeof raw.source === 'object' && !Array.isArray(raw.source)
-      ? raw.source
-      : null;
+      ? { ...raw.source }
+      : {};
+  const sourceProvider = normalizeText(
+    raw?.provider ?? raw?.source?.provider ?? rawSource.provider,
+  );
+  const sourceProviderId = normalizeTextOrNumber(
+    raw?.providerId ??
+      raw?.tmdbId ??
+      raw?.tmdb_id ??
+      raw?.source?.providerId ??
+      rawSource.providerId,
+  );
+  if (sourceProvider) rawSource.provider = sourceProvider;
+  if (sourceProviderId) {
+    rawSource.providerId = sourceProviderId;
+    if (!rawSource.provider) rawSource.provider = 'tmdb';
+  }
+  const source = Object.keys(rawSource).length > 0 ? rawSource : null;
   const media =
     raw?.media && typeof raw.media === 'object' && !Array.isArray(raw.media)
       ? raw.media

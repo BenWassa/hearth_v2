@@ -157,6 +157,68 @@ const resolveProviderIdentityFromImport = (item = {}) => {
   };
 };
 
+const hasValue = (value) => String(value || '').trim().length > 0;
+
+const hasListValues = (value) => {
+  return (
+    Array.isArray(value) &&
+    value.some((entry) => String(entry || '').trim().length > 0)
+  );
+};
+
+const toFiniteNumber = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const parsed = Number.parseFloat(String(value || '').trim());
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toPositiveInteger = (value) => {
+  const parsed = Number.parseInt(String(value || '').trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+
+const hasSufficientImportMetadata = (item = {}, itemType = 'movie') => {
+  const hasArtwork = hasValue(item?.poster) || hasValue(item?.backdrop);
+  const hasYear = hasValue(item?.year);
+  const hasRuntime = (toFiniteNumber(item?.runtimeMinutes) || 0) > 0;
+  const hasGenres = hasListValues(item?.genres);
+  const hasActors = hasListValues(item?.actors);
+  const hasDirector = hasValue(item?.director);
+  const hasSeasons =
+    (toPositiveInteger(item?.totalSeasons) || 0) > 0 ||
+    (Array.isArray(item?.seasons) && item.seasons.length > 0);
+  const hasDescriptiveMetadata = hasGenres || hasActors || hasDirector;
+
+  if (itemType === 'show') {
+    return hasArtwork && hasYear && hasSeasons && hasDescriptiveMetadata;
+  }
+
+  return hasArtwork && hasYear && hasRuntime && hasDescriptiveMetadata;
+};
+
+const shouldHydrateImportItem = ({
+  item = {},
+  directIdentity = null,
+  title = '',
+  itemType = 'movie',
+}) => {
+  if (!title && !(directIdentity?.provider && directIdentity?.providerId)) {
+    return false;
+  }
+
+  if (hasSufficientImportMetadata(item, itemType)) {
+    return false;
+  }
+
+  // If the item already provides artwork but lacks a stable identity,
+  // trust the import and skip slow title search for first-pass bulk loads.
+  if (!directIdentity?.providerId && hasValue(item?.poster)) {
+    return false;
+  }
+
+  return true;
+};
+
 const isRateLimitedError = (error) => {
   const message = String(error?.message || '').toLowerCase();
   const code = String(error?.code || '').toLowerCase();
@@ -761,6 +823,19 @@ export const useAppState = () => {
       let matchedCount = 0;
       let unmatchedCount = 0;
       let importedCount = 0;
+      let skippedLookupCount = 0;
+      let hydrationCompleted = 0;
+      const hydrationTotal = itemsForLookup.filter((item) => {
+        const title = String(item?.title || '').trim();
+        const itemType = item?.type === 'show' ? 'show' : 'movie';
+        const directIdentity = resolveProviderIdentityFromImport(item);
+        return shouldHydrateImportItem({
+          item,
+          directIdentity,
+          title,
+          itemType,
+        });
+      }).length;
 
       setImportProgress({
         phase: 'matching',
@@ -773,8 +848,8 @@ export const useAppState = () => {
         duplicateCount,
         rateLimitedCount: 0,
         isRateLimitedBackoff: false,
-        hydrationTotal: 0,
-        hydrationCompleted: 0,
+        hydrationTotal,
+        hydrationCompleted,
         previewCards: [],
       });
 
@@ -788,8 +863,16 @@ export const useAppState = () => {
         let providerId = '';
         let details = null;
         const directIdentity = resolveProviderIdentityFromImport(item);
+        const shouldHydrate = shouldHydrateImportItem({
+          item,
+          directIdentity,
+          title,
+          itemType,
+        });
 
-        if (directIdentity?.provider && directIdentity?.providerId) {
+        if (!shouldHydrate) {
+          skippedLookupCount += 1;
+        } else if (directIdentity?.provider && directIdentity?.providerId) {
           provider = directIdentity.provider;
           providerId = directIdentity.providerId;
           try {
@@ -812,8 +895,10 @@ export const useAppState = () => {
             }
             unmatchedCount += 1;
           }
+          hydrationCompleted += 1;
         } else if (!title) {
           unmatchedCount += 1;
+          hydrationCompleted += 1;
         } else {
           try {
             const searchData = await searchMedia({
@@ -853,12 +938,40 @@ export const useAppState = () => {
             }
             unmatchedCount += 1;
           }
+          hydrationCompleted += 1;
         }
 
         if (details) {
-          resolvedType = details?.type === 'show' ? 'show' : 'movie';
-          const poster = details?.posterUrl || item?.poster || '';
-          const backdrop = details?.backdropUrl || item?.backdrop || '';
+          resolvedType =
+            item?.type === 'show' || item?.type === 'movie'
+              ? item.type
+              : details?.type === 'show'
+              ? 'show'
+              : 'movie';
+          const poster = String(item?.poster || details?.posterUrl || '').trim();
+          const backdrop = String(
+            item?.backdrop || details?.backdropUrl || '',
+          ).trim();
+          const importedRuntimeMinutes = toFiniteNumber(item?.runtimeMinutes);
+          const runtimeMinutes = Number.isFinite(importedRuntimeMinutes)
+            ? importedRuntimeMinutes
+            : Number.isFinite(details?.runtimeMinutes)
+            ? details.runtimeMinutes
+            : item?.runtimeMinutes;
+          const importedYear = String(item?.year || '').trim();
+          const year = importedYear || details?.year || '';
+          const importedGenres = hasListValues(item?.genres) ? item.genres : null;
+          const importedActors = hasListValues(item?.actors) ? item.actors : null;
+          const director = String(
+            item?.director ||
+              (Array.isArray(details?.directors) && details.directors[0]) ||
+              (resolvedType === 'show' &&
+              Array.isArray(details?.creators) &&
+              details.creators[0]
+                ? details.creators[0]
+                : '') ||
+              '',
+          ).trim();
           const seasonSummaries =
             resolvedType === 'show' && Array.isArray(details?.seasonSummaries)
               ? details.seasonSummaries
@@ -873,35 +986,27 @@ export const useAppState = () => {
                   }))
                   .filter((season) => Number.isFinite(season.number))
               : [];
+          const importedSeasonCount = toPositiveInteger(item?.totalSeasons);
+          const importedSeasons = Array.isArray(item?.seasons) ? item.seasons : [];
 
           nextItem = {
             ...item,
             schemaVersion: 2,
-            title: details?.title || item?.title || title,
+            title: item?.title || details?.title || title,
             type: resolvedType,
-            year: details?.year || item?.year || '',
-            runtimeMinutes: Number.isFinite(details?.runtimeMinutes)
-              ? details.runtimeMinutes
-              : item?.runtimeMinutes,
+            year,
+            runtimeMinutes,
             genres:
-              Array.isArray(details?.genres) && details.genres.length
+              importedGenres ||
+              (Array.isArray(details?.genres) && details.genres.length
                 ? details.genres
-                : item?.genres,
+                : item?.genres),
             actors:
-              Array.isArray(details?.cast) && details.cast.length
+              importedActors ||
+              (Array.isArray(details?.cast) && details.cast.length
                 ? details.cast
-                : item?.actors,
-            director:
-              String(
-                (Array.isArray(details?.directors) && details.directors[0]) ||
-                  (resolvedType === 'show' &&
-                  Array.isArray(details?.creators) &&
-                  details.creators[0]
-                    ? details.creators[0]
-                    : '') ||
-                  item?.director ||
-                  '',
-              ).trim(),
+                : item?.actors),
+            director,
             poster,
             backdrop,
             source: {
@@ -913,7 +1018,22 @@ export const useAppState = () => {
             media: {
               ...details,
               type: resolvedType,
-              title: details?.title || item?.title || title,
+              title: item?.title || details?.title || title,
+              year,
+              runtimeMinutes,
+              genres:
+                importedGenres ||
+                (Array.isArray(details?.genres) ? details.genres : []),
+              cast:
+                importedActors ||
+                (Array.isArray(details?.cast) ? details.cast : []),
+              directors: director ? [director] : details?.directors,
+              creators:
+                resolvedType === 'show'
+                  ? director
+                    ? [director]
+                    : details?.creators
+                  : details?.creators,
               poster,
               backdrop,
             },
@@ -921,10 +1041,15 @@ export const useAppState = () => {
               resolvedType === 'show'
                 ? {
                     seasonCount:
-                      Number.isFinite(details?.seasonCount) && details.seasonCount > 0
+                      importedSeasonCount ||
+                      (Number.isFinite(details?.seasonCount) &&
+                      details.seasonCount > 0
                         ? details.seasonCount
-                        : seasonSummaries.length || null,
-                    seasons: seasonSummaries,
+                        : seasonSummaries.length || null),
+                    seasons:
+                      importedSeasons.length > 0
+                        ? importedSeasons
+                        : seasonSummaries,
                   }
                 : { seasonCount: null, seasons: [] },
           };
@@ -956,6 +1081,7 @@ export const useAppState = () => {
             matched: progressSnapshot.matched,
             unmatched: progressSnapshot.unmatched,
             isRateLimitedBackoff: false,
+            hydrationCompleted,
             previewCards: appendPreviewCard(current.previewCards, {
               id: previewId,
               title: payload.title || title || '[untitled]',
@@ -979,6 +1105,13 @@ export const useAppState = () => {
         notifyUpdate(
           `Found metadata for ${matchedCount} imported title${
             matchedCount === 1 ? '' : 's'
+          }.`,
+        );
+      }
+      if (skippedLookupCount > 0) {
+        notifyUpdate(
+          `Used provided metadata without API lookup for ${skippedLookupCount} title${
+            skippedLookupCount === 1 ? '' : 's'
           }.`,
         );
       }

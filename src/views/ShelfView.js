@@ -2,17 +2,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   BookOpen,
+  Eye,
   Film,
   Heart,
   Moon,
   Plus,
   Search,
+  Trash2,
   Tv,
   X,
 } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { normalizeSearchText } from '../utils/text.js';
-import Button from '../components/ui/Button.js';
 import PosterCard from '../components/cards/PosterCard.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 
@@ -37,13 +38,14 @@ const ShelfView = ({
   const [detailItem, setDetailItem] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
+  const [isBulkMarking, setIsBulkMarking] = useState(false);
   const [sortBy, setSortBy] = useState('vibe'); // 'vibe', 'energy', or 'alphabetical'
   const [showMovies, setShowMovies] = useState(true);
   const [showShows, setShowShows] = useState(true);
   const [viewTab, setViewTab] = useState('library'); // 'library' or 'memories'
 
   const selectedCount = selectedIds.size;
-  const allIds = useMemo(() => items.map((item) => item.id), [items]);
+  const isSelectionBusy = isBulkDeleting || isBulkMarking;
   const normalizedQuery = useMemo(
     () => normalizeSearchText(searchQuery),
     [searchQuery],
@@ -103,6 +105,23 @@ const ShelfView = ({
   const requestBulkDelete = () => {
     if (selectedCount === 0 || isBulkDeleting) return;
     setIsBulkDeleteConfirmOpen(true);
+  };
+
+  const handleBulkMarkWatched = async () => {
+    if (!onToggleStatus || selectedCount === 0 || isSelectionBusy) return;
+    setIsBulkMarking(true);
+    try {
+      const selectedItems = items.filter(
+        (item) => selectedIds.has(item.id) && item.status !== 'watched',
+      );
+      await Promise.all(
+        selectedItems.map((item) => onToggleStatus(item.id, item.status)),
+      );
+      setSelectedIds(new Set());
+      setSelectionMode(false);
+    } finally {
+      setIsBulkMarking(false);
+    }
   };
 
   // Apply type filters to unwatched items
@@ -347,55 +366,9 @@ const ShelfView = ({
         </div>
       )}
 
-      <div className="p-6 space-y-10">
+      <div className="p-6 pb-40 space-y-10">
         {viewTab === 'library' && (
           <>
-            {selectionMode && (
-              <div className="bg-stone-900/40 border border-stone-800 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-                <div className="space-y-2">
-                  <div className="text-sm sm:text-base text-stone-300 font-semibold uppercase tracking-widest">
-                    Selected:{' '}
-                    <span className="text-lg sm:text-xl text-amber-400 font-bold">
-                      {selectedCount}
-                    </span>
-                  </div>
-                  {isBulkDeleting && (
-                    <div className="text-xs text-amber-400 bg-amber-900/10 border border-amber-900/30 rounded-lg px-3 py-2 inline-block">
-                      Deleting... this can take a moment.
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap items-center justify-center sm:justify-end gap-4 sm:gap-5 w-full sm:w-auto">
-                  <Button
-                    className="w-full sm:w-auto"
-                    variant="secondary"
-                    onClick={() => {
-                      if (
-                        selectedCount === allIds.length &&
-                        allIds.length > 0
-                      ) {
-                        setSelectedIds(new Set());
-                      } else {
-                        setSelectedIds(new Set(allIds));
-                      }
-                    }}
-                    disabled={allIds.length === 0 || isBulkDeleting}
-                  >
-                    {selectedCount === allIds.length && allIds.length > 0
-                      ? 'Deselect All'
-                      : 'Select All'}
-                  </Button>
-                  <Button
-                    className="w-full sm:w-auto"
-                    variant="danger"
-                    onClick={requestBulkDelete}
-                    disabled={selectedCount === 0 || isBulkDeleting}
-                  >
-                    {isBulkDeleting ? 'Deleting...' : 'Delete Selected'}
-                  </Button>
-                </div>
-              </div>
-            )}
             {isSearching ? (
               <div className="space-y-4">
                 {filteredItems.length === 0 ? (
@@ -596,34 +569,42 @@ const ShelfView = ({
         </>
       )}
 
-      {/* Bottom Nav */}
-      <div
-        className="mt-auto sticky bottom-0 z-40 w-full border-t border-stone-900 bg-gradient-to-b from-stone-950/0 to-stone-950"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-      >
-        {selectionMode && (
-          <div className="px-6 py-4 flex items-center justify-between">
-            <span className="text-sm text-stone-400">
-              {selectedCount} selected
-            </span>
-            <div className="flex gap-3">
+      {viewTab === 'library' && selectionMode && (
+        <div
+          className="fixed left-1/2 -translate-x-1/2 bottom-[7.7rem] z-50 max-w-md w-[calc(100%-3rem)]"
+          style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="mx-auto w-fit bg-stone-900/75 backdrop-blur-xl border border-stone-700/60 rounded-2xl px-4 py-2.5 shadow-xl shadow-black/40">
+            <div className="flex items-center gap-4">
               <button
-                onClick={toggleSelectionMode}
-                className="text-sm text-stone-400 hover:text-stone-200"
+                onClick={handleBulkMarkWatched}
+                disabled={selectedCount === 0 || isSelectionBusy}
+                className="flex flex-col items-center gap-1 text-stone-200 hover:text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Cancel
+                <Eye className="w-4 h-4" />
+                <span className="text-[10px] uppercase tracking-widest">Seen</span>
               </button>
+              <span className="text-[11px] text-stone-400 min-w-16 text-center">
+                {isBulkMarking
+                  ? 'Saving...'
+                  : isBulkDeleting
+                  ? 'Deleting...'
+                  : `${selectedCount} selected`}
+              </span>
               <button
                 onClick={requestBulkDelete}
-                disabled={selectedCount === 0 || isBulkDeleting}
-                className="px-4 py-2 bg-red-900/30 text-red-400 rounded-lg hover:bg-red-900/50 disabled:opacity-50 transition-colors"
+                disabled={selectedCount === 0 || isSelectionBusy}
+                className="flex flex-col items-center gap-1 text-red-300 hover:text-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                {isBulkDeleting ? 'Deleting...' : 'Delete'}
+                <Trash2 className="w-4 h-4" />
+                <span className="text-[10px] uppercase tracking-widest">
+                  Delete
+                </span>
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Bottom Nav - Tonight, Add & Library */}
       <nav

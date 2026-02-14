@@ -166,10 +166,52 @@ describe('importer', () => {
     expect(unwatched.status).toBe('unwatched');
   });
 
+  it('normalizes watched status from watchStatus aliases', () => {
+    const watched = normalizeItem({
+      title: 'The Matrix',
+      watchStatus: 'watched',
+    });
+    expect(watched.status).toBe('watched');
+
+    const unwatched = normalizeItem({
+      title: 'The Matrix',
+      watchedOrNot: 'unwatched',
+    });
+    expect(unwatched.status).toBe('unwatched');
+  });
+
   it('maps CSV watched column to watched status', () => {
     const input = [
       'title,type,vibe,energy,watched',
       'The Matrix,movie,visual,focused,true',
+    ].join('\n');
+
+    const parsed = parseText(input);
+    expect(parsed.error).toBe('');
+    expect(parsed.items).toHaveLength(1);
+
+    const normalized = normalizeItem(parsed.items[0]);
+    expect(normalized.status).toBe('watched');
+  });
+
+  it('maps CSV watched_or_not column to status', () => {
+    const input = [
+      'title,type,vibe,energy,watched_or_not',
+      'Arrival,movie,gripping,focused,watched',
+    ].join('\n');
+
+    const parsed = parseText(input);
+    expect(parsed.error).toBe('');
+    expect(parsed.items).toHaveLength(1);
+
+    const normalized = normalizeItem(parsed.items[0]);
+    expect(normalized.status).toBe('watched');
+  });
+
+  it('maps CSV watched date column to watched status', () => {
+    const input = [
+      'title,type,vibe,energy,watched_date',
+      'Arrival,movie,gripping,focused,2024-05-01',
     ].join('\n');
 
     const parsed = parseText(input);

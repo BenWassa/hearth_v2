@@ -20,6 +20,43 @@ const PLACEHOLDER_PROVIDER_TOKENS = new Set([
   'undefined',
   'unknown',
 ]);
+const WATCHED_FLAG_HEADERS = new Set([
+  'watched',
+  'seen',
+  'iswatched',
+  'is_watched',
+  'is-watched',
+  'is watched',
+  'isseen',
+  'is_seen',
+  'is-seen',
+  'is seen',
+  'completed',
+  'iscompleted',
+  'is_completed',
+  'is-completed',
+  'is completed',
+  'done',
+  'watcheddate',
+  'watched_date',
+  'watched-date',
+  'watched date',
+  'lastwatched',
+  'last_watched',
+  'last-watched',
+  'last watched',
+]);
+const STATUS_HEADERS = new Set([
+  'status',
+  'watchstatus',
+  'watch_status',
+  'watch-status',
+  'watch status',
+  'watchedornot',
+  'watched_or_not',
+  'watched-or-not',
+  'watched or not',
+]);
 
 const normalizeToken = (value) =>
   String(value || '')
@@ -105,6 +142,8 @@ const normalizeStatus = (value) => {
     [
       'unwatched',
       'not watched',
+      'not seen',
+      'unseen',
       'todo',
       'to-watch',
       'to watch',
@@ -116,9 +155,76 @@ const normalizeStatus = (value) => {
   return '';
 };
 
+const normalizeWatchedHint = (value) => {
+  const normalizedBoolean = normalizeBoolean(value);
+  if (normalizedBoolean !== null) return normalizedBoolean;
+
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  if (
+    ['na', 'n/a', 'none', 'null', 'undefined', 'unknown', '-', '--'].includes(
+      normalized,
+    )
+  ) {
+    return null;
+  }
+  if (['never', 'not yet', 'not watched yet', 'unwatched'].includes(normalized)) {
+    return false;
+  }
+  const status = normalizeStatus(normalized);
+  if (status === 'watched') return true;
+  if (status === 'unwatched') return false;
+
+  const parsedDate = Date.parse(normalized);
+  if (Number.isFinite(parsedDate)) return true;
+
+  return null;
+};
+
+const normalizeStatusFromAliases = (raw = {}) => {
+  const statusHints = [
+    raw?.status,
+    raw?.watchStatus,
+    raw?.watch_status,
+    raw?.['watch-status'],
+    raw?.['watch status'],
+    raw?.watchedOrNot,
+    raw?.watched_or_not,
+    raw?.['watched-or-not'],
+    raw?.['watched or not'],
+    raw?.userState?.status,
+    raw?.userState?.watchStatus,
+    raw?.userState?.watch_status,
+    raw?.userState?.['watch-status'],
+    raw?.userState?.['watch status'],
+    raw?.userState?.watchedOrNot,
+    raw?.userState?.watched_or_not,
+    raw?.userState?.['watched-or-not'],
+    raw?.userState?.['watched or not'],
+  ];
+
+  for (const hint of statusHints) {
+    const normalizedStatus = normalizeStatus(
+      typeof hint === 'string' ? hint : '',
+    );
+    if (normalizedStatus) return normalizedStatus;
+
+    const normalizedBoolean = normalizeBoolean(hint);
+    if (normalizedBoolean === true) return 'watched';
+    if (normalizedBoolean === false) return 'unwatched';
+  }
+
+  return '';
+};
+
 const normalizeStatusFromFlags = (raw = {}) => {
   const watchedHints = [
     raw?.watched,
+    raw?.watchedOrNot,
+    raw?.watched_or_not,
+    raw?.['watched-or-not'],
+    raw?.['watched or not'],
     raw?.seen,
     raw?.isWatched,
     raw?.is_watched,
@@ -131,7 +237,23 @@ const normalizeStatusFromFlags = (raw = {}) => {
     raw?.is_completed,
     raw?.['is-completed'],
     raw?.done,
+    raw?.watchStatus,
+    raw?.watch_status,
+    raw?.['watch-status'],
+    raw?.['watch status'],
+    raw?.watchedDate,
+    raw?.watched_date,
+    raw?.['watched-date'],
+    raw?.['watched date'],
+    raw?.lastWatched,
+    raw?.last_watched,
+    raw?.['last-watched'],
+    raw?.['last watched'],
     raw?.userState?.watched,
+    raw?.userState?.watchedOrNot,
+    raw?.userState?.watched_or_not,
+    raw?.userState?.['watched-or-not'],
+    raw?.userState?.['watched or not'],
     raw?.userState?.seen,
     raw?.userState?.isWatched,
     raw?.userState?.is_watched,
@@ -140,10 +262,22 @@ const normalizeStatusFromFlags = (raw = {}) => {
     raw?.userState?.isCompleted,
     raw?.userState?.is_completed,
     raw?.userState?.['is-completed'],
+    raw?.userState?.watchStatus,
+    raw?.userState?.watch_status,
+    raw?.userState?.['watch-status'],
+    raw?.userState?.['watch status'],
+    raw?.userState?.watchedDate,
+    raw?.userState?.watched_date,
+    raw?.userState?.['watched-date'],
+    raw?.userState?.['watched date'],
+    raw?.userState?.lastWatched,
+    raw?.userState?.last_watched,
+    raw?.userState?.['last-watched'],
+    raw?.userState?.['last watched'],
   ];
 
   for (const hint of watchedHints) {
-    const normalized = normalizeBoolean(hint);
+    const normalized = normalizeWatchedHint(hint);
     if (normalized === true) return 'watched';
     if (normalized === false) return 'unwatched';
   }
@@ -246,26 +380,7 @@ const parseCsv = (text) => {
         row.runtimeMinutes = values[index] || '';
         return;
       }
-      if (
-        [
-          'watched',
-          'seen',
-          'iswatched',
-          'is_watched',
-          'is-watched',
-          'is watched',
-          'isseen',
-          'is_seen',
-          'is-seen',
-          'is seen',
-          'completed',
-          'iscompleted',
-          'is_completed',
-          'is-completed',
-          'is completed',
-          'done',
-        ].includes(header)
-      ) {
+      if (WATCHED_FLAG_HEADERS.has(header)) {
         row.watched = values[index] || '';
         return;
       }
@@ -290,10 +405,7 @@ const parseCsv = (text) => {
           'tmdbid',
           'tmdb_id',
           'mediaid',
-          'watchstatus',
-          'watch_status',
-          'watch-status',
-          'watch status',
+          ...STATUS_HEADERS,
         ].includes(header)
       ) {
         if (header === 'cast') {
@@ -312,11 +424,7 @@ const parseCsv = (text) => {
           row.mediaId = values[index] || '';
           return;
         }
-        if (
-          ['watchstatus', 'watch_status', 'watch-status', 'watch status'].includes(
-            header,
-          )
-        ) {
+        if (STATUS_HEADERS.has(header)) {
           row.status = values[index] || '';
           return;
         }
@@ -419,8 +527,7 @@ export const normalizeItem = (raw) => {
     title: normalizeText(raw?.title),
     type: normalizeEnum(raw?.type, typeAliases),
     status:
-      normalizeStatus(raw?.status) ||
-      normalizeStatus(raw?.userState?.status) ||
+      normalizeStatusFromAliases(raw) ||
       normalizeStatusFromFlags(raw) ||
       '',
     vibe: normalizeEnum(raw?.vibe),

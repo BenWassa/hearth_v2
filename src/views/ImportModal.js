@@ -365,10 +365,10 @@ Titles:
                   className="w-full bg-stone-900/40 border border-stone-800 text-stone-300 placeholder-stone-600 px-4 py-3 rounded-xl focus:outline-none font-mono text-xs resize-none"
                 />
                 <div className="flex items-center gap-2">
-                  <Button variant="secondary" onClick={copyPrompt}>
+                  <Button variant="secondary" onClick={copyPrompt} className="px-4 py-2 text-sm">
                     {promptCopied ? 'Prompt Copied' : 'Copy Prompt'}
                   </Button>
-                  <Button variant="ghost" onClick={loadSampleData}>
+                  <Button variant="ghost" onClick={loadSampleData} className="px-4 py-2 text-sm">
                     Load sample data
                   </Button>
                 </div>
@@ -413,7 +413,7 @@ Titles:
                   ready to import.
                 </p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <Button variant="secondary" onClick={fillDefaults}>
+                  <Button variant="secondary" onClick={fillDefaults} className="px-4 py-2 text-sm">
                     Auto-fill Defaults
                   </Button>
                   <Button
@@ -421,6 +421,7 @@ Titles:
                     onClick={() => {
                       jumpToFirstIssue();
                     }}
+                    className="px-4 py-2 text-sm"
                   >
                     Assign Manually
                   </Button>
@@ -705,23 +706,23 @@ Titles:
               shelf (same title/type/year or provider) will be skipped.
             </div>
           )}
-          <div className="flex items-center justify-between gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center justify-between gap-2 min-w-0">
             <Button
               variant="ghost"
               onClick={onClose}
-              className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+              className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
             >
               Cancel
             </Button>
             {step === 'prompt' && (
-              <Button onClick={() => setStep('paste')}>Next</Button>
+              <Button onClick={() => setStep('paste')} className="px-4 py-2 text-sm">Next</Button>
             )}
             {step === 'paste' && (
               <div className="flex items-center gap-2 min-w-0">
                 <Button
                   variant="ghost"
                   onClick={() => setStep('prompt')}
-                  className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
                 >
                   Back
                 </Button>
@@ -729,6 +730,7 @@ Titles:
                   variant="secondary"
                   onClick={handlePreview}
                   disabled={!rawText.trim()}
+                  className="px-4 py-2 text-sm"
                 >
                   Preview
                 </Button>
@@ -739,7 +741,7 @@ Titles:
                 <Button
                   variant="ghost"
                   onClick={() => setStep('paste')}
-                  className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
                 >
                   Back
                 </Button>
@@ -751,7 +753,7 @@ Titles:
                     selectedImportableCount === 0 ||
                     isImporting
                   }
-                  className="px-4 py-2.5 sm:py-3 text-sm sm:text-base whitespace-nowrap shrink-0"
+                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
                 >
                   {isImporting ? (
                     'Importing...'

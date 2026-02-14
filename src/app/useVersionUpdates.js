@@ -117,16 +117,38 @@ export const useVersionUpdates = () => {
     setAutoReloadCountdown(null);
 
     try {
-      if (
-        newVersionAvailable === 'service-worker' &&
-        'serviceWorker' in navigator
-      ) {
+      if ('serviceWorker' in navigator) {
         const reg = await navigator.serviceWorker.getRegistration();
-        if (reg && reg.waiting) {
+        if (reg?.waiting) {
           setNewVersionAvailable(null);
           setUpdateMessage('');
           reg.waiting.postMessage({ type: 'SKIP_WAITING' });
           return;
+        }
+
+        if (reg?.installing) {
+          await new Promise((resolve) => {
+            let settled = false;
+            const finalize = () => {
+              if (settled) return;
+              settled = true;
+              resolve();
+            };
+            const timeoutId = setTimeout(finalize, 4000);
+            reg.installing.addEventListener('statechange', () => {
+              if (reg.waiting || reg.installing?.state === 'redundant') {
+                clearTimeout(timeoutId);
+                finalize();
+              }
+            });
+          });
+
+          if (reg.waiting) {
+            setNewVersionAvailable(null);
+            setUpdateMessage('');
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            return;
+          }
         }
       }
     } catch (err) {
@@ -134,7 +156,7 @@ export const useVersionUpdates = () => {
     }
 
     window.location.reload();
-  }, [clearAutoReloadTimers, newVersionAvailable]);
+  }, [clearAutoReloadTimers]);
 
   const dismissUpdate = useCallback(() => {
     setNewVersionAvailable(null);

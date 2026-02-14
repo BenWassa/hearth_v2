@@ -705,16 +705,24 @@ Titles:
               shelf (same title/type/year or provider) will be skipped.
             </div>
           )}
-          <div className="flex items-center justify-between gap-3">
-            <Button variant="ghost" onClick={onClose}>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 min-w-0">
+            <Button
+              variant="ghost"
+              onClick={onClose}
+              className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+            >
               Cancel
             </Button>
             {step === 'prompt' && (
               <Button onClick={() => setStep('paste')}>Next</Button>
             )}
             {step === 'paste' && (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={() => setStep('prompt')}>
+              <div className="flex items-center gap-2 min-w-0">
+                <Button
+                  variant="ghost"
+                  onClick={() => setStep('prompt')}
+                  className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+                >
                   Back
                 </Button>
                 <Button
@@ -727,8 +735,12 @@ Titles:
               </div>
             )}
             {step === 'review' && (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={() => setStep('paste')}>
+              <div className="flex items-center gap-2 min-w-0">
+                <Button
+                  variant="ghost"
+                  onClick={() => setStep('paste')}
+                  className="px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base whitespace-nowrap"
+                >
                   Back
                 </Button>
                 <Button
@@ -739,7 +751,7 @@ Titles:
                     selectedImportableCount === 0 ||
                     isImporting
                   }
-                  className="px-4 py-3"
+                  className="px-4 py-2.5 sm:py-3 text-sm sm:text-base whitespace-nowrap shrink-0"
                 >
                   {isImporting ? (
                     'Importing...'

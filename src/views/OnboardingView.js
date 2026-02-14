@@ -176,7 +176,7 @@ const OnboardingView = ({
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                       <>
-                        <span>Create Your Space</span>
+                        <span>Create or Join Space</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}

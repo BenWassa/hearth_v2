@@ -21,9 +21,8 @@ import {
   subscribeToAuth,
 } from '../services/firebase/auth.js';
 import {
-  createSpace,
+  createOrJoinSpaceByName,
   fetchSpace,
-  findUserSpaceByName,
   joinSpace,
 } from '../services/firebase/spaces.js';
 import {
@@ -555,21 +554,16 @@ export const useAppState = () => {
 
     setIsSpaceSetupRunning(true);
     try {
-      const existingSpace = await findUserSpaceByName({
+      const space = await createOrJoinSpaceByName({
         db,
         appId,
-        userId: user.uid,
         name: trimmedName,
+        userId: user.uid,
       });
 
-      const space =
-        existingSpace ||
-        (await createSpace({
-          db,
-          appId,
-          name: trimmedName,
-          userId: user.uid,
-        }));
+      if (!space?.id) {
+        throw new Error('space-unavailable');
+      }
 
       localStorage.setItem(SPACE_ID_STORAGE_KEY, space.id);
       setSpaceId(space.id);

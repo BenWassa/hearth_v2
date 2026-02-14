@@ -28,13 +28,42 @@ const generateSpaceId = (length = 8) => {
   ).join('');
 };
 
+const normalizeSpaceName = (value) =>
+  String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+
+// FNV-1a 32-bit hash; deterministic and compact for stable IDs.
+const hashString = (input) => {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash +=
+      (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  return (hash >>> 0).toString(36);
+};
+
+export const getSpaceIdFromName = (name) => {
+  const normalized = normalizeSpaceName(name);
+  if (!normalized) return '';
+  const slug = normalized
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+  const base = slug || 'space';
+  return `space-${base}-${hashString(normalized)}`;
+};
+
 export const createSpace = async ({ db, appId, name, userId }) => {
-  const newSpaceId = generateSpaceId();
   const trimmedName = typeof name === 'string' ? name.trim() : '';
+  const deterministicSpaceId = getSpaceIdFromName(trimmedName);
+  const newSpaceId = deterministicSpaceId || generateSpaceId();
   const spaceRef = doc(db, 'artifacts', appId, 'spaces', newSpaceId);
   await setDoc(spaceRef, {
     name: trimmedName,
-    nameLower: trimmedName.toLowerCase(),
+    nameLower: normalizeSpaceName(trimmedName),
     ownerUid: userId,
     members: [userId],
     createdAt: serverTimestamp(),
@@ -81,7 +110,7 @@ export const findUserSpaceByName = async ({ db, appId, userId, name }) => {
     throw err;
   }
 
-  const targetLower = trimmedName.toLowerCase();
+  const targetLower = normalizeSpaceName(trimmedName);
   const match = snapshot.docs.find((docSnap) => {
     const data = docSnap.data();
     const candidate = typeof data?.nameLower === 'string' ? data.nameLower : '';
@@ -93,4 +122,69 @@ export const findUserSpaceByName = async ({ db, appId, userId, name }) => {
     id: match.id,
     ...match.data(),
   };
+};
+
+export const createOrJoinSpaceByName = async ({ db, appId, name, userId }) => {
+  const trimmedName = typeof name === 'string' ? name.trim() : '';
+  if (!trimmedName) return null;
+
+  // Compatibility path for legacy spaces that were created with random IDs.
+  const existingMemberSpace = await findUserSpaceByName({
+    db,
+    appId,
+    userId,
+    name: trimmedName,
+  });
+  if (existingMemberSpace?.id) {
+    return existingMemberSpace;
+  }
+
+  const deterministicSpaceId = getSpaceIdFromName(trimmedName);
+  if (!deterministicSpaceId) return null;
+
+  try {
+    const joinedSpace = await joinSpace({
+      db,
+      appId,
+      spaceId: deterministicSpaceId,
+      userId,
+    });
+    if (joinedSpace) {
+      return {
+        id: deterministicSpaceId,
+        ...joinedSpace,
+      };
+    }
+  } catch (err) {
+    if (err?.code !== 'not-found') {
+      throw err;
+    }
+  }
+
+  try {
+    const createdSpace = await createSpace({
+      db,
+      appId,
+      name: trimmedName,
+      userId,
+    });
+    return createdSpace;
+  } catch (err) {
+    // Race condition: another user may have created the same deterministic space.
+    if (err?.code === 'permission-denied' || err?.code === 'already-exists') {
+      const joinedSpace = await joinSpace({
+        db,
+        appId,
+        spaceId: deterministicSpaceId,
+        userId,
+      });
+      if (joinedSpace) {
+        return {
+          id: deterministicSpaceId,
+          ...joinedSpace,
+        };
+      }
+    }
+    throw err;
+  }
 };

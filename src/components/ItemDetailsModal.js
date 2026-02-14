@@ -484,11 +484,21 @@ const ItemDetailsModal = ({
     })();
     setLocalEpisodeProgress((prev) => {
       const next = { ...(prev || {}) };
+      const wasWatched = Boolean(next[episodeId]);
       if (next[episodeId]) {
         delete next[episodeId];
       } else {
         next[episodeId] = true;
       }
+      const currentEpisodeIndex =
+        activeSeason?.episodes?.findIndex((episode) => episode.id === episodeId) ??
+        -1;
+      const nextUnwatchedEpisode =
+        currentEpisodeIndex === -1
+          ? null
+          : activeSeason.episodes.find(
+              (episode, index) => index > currentEpisodeIndex && !next[episode.id],
+            ) ?? null;
       const isSeasonComplete = Boolean(
         activeSeason?.episodes?.length &&
           activeSeason.episodes.every((episode) => next[episode.id]),
@@ -504,8 +514,11 @@ const ItemDetailsModal = ({
         ? { episodeProgress: next, status: statusUpdate }
         : { episodeProgress: next };
       onUpdate?.(item.id, updatePayload);
-      if (isSeasonComplete && nextSeasonNumber) {
+      if (!wasWatched && nextUnwatchedEpisode?.id) {
+        setExpandedEpisodeId(nextUnwatchedEpisode.id);
+      } else if (isSeasonComplete && nextSeasonNumber) {
         setActiveSeasonNum(nextSeasonNumber);
+        setExpandedEpisodeId(null);
         scrollToSeason(nextSeasonNumber);
       }
       return next;

@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DAILY_TRAY_STORAGE_PREFIX } from '../config/constants.js';
-import { buildTonightTray } from '../domain/watchlist.js';
+import {
+  buildTonightTray,
+  isTonightTrayValidForPool,
+} from '../domain/watchlist.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
 import EnergyPickModal from './components/tonight/EnergyPickModal.js';
@@ -117,7 +120,10 @@ const TonightView = ({
       const ids = Array.isArray(cached?.ids) ? cached.ids : [];
       const byId = new Map(pool.map((item) => [item.id, item]));
       const fromCache = ids.map((id) => byId.get(id)).filter(Boolean);
-      if (fromCache.length === Math.min(3, pool.length)) {
+      if (
+        fromCache.length === Math.min(3, pool.length) &&
+        isTonightTrayValidForPool(pool, fromCache)
+      ) {
         return fromCache;
       }
     } catch (err) {

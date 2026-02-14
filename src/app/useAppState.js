@@ -137,6 +137,19 @@ const resolveProviderIdentityFromImport = (item = {}) => {
       '',
   ).trim();
 
+  if (!providerId) {
+    const mediaId = String(item?.mediaId || item?.media_id || '').trim();
+    const [mediaProvider = '', mediaProviderId = ''] = mediaId.split(':');
+    const normalizedProvider = mediaProvider.trim().toLowerCase();
+    const normalizedProviderId = mediaProviderId.trim();
+    if (normalizedProvider && normalizedProviderId) {
+      return {
+        provider: normalizedProvider,
+        providerId: normalizedProviderId,
+      };
+    }
+  }
+
   if (!providerId) return null;
   return {
     provider: provider || 'tmdb',
@@ -998,11 +1011,20 @@ export const useAppState = () => {
     }
     const payload = items.map((item) => {
       const entry = {
+        schemaVersion: 2,
+        mediaId: item.mediaId || '',
         title: item.title,
         type: item.type,
+        status: item.status || 'unwatched',
         vibe: item.vibe,
         energy: item.energy,
       };
+      if (item.source?.provider) {
+        entry.provider = item.source.provider;
+      }
+      if (item.source?.providerId) {
+        entry.providerId = item.source.providerId;
+      }
       if (item.note) entry.note = item.note;
       if (item.poster) entry.poster = item.poster;
       if (item.backdrop) entry.backdrop = item.backdrop;

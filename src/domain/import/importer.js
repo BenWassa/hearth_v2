@@ -25,6 +25,42 @@ const normalizeTextOrNumber = (value) => {
   return '';
 };
 
+const normalizeStatus = (value) => {
+  if (!value || typeof value !== 'string') return '';
+  const normalized = value.trim().toLowerCase();
+  if (
+    ['watched', 'seen', 'complete', 'completed', 'done', 'finished'].includes(
+      normalized,
+    )
+  ) {
+    return 'watched';
+  }
+  if (
+    [
+      'unwatched',
+      'not watched',
+      'todo',
+      'to-watch',
+      'to watch',
+      'queued',
+    ].includes(normalized)
+  ) {
+    return 'unwatched';
+  }
+  return '';
+};
+
+const parseProviderIdentityFromMediaId = (value) => {
+  const normalized = normalizeTextOrNumber(value);
+  if (!normalized) return null;
+
+  const [providerRaw = '', providerIdRaw = ''] = normalized.split(':');
+  const provider = normalizeText(providerRaw).toLowerCase();
+  const providerId = normalizeText(providerIdRaw);
+  if (!provider || !providerId) return null;
+  return { provider, providerId };
+};
+
 const normalizeRuntimeMinutes = (value) => {
   if (value === null || value === undefined) return '';
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -116,6 +152,7 @@ const parseCsv = (text) => {
           'type',
           'vibe',
           'energy',
+          'status',
           'note',
           'poster',
           'year',
@@ -124,10 +161,27 @@ const parseCsv = (text) => {
           'cast',
           'genres',
           'backdrop',
+          'provider',
+          'providerid',
+          'tmdbid',
+          'tmdb_id',
+          'mediaid',
         ].includes(header)
       ) {
         if (header === 'cast') {
           row.actors = values[index] || '';
+          return;
+        }
+        if (header === 'providerid') {
+          row.providerId = values[index] || '';
+          return;
+        }
+        if (header === 'tmdbid') {
+          row.tmdbId = values[index] || '';
+          return;
+        }
+        if (header === 'mediaid') {
+          row.mediaId = values[index] || '';
           return;
         }
         row[header] = values[index] || '';
@@ -194,6 +248,14 @@ export const normalizeItem = (raw) => {
     rawSource.providerId = sourceProviderId;
     if (!rawSource.provider) rawSource.provider = 'tmdb';
   }
+  const mediaId = normalizeTextOrNumber(raw?.mediaId ?? raw?.media_id);
+  const mediaIdentity = parseProviderIdentityFromMediaId(mediaId);
+  if (!rawSource.provider && mediaIdentity?.provider) {
+    rawSource.provider = mediaIdentity.provider;
+  }
+  if (!rawSource.providerId && mediaIdentity?.providerId) {
+    rawSource.providerId = mediaIdentity.providerId;
+  }
   const source = Object.keys(rawSource).length > 0 ? rawSource : null;
   const media =
     raw?.media && typeof raw.media === 'object' && !Array.isArray(raw.media)
@@ -217,8 +279,13 @@ export const normalizeItem = (raw) => {
       Number.isFinite(raw?.schemaVersion) && raw.schemaVersion > 0
         ? raw.schemaVersion
         : '',
+    mediaId,
     title: normalizeText(raw?.title),
     type: normalizeEnum(raw?.type, typeAliases),
+    status:
+      normalizeStatus(raw?.status) ||
+      normalizeStatus(raw?.userState?.status) ||
+      '',
     vibe: normalizeEnum(raw?.vibe),
     energy: normalizeEnum(raw?.energy),
     note: normalizeText(raw?.note),
@@ -304,6 +371,12 @@ export const buildImportDedupeKey = (item = {}) => {
   const sourceProviderId = normalizeToken(item?.source?.providerId);
   if (sourceProvider && sourceProviderId) {
     return `provider:${sourceProvider}:${sourceProviderId}`;
+  }
+  const mediaIdentity = parseProviderIdentityFromMediaId(item?.mediaId);
+  if (mediaIdentity?.provider && mediaIdentity?.providerId) {
+    return `provider:${normalizeToken(mediaIdentity.provider)}:${normalizeToken(
+      mediaIdentity.providerId,
+    )}`;
   }
 
   const title = normalizeToken(item?.title);

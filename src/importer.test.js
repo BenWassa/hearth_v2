@@ -37,8 +37,10 @@ describe('importer', () => {
 
     expect(normalized).toEqual({
       schemaVersion: '',
+      mediaId: '',
       title: 'Ted Lasso',
       type: 'show',
+      status: '',
       vibe: 'comfort',
       energy: 'focused',
       note: '',
@@ -133,5 +135,21 @@ describe('importer', () => {
       provider: 'tmdb',
       providerId: '603',
     });
+  });
+
+  it('normalizes watched status from imported rows', () => {
+    const normalized = normalizeItem({
+      title: 'The Matrix',
+      status: 'seen',
+    });
+    expect(normalized.status).toBe('watched');
+  });
+
+  it('uses mediaId as dedupe identity when provider fields are missing', () => {
+    const key = buildImportDedupeKey({
+      title: 'Dune',
+      mediaId: 'tmdb:438631',
+    });
+    expect(key).toBe('provider:tmdb:438631');
   });
 });

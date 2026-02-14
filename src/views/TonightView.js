@@ -221,7 +221,7 @@ const TonightView = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col animate-in fade-in duration-500">
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
       <TonightHeaderMenu
         greeting={greeting}
         spaceLabel={spaceLabel}
@@ -239,8 +239,8 @@ const TonightView = ({
         onSignOut={onSignOut}
       />
 
-      <div className="flex-1 px-6 space-y-8 overflow-y-auto pb-32">
-        <div className="space-y-8">
+      <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col overflow-hidden">
+        <div className="space-y-6">
           {showImportBanner && (
             <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
               <div className="text-xs text-amber-200 tabular-nums">
@@ -289,49 +289,49 @@ const TonightView = ({
         </div>
 
         <BottomNav onAdd={onAdd} goToShelf={goToShelf} />
-
-        <VibePickModal
-          isOpen={isPickModalOpen && pickFilterMode === 'vibe'}
-          selectedVibe={pickFilters.vibe}
-          onClose={() => closePickModal('vibe')}
-          onSelectVibe={handleSelectVibe}
-          localPickError={localPickError}
-        />
-
-        <EnergyPickModal
-          isOpen={isPickModalOpen && pickFilterMode === 'energy'}
-          selectedEnergy={pickFilters.energy}
-          onClose={() => closePickModal('energy')}
-          onSelectEnergy={handleSelectEnergy}
-          localPickError={localPickError}
-        />
-
-        <ItemDetailsModal
-          isOpen={isDetailOpen}
-          item={detailItem}
-          onClose={closeDetails}
-          onToggleStatus={onToggleStatus}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
-        />
-
-        <MetadataAuditModal
-          isOpen={isAuditModalOpen}
-          onClose={() => setIsAuditModalOpen(false)}
-          isAuditLoading={isAuditLoading}
-          auditReport={auditReport}
-        />
-
-        <WipeConfirmModal
-          isOpen={isWipeConfirmOpen}
-          isDeletingAll={isDeletingAll}
-          wipeConfirmText={wipeConfirmText}
-          setWipeConfirmText={setWipeConfirmText}
-          canConfirmWipe={canConfirmWipe}
-          onClose={closeWipeModal}
-          onConfirm={confirmDeleteAll}
-        />
       </div>
+
+      <VibePickModal
+        isOpen={isPickModalOpen && pickFilterMode === 'vibe'}
+        selectedVibe={pickFilters.vibe}
+        onClose={() => closePickModal('vibe')}
+        onSelectVibe={handleSelectVibe}
+        localPickError={localPickError}
+      />
+
+      <EnergyPickModal
+        isOpen={isPickModalOpen && pickFilterMode === 'energy'}
+        selectedEnergy={pickFilters.energy}
+        onClose={() => closePickModal('energy')}
+        onSelectEnergy={handleSelectEnergy}
+        localPickError={localPickError}
+      />
+
+      <ItemDetailsModal
+        isOpen={isDetailOpen}
+        item={detailItem}
+        onClose={closeDetails}
+        onToggleStatus={onToggleStatus}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+      />
+
+      <MetadataAuditModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        isAuditLoading={isAuditLoading}
+        auditReport={auditReport}
+      />
+
+      <WipeConfirmModal
+        isOpen={isWipeConfirmOpen}
+        isDeletingAll={isDeletingAll}
+        wipeConfirmText={wipeConfirmText}
+        setWipeConfirmText={setWipeConfirmText}
+        canConfirmWipe={canConfirmWipe}
+        onClose={closeWipeModal}
+        onConfirm={confirmDeleteAll}
+      />
     </div>
   );
 };

@@ -6,7 +6,13 @@ import Button from '../components/ui/Button.js';
 import PosterPlaceholder from '../components/cards/PosterPlaceholder.js';
 import LazyMediaImage from '../components/media/LazyMediaImage.js';
 
-const DecisionView = ({ isDeciding, result, onClose, onReroll }) => {
+const DecisionView = ({
+  isDeciding,
+  result,
+  onClose,
+  onReroll,
+  decisionContext,
+}) => {
   const energyDef = result
     ? ENERGIES.find((e) => e.id === result.energy)
     : null;
@@ -14,6 +20,23 @@ const DecisionView = ({ isDeciding, result, onClose, onReroll }) => {
   const EnergyIcon = energyDef ? energyDef.icon : Battery;
   const [posterMissing, setPosterMissing] = useState(false);
   const posterSrc = result ? getPosterSrc(result) : null;
+  const decisionTag = (() => {
+    if (!decisionContext) return null;
+    const { filterType, filterId } = decisionContext;
+    if (filterType === 'energy') {
+      const def = ENERGIES.find((energy) => energy.id === filterId);
+      return def ? `Energy: ${def.label}` : 'Energy Pick';
+    }
+    if (filterType === 'vibe') {
+      const def = VIBES.find((vibe) => vibe.id === filterId);
+      return def ? `Vibe: ${def.label}` : 'Vibe Pick';
+    }
+    if (filterType === 'type') {
+      if (filterId === 'movie') return 'Movies';
+      if (filterId === 'show') return 'TV Shows';
+    }
+    return null;
+  })();
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-950 flex flex-col items-center justify-center p-6 sm:p-8 animate-in fade-in duration-300">
@@ -39,6 +62,14 @@ const DecisionView = ({ isDeciding, result, onClose, onReroll }) => {
         </div>
       ) : (
         <div className="w-full max-w-md space-y-6 animate-in zoom-in-95 duration-500">
+          {decisionTag && (
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-700/40 bg-amber-900/20 text-amber-300 text-[11px] uppercase tracking-wider font-semibold">
+                <Sparkles className="w-3 h-3" />
+                {decisionTag}
+              </div>
+            </div>
+          )}
           {/* Large Poster Image */}
           {result && (
             <div className="mx-auto w-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">

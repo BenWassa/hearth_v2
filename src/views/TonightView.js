@@ -191,7 +191,11 @@ const TonightView = ({
     }
     setVibePickError('');
     setIsVibeModalOpen(false);
-    onDecide?.(pool);
+    onDecide?.(pool, {
+      source: 'pick_for_us',
+      filterType: 'vibe',
+      filterId: vibeId,
+    });
   };
 
   const handleSelectEnergy = (energyId) => {
@@ -203,7 +207,11 @@ const TonightView = ({
     }
     setEnergyPickError('');
     setIsEnergyModalOpen(false);
-    onDecide?.(pool);
+    onDecide?.(pool, {
+      source: 'pick_for_us',
+      filterType: 'energy',
+      filterId: energyId,
+    });
   };
 
   return (
@@ -245,7 +253,13 @@ const TonightView = ({
               pool={unwatchedMovies}
               suggestions={movieSuggestions}
               emptyLabel="No movies queued yet."
-              onDecide={onDecide}
+              onDecide={(pool) =>
+                onDecide?.(pool, {
+                  source: 'section',
+                  filterType: 'type',
+                  filterId: 'movie',
+                })
+              }
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
             />
@@ -255,7 +269,13 @@ const TonightView = ({
               pool={unwatchedShows}
               suggestions={showSuggestions}
               emptyLabel="No shows queued yet."
-              onDecide={onDecide}
+              onDecide={(pool) =>
+                onDecide?.(pool, {
+                  source: 'section',
+                  filterType: 'type',
+                  filterId: 'show',
+                })
+              }
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
             />

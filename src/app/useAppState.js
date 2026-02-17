@@ -421,6 +421,7 @@ export const useAppState = () => {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState(getInitialView);
   const [decisionResult, setDecisionResult] = useState(null);
+  const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);
   const [contextItems, setContextItems] = useState([]);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -1533,6 +1534,7 @@ export const useAppState = () => {
       setItems([]);
       setContextItems([]);
       setDecisionResult(null);
+      setDecisionContext(null);
       setIsImportOpen(false);
       setView('tonight');
       notifyUpdate('Space wiped clean.');
@@ -1546,7 +1548,7 @@ export const useAppState = () => {
     }
   };
 
-  const startDecision = (poolOfItems) => {
+  const startDecision = (poolOfItems, context = null) => {
     const pool =
       poolOfItems && poolOfItems.length > 0
         ? poolOfItems
@@ -1555,6 +1557,8 @@ export const useAppState = () => {
     if (pool.length === 0) return;
 
     setIsDeciding(true);
+    setDecisionResult(null);
+    setDecisionContext(context);
     setContextItems(pool);
     setView('decision');
 
@@ -1569,6 +1573,7 @@ export const useAppState = () => {
     authResolved,
     autoReloadCountdown,
     contextItems,
+    decisionContext,
     decisionResult,
     dismissUpdate,
     errorMessage,

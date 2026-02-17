@@ -14,6 +14,7 @@ export default function HearthApp() {
     autoReloadCountdown,
     authResolved,
     contextItems,
+    decisionContext,
     decisionResult,
     dismissUpdate,
     errorMessage,
@@ -152,7 +153,7 @@ export default function HearthApp() {
             onExport={handleExportItems}
             onInvite={handleInvite}
             onDeleteAll={handleDeleteAll}
-            onDecide={(pool) => startDecision(pool)}
+            onDecide={(pool, context) => startDecision(pool, context)}
             onToggleStatus={handleMarkWatched}
             onDelete={handleDelete}
             onUpdate={handleUpdateItem}
@@ -194,8 +195,10 @@ export default function HearthApp() {
             onReroll={() =>
               startDecision(
                 contextItems.filter((item) => item.id !== decisionResult?.id),
+                decisionContext,
               )
             }
+            decisionContext={decisionContext}
           />
         )}
 

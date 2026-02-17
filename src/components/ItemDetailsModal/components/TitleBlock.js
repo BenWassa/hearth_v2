@@ -11,7 +11,9 @@ const TitleBlock = ({ item, metadataChips, genres }) => {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-stone-400">
         {metadataChips.map((chip, index) => (
           <React.Fragment key={chip.label}>
-            {index > 0 && <span className="w-1 h-1 rounded-full bg-stone-700/60" />}
+            {index > 0 && (
+              <span className="w-1 h-1 rounded-full bg-stone-700/60" />
+            )}
             <div className="flex items-center gap-1.5" title={chip.label}>
               <chip.icon className="w-3.5 h-3.5 opacity-60" />
               <span className={chip.isPlaceholder ? 'opacity-50 italic' : ''}>

@@ -169,7 +169,9 @@ const normalizeWatchedHint = (value) => {
   ) {
     return null;
   }
-  if (['never', 'not yet', 'not watched yet', 'unwatched'].includes(normalized)) {
+  if (
+    ['never', 'not yet', 'not watched yet', 'unwatched'].includes(normalized)
+  ) {
     return false;
   }
   const status = normalizeStatus(normalized);
@@ -527,9 +529,7 @@ export const normalizeItem = (raw) => {
     title: normalizeText(raw?.title),
     type: normalizeEnum(raw?.type, typeAliases),
     status:
-      normalizeStatusFromAliases(raw) ||
-      normalizeStatusFromFlags(raw) ||
-      '',
+      normalizeStatusFromAliases(raw) || normalizeStatusFromFlags(raw) || '',
     vibe: normalizeEnum(raw?.vibe),
     energy: normalizeEnum(raw?.energy),
     note: normalizeText(raw?.note),

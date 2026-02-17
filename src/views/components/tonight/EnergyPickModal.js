@@ -23,7 +23,9 @@ const EnergyPickModal = ({
           <div className="flex items-center justify-between pb-2 border-b border-stone-800">
             <div className="flex items-center gap-2">
               <Zap className="w-5 h-5 text-amber-400" />
-              <h3 className="text-xl font-serif text-amber-200">Choose Energy Level</h3>
+              <h3 className="text-xl font-serif text-amber-200">
+                Choose Energy Level
+              </h3>
             </div>
             <button
               onClick={onClose}
@@ -34,7 +36,9 @@ const EnergyPickModal = ({
             </button>
           </div>
 
-          <p className="text-sm text-stone-400 -mt-2">How much attention do you want to give?</p>
+          <p className="text-sm text-stone-400 -mt-2">
+            How much attention do you want to give?
+          </p>
           {localPickError && (
             <div className="text-xs text-amber-300 mt-1">{localPickError}</div>
           )}
@@ -50,11 +54,15 @@ const EnergyPickModal = ({
                     : 'bg-stone-800/60 text-stone-300 border-2 border-stone-700/50 hover:bg-stone-800 hover:border-amber-600/30 hover:text-amber-200'
                 }`}
               >
-                {energy.icon && <energy.icon className="w-6 h-6 flex-shrink-0" />}
+                {energy.icon && (
+                  <energy.icon className="w-6 h-6 flex-shrink-0" />
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-base">{energy.label}</div>
                   {energy.desc && (
-                    <div className="text-xs opacity-80 mt-0.5">{energy.desc}</div>
+                    <div className="text-xs opacity-80 mt-0.5">
+                      {energy.desc}
+                    </div>
                   )}
                 </div>
                 {selectedEnergy === energy.id && (

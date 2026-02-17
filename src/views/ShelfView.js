@@ -582,7 +582,9 @@ const ShelfView = ({
                 className="flex flex-col items-center gap-1 text-stone-200 hover:text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <Eye className="w-4 h-4" />
-                <span className="text-[10px] uppercase tracking-widest">Seen</span>
+                <span className="text-[10px] uppercase tracking-widest">
+                  Seen
+                </span>
               </button>
               <span className="text-[11px] text-stone-400 min-w-16 text-center">
                 {isBulkMarking

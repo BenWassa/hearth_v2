@@ -260,7 +260,9 @@ const ItemDetailsModal = ({
         item?.tmdbId ||
         '',
     ).trim();
-    const canHydrateFromTmdb = Boolean(providerId && (!provider || provider === 'tmdb'));
+    const canHydrateFromTmdb = Boolean(
+      providerId && (!provider || provider === 'tmdb'),
+    );
 
     const loadSeasons = async () => {
       if (canHydrateFromTmdb) {
@@ -491,13 +493,15 @@ const ItemDetailsModal = ({
         next[episodeId] = true;
       }
       const currentEpisodeIndex =
-        activeSeason?.episodes?.findIndex((episode) => episode.id === episodeId) ??
-        -1;
+        activeSeason?.episodes?.findIndex(
+          (episode) => episode.id === episodeId,
+        ) ?? -1;
       const nextUnwatchedEpisode =
         currentEpisodeIndex === -1
           ? null
           : activeSeason.episodes.find(
-              (episode, index) => index > currentEpisodeIndex && !next[episode.id],
+              (episode, index) =>
+                index > currentEpisodeIndex && !next[episode.id],
             ) ?? null;
       const isSeasonComplete = Boolean(
         activeSeason?.episodes?.length &&
@@ -735,10 +739,7 @@ const ItemDetailsModal = ({
           </div>
 
           {/* Fixed Bottom Action Bar */}
-          <ActionBar
-            item={item}
-            onToggleStatus={onToggleStatus}
-          />
+          <ActionBar item={item} onToggleStatus={onToggleStatus} />
         </div>
       </div>
     </div>

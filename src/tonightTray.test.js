@@ -1,4 +1,7 @@
-import { buildTonightTray, isTonightTrayValidForPool } from './domain/watchlist';
+import {
+  buildTonightTray,
+  isTonightTrayValidForPool,
+} from './domain/watchlist';
 
 const makeItem = (id, energy) => ({ id, energy });
 

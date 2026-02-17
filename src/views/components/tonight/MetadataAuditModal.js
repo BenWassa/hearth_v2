@@ -1,7 +1,12 @@
 import React from 'react';
 import { BarChart3, X } from 'lucide-react';
 
-const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) => {
+const MetadataAuditModal = ({
+  isOpen,
+  onClose,
+  isAuditLoading,
+  auditReport,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -16,7 +21,9 @@ const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) =>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-amber-400" />
-              <h3 className="text-lg font-serif text-stone-100">Metadata Audit</h3>
+              <h3 className="text-lg font-serif text-stone-100">
+                Metadata Audit
+              </h3>
             </div>
             <button
               onClick={onClose}
@@ -30,25 +37,43 @@ const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) =>
           {isAuditLoading ? (
             <div className="text-sm text-stone-400">Running audit...</div>
           ) : !auditReport ? (
-            <div className="text-sm text-stone-400">Audit data is unavailable right now.</div>
+            <div className="text-sm text-stone-400">
+              Audit data is unavailable right now.
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">Total</div>
-                  <div className="text-lg font-semibold text-stone-100">{auditReport.totalItems}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                    Total
+                  </div>
+                  <div className="text-lg font-semibold text-stone-100">
+                    {auditReport.totalItems}
+                  </div>
                 </div>
                 <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">Complete</div>
-                  <div className="text-lg font-semibold text-emerald-300">{auditReport.completeItems}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                    Complete
+                  </div>
+                  <div className="text-lg font-semibold text-emerald-300">
+                    {auditReport.completeItems}
+                  </div>
                 </div>
                 <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">Missing</div>
-                  <div className="text-lg font-semibold text-amber-300">{auditReport.itemsWithGaps}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                    Missing
+                  </div>
+                  <div className="text-lg font-semibold text-amber-300">
+                    {auditReport.itemsWithGaps}
+                  </div>
                 </div>
                 <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">Shows Missing</div>
-                  <div className="text-lg font-semibold text-amber-300">{auditReport.byType.show.withGaps}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                    Shows Missing
+                  </div>
+                  <div className="text-lg font-semibold text-amber-300">
+                    {auditReport.byType.show.withGaps}
+                  </div>
                 </div>
               </div>
 
@@ -61,7 +86,9 @@ const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) =>
                 <div>Genres: {auditReport.gapCounts.genres || 0}</div>
                 <div>Actors: {auditReport.gapCounts.actors || 0}</div>
                 <div>Director: {auditReport.gapCounts.director || 0}</div>
-                <div>Season Count: {auditReport.gapCounts.seasonCount || 0}</div>
+                <div>
+                  Season Count: {auditReport.gapCounts.seasonCount || 0}
+                </div>
                 <div>Seasons: {auditReport.gapCounts.seasons || 0}</div>
               </div>
 
@@ -70,7 +97,9 @@ const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) =>
                   Missing Items ({auditReport.missingRows.length})
                 </div>
                 {auditReport.missingRows.length === 0 ? (
-                  <div className="text-sm text-stone-400">No missing metadata found.</div>
+                  <div className="text-sm text-stone-400">
+                    No missing metadata found.
+                  </div>
                 ) : (
                   <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {auditReport.missingRows.slice(0, 100).map((row) => (
@@ -78,9 +107,15 @@ const MetadataAuditModal = ({ isOpen, onClose, isAuditLoading, auditReport }) =>
                         key={row.id}
                         className="rounded-lg border border-stone-800 bg-stone-900/30 px-3 py-2"
                       >
-                        <div className="text-sm text-stone-200">{row.title}</div>
-                        <div className="text-[11px] text-stone-500 uppercase tracking-wider">{row.type}</div>
-                        <div className="text-xs text-amber-300 mt-1">Missing: {row.gaps.join(', ')}</div>
+                        <div className="text-sm text-stone-200">
+                          {row.title}
+                        </div>
+                        <div className="text-[11px] text-stone-500 uppercase tracking-wider">
+                          {row.type}
+                        </div>
+                        <div className="text-xs text-amber-300 mt-1">
+                          Missing: {row.gaps.join(', ')}
+                        </div>
                       </div>
                     ))}
                   </div>

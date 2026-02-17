@@ -222,7 +222,8 @@ Titles:
     });
     return count;
   })();
-  const selectedDuplicateCount = selectedRows.length - selectedUniqueInImportCount;
+  const selectedDuplicateCount =
+    selectedRows.length - selectedUniqueInImportCount;
   const selectedAlreadyExistingCount = (() => {
     const seen = new Set();
     let count = 0;
@@ -438,10 +439,18 @@ Titles:
                   className="w-full bg-stone-900/40 border border-stone-800 text-stone-300 placeholder-stone-600 px-4 py-3 rounded-xl focus:outline-none font-mono text-xs resize-none"
                 />
                 <div className="flex items-center gap-2">
-                  <Button variant="secondary" onClick={copyPrompt} className="px-4 py-2 text-sm">
+                  <Button
+                    variant="secondary"
+                    onClick={copyPrompt}
+                    className="px-4 py-2 text-sm"
+                  >
                     {promptCopied ? 'Prompt Copied' : 'Copy Prompt'}
                   </Button>
-                  <Button variant="ghost" onClick={loadSampleData} className="px-4 py-2 text-sm">
+                  <Button
+                    variant="ghost"
+                    onClick={loadSampleData}
+                    className="px-4 py-2 text-sm"
+                  >
                     Load sample data
                   </Button>
                 </div>
@@ -486,7 +495,11 @@ Titles:
                   ready to import.
                 </p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <Button variant="secondary" onClick={fillDefaults} className="px-4 py-2 text-sm">
+                  <Button
+                    variant="secondary"
+                    onClick={fillDefaults}
+                    className="px-4 py-2 text-sm"
+                  >
                     Auto-fill Defaults
                   </Button>
                   <Button
@@ -776,7 +789,8 @@ Titles:
               </div>
               <div className="flex items-center justify-between text-[11px] text-stone-400">
                 <span className="tabular-nums">
-                  {progressProcessed}/{progressTotal || selectedImportableCount} titles
+                  {progressProcessed}/{progressTotal || selectedImportableCount}{' '}
+                  titles
                 </span>
                 {hydrationTotal > 0 && (
                   <span className="tabular-nums">
@@ -852,7 +866,12 @@ Titles:
               Cancel
             </Button>
             {step === 'prompt' && (
-              <Button onClick={() => setStep('paste')} className="px-4 py-2 text-sm">Next</Button>
+              <Button
+                onClick={() => setStep('paste')}
+                className="px-4 py-2 text-sm"
+              >
+                Next
+              </Button>
             )}
             {step === 'paste' && (
               <div className="flex items-center gap-2 min-w-0">

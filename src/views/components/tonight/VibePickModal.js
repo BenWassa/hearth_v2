@@ -23,7 +23,9 @@ const VibePickModal = ({
           <div className="flex items-center justify-between pb-2 border-b border-stone-800">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-400" />
-              <h3 className="text-xl font-serif text-amber-200">Choose a Vibe</h3>
+              <h3 className="text-xl font-serif text-amber-200">
+                Choose a Vibe
+              </h3>
             </div>
             <button
               onClick={onClose}
@@ -34,7 +36,9 @@ const VibePickModal = ({
             </button>
           </div>
 
-          <p className="text-sm text-stone-400 -mt-2">Pick the mood you're in for tonight</p>
+          <p className="text-sm text-stone-400 -mt-2">
+            Pick the mood you're in for tonight
+          </p>
           {localPickError && (
             <div className="text-xs text-amber-300 mt-1">{localPickError}</div>
           )}

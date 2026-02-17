@@ -26,7 +26,9 @@ const WipeConfirmModal = ({
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-serif text-rose-200">Delete all titles?</h3>
+              <h3 className="text-lg font-serif text-rose-200">
+                Delete all titles?
+              </h3>
               <p className="text-sm text-stone-300">
                 This permanently clears every title in this space for everyone.
               </p>

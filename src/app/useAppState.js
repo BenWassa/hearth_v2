@@ -94,7 +94,10 @@ const scoreSearchResult = ({ result, title, type, year }) => {
   const resultYear = String(result?.year || '').trim();
 
   if (result?.type === wantedType) score += 30;
-  if (normalizedResultTitle && normalizedResultTitle === normalizedWantedTitle) {
+  if (
+    normalizedResultTitle &&
+    normalizedResultTitle === normalizedWantedTitle
+  ) {
     score += 50;
   }
   if (
@@ -312,7 +315,8 @@ const getMetadataGaps = (item = {}) => {
   if (!actors.length) gaps.push('actors');
   if (!director) gaps.push('director');
   if (isShow) {
-    if (!Number.isFinite(seasonCount) || seasonCount < 1) gaps.push('seasonCount');
+    if (!Number.isFinite(seasonCount) || seasonCount < 1)
+      gaps.push('seasonCount');
     if (!seasons.length) gaps.push('seasons');
   }
 
@@ -775,8 +779,12 @@ export const useAppState = () => {
           const existingProvider = String(
             existingItem?.source?.provider || '',
           ).toLowerCase();
-          const existingProviderId = String(existingItem?.source?.providerId || '');
-          const nextProvider = String(payload.source.provider || '').toLowerCase();
+          const existingProviderId = String(
+            existingItem?.source?.providerId || '',
+          );
+          const nextProvider = String(
+            payload.source.provider || '',
+          ).toLowerCase();
           const nextProviderId = String(payload.source.providerId || '');
           return (
             existingProvider &&
@@ -807,7 +815,9 @@ export const useAppState = () => {
     }
     try {
       const existingKeys = new Set(
-        items.map((existingItem) => buildImportDedupeKey(existingItem)).filter(Boolean),
+        items
+          .map((existingItem) => buildImportDedupeKey(existingItem))
+          .filter(Boolean),
       );
       const importKeys = new Set();
       const itemsForLookup = [];
@@ -966,7 +976,9 @@ export const useAppState = () => {
               : details?.type === 'show'
               ? 'show'
               : 'movie';
-          const poster = String(item?.poster || details?.posterUrl || '').trim();
+          const poster = String(
+            item?.poster || details?.posterUrl || '',
+          ).trim();
           const backdrop = String(
             item?.backdrop || details?.backdropUrl || '',
           ).trim();
@@ -978,8 +990,12 @@ export const useAppState = () => {
             : item?.runtimeMinutes;
           const importedYear = String(item?.year || '').trim();
           const year = importedYear || details?.year || '';
-          const importedGenres = hasListValues(item?.genres) ? item.genres : null;
-          const importedActors = hasListValues(item?.actors) ? item.actors : null;
+          const importedGenres = hasListValues(item?.genres)
+            ? item.genres
+            : null;
+          const importedActors = hasListValues(item?.actors)
+            ? item.actors
+            : null;
           const director = String(
             item?.director ||
               (Array.isArray(details?.directors) && details.directors[0]) ||
@@ -1005,7 +1021,9 @@ export const useAppState = () => {
                   .filter((season) => Number.isFinite(season.number))
               : [];
           const importedSeasonCount = toPositiveInteger(item?.totalSeasons);
-          const importedSeasons = Array.isArray(item?.seasons) ? item.seasons : [];
+          const importedSeasons = Array.isArray(item?.seasons)
+            ? item.seasons
+            : [];
 
           nextItem = {
             ...item,
@@ -1090,6 +1108,7 @@ export const useAppState = () => {
           matched: matchedCount,
           unmatched: unmatchedCount,
         };
+        const hydrationCompletedSnapshot = hydrationCompleted;
         setImportProgress((current) => {
           if (!current) return current;
           return {
@@ -1099,7 +1118,7 @@ export const useAppState = () => {
             matched: progressSnapshot.matched,
             unmatched: progressSnapshot.unmatched,
             isRateLimitedBackoff: false,
-            hydrationCompleted,
+            hydrationCompleted: hydrationCompletedSnapshot,
             previewCards: appendPreviewCard(current.previewCards, {
               id: previewId,
               title: payload.title || title || '[untitled]',
@@ -1114,9 +1133,7 @@ export const useAppState = () => {
       setView('tonight');
       if (importedCount > 0) {
         notifyUpdate(
-          `Imported ${importedCount} title${
-            importedCount === 1 ? '' : 's'
-          }.`,
+          `Imported ${importedCount} title${importedCount === 1 ? '' : 's'}.`,
         );
       }
       if (matchedCount > 0) {
@@ -1330,7 +1347,8 @@ export const useAppState = () => {
     const refreshedType = refreshed.media?.type || refreshed.type || '';
     const isShow = refreshedType === 'show';
     const primaryCredit =
-      (Array.isArray(refreshed.media?.directors) && refreshed.media.directors[0]) ||
+      (Array.isArray(refreshed.media?.directors) &&
+        refreshed.media.directors[0]) ||
       (isShow && Array.isArray(refreshed.media?.creators)
         ? refreshed.media.creators[0]
         : '');
@@ -1341,9 +1359,13 @@ export const useAppState = () => {
       updates.poster = refreshed.media.poster || refreshed.media.posterUrl;
     }
     if (refreshed.media?.backdrop || refreshed.media?.backdropUrl) {
-      updates.backdrop = refreshed.media.backdrop || refreshed.media.backdropUrl;
+      updates.backdrop =
+        refreshed.media.backdrop || refreshed.media.backdropUrl;
     }
-    if (Number.isFinite(refreshed.showData?.seasonCount) && refreshed.showData.seasonCount > 0) {
+    if (
+      Number.isFinite(refreshed.showData?.seasonCount) &&
+      refreshed.showData.seasonCount > 0
+    ) {
       updates.totalSeasons = refreshed.showData.seasonCount;
     }
     if (Array.isArray(refreshed.showData?.seasons)) {
@@ -1393,7 +1415,9 @@ export const useAppState = () => {
       return report;
     }
     if (!report.itemsWithGaps) {
-      notifyUpdate(`Metadata audit: all ${report.totalItems} title(s) look complete.`);
+      notifyUpdate(
+        `Metadata audit: all ${report.totalItems} title(s) look complete.`,
+      );
       return report;
     }
     notifyUpdate(
@@ -1427,7 +1451,11 @@ export const useAppState = () => {
 
           if (!provider || !providerId) {
             const itemType = item?.type === 'show' ? 'show' : 'movie';
-            const searchData = await searchMedia({ q: item.title, type: itemType, page: 1 });
+            const searchData = await searchMedia({
+              q: item.title,
+              type: itemType,
+              page: 1,
+            });
             const best = pickBestSearchResult({
               results: searchData?.results,
               title: item.title,

@@ -283,7 +283,6 @@ const TonightView = ({
               onPickVibe={handlePickVibe}
               onPickEnergy={handlePickEnergy}
             />
-
           </div>
         </div>
 

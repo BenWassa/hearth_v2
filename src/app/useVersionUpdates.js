@@ -78,7 +78,10 @@ export const useVersionUpdates = () => {
 
         const timeoutId = setTimeout(finish, 4000);
         registration.installing.addEventListener('statechange', () => {
-          if (registration.waiting || registration.installing?.state === 'redundant') {
+          if (
+            registration.waiting ||
+            registration.installing?.state === 'redundant'
+          ) {
             clearTimeout(timeoutId);
             finish();
           }
@@ -107,7 +110,9 @@ export const useVersionUpdates = () => {
         if (!activationRequested) {
           if (fallbackToBanner) {
             setNewVersionAvailable('manual-reload');
-            setUpdateMessage('Update ready. Reload to apply the latest version.');
+            setUpdateMessage(
+              'Update ready. Reload to apply the latest version.',
+            );
             scheduleAutoReload();
           } else {
             window.location.reload();
@@ -139,7 +144,9 @@ export const useVersionUpdates = () => {
         if (!response.ok) return;
         const data = await response.json();
 
-        const versionChanged = Boolean(data.version && data.version !== APP_VERSION);
+        const versionChanged = Boolean(
+          data.version && data.version !== APP_VERSION,
+        );
         const buildChanged = Boolean(data.buildId && data.buildId !== BUILD_ID);
 
         if (isMounted && (versionChanged || buildChanged)) {

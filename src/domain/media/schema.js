@@ -96,11 +96,7 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const directors = normalizeCredits(media.directors);
   const creators = normalizeCredits(media.creators);
   const normalizedDirectors =
-    directors.length > 0
-      ? directors
-      : primaryDirector
-      ? [primaryDirector]
-      : [];
+    directors.length > 0 ? directors : primaryDirector ? [primaryDirector] : [];
   const normalizedCreators =
     creators.length > 0
       ? creators

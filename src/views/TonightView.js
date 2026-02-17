@@ -7,6 +7,7 @@ import {
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
+import PickForUsCard from './components/tonight/PickForUsCard.js';
 import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
@@ -159,6 +160,42 @@ const TonightView = ({
     }
   };
 
+  const pickRandomFrom = (values) =>
+    values[Math.floor(Math.random() * values.length)];
+
+  const handlePickRandom = () => {
+    if (!onDecide || unwatched.length === 0) return;
+    onDecide(unwatched);
+  };
+
+  const handlePickVibe = () => {
+    if (!onDecide || unwatched.length === 0) return;
+    const availableVibes = [...new Set(unwatched.map((item) => item.vibe))].filter(
+      Boolean,
+    );
+    if (availableVibes.length === 0) {
+      onDecide(unwatched);
+      return;
+    }
+    const selectedVibe = pickRandomFrom(availableVibes);
+    const pool = unwatched.filter((item) => item.vibe === selectedVibe);
+    onDecide(pool.length > 0 ? pool : unwatched);
+  };
+
+  const handlePickEnergy = () => {
+    if (!onDecide || unwatched.length === 0) return;
+    const availableEnergies = [
+      ...new Set(unwatched.map((item) => item.energy)),
+    ].filter(Boolean);
+    if (availableEnergies.length === 0) {
+      onDecide(unwatched);
+      return;
+    }
+    const selectedEnergy = pickRandomFrom(availableEnergies);
+    const pool = unwatched.filter((item) => item.energy === selectedEnergy);
+    onDecide(pool.length > 0 ? pool : unwatched);
+  };
+
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
       <TonightHeaderMenu
@@ -211,6 +248,11 @@ const TonightView = ({
               onDecide={onDecide}
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
+            />
+            <PickForUsCard
+              onPickRandom={handlePickRandom}
+              onPickVibe={handlePickVibe}
+              onPickEnergy={handlePickEnergy}
             />
 
           </div>

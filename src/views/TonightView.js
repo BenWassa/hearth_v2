@@ -6,10 +6,12 @@ import {
 } from '../domain/watchlist.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
+import EnergyPickModal from './components/tonight/EnergyPickModal.js';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
 import PickForUsCard from './components/tonight/PickForUsCard.js';
 import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
+import VibePickModal from './components/tonight/VibePickModal.js';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
 
 const TonightView = ({
@@ -52,6 +54,12 @@ const TonightView = ({
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [auditReport, setAuditReport] = useState(null);
+  const [isVibeModalOpen, setIsVibeModalOpen] = useState(false);
+  const [selectedVibe, setSelectedVibe] = useState('');
+  const [vibePickError, setVibePickError] = useState('');
+  const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
+  const [selectedEnergy, setSelectedEnergy] = useState('');
+  const [energyPickError, setEnergyPickError] = useState('');
 
   const spaceLabel =
     spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
@@ -160,40 +168,42 @@ const TonightView = ({
     }
   };
 
-  const pickRandomFrom = (values) =>
-    values[Math.floor(Math.random() * values.length)];
-
-  const handlePickRandom = () => {
-    if (!onDecide || unwatched.length === 0) return;
-    onDecide(unwatched);
-  };
-
   const handlePickVibe = () => {
-    if (!onDecide || unwatched.length === 0) return;
-    const availableVibes = [...new Set(unwatched.map((item) => item.vibe))].filter(
-      Boolean,
-    );
-    if (availableVibes.length === 0) {
-      onDecide(unwatched);
-      return;
-    }
-    const selectedVibe = pickRandomFrom(availableVibes);
-    const pool = unwatched.filter((item) => item.vibe === selectedVibe);
-    onDecide(pool.length > 0 ? pool : unwatched);
+    if (unwatched.length === 0) return;
+    setSelectedVibe('');
+    setVibePickError('');
+    setIsVibeModalOpen(true);
   };
 
   const handlePickEnergy = () => {
-    if (!onDecide || unwatched.length === 0) return;
-    const availableEnergies = [
-      ...new Set(unwatched.map((item) => item.energy)),
-    ].filter(Boolean);
-    if (availableEnergies.length === 0) {
-      onDecide(unwatched);
+    if (unwatched.length === 0) return;
+    setSelectedEnergy('');
+    setEnergyPickError('');
+    setIsEnergyModalOpen(true);
+  };
+
+  const handleSelectVibe = (vibeId) => {
+    setSelectedVibe(vibeId);
+    const pool = unwatched.filter((item) => item.vibe === vibeId);
+    if (pool.length === 0) {
+      setVibePickError('No unwatched titles in that vibe yet.');
       return;
     }
-    const selectedEnergy = pickRandomFrom(availableEnergies);
-    const pool = unwatched.filter((item) => item.energy === selectedEnergy);
-    onDecide(pool.length > 0 ? pool : unwatched);
+    setVibePickError('');
+    setIsVibeModalOpen(false);
+    onDecide?.(pool);
+  };
+
+  const handleSelectEnergy = (energyId) => {
+    setSelectedEnergy(energyId);
+    const pool = unwatched.filter((item) => item.energy === energyId);
+    if (pool.length === 0) {
+      setEnergyPickError('No unwatched titles at that energy yet.');
+      return;
+    }
+    setEnergyPickError('');
+    setIsEnergyModalOpen(false);
+    onDecide?.(pool);
   };
 
   return (
@@ -250,7 +260,6 @@ const TonightView = ({
               onOpenDetails={openDetails}
             />
             <PickForUsCard
-              onPickRandom={handlePickRandom}
               onPickVibe={handlePickVibe}
               onPickEnergy={handlePickEnergy}
             />
@@ -275,6 +284,22 @@ const TonightView = ({
         onClose={() => setIsAuditModalOpen(false)}
         isAuditLoading={isAuditLoading}
         auditReport={auditReport}
+      />
+
+      <VibePickModal
+        isOpen={isVibeModalOpen}
+        selectedVibe={selectedVibe}
+        onClose={() => setIsVibeModalOpen(false)}
+        onSelectVibe={handleSelectVibe}
+        localPickError={vibePickError}
+      />
+
+      <EnergyPickModal
+        isOpen={isEnergyModalOpen}
+        selectedEnergy={selectedEnergy}
+        onClose={() => setIsEnergyModalOpen(false)}
+        onSelectEnergy={handleSelectEnergy}
+        localPickError={energyPickError}
       />
 
       <WipeConfirmModal

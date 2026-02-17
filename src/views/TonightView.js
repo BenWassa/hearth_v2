@@ -6,12 +6,9 @@ import {
 } from '../domain/watchlist.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
-import EnergyPickModal from './components/tonight/EnergyPickModal.js';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
-import PickForUsCard from './components/tonight/PickForUsCard.js';
 import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
-import VibePickModal from './components/tonight/VibePickModal.js';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
 
 const TonightView = ({
@@ -47,16 +44,8 @@ const TonightView = ({
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isPickModalOpen, setIsPickModalOpen] = useState(false);
-  const [pickFilterMode, setPickFilterMode] = useState(null);
-  const [pickFilters, setPickFilters] = useState({
-    vibe: null,
-    energy: null,
-    type: null,
-  });
   const [detailItem, setDetailItem] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [localPickError, setLocalPickError] = useState('');
   const [isWipeConfirmOpen, setIsWipeConfirmOpen] = useState(false);
   const [wipeConfirmText, setWipeConfirmText] = useState('');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -150,56 +139,6 @@ const TonightView = ({
     return buildDailyTray(unwatchedShows, 'show');
   }, [unwatchedShows, spaceId, todayKey]);
 
-  const closePickModal = (mode) => {
-    setPickFilterMode(null);
-    setIsPickModalOpen(false);
-    setPickFilters((prev) => ({ ...prev, [mode]: null }));
-  };
-
-  const handleSelectVibe = (vibeId) => {
-    const newVibe = pickFilters.vibe === vibeId ? null : vibeId;
-    setPickFilters((prev) => ({ ...prev, vibe: newVibe }));
-
-    if (!newVibe) return;
-    const filtered = [...unwatchedMovies, ...unwatchedShows].filter(
-      (item) => item.vibe === newVibe,
-    );
-
-    if (filtered.length > 0) {
-      const pickedItem = filtered[Math.floor(Math.random() * filtered.length)];
-      onDecide([pickedItem]);
-      setPickFilters({ vibe: null, energy: null, type: null });
-      setPickFilterMode(null);
-      setIsPickModalOpen(false);
-      return;
-    }
-
-    setLocalPickError('No items match that vibe yet.');
-    setTimeout(() => setLocalPickError(''), 2500);
-  };
-
-  const handleSelectEnergy = (energyId) => {
-    const newEnergy = pickFilters.energy === energyId ? null : energyId;
-    setPickFilters((prev) => ({ ...prev, energy: newEnergy }));
-
-    if (!newEnergy) return;
-    const filtered = [...unwatchedMovies, ...unwatchedShows].filter(
-      (item) => item.energy === newEnergy,
-    );
-
-    if (filtered.length > 0) {
-      const pickedItem = filtered[Math.floor(Math.random() * filtered.length)];
-      onDecide([pickedItem]);
-      setPickFilters({ vibe: null, energy: null, type: null });
-      setPickFilterMode(null);
-      setIsPickModalOpen(false);
-      return;
-    }
-
-    setLocalPickError('No items match that energy level yet.');
-    setTimeout(() => setLocalPickError(''), 2500);
-  };
-
   const handleOpenDeleteAll = () => {
     setWipeConfirmText('');
     setIsWipeConfirmOpen(true);
@@ -240,72 +179,45 @@ const TonightView = ({
       />
 
       <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col overflow-hidden">
-        <div className="space-y-6">
-          {showImportBanner && (
-            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
-              <div className="text-xs text-amber-200 tabular-nums">
-                Importing {activeImportProcessed}/{activeImportTotal}
-              </div>
-              {importProgress?.isRateLimitedBackoff && (
-                <div className="text-[11px] text-amber-300/90">
-                  Retrying after rate limit...
+        <div className="flex-1 min-h-0 overflow-y-auto pb-32">
+          <div className="space-y-6">
+            {showImportBanner && (
+              <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
+                <div className="text-xs text-amber-200 tabular-nums">
+                  Importing {activeImportProcessed}/{activeImportTotal}
                 </div>
-              )}
-            </div>
-          )}
-          <SuggestionSection
-            title="Movies"
-            pool={unwatchedMovies}
-            suggestions={movieSuggestions}
-            emptyLabel="No movies queued yet."
-            onDecide={onDecide}
-            onToggleStatus={onToggleStatus}
-            onOpenDetails={openDetails}
-          />
+                {importProgress?.isRateLimitedBackoff && (
+                  <div className="text-[11px] text-amber-300/90">
+                    Retrying after rate limit...
+                  </div>
+                )}
+              </div>
+            )}
+            <SuggestionSection
+              title="Movies"
+              pool={unwatchedMovies}
+              suggestions={movieSuggestions}
+              emptyLabel="No movies queued yet."
+              onDecide={onDecide}
+              onToggleStatus={onToggleStatus}
+              onOpenDetails={openDetails}
+            />
 
-          <SuggestionSection
-            title="TV Shows"
-            pool={unwatchedShows}
-            suggestions={showSuggestions}
-            emptyLabel="No shows queued yet."
-            onDecide={onDecide}
-            onToggleStatus={onToggleStatus}
-            onOpenDetails={openDetails}
-          />
+            <SuggestionSection
+              title="TV Shows"
+              pool={unwatchedShows}
+              suggestions={showSuggestions}
+              emptyLabel="No shows queued yet."
+              onDecide={onDecide}
+              onToggleStatus={onToggleStatus}
+              onOpenDetails={openDetails}
+            />
 
-          <PickForUsCard
-            onPickRandom={() => onDecide()}
-            onPickVibe={() => {
-              setLocalPickError('');
-              setPickFilterMode('vibe');
-              setIsPickModalOpen(true);
-            }}
-            onPickEnergy={() => {
-              setLocalPickError('');
-              setPickFilterMode('energy');
-              setIsPickModalOpen(true);
-            }}
-          />
+          </div>
         </div>
 
         <BottomNav onAdd={onAdd} goToShelf={goToShelf} />
       </div>
-
-      <VibePickModal
-        isOpen={isPickModalOpen && pickFilterMode === 'vibe'}
-        selectedVibe={pickFilters.vibe}
-        onClose={() => closePickModal('vibe')}
-        onSelectVibe={handleSelectVibe}
-        localPickError={localPickError}
-      />
-
-      <EnergyPickModal
-        isOpen={isPickModalOpen && pickFilterMode === 'energy'}
-        selectedEnergy={pickFilters.energy}
-        onClose={() => closePickModal('energy')}
-        onSelectEnergy={handleSelectEnergy}
-        localPickError={localPickError}
-      />
 
       <ItemDetailsModal
         isOpen={isDetailOpen}

@@ -76,5 +76,11 @@ export const normalizeSeasons = (seasons) => {
       };
     })
     .filter(Boolean)
+    .filter((season) => {
+      if (season.number === 0 && season.episodes.length === 0) {
+        return false;
+      }
+      return true;
+    })
     .sort((a, b) => a.number - b.number);
 };

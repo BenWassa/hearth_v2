@@ -179,15 +179,15 @@ const TonightView = ({
       />
 
       <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-y-auto pb-32">
+        <div className="flex-1 min-h-0 overflow-y-auto pb-8 custom-scrollbar">
           <div className="space-y-6">
             {showImportBanner && (
               <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
-                <div className="text-xs text-amber-200 tabular-nums">
+                <div className="text-sm text-amber-200 tabular-nums">
                   Importing {activeImportProcessed}/{activeImportTotal}
                 </div>
                 {importProgress?.isRateLimitedBackoff && (
-                  <div className="text-[11px] text-amber-300/90">
+                  <div className="text-xs text-amber-300/90">
                     Retrying after rate limit...
                   </div>
                 )}

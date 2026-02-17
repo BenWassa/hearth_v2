@@ -29,7 +29,7 @@ const TonightHeaderMenu = ({
       )}
       <header className="px-6 py-8 flex justify-between items-start">
         <div className="space-y-1 min-w-0">
-          <p className="text-xs text-amber-700 font-bold uppercase tracking-widest">
+          <p className="text-sm text-amber-700 font-bold uppercase tracking-widest">
             {greeting}
           </p>
           <h2
@@ -70,7 +70,7 @@ const TonightHeaderMenu = ({
                   setIsMenuOpen(false);
                   onInvite();
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
+                className="w-full px-4 py-3 text-left text-base text-stone-300 hover:bg-stone-900/60 transition-colors"
                 role="menuitem"
               >
                 Invite partner
@@ -80,7 +80,7 @@ const TonightHeaderMenu = ({
                   setIsMenuOpen(false);
                   onImport();
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
+                className="w-full px-4 py-3 text-left text-base text-stone-300 hover:bg-stone-900/60 transition-colors"
                 role="menuitem"
               >
                 Import
@@ -90,7 +90,7 @@ const TonightHeaderMenu = ({
                   setIsMenuOpen(false);
                   onExport();
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 transition-colors"
+                className="w-full px-4 py-3 text-left text-base text-stone-300 hover:bg-stone-900/60 transition-colors"
                 role="menuitem"
               >
                 Export
@@ -102,7 +102,7 @@ const TonightHeaderMenu = ({
                       setIsMenuOpen(false);
                       openAuditModal();
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors border-t border-stone-900"
+                    className="w-full px-4 py-3 text-left text-base text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors border-t border-stone-900"
                     role="menuitem"
                   >
                     Audit Metadata (Dev)
@@ -113,7 +113,7 @@ const TonightHeaderMenu = ({
                       onMetadataRepairMissing?.();
                     }}
                     disabled={isMetadataRepairing}
-                    className="w-full px-4 py-3 text-left text-sm text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-t border-stone-900"
+                    className="w-full px-4 py-3 text-left text-base text-amber-300 hover:bg-amber-950/20 hover:text-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-t border-stone-900"
                     role="menuitem"
                   >
                     {isMetadataRepairing
@@ -128,13 +128,13 @@ const TonightHeaderMenu = ({
                     setIsMenuOpen(false);
                     onOpenDeleteAll();
                   }}
-                  className="w-full px-4 py-3 text-left text-sm text-rose-300 hover:bg-rose-950/30 hover:text-rose-200 transition-colors border-t border-stone-900"
+                  className="w-full px-4 py-3 text-left text-base text-rose-300 hover:bg-rose-950/30 hover:text-rose-200 transition-colors border-t border-stone-900"
                   role="menuitem"
                 >
                   Delete all titles
                 </button>
               )}
-              <div className="px-4 py-3 text-xs text-stone-400 border-t border-stone-900">
+              <div className="px-4 py-3 text-sm text-stone-400 border-t border-stone-900">
                 Version {APP_VERSION}
               </div>
               <button
@@ -142,7 +142,7 @@ const TonightHeaderMenu = ({
                   setIsMenuOpen(false);
                   onSignOut();
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-200 transition-colors border-t border-stone-900"
+                className="w-full px-4 py-3 text-left text-base text-stone-300 hover:bg-stone-900/60 hover:text-stone-200 transition-colors border-t border-stone-900"
                 role="menuitem"
               >
                 Sign Out

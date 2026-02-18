@@ -20,6 +20,7 @@ import {
   normalizeGenres,
   normalizeSeasons,
 } from './ItemDetailsModal/utils/normalizers.js';
+import { getShowEntryTarget } from './ItemDetailsModal/utils/showProgress.js';
 import MovieTimingCard from './ItemDetailsModal/components/MovieTimingCard.js';
 import CastSection from './ItemDetailsModal/components/CastSection.js';
 import ActionBar from './ItemDetailsModal/components/ActionBar.js';
@@ -103,6 +104,7 @@ const ItemDetailsModal = ({
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
   const persistedHydrationRef = useRef(new Set());
+  const initializedShowRef = useRef(null);
   const seasonScrollRef = useRef(null);
   const [seasonScrollState, setSeasonScrollState] = useState({
     canScrollLeft: false,
@@ -335,17 +337,44 @@ const ItemDetailsModal = ({
     episodeFetchSeed,
   ]);
 
+  const showEntryTarget = useMemo(
+    () =>
+      getShowEntryTarget({
+        seasons,
+        episodeProgress: item?.episodeProgress || localEpisodeProgress,
+      }),
+    [seasons, item?.episodeProgress, localEpisodeProgress],
+  );
+
   useEffect(() => {
-    if (!item?.id) return;
-    if (!seasons.length) {
+    if (!item?.id) {
+      initializedShowRef.current = null;
       setActiveSeasonNum(null);
+      setExpandedEpisodeId(null);
       return;
     }
-    setActiveSeasonNum((prev) => {
-      if (prev && seasons.some((season) => season.number === prev)) return prev;
-      return seasons[0].number;
-    });
-  }, [item?.id, seasons]);
+    if (!seasons.length) {
+      setActiveSeasonNum(null);
+      setExpandedEpisodeId(null);
+      return;
+    }
+    const didChangeItem = initializedShowRef.current !== item.id;
+    if (didChangeItem) {
+      initializedShowRef.current = item.id;
+      setActiveSeasonNum(showEntryTarget?.seasonNumber ?? seasons[0].number);
+      setExpandedEpisodeId(showEntryTarget?.episodeId ?? null);
+      return;
+    }
+    if (activeSeasonNum && seasons.some((season) => season.number === activeSeasonNum))
+      return;
+    setActiveSeasonNum(showEntryTarget?.seasonNumber ?? seasons[0].number);
+  }, [
+    item?.id,
+    seasons,
+    activeSeasonNum,
+    showEntryTarget?.seasonNumber,
+    showEntryTarget?.episodeId,
+  ]);
 
   const activeSeason = useMemo(() => {
     if (!seasons.length) return null;

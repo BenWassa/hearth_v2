@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Plus, Check, Trash2, CheckCircle2 } from 'lucide-react';
 import { ENERGIES } from '../../config/constants.js';
 import { getPosterSrc } from '../../utils/poster.js';
-import { isEpisodeWatched } from '../ItemDetailsModal/utils/showProgress.js';
+import { getShowWatchProgressPercent } from './showCardProgress.js';
 import PosterPlaceholder from './PosterPlaceholder.js';
 import LazyMediaImage from '../media/LazyMediaImage.js';
 
@@ -22,52 +22,8 @@ const PosterCard = ({
   const energyDef = ENERGIES.find((e) => e.id === item.energy);
 
   const progressPercentage = useMemo(() => {
-    if (item.type !== 'show') return 0;
-    const progressObj = item.episodeProgress || {};
-    const seasons = Array.isArray(item.seasons) ? item.seasons : [];
-
-    if (seasons.length > 0) {
-      let watchedEpisodes = 0;
-      let totalEpisodes = 0;
-
-      seasons.forEach((season) => {
-        const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
-        const seasonNumber = Number.isFinite(season?.number)
-          ? season.number
-          : season?.seasonNumber;
-        if (episodes.length > 0) {
-          totalEpisodes += episodes.length;
-          episodes.forEach((episode) => {
-            if (
-              isEpisodeWatched(progressObj, {
-                ...episode,
-                seasonNumber:
-                  episode?.seasonNumber ?? episode?.season_number ?? seasonNumber,
-                number:
-                  episode?.number ??
-                  episode?.episodeNumber ??
-                  episode?.episode_number,
-              })
-            ) {
-              watchedEpisodes += 1;
-            }
-          });
-        } else if (Number.isFinite(season?.episodeCount) && season.episodeCount > 0) {
-          totalEpisodes += season.episodeCount;
-        }
-      });
-
-      if (totalEpisodes > 0) {
-        return Math.min(
-          Math.round((watchedEpisodes / totalEpisodes) * 100),
-          100,
-        );
-      }
-    }
-
-    const watchedCount = Object.values(progressObj).filter(Boolean).length;
-    return watchedCount > 0 ? 5 : 0;
-  }, [item.type, item.episodeProgress, item.seasons]);
+    return getShowWatchProgressPercent(item);
+  }, [item]);
 
   // Energy-based styling tokens
   const energyStyles = {

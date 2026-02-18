@@ -31,9 +31,11 @@ const TitleBlock = ({ item, metadataChips, genres }) => {
       </div>
 
       {item.overview ? (
-        <p className="text-sm sm:text-base leading-relaxed text-stone-300/90 max-w-2xl">
-          {item.overview}
-        </p>
+        <div className="pl-3.5 border-l-2 border-stone-700/60 mt-4">
+          <p className="text-base sm:text-[1.05rem] leading-[1.7] text-stone-300/85 font-light tracking-[0.01em] max-w-prose italic">
+            {item.overview}
+          </p>
+        </div>
       ) : null}
     </div>
   );

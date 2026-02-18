@@ -72,11 +72,11 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 to-transparent" />
 
       {currentLogo && !logoFailed && (
-        <div className="absolute bottom-5 right-5">
+        <div className="absolute bottom-5 left-5">
           <img
             src={currentLogo}
             alt={`${currentItem?.title || 'Title'} logo`}
-            className="max-h-16 sm:max-h-20 max-w-[55vw] sm:max-w-[38vw] object-contain object-right drop-shadow-[0_6px_18px_rgba(0,0,0,0.8)]"
+            className="max-h-16 sm:max-h-20 max-w-[55vw] sm:max-w-[38vw] object-contain object-left drop-shadow-[0_6px_18px_rgba(0,0,0,0.8)]"
             onError={() => setLogoFailed(true)}
             loading="eager"
           />

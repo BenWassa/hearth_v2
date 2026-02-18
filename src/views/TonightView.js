@@ -1,9 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { DAILY_TRAY_STORAGE_PREFIX } from '../config/constants.js';
-import {
-  buildTonightTray,
-  isTonightTrayValidForPool,
-} from '../domain/watchlist.js';
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
@@ -13,6 +8,7 @@ import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
 import { toMillis } from '../utils/time.js';
+import { getBackdropSrc } from '../utils/poster.js';
 
 const getModifiedAt = (item) =>
   toMillis(item?.updatedAt || item?.startedAt || item?.createdAt || item?.timestamp);
@@ -38,6 +34,19 @@ const isShowComplete = (item) => {
     ),
   );
 };
+
+const hasHeroLogo = (item) =>
+  Boolean(
+    String(
+      item?.logo ||
+        item?.logoUrl ||
+        item?.media?.logo ||
+        item?.media?.logoUrl ||
+        '',
+    ).trim(),
+  );
+
+const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
 
 const SkeletonRail = ({ title, count = 6 }) => (
   <div className="space-y-1.5 shrink-0">
@@ -80,7 +89,6 @@ const TonightView = ({
   isMetadataRepairing = false,
   goToShelf,
   importProgress,
-  spaceId,
   spaceName,
   isDeletingAll,
   onSignOut,
@@ -128,7 +136,6 @@ const TonightView = ({
   const activeImportTotal = Number(importProgress?.total || 0);
   const activeImportProcessed = Number(importProgress?.processed || 0);
   const showImportBanner = activeImportTotal > 0;
-  const todayKey = new Date().toISOString().slice(0, 10);
   const wipePhrase = 'WIPE';
   const canConfirmWipe =
     wipeConfirmText.trim().toUpperCase() === wipePhrase && !isDeletingAll;
@@ -169,51 +176,13 @@ const TonightView = ({
     }
   }, [detailItem, items]);
 
-  const buildDailyTray = (pool, type) => {
-    if (pool.length === 0) return [];
-    const storageKey = `${DAILY_TRAY_STORAGE_PREFIX}:${
-      spaceId || 'anon'
-    }:${type}:${todayKey}`;
-
-    try {
-      const cached = JSON.parse(localStorage.getItem(storageKey) || 'null');
-      const ids = Array.isArray(cached?.ids) ? cached.ids : [];
-      const byId = new Map(pool.map((item) => [item.id, item]));
-      const fromCache = ids.map((id) => byId.get(id)).filter(Boolean);
-      if (
-        fromCache.length === Math.min(3, pool.length) &&
-        isTonightTrayValidForPool(pool, fromCache)
-      ) {
-        return fromCache;
-      }
-    } catch (err) {
-      console.warn('Failed to read cached tray', err);
-    }
-
-    const tray = buildTonightTray(pool);
-    try {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ ids: tray.map((item) => item.id) }),
-      );
-    } catch (err) {
-      console.warn('Failed to cache tray', err);
-    }
-    return tray;
-  };
-
-  const movieSuggestions = useMemo(() => {
-    return buildDailyTray(unwatchedMovies, 'movie');
-  }, [unwatchedMovies, spaceId, todayKey]);
-
-  const showSuggestions = useMemo(() => {
-    return buildDailyTray(unwatchedShows, 'show');
-  }, [unwatchedShows, spaceId, todayKey]);
-
-  const heroItems = useMemo(
-    () => [...movieSuggestions, ...showSuggestions].slice(0, 5),
-    [movieSuggestions, showSuggestions],
-  );
+  const heroItems = useMemo(() => {
+    const candidates = [...unwatchedMovies, ...unwatchedShows];
+    const withBackdrop = candidates.filter((item) => hasHeroBackdrop(item));
+    const withLogo = withBackdrop.filter((item) => hasHeroLogo(item));
+    const withoutLogo = withBackdrop.filter((item) => !hasHeroLogo(item));
+    return [...withLogo, ...withoutLogo].slice(0, 5);
+  }, [unwatchedMovies, unwatchedShows]);
   const showSkeleton = isLoading && items.length === 0;
 
   const handleOpenDeleteAll = () => {

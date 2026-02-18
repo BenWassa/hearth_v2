@@ -50,6 +50,7 @@ export const normalizeSeasons = (seasons) => {
           return {
             id: buildEpisodeKey(episode, number, episodeNumber),
             number: episodeNumber,
+            seasonNumber: number,
             title: episode.title ?? episode.name ?? `Episode ${episodeNumber}`,
             airDate: episode.airDate ?? episode.air_date ?? '',
             description: episode.description ?? episode.overview ?? '',
@@ -58,6 +59,20 @@ export const normalizeSeasons = (seasons) => {
                 episode.runtime_minutes ??
                 episode.runtime,
               null,
+            ),
+            progressKeys: Array.from(
+              new Set(
+                [
+                  buildEpisodeKey(episode, number, episodeNumber),
+                  episode.id,
+                  episode.episodeId,
+                  episode.tmdb_id,
+                  episode.tmdbId,
+                  `s${number}e${episodeNumber}`,
+                ]
+                  .filter(Boolean)
+                  .map((key) => `${key}`),
+              ),
             ),
           };
         })

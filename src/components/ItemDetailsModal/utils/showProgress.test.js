@@ -78,4 +78,41 @@ describe('getShowEntryTarget', () => {
       episodeId: 's2e2',
     });
   });
+
+  it('supports legacy progress keys when episode ids changed across sources', () => {
+    const seasons = [
+      {
+        number: 2,
+        episodes: [
+          {
+            id: '2001',
+            seasonNumber: 2,
+            number: 1,
+            progressKeys: ['2001', 's2e1'],
+          },
+          {
+            id: '2002',
+            seasonNumber: 2,
+            number: 2,
+            progressKeys: ['2002', 's2e2'],
+          },
+          {
+            id: '2003',
+            seasonNumber: 2,
+            number: 3,
+            progressKeys: ['2003', 's2e3'],
+          },
+        ],
+      },
+    ];
+    const episodeProgress = {
+      s2e1: true,
+      s2e2: true,
+    };
+
+    expect(getShowEntryTarget({ seasons, episodeProgress })).toEqual({
+      seasonNumber: 2,
+      episodeId: '2003',
+    });
+  });
 });

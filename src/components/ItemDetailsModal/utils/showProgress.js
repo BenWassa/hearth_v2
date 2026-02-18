@@ -4,6 +4,24 @@ const sortSeasonsAsc = (seasons = []) =>
 const sortEpisodesAsc = (episodes = []) =>
   [...episodes].sort((a, b) => a.number - b.number);
 
+export const getEpisodeProgressKeys = (episode) => {
+  if (!episode || typeof episode !== 'object') return [];
+  const fallbackKey =
+    Number.isFinite(episode.seasonNumber) && Number.isFinite(episode.number)
+      ? `s${episode.seasonNumber}e${episode.number}`
+      : null;
+  return Array.from(
+    new Set(
+      [episode.id, ...(episode.progressKeys || []), fallbackKey]
+        .filter(Boolean)
+        .map((key) => `${key}`),
+    ),
+  );
+};
+
+export const isEpisodeWatched = (episodeProgress, episode) =>
+  getEpisodeProgressKeys(episode).some((key) => Boolean(episodeProgress?.[key]));
+
 export const getShowEntryTarget = ({ seasons, episodeProgress }) => {
   if (!Array.isArray(seasons) || seasons.length === 0) return null;
   const progress = episodeProgress || {};
@@ -13,7 +31,7 @@ export const getShowEntryTarget = ({ seasons, episodeProgress }) => {
     const season = orderedSeasons[seasonIndex];
     const orderedEpisodes = sortEpisodesAsc(season.episodes || []);
     const nextUnwatched = orderedEpisodes.find(
-      (episode) => !progress?.[episode.id],
+      (episode) => !isEpisodeWatched(progress, episode),
     );
     if (nextUnwatched) {
       return {

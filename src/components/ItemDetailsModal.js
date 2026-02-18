@@ -20,7 +20,11 @@ import {
   normalizeGenres,
   normalizeSeasons,
 } from './ItemDetailsModal/utils/normalizers.js';
-import { getShowEntryTarget } from './ItemDetailsModal/utils/showProgress.js';
+import {
+  getEpisodeProgressKeys,
+  getShowEntryTarget,
+  isEpisodeWatched,
+} from './ItemDetailsModal/utils/showProgress.js';
 import MovieTimingCard from './ItemDetailsModal/components/MovieTimingCard.js';
 import CastSection from './ItemDetailsModal/components/CastSection.js';
 import ActionBar from './ItemDetailsModal/components/ActionBar.js';
@@ -388,7 +392,7 @@ const ItemDetailsModal = ({
     if (!activeSeason?.episodes?.length) return [];
     return activeSeason.episodes.map((episode) => ({
       ...episode,
-      watched: Boolean(localEpisodeProgress?.[episode.id]),
+      watched: isEpisodeWatched(localEpisodeProgress, episode),
     }));
   }, [activeSeason, localEpisodeProgress]);
 
@@ -409,7 +413,7 @@ const ItemDetailsModal = ({
   const isActiveSeasonWatched = useMemo(() => {
     if (!activeSeason?.episodes?.length) return false;
     return activeSeason.episodes.every((episode) =>
-      Boolean(localEpisodeProgress?.[episode.id]),
+      isEpisodeWatched(localEpisodeProgress, episode),
     );
   }, [activeSeason, localEpisodeProgress]);
   const seasonProgress = useMemo(() => {
@@ -421,7 +425,7 @@ const ItemDetailsModal = ({
         : 0;
       const watched = season.episodes.length
         ? season.episodes.filter(
-            (episode) => localEpisodeProgress?.[episode.id],
+            (episode) => isEpisodeWatched(localEpisodeProgress, episode),
           ).length
         : 0;
       const progress = total === 0 ? 0 : Math.round((watched / total) * 100);
@@ -499,7 +503,7 @@ const ItemDetailsModal = ({
       (season) =>
         Array.isArray(season.episodes) &&
         season.episodes.length > 0 &&
-        season.episodes.every((episode) => Boolean(progress?.[episode.id])),
+        season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
     );
   };
 
@@ -515,11 +519,18 @@ const ItemDetailsModal = ({
     })();
     setLocalEpisodeProgress((prev) => {
       const next = { ...(prev || {}) };
-      const wasWatched = Boolean(next[episodeId]);
-      if (next[episodeId]) {
-        delete next[episodeId];
+      const currentEpisode =
+        activeSeason?.episodes?.find((episode) => episode.id === episodeId) || null;
+      const episodeKeys = getEpisodeProgressKeys(currentEpisode);
+      const wasWatched = episodeKeys.some((key) => Boolean(next[key]));
+      if (wasWatched) {
+        episodeKeys.forEach((key) => {
+          delete next[key];
+        });
       } else {
-        next[episodeId] = true;
+        episodeKeys.forEach((key) => {
+          next[key] = true;
+        });
       }
       const currentEpisodeIndex =
         activeSeason?.episodes?.findIndex(
@@ -530,11 +541,11 @@ const ItemDetailsModal = ({
           ? null
           : activeSeason.episodes.find(
               (episode, index) =>
-                index > currentEpisodeIndex && !next[episode.id],
+                index > currentEpisodeIndex && !isEpisodeWatched(next, episode),
             ) ?? null;
       const isSeasonComplete = Boolean(
         activeSeason?.episodes?.length &&
-          activeSeason.episodes.every((episode) => next[episode.id]),
+          activeSeason.episodes.every((episode) => isEpisodeWatched(next, episode)),
       );
       const showComplete = isShowComplete(next);
       const statusUpdate =
@@ -567,7 +578,9 @@ const ItemDetailsModal = ({
     setLocalEpisodeProgress((prev) => {
       const next = { ...(prev || {}) };
       activeSeason.episodes.forEach((episode) => {
-        next[episode.id] = true;
+        getEpisodeProgressKeys(episode).forEach((key) => {
+          next[key] = true;
+        });
       });
       const currentIndex = seasons.findIndex(
         (season) => season.number === activeSeason?.number,
@@ -601,7 +614,9 @@ const ItemDetailsModal = ({
     setLocalEpisodeProgress((prev) => {
       const next = { ...(prev || {}) };
       activeSeason.episodes.forEach((episode) => {
-        delete next[episode.id];
+        getEpisodeProgressKeys(episode).forEach((key) => {
+          delete next[key];
+        });
       });
       const showComplete = isShowComplete(next);
       const statusUpdate =

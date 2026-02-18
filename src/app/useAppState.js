@@ -758,24 +758,6 @@ export const useAppState = () => {
     }
   };
 
-  const handleInvite = async () => {
-    if (!spaceId) {
-      notifyError('Space not available. Create a space first.');
-      return;
-    }
-    const baseUrl =
-      typeof window !== 'undefined'
-        ? `${window.location.origin}${window.location.pathname}`
-        : '';
-    const inviteUrl = `${baseUrl}?join=${spaceId}`;
-    const copied = await copyToClipboard(inviteUrl);
-    if (copied) {
-      notifyUpdate('Invite link copied. Share it to join your space.');
-    } else {
-      notifyError('Could not copy invite link. Try again.');
-    }
-  };
-
   const handleAddItem = async (itemData) => {
     if (!user || !spaceId || !db) {
       notifyError('Database not available. Please check your connection.');
@@ -1776,7 +1758,6 @@ export const useAppState = () => {
     handleDelete,
     handleExportItems,
     handleImportItems,
-    handleInvite,
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRepairMissing,

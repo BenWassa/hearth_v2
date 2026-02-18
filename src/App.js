@@ -25,7 +25,6 @@ export default function HearthApp() {
     handleDelete,
     handleExportItems,
     handleImportItems,
-    handleInvite,
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRepairMissing,
@@ -152,7 +151,6 @@ export default function HearthApp() {
             onAdd={() => setView('add')}
             onImport={() => setIsImportOpen(true)}
             onExport={handleExportItems}
-            onInvite={handleInvite}
             onDeleteAll={handleDeleteAll}
             onDecide={(pool, context) => startDecision(pool, context)}
             onToggleStatus={handleMarkWatched}

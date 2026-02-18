@@ -78,7 +78,6 @@ const TonightView = ({
   onAdd,
   onImport,
   onExport,
-  onInvite,
   onDeleteAll,
   onDelete,
   onToggleStatus,
@@ -214,7 +213,6 @@ const TonightView = ({
             spaceLabel={spaceLabel}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}
-            onInvite={onInvite}
             onImport={onImport}
             onExport={onExport}
             showDevMetadataTools={showDevMetadataTools}

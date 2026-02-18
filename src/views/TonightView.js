@@ -50,7 +50,6 @@ const TonightView = ({
   isDeletingAll,
   onSignOut,
 }) => {
-  const unwatched = items.filter((i) => i.status === 'unwatched');
   const currentlyWatchingShows = useMemo(
     () =>
       items

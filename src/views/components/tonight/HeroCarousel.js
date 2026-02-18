@@ -69,21 +69,33 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           />
         );
       })}
-      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 to-transparent" />
+      {/* Scrim: strong bottom-left gradient to stage the logo */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-stone-950/80 via-stone-950/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent" />
 
-      {currentLogo && !logoFailed && (
-        <div className="absolute bottom-5 left-5">
+      {/* Logo + metadata — bottom-left, Netflix/Apple TV convention */}
+      <div className="absolute bottom-7 left-5 right-16 z-10">
+        {currentLogo && !logoFailed ? (
           <img
             src={currentLogo}
             alt={`${currentItem?.title || 'Title'} logo`}
-            className="max-h-16 sm:max-h-20 max-w-[55vw] sm:max-w-[38vw] object-contain object-left drop-shadow-[0_6px_18px_rgba(0,0,0,0.8)]"
+            className="max-h-14 sm:max-h-18 max-w-[52vw] sm:max-w-[36vw] object-contain object-left drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] mb-1.5"
             onError={() => setLogoFailed(true)}
             loading="eager"
           />
+        ) : null}
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-stone-300/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+          {currentItem?.type === 'movie' ? 'Film' : 'Series'}
+          {currentItem?.year && (
+            <>
+              <span className="w-0.5 h-0.5 rounded-full bg-stone-400/60" />
+              <span>{currentItem.year}</span>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20">
+      <div className="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20">
         {safeItems.map((item, index) => (
           <div
             key={`${getItemKey(item, index)}-dot`}

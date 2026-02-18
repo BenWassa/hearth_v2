@@ -234,8 +234,9 @@ const ItemDetailsModal = ({
     );
   }, [item?.seasons]);
   const totalSeasons =
-    item?.totalSeasons ??
-    (seasons.length ? seasons.length : item?.seasonCount ?? null);
+    seasons.length > 0
+      ? seasons.length
+      : item?.totalSeasons ?? item?.seasonCount ?? null;
 
   useEffect(() => {
     let isActive = true;

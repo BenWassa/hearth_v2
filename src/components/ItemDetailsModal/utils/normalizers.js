@@ -32,6 +32,13 @@ export const buildEpisodeKey = (episode, seasonNumber, episodeNumber) => {
 
 export const normalizeSeasons = (seasons) => {
   if (!Array.isArray(seasons)) return [];
+  const getSeasonEpisodeTotal = (season) =>
+    season.episodes.length > 0
+      ? season.episodes.length
+      : Number.isFinite(season.episodeCount)
+      ? season.episodeCount
+      : 0;
+
   return seasons
     .map((season, index) => {
       if (!season || typeof season !== 'object') return null;
@@ -91,11 +98,6 @@ export const normalizeSeasons = (seasons) => {
       };
     })
     .filter(Boolean)
-    .filter((season) => {
-      if (season.number === 0 && season.episodes.length === 0) {
-        return false;
-      }
-      return true;
-    })
+    .filter((season) => getSeasonEpisodeTotal(season) > 0)
     .sort((a, b) => a.number - b.number);
 };

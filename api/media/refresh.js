@@ -39,6 +39,7 @@ module.exports = async (req, res) => {
   const details = await getMediaDetails({
     id: providerId,
     type,
+    locale,
   });
 
   if (!details.ok) {

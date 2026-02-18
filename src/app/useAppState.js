@@ -81,7 +81,17 @@ const isShowFullyWatched = (item) => {
   if (!seasonsWithEpisodes.length) return false;
   const progress = item.episodeProgress || {};
   return seasonsWithEpisodes.every((season) =>
-    season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
+    season.episodes.every((episode) =>
+      isEpisodeWatched(progress, {
+        ...episode,
+        seasonNumber:
+          episode?.seasonNumber ?? episode?.season_number ?? season?.number,
+        number:
+          episode?.number ??
+          episode?.episodeNumber ??
+          episode?.episode_number,
+      }),
+    ),
   );
 };
 
@@ -283,6 +293,9 @@ const getMetadataGaps = (item = {}) => {
   const sourceProviderId = String(item?.source?.providerId || '').trim();
   const poster = String(item?.poster || item?.media?.poster || '').trim();
   const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
+  const logo = String(
+    item?.logo || item?.logoUrl || item?.media?.logo || item?.media?.logoUrl || '',
+  ).trim();
   const runtimeMinutes = Number(
     item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
   );
@@ -313,6 +326,7 @@ const getMetadataGaps = (item = {}) => {
   if (!sourceProvider || !sourceProviderId) gaps.push('source');
   if (!poster) gaps.push('poster');
   if (!backdrop) gaps.push('backdrop');
+  if (!logo) gaps.push('logo');
   if (!isShow && (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0)) {
     gaps.push('runtimeMinutes');
   }
@@ -352,6 +366,7 @@ const buildMetadataAuditReport = (items = []) => {
       source: 0,
       poster: 0,
       backdrop: 0,
+      logo: 0,
       runtimeMinutes: 0,
       year: 0,
       genres: 0,
@@ -989,6 +1004,7 @@ export const useAppState = () => {
           const backdrop = String(
             item?.backdrop || details?.backdropUrl || '',
           ).trim();
+          const logo = String(item?.logo || details?.logoUrl || '').trim();
           const importedRuntimeMinutes = toFiniteNumber(item?.runtimeMinutes);
           const runtimeMinutes = Number.isFinite(importedRuntimeMinutes)
             ? importedRuntimeMinutes
@@ -1052,6 +1068,7 @@ export const useAppState = () => {
             director,
             poster,
             backdrop,
+            logo,
             source: {
               provider: provider || 'tmdb',
               providerId: providerId || '',
@@ -1079,6 +1096,7 @@ export const useAppState = () => {
                   : details?.creators,
               poster,
               backdrop,
+              logo,
             },
             showData:
               resolvedType === 'show'
@@ -1203,6 +1221,7 @@ export const useAppState = () => {
       if (item.note) entry.note = item.note;
       if (item.poster) entry.poster = item.poster;
       if (item.backdrop) entry.backdrop = item.backdrop;
+      if (item.logo) entry.logo = item.logo;
       if (item.year) entry.year = item.year;
       if (item.director) entry.director = item.director;
       if (item.genres?.length) entry.genres = item.genres;
@@ -1332,7 +1351,12 @@ export const useAppState = () => {
     }
   };
 
-  const buildUpdatesFromRefreshed = (currentItem, refreshed = {}) => {
+  const buildUpdatesFromRefreshed = (
+    currentItem,
+    refreshed = {},
+    options = {},
+  ) => {
+    const recomputeShowStatus = options.recomputeShowStatus !== false;
     const updates = {
       schemaVersion: 2,
       source: refreshed.source,
@@ -1341,6 +1365,7 @@ export const useAppState = () => {
         poster: refreshed.media?.poster || refreshed.media?.posterUrl || '',
         backdrop:
           refreshed.media?.backdrop || refreshed.media?.backdropUrl || '',
+        logo: refreshed.media?.logo || refreshed.media?.logoUrl || '',
       },
       showData: refreshed.showData || { seasonCount: null, seasons: [] },
     };
@@ -1375,6 +1400,9 @@ export const useAppState = () => {
       updates.backdrop =
         refreshed.media.backdrop || refreshed.media.backdropUrl;
     }
+    if (refreshed.media?.logo || refreshed.media?.logoUrl) {
+      updates.logo = refreshed.media.logo || refreshed.media.logoUrl;
+    }
     if (
       Number.isFinite(refreshed.showData?.seasonCount) &&
       refreshed.showData.seasonCount > 0
@@ -1384,7 +1412,7 @@ export const useAppState = () => {
     if (Array.isArray(refreshed.showData?.seasons)) {
       updates.seasons = refreshed.showData.seasons;
     }
-    if (isShow && Array.isArray(refreshed.showData?.seasons)) {
+    if (recomputeShowStatus && isShow && Array.isArray(refreshed.showData?.seasons)) {
       const nextItem = {
         ...currentItem,
         ...updates,
@@ -1512,7 +1540,9 @@ export const useAppState = () => {
             appId,
             spaceId,
             itemId: item.id,
-            updates: buildUpdatesFromRefreshed(item, refreshed),
+            updates: buildUpdatesFromRefreshed(item, refreshed, {
+              recomputeShowStatus: false,
+            }),
           });
           repaired += 1;
         } catch (error) {

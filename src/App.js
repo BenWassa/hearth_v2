@@ -71,7 +71,7 @@ export default function HearthApp() {
     );
   }
 
-  if (loading && !items.length && view !== 'onboarding') {
+  if (loading && !items.length && view !== 'onboarding' && view !== 'tonight') {
     return (
       <div className="min-h-screen bg-stone-950 flex items-center justify-center">
         <div className="animate-pulse text-amber-700">
@@ -148,6 +148,7 @@ export default function HearthApp() {
         {view === 'tonight' && (
           <TonightView
             items={items}
+            isLoading={loading}
             onAdd={() => setView('add')}
             onImport={() => setIsImportOpen(true)}
             onExport={handleExportItems}

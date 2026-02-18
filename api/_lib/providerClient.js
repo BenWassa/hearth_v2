@@ -40,6 +40,12 @@ const DETAILS_APPEND = {
   show: 'credits,content_ratings,images',
 };
 
+const buildImageLanguageParam = (locale = 'en-US') => {
+  const raw = String(locale || 'en-US').trim();
+  const base = raw.split('-')[0] || 'en';
+  return Array.from(new Set([raw, base, 'null'])).join(',');
+};
+
 const mapStatusToError = (status) => {
   if (status === 404) {
     return { status: 404, code: 'NOT_FOUND', message: 'Resource not found.' };
@@ -134,10 +140,12 @@ const tmdbGet = async (path, params = {}) => {
   return fetchJson(url.toString(), { headers });
 };
 
-const tryFetchDetails = async ({ id, type }) => {
+const tryFetchDetails = async ({ id, type, locale = 'en-US' }) => {
   const detailsPath = detailsEndpointForType(type, id);
   const response = await tmdbGet(detailsPath, {
     append_to_response: DETAILS_APPEND[type] || DETAILS_APPEND.movie,
+    language: locale,
+    include_image_language: buildImageLanguageParam(locale),
   });
   if (!response.ok) return response;
 
@@ -149,7 +157,7 @@ const tryFetchDetails = async ({ id, type }) => {
   };
 };
 
-const resolveDetailsType = async ({ id, preferredType }) => {
+const resolveDetailsType = async ({ id, preferredType, locale = 'en-US' }) => {
   const attempts =
     preferredType === 'movie'
       ? ['movie', 'show']
@@ -158,7 +166,7 @@ const resolveDetailsType = async ({ id, preferredType }) => {
       : ['show', 'movie'];
 
   for (const type of attempts) {
-    const result = await tryFetchDetails({ id, type });
+    const result = await tryFetchDetails({ id, type, locale });
     if (result.ok) return result;
     if (result.status === 404) continue;
     return result;
@@ -192,8 +200,8 @@ const search = async ({ q, type, page }) => {
   };
 };
 
-const getMediaDetails = async ({ id, type }) => {
-  return resolveDetailsType({ id, preferredType: type });
+const getMediaDetails = async ({ id, type, locale = 'en-US' }) => {
+  return resolveDetailsType({ id, preferredType: type, locale });
 };
 
 const getShowSeasons = async ({ id }) => {

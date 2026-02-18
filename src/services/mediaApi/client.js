@@ -151,9 +151,15 @@ export const searchMedia = async ({ q, type = 'all', page = 1 }) => {
   return getJson(`/api/search?${params.toString()}`);
 };
 
-export const getMediaDetails = async ({ provider, providerId, type }) => {
+export const getMediaDetails = async ({
+  provider,
+  providerId,
+  type,
+  locale = 'en-US',
+}) => {
   const params = new URLSearchParams();
   if (type) params.set('type', type);
+  if (locale) params.set('locale', locale);
   const suffix = params.toString() ? `?${params.toString()}` : '';
   return getJson(`/api/media/${provider}/${providerId}${suffix}`);
 };

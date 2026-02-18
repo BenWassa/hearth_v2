@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
   const provider = getParam(req?.query?.provider);
   const id = getParam(req?.query?.id);
   const type = getParam(req?.query?.type).toLowerCase();
+  const locale = getParam(req?.query?.locale) || 'en-US';
 
   if (provider !== 'tmdb' || !id) {
     return fail(req, res, 400, 'BAD_REQUEST', 'Provider and id are required.');
@@ -29,7 +30,7 @@ module.exports = async (req, res) => {
 
   logInfo('media.details.request', { requestId, provider, id, type: type || 'auto' });
 
-  const result = await getMediaDetails({ id, type: type || 'auto' });
+  const result = await getMediaDetails({ id, type: type || 'auto', locale });
   if (!result.ok) {
     if (result.status === 429) {
       logInfo('media.details.upstream_rate_limited', { requestId, provider, id });

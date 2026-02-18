@@ -28,10 +28,12 @@ Hearth favors:
 
 - Shared space onboarding for a couple (private, invite-only by name)
 - A finite shelf of saved movies and shows
-- A "Tonight" tray that surfaces a few options
+- A "Tonight" tray with cinematic hero + horizontal rails
+- Currently Watching rail with per-show progress bars
 - Vibes (comfort, easy, gripping, visual, classic) and energy levels (light, balanced, focused)
 - A gentle decision helper that picks from your shelf without explaining an algorithm
 - JSON/CSV import with preview and fixes to move existing lists in quickly
+- Metadata audit + repair flows for missing artwork/details
 
 ---
 
@@ -42,6 +44,7 @@ Hearth favors:
 - `src/components/` - UI primitives and cards
 - `src/domain/` - Pure domain logic (no React/Firebase)
 - `src/services/firebase/` - Firebase client + service wrappers
+- `api/` - App Hosting API routes (search, media details, refresh, seasons/episodes)
 - `server/` - App Hosting runtime entrypoint and API/static wiring
 - `src/app/` - App hooks bridging UI and services
 - `src/utils/` + `src/config/` - Shared utilities and constants
@@ -98,6 +101,12 @@ npm run dev
 npm run build
 ```
 
+### Run API Runtime Locally (App Hosting Shape)
+
+```bash
+npm run start:apphosting
+```
+
 ---
 
 ## Scripts (Common)
@@ -138,6 +147,7 @@ Current runtime shape:
 - API runtime entrypoint: `server/index.js`
 - App Hosting config: `apphosting.yaml`
 - Poster/backdrop hosting: absolute provider URLs (TMDB by default), not repo-served `/posters` or `/backdrops`
+- Metadata enrichment: TMDB details with appended credits/ratings/images and repair pipeline
 
 Legacy GitHub Pages runtime artifacts and helper scripts are archived under:
 - `_archive/legacy-github-pages/`
@@ -186,7 +196,8 @@ Note: posters/backdrops are no longer served from this repo. Persist absolute UR
 - `_archive/SETUP_IMPORT.md` - Data import schema and guidelines
 - `_archive/PRODUCT.md` - Product vision and non-goals
 - `_archive/` - legacy plans, sprint notes, and assessment docs
-- `SPRINTS.md` - active backend migration sprint plan and task backlog
+- `SPRINTS_NEW_REPO.md` - active sprint plan and task backlog
+- `docs/TECHNICAL_OVERVIEW.md` - architecture, data model, and runtime flows
 - `docs/BACKEND_MIGRATION_CONTROL_PLANE.md` - merge/release/rollback policy for migration work
 - `docs/VNEXT_APP_HOSTING_ROADMAP.md` - Firebase App Hosting migration path and Gemini-later metadata plan
 - `docs/VNEXT_KEEP_ARCHIVE_MATRIX.md` - keep/archive decisions for major vNext transition

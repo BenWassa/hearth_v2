@@ -70,6 +70,7 @@ const AddView = ({ onBack, onSubmit }) => {
           ...details,
           poster: details.posterUrl || '',
           backdrop: details.backdropUrl || '',
+          logo: details.logoUrl || '',
         },
         showData,
       });
@@ -132,6 +133,7 @@ const AddView = ({ onBack, onSubmit }) => {
         runtimeMinutes: Number.isFinite(runtime) ? runtime : null,
         poster: enrichedPayload.media.poster || '',
         backdrop: enrichedPayload.media.backdrop || '',
+        logo: enrichedPayload.media.logo || '',
       };
       payload.showData =
         type === 'show'
@@ -146,6 +148,7 @@ const AddView = ({ onBack, onSubmit }) => {
       };
       payload.poster = payload.media.poster;
       payload.backdrop = payload.media.backdrop;
+      payload.logo = payload.media.logo;
       if (payload.media.year) payload.year = payload.media.year;
       if (Array.isArray(payload.media.genres) && payload.media.genres.length) {
         payload.genres = payload.media.genres;

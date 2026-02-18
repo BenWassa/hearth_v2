@@ -37,6 +37,16 @@ const mapSeasonSummaries = (seasons = []) =>
     }))
     .filter((season) => Number.isFinite(season.seasonNumber));
 
+const mapLogoUrl = (images) => {
+  const logos = Array.isArray(images?.logos) ? images.logos : [];
+  if (!logos.length) return null;
+  const bestLogo =
+    logos.find((logo) => logo?.iso_639_1 === 'en' && logo?.file_path) ||
+    logos.find((logo) => typeof logo?.file_path === 'string' && logo.file_path) ||
+    null;
+  return bestLogo ? toImageUrl(bestLogo.file_path, 'w500') : null;
+};
+
 const mapMovieDetails = (data = {}) => ({
   provider: 'tmdb',
   providerId: String(data.id || ''),
@@ -48,6 +58,7 @@ const mapMovieDetails = (data = {}) => ({
   overview: data.overview || '',
   posterUrl: toImageUrl(data.poster_path, 'w500'),
   backdropUrl: toImageUrl(data.backdrop_path, 'w780'),
+  logoUrl: mapLogoUrl(data.images),
   genres: mapNames(data.genres, 8),
   cast: mapNames(data.credits?.cast, 12),
   creators: [],
@@ -73,6 +84,7 @@ const mapShowDetails = (data = {}) => ({
   overview: data.overview || '',
   posterUrl: toImageUrl(data.poster_path, 'w500'),
   backdropUrl: toImageUrl(data.backdrop_path, 'w780'),
+  logoUrl: mapLogoUrl(data.images),
   genres: mapNames(data.genres, 8),
   cast: mapNames(data.credits?.cast, 12),
   creators: mapNames(data.created_by, 6),

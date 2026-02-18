@@ -53,6 +53,11 @@ export const adaptWatchlistItem = (rawItem = {}) => {
     director: pickPrimaryCredit({ rawItem, media, type }),
     poster: asString(media.poster) || asString(rawItem.poster),
     backdrop: asString(media.backdrop) || asString(rawItem.backdrop),
+    logo:
+      asString(media.logo) ||
+      asString(media.logoUrl) ||
+      asString(rawItem.logo) ||
+      asString(rawItem.logoUrl),
     year: media.year || rawItem.year || '',
     runtimeMinutes: Number.isFinite(media.runtimeMinutes)
       ? media.runtimeMinutes
@@ -108,6 +113,9 @@ export const mapWatchlistUpdatesForWrite = (item = {}, updates = {}) => {
   }
   if (Object.prototype.hasOwnProperty.call(updates, 'backdrop')) {
     mapped['media.backdrop'] = updates.backdrop;
+  }
+  if (Object.prototype.hasOwnProperty.call(updates, 'logo')) {
+    mapped['media.logo'] = updates.logo;
   }
 
   return mapped;

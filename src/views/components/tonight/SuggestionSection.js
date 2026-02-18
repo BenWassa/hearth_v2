@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Moon, Sparkles } from 'lucide-react';
 import ItemCard from '../../../components/cards/ItemCard.js';
 
@@ -16,9 +16,55 @@ const SuggestionSection = ({
   showEdgeFade = false,
   railPaddingClassName = '',
   cardWidthClassName = 'w-[clamp(6.53rem,14.4vw,8.55rem)]',
+  enableRewind = false,
   className = '',
 }) => {
   const isRail = layout === 'rail';
+  const railRef = useRef(null);
+  const rewindTimeoutRef = useRef(null);
+  const rewindLockedRef = useRef(false);
+  const [isPointerDown, setIsPointerDown] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return undefined;
+    }
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setPrefersReducedMotion(Boolean(mediaQuery.matches));
+    sync();
+    mediaQuery.addEventListener?.('change', sync);
+    return () => mediaQuery.removeEventListener?.('change', sync);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (rewindTimeoutRef.current) {
+        clearTimeout(rewindTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const maybeRewind = () => {
+    if (!isRail || !enableRewind || isPointerDown) return;
+    if (rewindLockedRef.current) return;
+    const rail = railRef.current;
+    if (!rail) return;
+    if (rail.scrollWidth <= rail.clientWidth + 1) return;
+
+    const threshold = 32;
+    const distanceToEnd = rail.scrollWidth - rail.clientWidth - rail.scrollLeft;
+    if (distanceToEnd > threshold) return;
+
+    rewindLockedRef.current = true;
+    rail.scrollTo({
+      left: 0,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
+    rewindTimeoutRef.current = setTimeout(() => {
+      rewindLockedRef.current = false;
+    }, 1200);
+  };
 
   return (
     <div className={`space-y-1.5 ${isRail ? 'flex flex-col' : ''} ${className}`}>
@@ -40,9 +86,14 @@ const SuggestionSection = ({
         isRail ? (
           <div className={`relative ${railPaddingClassName}`}>
             <div
+              ref={railRef}
               className={`pb-1 overflow-x-auto overflow-y-hidden ${
                 hideScrollbar ? 'no-scrollbar' : 'custom-scrollbar'
               }`}
+              onScroll={maybeRewind}
+              onPointerDown={() => setIsPointerDown(true)}
+              onPointerUp={() => setIsPointerDown(false)}
+              onPointerCancel={() => setIsPointerDown(false)}
             >
               <div className="flex gap-1.5 min-w-max">
                 {suggestions.map((item) => (

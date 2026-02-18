@@ -82,6 +82,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
   const director = pickPrimaryCredit({ payload, media, type });
   const poster = asString(media.poster || payload.poster);
   const backdrop = asString(media.backdrop || payload.backdrop);
+  const logo = asString(media.logo || payload.logo);
 
   return {
     mediaId,
@@ -105,6 +106,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
       overview: asString(media.overview),
       poster,
       backdrop,
+      logo,
       genres,
       cast,
       creators: asArray(media.creators),
@@ -134,6 +136,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
     actors: cast,
     poster,
     backdrop,
+    logo,
     totalSeasons: seasonCount,
     seasons,
     updatedAt: serverTimestamp(),
@@ -171,6 +174,7 @@ const buildWatchlistPayload = (
     year: asString(media.year || payload.year),
     poster: asString(media.poster || payload.poster),
     backdrop: asString(media.backdrop || payload.backdrop),
+    logo: asString(media.logo || payload.logo),
     userState: {
       status,
       vibe,
@@ -216,6 +220,7 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
     backdrop: asString(
       media.backdrop || catalogData.backdrop || watchData.backdrop,
     ),
+    logo: asString(media.logo || catalogData.logo || watchData.logo),
     runtimeMinutes: asNumberOrNull(
       media.runtimeMinutes ??
         catalogData.runtimeMinutes ??
@@ -251,6 +256,7 @@ const CATALOG_PATH_ALIASES = {
   runtimeMinutes: 'media.runtimeMinutes',
   poster: 'media.poster',
   backdrop: 'media.backdrop',
+  logo: 'media.logo',
   genres: 'media.genres',
   actors: 'media.cast',
   totalSeasons: 'showData.seasonCount',

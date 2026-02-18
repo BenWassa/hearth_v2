@@ -2,26 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Plus, Check, Trash2, CheckCircle2 } from 'lucide-react';
 import { ENERGIES } from '../../config/constants.js';
 import { getPosterSrc } from '../../utils/poster.js';
+import { isEpisodeWatched } from '../ItemDetailsModal/utils/showProgress.js';
 import PosterPlaceholder from './PosterPlaceholder.js';
 import LazyMediaImage from '../media/LazyMediaImage.js';
-
-const getEpisodeProgressKeys = (episode) => {
-  if (!episode || typeof episode !== 'object') return [];
-  const fallbackKey =
-    Number.isFinite(episode.seasonNumber) && Number.isFinite(episode.number)
-      ? `s${episode.seasonNumber}e${episode.number}`
-      : null;
-  return Array.from(
-    new Set(
-      [episode.id, ...(episode.progressKeys || []), fallbackKey]
-        .filter(Boolean)
-        .map((key) => `${key}`),
-    ),
-  );
-};
-
-const isEpisodeWatched = (episodeProgress, episode) =>
-  getEpisodeProgressKeys(episode).some((key) => Boolean(episodeProgress?.[key]));
 
 const PosterCard = ({
   item,
@@ -49,10 +32,23 @@ const PosterCard = ({
 
       seasons.forEach((season) => {
         const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
+        const seasonNumber = Number.isFinite(season?.number)
+          ? season.number
+          : season?.seasonNumber;
         if (episodes.length > 0) {
           totalEpisodes += episodes.length;
           episodes.forEach((episode) => {
-            if (isEpisodeWatched(progressObj, episode)) {
+            if (
+              isEpisodeWatched(progressObj, {
+                ...episode,
+                seasonNumber:
+                  episode?.seasonNumber ?? episode?.season_number ?? seasonNumber,
+                number:
+                  episode?.number ??
+                  episode?.episodeNumber ??
+                  episode?.episode_number,
+              })
+            ) {
               watchedEpisodes += 1;
             }
           });

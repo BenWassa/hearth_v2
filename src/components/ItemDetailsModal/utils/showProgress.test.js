@@ -137,4 +137,24 @@ describe('getShowEntryTarget', () => {
       episodeId: '2003',
     });
   });
+
+  it('supports refreshed API episode shape (episodeId + episodeNumber)', () => {
+    const seasons = [
+      {
+        number: 1,
+        episodes: [
+          { episodeId: 's1e1', episodeNumber: 1 },
+          { episodeId: 's1e2', episodeNumber: 2 },
+        ],
+      },
+    ];
+    const episodeProgress = {
+      s1e1: true,
+    };
+
+    expect(getShowEntryTarget({ seasons, episodeProgress })).toEqual({
+      seasonNumber: 1,
+      episodeId: 's1e2',
+    });
+  });
 });

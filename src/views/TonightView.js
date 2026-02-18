@@ -7,6 +7,7 @@ import {
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
+import HeroCarousel from './components/tonight/HeroCarousel.js';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
 import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
@@ -24,19 +25,53 @@ const isShowComplete = (item) => {
   if (!seasonsWithEpisodes.length) return false;
   const progress = item?.episodeProgress || {};
   return seasonsWithEpisodes.every((season) =>
-    season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
+    season.episodes.every((episode) =>
+      isEpisodeWatched(progress, {
+        ...episode,
+        seasonNumber:
+          episode?.seasonNumber ?? episode?.season_number ?? season?.number,
+        number:
+          episode?.number ??
+          episode?.episodeNumber ??
+          episode?.episode_number,
+      }),
+    ),
   );
 };
 
+const SkeletonRail = ({ title, count = 6 }) => (
+  <div className="space-y-1.5 shrink-0">
+    <div className="h-3 w-28 rounded bg-stone-800/90 animate-pulse" aria-label={title} />
+    <div className="relative px-1">
+      <div className="pb-1 overflow-x-hidden">
+        <div className="flex gap-1.5 min-w-max">
+          {Array.from({ length: count }).map((_, index) => (
+            <div
+              key={`${title}-skeleton-${index}`}
+              className="w-[clamp(6.53rem,14.4vw,8.55rem)] shrink-0"
+            >
+              <div className="h-1 w-full bg-stone-700/80 animate-pulse" />
+              <div className="aspect-[2/3] w-full bg-stone-900/80 border border-stone-800 animate-pulse" />
+              <div className="mt-2 h-3 w-4/5 rounded bg-stone-800/90 animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-stone-950/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-stone-950/85 to-transparent" />
+    </div>
+  </div>
+);
+
 const TonightView = ({
   items,
+  isLoading = false,
   onAdd,
   onImport,
   onExport,
   onInvite,
   onDeleteAll,
   onDelete,
-  onDecide,
   onToggleStatus,
   onUpdate,
   showDevMetadataTools = false,
@@ -175,6 +210,12 @@ const TonightView = ({
     return buildDailyTray(unwatchedShows, 'show');
   }, [unwatchedShows, spaceId, todayKey]);
 
+  const heroItems = useMemo(
+    () => [...movieSuggestions, ...showSuggestions].slice(0, 5),
+    [movieSuggestions, showSuggestions],
+  );
+  const showSkeleton = isLoading && items.length === 0;
+
   const handleOpenDeleteAll = () => {
     setWipeConfirmText('');
     setIsWipeConfirmOpen(true);
@@ -228,55 +269,80 @@ const TonightView = ({
               )}
             </div>
           )}
-          <div className="flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto pb-2">
-            <SuggestionSection
-              title="Movies"
-              pool={unwatchedMovies}
-              suggestions={movieSuggestions}
-              emptyLabel="No movies queued yet."
-              onDecide={(pool) =>
-                onDecide?.(pool, {
-                  source: 'section',
-                  filterType: 'type',
-                  filterId: 'movie',
-                })
-              }
-              onToggleStatus={onToggleStatus}
-              onOpenDetails={openDetails}
-              layout="rail"
-              className="shrink-0"
-            />
-            <SuggestionSection
-              title="TV Shows"
-              pool={unwatchedShows}
-              suggestions={showSuggestions}
-              emptyLabel="No shows queued yet."
-              onDecide={(pool) =>
-                onDecide?.(pool, {
-                  source: 'section',
-                  filterType: 'type',
-                  filterId: 'show',
-                })
-              }
-              onToggleStatus={onToggleStatus}
-              onOpenDetails={openDetails}
-              layout="rail"
-              className="shrink-0"
-            />
-            <SuggestionSection
-              title="Currently Watching"
-              pool={currentlyWatchingShows}
-              suggestions={currentlyWatchingShows}
-              emptyLabel="No shows in progress yet."
-              onToggleStatus={onToggleStatus}
-              onOpenDetails={openDetails}
-              layout="rail"
-              hideScrollbar
-              showEdgeFade
-              railPaddingClassName="px-1"
-              hideDecide
-              className="shrink-0"
-            />
+          <div className="flex-1 min-h-0 flex flex-col gap-5 overflow-y-auto pb-2 custom-scrollbar">
+            {showSkeleton ? (
+              <>
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-800/60 bg-stone-900/80 animate-pulse">
+                  <div className="absolute inset-0 bg-gradient-to-br from-stone-800/80 to-stone-900/90" />
+                  <div className="absolute bottom-5 right-5 h-10 w-28 rounded bg-stone-700/80" />
+                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div
+                        key={`hero-dot-skeleton-${index}`}
+                        className={`h-1 rounded-full ${
+                          index === 0 ? 'w-4 bg-stone-600' : 'w-1.5 bg-stone-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <SkeletonRail title="Currently Watching" />
+                <SkeletonRail title="Movies" />
+                <SkeletonRail title="TV Shows" />
+              </>
+            ) : (
+              <>
+                <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
+
+                {currentlyWatchingShows.length > 0 && (
+                  <SuggestionSection
+                    title="Currently Watching"
+                    pool={currentlyWatchingShows}
+                    suggestions={currentlyWatchingShows}
+                    emptyLabel="No shows in progress yet."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    hideDecide
+                    className="shrink-0"
+                  />
+                )}
+
+                <SuggestionSection
+                  title="Movies"
+                  pool={unwatchedMovies}
+                  suggestions={unwatchedMovies}
+                  emptyLabel="No movies queued yet."
+                  onToggleStatus={onToggleStatus}
+                  onOpenDetails={openDetails}
+                  layout="rail"
+                  hideScrollbar
+                  showEdgeFade
+                  railPaddingClassName="px-1"
+                  hideDecide
+                  enableRewind
+                  className="shrink-0"
+                />
+                <SuggestionSection
+                  title="TV Shows"
+                  pool={unwatchedShows}
+                  suggestions={unwatchedShows}
+                  emptyLabel="No shows queued yet."
+                  onToggleStatus={onToggleStatus}
+                  onOpenDetails={openDetails}
+                  layout="rail"
+                  hideScrollbar
+                  showEdgeFade
+                  railPaddingClassName="px-1"
+                  hideDecide
+                  enableRewind
+                  className="shrink-0"
+                />
+              </>
+            )}
           </div>
         </div>
 

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Menu } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Menu, User } from 'lucide-react';
 import { APP_VERSION } from '../../../version';
+import hearthVector from '../../../assets/hearth_vector_up.png';
 
 const TonightHeaderMenu = ({
-  greeting,
   spaceLabel,
   isMenuOpen,
   setIsMenuOpen,
@@ -18,6 +18,27 @@ const TonightHeaderMenu = ({
   onOpenDeleteAll,
   onSignOut,
 }) => {
+  const [isSpaceLabelOpen, setIsSpaceLabelOpen] = useState(false);
+  const hideSpaceLabelTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (hideSpaceLabelTimerRef.current) {
+        clearTimeout(hideSpaceLabelTimerRef.current);
+      }
+    };
+  }, []);
+
+  const revealSpaceLabel = () => {
+    if (hideSpaceLabelTimerRef.current) {
+      clearTimeout(hideSpaceLabelTimerRef.current);
+    }
+    setIsSpaceLabelOpen(true);
+    hideSpaceLabelTimerRef.current = setTimeout(() => {
+      setIsSpaceLabelOpen(false);
+    }, 5000);
+  };
+
   return (
     <>
       {isMenuOpen && (
@@ -27,42 +48,24 @@ const TonightHeaderMenu = ({
           aria-label="Close menu"
         />
       )}
-      <header className="px-6 py-8 flex justify-between items-start">
-        <div className="space-y-1 min-w-0">
-          <p className="text-sm text-amber-700 font-bold uppercase tracking-widest">
-            {greeting}
-          </p>
-          <h2
-            className="text-3xl font-serif text-stone-100 max-w-full"
-            title={spaceLabel}
-            aria-label={spaceLabel}
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {spaceLabel}
-          </h2>
-        </div>
-        <div className="relative">
+      <header className="relative px-4 py-4 flex items-center justify-between sticky top-0 z-30 bg-stone-950/80 backdrop-blur-md border-b border-stone-900/50">
+        <div className="relative z-10 w-10 flex justify-start">
           <button
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className={`p-2 rounded-full transition-colors ${
+            className={`p-2 -ml-2 rounded-full transition-colors ${
               isMenuOpen
-                ? 'bg-stone-900 text-amber-400'
-                : 'bg-stone-900/50 text-stone-400 hover:text-stone-200'
+                ? 'text-amber-400 bg-stone-900'
+                : 'text-stone-400 hover:text-stone-200'
             }`}
             aria-expanded={isMenuOpen}
             aria-haspopup="menu"
             title="Menu"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-6 h-6" />
           </button>
           {isMenuOpen && (
             <div
-              className="absolute right-0 mt-2 w-48 bg-stone-950 border border-stone-800 rounded-xl shadow-2xl overflow-hidden z-30"
+              className="absolute left-0 mt-2 w-48 bg-stone-950 border border-stone-800 rounded-xl shadow-2xl overflow-hidden z-30"
               role="menu"
             >
               <button
@@ -149,6 +152,38 @@ const TonightHeaderMenu = ({
               </button>
             </div>
           )}
+        </div>
+
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 text-stone-100">
+          <img
+            src={hearthVector}
+            alt="Hearth"
+            className="w-5 h-5 object-contain"
+          />
+          <h1 className="text-xl font-serif tracking-wide">Hearth</h1>
+        </div>
+
+        <div className="relative z-10 w-10 flex justify-end">
+          <button
+            type="button"
+            onClick={revealSpaceLabel}
+            className="w-8 h-8 rounded-full bg-stone-900/80 border border-stone-800 flex items-center justify-center"
+            title={spaceLabel}
+            aria-label={spaceLabel}
+          >
+            <User className="w-3.5 h-3.5 text-stone-400" />
+          </button>
+          <div
+            className={`absolute right-10 top-1/2 -translate-y-1/2 bg-stone-900/95 border border-stone-800 rounded-full px-3 py-1 transition-all duration-300 ${
+              isSpaceLabelOpen
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 translate-x-2 pointer-events-none'
+            }`}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-300 whitespace-nowrap">
+              {spaceLabel || 'Space'}
+            </span>
+          </div>
         </div>
       </header>
     </>

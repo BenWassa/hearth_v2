@@ -238,7 +238,7 @@ const TonightView = ({
               )}
             </div>
           )}
-          <div className="flex-1 min-h-0 flex flex-col gap-5 overflow-y-auto pb-2 custom-scrollbar">
+          <div className="flex-1 min-h-0 flex flex-col gap-5 overflow-y-auto pb-2 no-scrollbar">
             {showSkeleton ? (
               <>
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-800/60 bg-stone-900/80 animate-pulse">

@@ -203,129 +203,143 @@ const ShelfView = ({
 
   return (
     <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
-      <header className="px-2 sm:px-3 py-3 bg-stone-950/95 sticky top-0 z-20 border-b border-stone-900">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-serif text-stone-200">
-            {viewTab === 'library' ? 'Library' : 'Memories'}
-          </h2>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                setIsSearchOpen((prev) => {
-                  const next = !prev;
-                  if (!next) setSearchQuery('');
-                  return next;
-                });
-              }}
-              className={`p-2 rounded-full transition-colors ${
-                isSearchOpen
-                  ? 'bg-stone-900 text-amber-400'
-                  : 'bg-stone-900/40 text-stone-400 hover:text-amber-400'
-              }`}
-              title="Search"
-            >
-              <Search className="w-4 h-4" />
-            </button>
-            <button
-              onClick={toggleSelectionMode}
-              className="text-stone-400 hover:text-amber-400 text-xs uppercase tracking-widest"
-            >
-              {selectionMode ? 'Done' : 'Select'}
-            </button>
-          </div>
-        </div>
-        {isSearchOpen && (
-          <div className="mt-5">
-            <div className="flex items-center gap-3 bg-stone-900/60 border border-stone-800 rounded-xl px-3 py-2">
-              <Search className="w-4 h-4 text-stone-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search your library..."
-                autoFocus
-                className="flex-1 bg-transparent text-stone-200 placeholder-stone-400 text-sm font-serif focus:outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="p-1 text-stone-400 hover:text-stone-200"
-                  title="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+      {/* ── Sticky header block: title row + tabs + filter bar ── */}
+      <div className="sticky top-0 z-20">
+        {/* Title row */}
+        <header className="px-4 sm:px-5 pt-4 pb-3 bg-stone-950 border-b border-stone-800/60 shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-0.5 h-5 rounded-full bg-amber-500/70 shrink-0" />
+              <h2 className="text-lg font-serif text-stone-100 tracking-wide leading-none truncate">
+                {viewTab === 'library' ? 'Library' : 'Memories'}
+              </h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setIsSearchOpen((prev) => {
+                    const next = !prev;
+                    if (!next) setSearchQuery('');
+                    return next;
+                  });
+                }}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isSearchOpen
+                    ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                    : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
+                }`}
+                title="Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+              <button
+                onClick={toggleSelectionMode}
+                className={`text-xs font-semibold uppercase tracking-widest transition-colors px-2 py-1 rounded-md ${
+                  selectionMode
+                    ? 'text-amber-400 bg-amber-500/10'
+                    : 'text-stone-500 hover:text-stone-300'
+                }`}
+              >
+                {selectionMode ? 'Done' : 'Select'}
+              </button>
             </div>
           </div>
-        )}
-      </header>
+          {isSearchOpen && (
+            <div className="mt-3">
+              <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
+                <Search className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search your library…"
+                  autoFocus
+                  className="flex-1 bg-transparent text-stone-200 placeholder-stone-500 text-sm focus:outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="p-0.5 text-stone-500 hover:text-stone-200 transition-colors"
+                    title="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </header>
 
-      {/* Tabs */}
-      <div className="px-2 sm:px-3 py-1.5 border-b border-stone-900 bg-stone-950/50 sticky top-[73px] z-10 flex gap-6">
-        <button
-          onClick={() => setViewTab('library')}
-          className={`pb-2 px-2 font-medium text-sm transition-colors border-b-2 ${
-            viewTab === 'library'
-              ? 'text-amber-400 border-amber-400'
-              : 'text-stone-500 border-transparent hover:text-stone-300'
-          }`}
-        >
-          Library
-        </button>
-        <button
-          onClick={() => setViewTab('memories')}
-          className={`pb-2 px-2 font-medium text-sm transition-colors border-b-2 ${
-            viewTab === 'memories'
-              ? 'text-amber-400 border-amber-400'
-              : 'text-stone-500 border-transparent hover:text-stone-300'
-          }`}
-        >
-          Memories
-        </button>
-      </div>
+        {/* Tabs */}
+        <div className="px-4 sm:px-5 bg-stone-950 border-b border-stone-800/60 flex gap-5">
+          <button
+            onClick={() => setViewTab('library')}
+            className={`py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+              viewTab === 'library'
+                ? 'text-amber-400 border-amber-400'
+                : 'text-stone-500 border-transparent hover:text-stone-300'
+            }`}
+          >
+            Library
+          </button>
+          <button
+            onClick={() => setViewTab('memories')}
+            className={`py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+              viewTab === 'memories'
+                ? 'text-amber-400 border-amber-400'
+                : 'text-stone-500 border-transparent hover:text-stone-300'
+            }`}
+          >
+            Memories
+            {watched.length > 0 && (
+              <span className="ml-1.5 text-xs text-stone-600">
+                {watched.length}
+              </span>
+            )}
+          </button>
+        </div>
 
-      {/* Sort and Type Filter Buttons */}
-      {(viewTab === 'library' || viewTab === 'memories') && (
-        <div className="px-2 sm:px-3 py-1.5 pb-4 border-b border-stone-900 bg-stone-950/50 sticky top-[120px] z-10 flex items-center gap-3">
-          {/* Sort Buttons */}
-          <div className="flex gap-2">
+        {/* Sort + Type Filter Bar */}
+        <div className="px-4 sm:px-5 py-2 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-2.5 overflow-x-auto no-scrollbar">
+          {/* Sort pill group */}
+          <div className="flex gap-1.5 shrink-0">
             <button
               onClick={() => setSortBy('vibe')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'vibe'
-                  ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30'
-                  : 'bg-stone-900/40 text-stone-400 border border-stone-800 hover:text-stone-300'
+                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
             >
-              By Vibe
+              Vibe
             </button>
             <button
               onClick={() => setSortBy('energy')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'energy'
-                  ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30'
-                  : 'bg-stone-900/40 text-stone-400 border border-stone-800 hover:text-stone-300'
+                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
             >
-              By Energy
+              Energy
             </button>
             <button
               onClick={() => setSortBy('alphabetical')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'alphabetical'
-                  ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30'
-                  : 'bg-stone-900/40 text-stone-400 border border-stone-800 hover:text-stone-300'
+                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
             >
-              A-Z
+              A–Z
             </button>
           </div>
 
           {/* Divider */}
-          <div className="w-px h-6 bg-stone-800" />
+          <div className="w-px h-4 bg-stone-800 shrink-0" />
 
           {/* Type Filter Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 shrink-0">
             <button
               onClick={() => {
                 // If clicking movies: if movies are only one shown, reset to both. If both shown, show only movies
@@ -339,14 +353,14 @@ const ShelfView = ({
                   setShowShows(false);
                 }
               }}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`p-1.5 rounded-md transition-colors ${
                 showMovies && !showShows
-                  ? 'bg-stone-900/60 text-stone-300 border border-stone-700'
-                  : 'bg-stone-900/20 text-stone-400 border border-stone-800 hover:text-stone-500'
+                  ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
+                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
               title="Filter by Movies"
             >
-              <Film className="w-4 h-4" />
+              <Film className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
@@ -361,18 +375,19 @@ const ShelfView = ({
                   setShowShows(true);
                 }
               }}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`p-1.5 rounded-md transition-colors ${
                 showShows && !showMovies
-                  ? 'bg-stone-900/60 text-stone-300 border border-stone-700'
-                  : 'bg-stone-900/20 text-stone-400 border border-stone-800 hover:text-stone-500'
+                  ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
+                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
               title="Filter by Shows"
             >
-              <Tv className="w-4 h-4" />
+              <Tv className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-      )}
+      </div>
+      {/* ── End sticky header block ── */}
 
       <div className={`px-2 sm:px-3 pt-2 pb-40 ${contentGapClassName}`}>
         {viewTab === 'library' && (
@@ -433,9 +448,11 @@ const ShelfView = ({
 
                   return (
                     <div key={groupId} className={sectionGapClassName}>
-                      <div className="flex items-center gap-2 text-stone-400/80 pl-1">
-                        {HeaderIcon && <HeaderIcon className="w-4 h-4" />}
-                        <h3 className="text-xs font-bold uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 pl-0.5 pt-1">
+                        {HeaderIcon && (
+                          <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
+                        )}
+                        <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
                           {header}
                         </h3>
                       </div>
@@ -527,9 +544,11 @@ const ShelfView = ({
 
                   return (
                     <div key={groupId} className={sectionGapClassName}>
-                      <div className="flex items-center gap-2 text-stone-400/80 pl-1">
-                        {HeaderIcon && <HeaderIcon className="w-4 h-4" />}
-                        <h3 className="text-xs font-bold uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 pl-0.5 pt-1">
+                        {HeaderIcon && (
+                          <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
+                        )}
+                        <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
                           {header}
                         </h3>
                       </div>

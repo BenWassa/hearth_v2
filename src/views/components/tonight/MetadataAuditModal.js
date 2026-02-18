@@ -84,6 +84,7 @@ const MetadataAuditModal = ({
                 <div>Logo: {auditReport.gapCounts.logo || 0}</div>
                 <div>Runtime: {auditReport.gapCounts.runtimeMinutes || 0}</div>
                 <div>Year: {auditReport.gapCounts.year || 0}</div>
+                <div>Overview: {auditReport.gapCounts.overview || 0}</div>
                 <div>Genres: {auditReport.gapCounts.genres || 0}</div>
                 <div>Actors: {auditReport.gapCounts.actors || 0}</div>
                 <div>Director: {auditReport.gapCounts.director || 0}</div>

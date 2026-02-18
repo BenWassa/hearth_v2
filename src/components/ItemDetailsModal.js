@@ -169,6 +169,11 @@ const ItemDetailsModal = ({
           mediaDetails?.director?.toString().trim() ||
           '[add director]',
         note: rawItem.note?.toString().trim() || '',
+        overview:
+          rawItem.overview?.toString().trim() ||
+          rawItem.media?.overview?.toString().trim() ||
+          mediaDetails?.overview?.toString().trim() ||
+          '',
         actors: rawItem.actors ?? rawItem.cast ?? mediaDetails?.actors ?? [],
         genres: rawItem.genres ?? mediaDetails?.genres ?? [],
         runtimeMinutes:

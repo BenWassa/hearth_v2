@@ -300,6 +300,7 @@ const getMetadataGaps = (item = {}) => {
     item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
   );
   const year = String(item?.year || item?.media?.year || '').trim();
+  const overview = String(item?.overview || item?.media?.overview || '').trim();
   const genres = Array.isArray(item?.genres)
     ? item.genres
     : Array.isArray(item?.media?.genres)
@@ -331,6 +332,7 @@ const getMetadataGaps = (item = {}) => {
     gaps.push('runtimeMinutes');
   }
   if (!year) gaps.push('year');
+  if (!overview) gaps.push('overview');
   if (!genres.length) gaps.push('genres');
   if (!actors.length) gaps.push('actors');
   if (!director) gaps.push('director');
@@ -369,6 +371,7 @@ const buildMetadataAuditReport = (items = []) => {
       logo: 0,
       runtimeMinutes: 0,
       year: 0,
+      overview: 0,
       genres: 0,
       actors: 0,
       director: 0,
@@ -1355,6 +1358,7 @@ export const useAppState = () => {
     if (refreshed.media?.title) updates.title = refreshed.media.title;
     if (refreshed.media?.type) updates.type = refreshed.media.type;
     if (refreshed.media?.year) updates.year = refreshed.media.year;
+    if (refreshed.media?.overview) updates.overview = refreshed.media.overview;
     if (Number.isFinite(refreshed.media?.runtimeMinutes)) {
       updates.runtimeMinutes = refreshed.media.runtimeMinutes;
     }

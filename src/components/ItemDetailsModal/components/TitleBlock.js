@@ -29,6 +29,12 @@ const TitleBlock = ({ item, metadataChips, genres }) => {
           </>
         )}
       </div>
+
+      {item.overview ? (
+        <p className="text-sm sm:text-base leading-relaxed text-stone-300/90 max-w-2xl">
+          {item.overview}
+        </p>
+      ) : null}
     </div>
   );
 };

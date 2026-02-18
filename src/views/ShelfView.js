@@ -133,9 +133,16 @@ const ShelfView = ({
       return true;
     });
   }, [items, showMovies, showShows]);
+  const watchedFiltered = useMemo(() => {
+    return watched.filter((i) => {
+      if (!showMovies && i.type === 'movie') return false;
+      if (!showShows && i.type === 'show') return false;
+      return true;
+    });
+  }, [watched, showMovies, showShows]);
   const searchBaseItems = useMemo(
-    () => (viewTab === 'memories' ? watched : unwatched),
-    [viewTab, watched, unwatched],
+    () => (viewTab === 'memories' ? watchedFiltered : unwatched),
+    [viewTab, watchedFiltered, unwatched],
   );
   const filteredItems = useMemo(() => {
     if (!isSearching) return [];
@@ -148,9 +155,8 @@ const ShelfView = ({
   const cardGridClassName =
     'grid [grid-template-columns:repeat(auto-fill,minmax(clamp(5.85rem,12.6vw,7.65rem),1fr))] gap-1.5';
 
-  // Group/sort unwatched based on sortBy setting
-  const itemsByVibe = useMemo(() => {
-    const backlog = unwatched;
+  const buildGroupedItems = (sourceItems = []) => {
+    const backlog = sourceItems;
     const groups = {};
 
     if (sortBy === 'alphabetical') {
@@ -185,7 +191,15 @@ const ShelfView = ({
     }
 
     return groups;
+  };
+
+  // Group/sort unwatched based on sortBy setting
+  const itemsByVibe = useMemo(() => {
+    return buildGroupedItems(unwatched);
   }, [unwatched, sortBy]);
+  const memoriesByGroup = useMemo(() => {
+    return buildGroupedItems(watchedFiltered);
+  }, [watchedFiltered, sortBy]);
 
   return (
     <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
@@ -266,12 +280,12 @@ const ShelfView = ({
               : 'text-stone-500 border-transparent hover:text-stone-300'
           }`}
         >
-          Memories {watched.length > 0 && `(${watched.length})`}
+          Memories
         </button>
       </div>
 
-      {/* Sort and Type Filter Buttons - Only show for Library */}
-      {viewTab === 'library' && (
+      {/* Sort and Type Filter Buttons */}
+      {(viewTab === 'library' || viewTab === 'memories') && (
         <div className="px-2 sm:px-3 py-1.5 pb-4 border-b border-stone-900 bg-stone-950/50 sticky top-[120px] z-10 flex items-center gap-3">
           {/* Sort Buttons */}
           <div className="flex gap-2">
@@ -483,21 +497,62 @@ const ShelfView = ({
                   When you finish watching something, it'll appear here
                 </p>
               </div>
-            ) : (
-              <div className={cardGridClassName}>
-                {watched.map((item) => (
-                  <PosterCard
-                    key={item.id}
-                    item={item}
-                    onToggle={() => onToggleStatus(item.id, item.status)}
-                    onDelete={null}
-                    selectionMode={false}
-                    isSelected={false}
-                    onSelect={null}
-                    onOpenDetails={openDetails}
-                  />
-                ))}
+            ) : watchedFiltered.length === 0 ? (
+              <div className="text-sm text-stone-400 text-center py-12">
+                No memories match the current filters.
               </div>
+            ) : (
+              <>
+                {Object.entries(memoriesByGroup).map(([groupId, groupItems]) => {
+                  if (groupItems.length === 0) return null;
+
+                  let header = null;
+                  let HeaderIcon = null;
+
+                  if (sortBy === 'alphabetical') {
+                    header = 'All Items';
+                  } else if (sortBy === 'energy') {
+                    const energyDef = ENERGIES.find((e) => e.id === groupId);
+                    if (energyDef) {
+                      header = energyDef.label;
+                      HeaderIcon = energyDef.icon;
+                    }
+                  } else {
+                    const vibeDef = VIBES.find((v) => v.id === groupId);
+                    if (vibeDef) {
+                      header = vibeDef.label;
+                      HeaderIcon = vibeDef.icon;
+                    }
+                  }
+
+                  return (
+                    <div key={groupId} className={sectionGapClassName}>
+                      <div className="flex items-center gap-2 text-stone-400/80 pl-1">
+                        {HeaderIcon && <HeaderIcon className="w-4 h-4" />}
+                        <h3 className="text-xs font-bold uppercase tracking-widest">
+                          {header}
+                        </h3>
+                      </div>
+                      <div className={cardGridClassName}>
+                        {groupItems.map((item) => (
+                          <PosterCard
+                            key={item.id}
+                            item={item}
+                            onToggle={() =>
+                              onToggleStatus(item.id, item.status)
+                            }
+                            onDelete={null}
+                            selectionMode={false}
+                            isSelected={false}
+                            onSelect={null}
+                            onOpenDetails={openDetails}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
             )}
           </div>
         )}

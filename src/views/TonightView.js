@@ -207,38 +207,39 @@ const TonightView = ({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
-      <TonightHeaderMenu
-        greeting={greeting}
-        spaceLabel={spaceLabel}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        onInvite={onInvite}
-        onImport={onImport}
-        onExport={onExport}
-        showDevMetadataTools={showDevMetadataTools}
-        openAuditModal={openAuditModal}
-        onMetadataRepairMissing={onMetadataRepairMissing}
-        isMetadataRepairing={isMetadataRepairing}
-        onDeleteAll={onDeleteAll}
-        onOpenDeleteAll={handleOpenDeleteAll}
-        onSignOut={onSignOut}
-      />
+      <div className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
+          <TonightHeaderMenu
+            greeting={greeting}
+            spaceLabel={spaceLabel}
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            onInvite={onInvite}
+            onImport={onImport}
+            onExport={onExport}
+            showDevMetadataTools={showDevMetadataTools}
+            openAuditModal={openAuditModal}
+            onMetadataRepairMissing={onMetadataRepairMissing}
+            isMetadataRepairing={isMetadataRepairing}
+            onDeleteAll={onDeleteAll}
+            onOpenDeleteAll={handleOpenDeleteAll}
+            onSignOut={onSignOut}
+          />
+          <div className="h-[60px]" />
 
-      <div className="flex-1 min-h-0 px-3 sm:px-4 pb-6 flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 flex flex-col gap-1.5 pb-2 overflow-hidden">
-          {showImportBanner && (
-            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-2 py-1.5 space-y-0.5">
-              <div className="text-sm text-amber-200 tabular-nums">
-                Importing {activeImportProcessed}/{activeImportTotal}
-              </div>
-              {importProgress?.isRateLimitedBackoff && (
-                <div className="text-xs text-amber-300/90">
-                  Retrying after rate limit...
+          <div className="px-3 sm:px-4 pt-2 pb-24 flex flex-col gap-5">
+            {showImportBanner && (
+              <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-2 py-1.5 space-y-0.5">
+                <div className="text-sm text-amber-200 tabular-nums">
+                  Importing {activeImportProcessed}/{activeImportTotal}
                 </div>
-              )}
-            </div>
-          )}
-          <div className="flex-1 min-h-0 flex flex-col gap-5 overflow-y-auto pb-2 no-scrollbar">
+                {importProgress?.isRateLimitedBackoff && (
+                  <div className="text-xs text-amber-300/90">
+                    Retrying after rate limit...
+                  </div>
+                )}
+              </div>
+            )}
             {showSkeleton ? (
               <>
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-800/60 bg-stone-900/80 animate-pulse">

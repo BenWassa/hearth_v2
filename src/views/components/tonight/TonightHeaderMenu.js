@@ -48,7 +48,7 @@ const TonightHeaderMenu = ({
           aria-label="Close menu"
         />
       )}
-      <header className="relative px-4 py-4 flex items-center justify-between sticky top-0 z-30 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/80 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+      <header className="fixed top-0 inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md px-2 sm:px-3 py-3 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/80 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
         <div className="relative z-10 w-10 flex justify-start">
           <button
             onClick={() => setIsMenuOpen((prev) => !prev)}

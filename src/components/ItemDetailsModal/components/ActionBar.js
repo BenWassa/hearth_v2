@@ -2,6 +2,8 @@ import React from 'react';
 import { Check, Plus } from 'lucide-react';
 
 const ActionBar = ({ item, onToggleStatus }) => {
+  if (item?.type === 'show') return null;
+
   return (
     <div className="p-4 bg-stone-950 border-t border-stone-900 grid gap-3">
       <button

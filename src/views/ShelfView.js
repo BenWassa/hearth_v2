@@ -203,109 +203,96 @@ const ShelfView = ({
 
   return (
     <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
-      {/* ── Sticky header block: title row + tabs + filter bar ── */}
+      {/* ── Sticky header block: tabs-as-title + filter bar ── */}
       <div className="sticky top-0 z-20">
-        {/* Title row */}
-        <header className="px-4 sm:px-5 pt-4 pb-3 bg-stone-950 border-b border-stone-800/60 shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="w-0.5 h-5 rounded-full bg-amber-500/70 shrink-0" />
-              <h2 className="text-lg font-serif text-stone-100 tracking-wide leading-none truncate">
-                {viewTab === 'library' ? 'Library' : 'Memories'}
-              </h2>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setIsSearchOpen((prev) => {
-                    const next = !prev;
-                    if (!next) setSearchQuery('');
-                    return next;
-                  });
-                }}
-                className={`p-1.5 rounded-lg transition-colors ${
-                  isSearchOpen
-                    ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
-                    : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
-                }`}
-                title="Search"
-              >
-                <Search className="w-4 h-4" />
-              </button>
-              <button
-                onClick={toggleSelectionMode}
-                className={`text-xs font-semibold uppercase tracking-widest transition-colors px-2 py-1 rounded-md ${
-                  selectionMode
-                    ? 'text-amber-400 bg-amber-500/10'
-                    : 'text-stone-500 hover:text-stone-300'
-                }`}
-              >
-                {selectionMode ? 'Done' : 'Select'}
-              </button>
-            </div>
+        {/* Tabs row — doubles as the page header */}
+        <header className="px-4 sm:px-5 pt-4 bg-stone-950 border-b border-stone-800/60 flex items-end justify-between">
+          <div className="flex gap-6">
+            <button
+              onClick={() => setViewTab('library')}
+              className={`pb-3 text-base font-serif tracking-wide transition-colors border-b-2 -mb-px ${
+                viewTab === 'library'
+                  ? 'text-stone-100 border-amber-500'
+                  : 'text-stone-500 border-transparent hover:text-stone-300'
+              }`}
+            >
+              Library
+            </button>
+            <button
+              onClick={() => setViewTab('memories')}
+              className={`pb-3 text-base font-serif tracking-wide transition-colors border-b-2 -mb-px ${
+                viewTab === 'memories'
+                  ? 'text-stone-100 border-amber-500'
+                  : 'text-stone-500 border-transparent hover:text-stone-300'
+              }`}
+            >
+              Memories
+            </button>
           </div>
-          {isSearchOpen && (
-            <div className="mt-3">
-              <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
-                <Search className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search your library…"
-                  autoFocus
-                  className="flex-1 bg-transparent text-stone-200 placeholder-stone-500 text-sm focus:outline-none"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="p-0.5 text-stone-500 hover:text-stone-200 transition-colors"
-                    title="Clear search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+          <div className="flex items-center gap-2 pb-2.5">
+            <button
+              onClick={() => {
+                setIsSearchOpen((prev) => {
+                  const next = !prev;
+                  if (!next) setSearchQuery('');
+                  return next;
+                });
+              }}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isSearchOpen
+                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                  : 'text-stone-500 hover:text-stone-200 hover:bg-stone-800/60'
+              }`}
+              title="Search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+            <button
+              onClick={toggleSelectionMode}
+              className={`text-xs font-semibold uppercase tracking-widest transition-colors px-2 py-1 rounded-md ${
+                selectionMode
+                  ? 'text-amber-400 bg-amber-500/10'
+                  : 'text-stone-500 hover:text-stone-300'
+              }`}
+            >
+              {selectionMode ? 'Done' : 'Select'}
+            </button>
+          </div>
         </header>
 
-        {/* Tabs */}
-        <div className="px-4 sm:px-5 bg-stone-950 border-b border-stone-800/60 flex gap-5">
-          <button
-            onClick={() => setViewTab('library')}
-            className={`py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
-              viewTab === 'library'
-                ? 'text-amber-400 border-amber-400'
-                : 'text-stone-500 border-transparent hover:text-stone-300'
-            }`}
-          >
-            Library
-          </button>
-          <button
-            onClick={() => setViewTab('memories')}
-            className={`py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
-              viewTab === 'memories'
-                ? 'text-amber-400 border-amber-400'
-                : 'text-stone-500 border-transparent hover:text-stone-300'
-            }`}
-          >
-            Memories
-            {watched.length > 0 && (
-              <span className="ml-1.5 text-xs text-stone-600">
-                {watched.length}
-              </span>
-            )}
-          </button>
-        </div>
+        {/* Search input — expands below header when open */}
+        {isSearchOpen && (
+          <div className="px-4 sm:px-5 py-2.5 bg-stone-950 border-b border-stone-800/60">
+            <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
+              <Search className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search your library…"
+                autoFocus
+                className="flex-1 bg-transparent text-stone-200 placeholder-stone-500 text-sm focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="p-0.5 text-stone-500 hover:text-stone-200 transition-colors"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Sort + Type Filter Bar */}
-        <div className="px-4 sm:px-5 py-2 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-2.5 overflow-x-auto no-scrollbar">
+        <div className="px-4 sm:px-5 py-2.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
           {/* Sort pill group */}
-          <div className="flex gap-1.5 shrink-0">
+          <div className="flex gap-2 shrink-0">
             <button
               onClick={() => setSortBy('vibe')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'vibe'
                   ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
                   : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
@@ -315,7 +302,7 @@ const ShelfView = ({
             </button>
             <button
               onClick={() => setSortBy('energy')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'energy'
                   ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
                   : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
@@ -325,7 +312,7 @@ const ShelfView = ({
             </button>
             <button
               onClick={() => setSortBy('alphabetical')}
-              className={`px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide transition-colors ${
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
                 sortBy === 'alphabetical'
                   ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
                   : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
@@ -336,10 +323,10 @@ const ShelfView = ({
           </div>
 
           {/* Divider */}
-          <div className="w-px h-4 bg-stone-800 shrink-0" />
+          <div className="w-px h-5 bg-stone-800 shrink-0" />
 
           {/* Type Filter Buttons */}
-          <div className="flex gap-1.5 shrink-0">
+          <div className="flex gap-2 shrink-0">
             <button
               onClick={() => {
                 // If clicking movies: if movies are only one shown, reset to both. If both shown, show only movies
@@ -353,14 +340,14 @@ const ShelfView = ({
                   setShowShows(false);
                 }
               }}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-2 rounded-lg transition-colors ${
                 showMovies && !showShows
                   ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
                   : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
               title="Filter by Movies"
             >
-              <Film className="w-3.5 h-3.5" />
+              <Film className="w-4 h-4" />
             </button>
             <button
               onClick={() => {
@@ -375,14 +362,14 @@ const ShelfView = ({
                   setShowShows(true);
                 }
               }}
-              className={`p-1.5 rounded-md transition-colors ${
+              className={`p-2 rounded-lg transition-colors ${
                 showShows && !showMovies
                   ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
                   : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
               }`}
               title="Filter by Shows"
             >
-              <Tv className="w-3.5 h-3.5" />
+              <Tv className="w-4 h-4" />
             </button>
           </div>
         </div>

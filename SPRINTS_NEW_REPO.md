@@ -189,3 +189,70 @@ Done when:
 3. S12 (throughput once matching is reliable)
 4. S13 (request hygiene)
 5. S14 (lock behavior and prevent regressions)
+
+## TV Progress Navigation + Status CTA Cleanup Sprints
+
+## S15 - Show Entry Targeting (Latest Season + Next Unwatched Episode)
+Goal: Ensure opening a show always lands on the correct season/episode target for that show, not stale state from a previous show.
+
+Deliverables:
+- Add a deterministic selector for initial show landing target using `seasons` + `episodeProgress`
+- Reset modal season/episode focus per `item.id` change in `src/components/ItemDetailsModal.js`
+- Default behavior:
+  - If unwatched episodes exist, open the highest-numbered season that still has unwatched episodes
+  - In that season, focus the lowest-numbered unwatched episode (the "next up" episode)
+  - If all episodes are watched, open the highest-numbered season and its highest-numbered episode
+- Remove fallback behavior that keeps a season number only because it existed in the previous show
+
+Done when:
+- Opening Tulsa King after watching S2E8 lands on Season 2 with Episode 9 marked next up
+- Switching between two different shows never preserves prior show season state
+- Fully watched shows open on the latest season/latest episode without errors
+
+## S16 - Remove TV-Level "Mark Watched" Action
+Goal: Remove unreliable show-wide status toggles and keep watch tracking episode-driven for TV shows.
+
+Deliverables:
+- Hide/remove TV "Mark Watched"/"Back to Shelf" action from `src/components/ItemDetailsModal/components/ActionBar.js`
+- Keep movie status toggle unchanged
+- Keep episode-level toggle behavior in show season tracker unchanged
+- Confirm no show UI path still calls `onToggleStatus` as a primary watch-progress action
+
+Done when:
+- Show details modal does not display the bottom status toggle
+- Movie details modal still displays the status toggle
+- Show watch state transitions only via episode progress updates
+
+## S17 - Regression Test Lock-In + Manual QA Matrix
+Goal: Prevent reintroduction of stale season targeting and invalid TV status controls.
+
+Deliverables:
+- Add unit tests for landing-target selector logic (partial season watched, cross-show switch, fully watched show)
+- Add component-level tests for show vs movie ActionBar rendering rules
+- Add manual QA checklist for:
+  - Partial progress show resume
+  - Cross-show switching
+  - Fully watched show open state
+  - No TV "Mark Watched" action present
+
+Done when:
+- New tests fail against current behavior and pass after fixes
+- QA checklist passes on desktop and mobile modal flows
+
+## S18 - Release Hardening + Data Safety Checks
+Goal: Ship safely without breaking existing user episode progress.
+
+Deliverables:
+- Verify no write-schema changes required (`episodeProgress` remains source of truth)
+- Validate no regressions in `handleUpdateItem` auto-status sync in `src/app/useAppState.js`
+- Add release notes for changed show behavior and removed TV status button
+
+Done when:
+- Existing watchlists load with no data migration
+- Production smoke test passes for add/open/update flows on shows and movies
+
+## Execution Order
+1. S15 (fix incorrect show landing behavior first)
+2. S16 (remove conflicting TV-level status action)
+3. S17 (lock behavior with tests + QA)
+4. S18 (ship readiness and smoke checks)

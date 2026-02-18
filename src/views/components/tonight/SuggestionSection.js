@@ -12,13 +12,16 @@ const SuggestionSection = ({
   onOpenDetails,
   layout = 'grid',
   hideDecide = false,
-  cardWidthClassName = 'w-[clamp(3.75rem,10vh,6.25rem)]',
+  hideScrollbar = false,
+  showEdgeFade = false,
+  railPaddingClassName = '',
+  cardWidthClassName = 'w-[clamp(6.53rem,14.4vw,8.55rem)]',
   className = '',
 }) => {
   const isRail = layout === 'rail';
 
   return (
-    <div className={`space-y-3 ${isRail ? 'h-full min-h-0 flex flex-col' : ''} ${className}`}>
+    <div className={`space-y-1.5 ${isRail ? 'flex flex-col' : ''} ${className}`}>
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
           {title}
@@ -35,22 +38,34 @@ const SuggestionSection = ({
       </div>
       {suggestions.length > 0 ? (
         isRail ? (
-          <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden pb-1 custom-scrollbar">
-            <div className="flex gap-2 min-w-max">
-              {suggestions.map((item) => (
-                <div key={item.id} className={`${cardWidthClassName} shrink-0`}>
-                  <ItemCard
-                    item={item}
-                    onToggle={() => onToggleStatus(item.id, item.status)}
-                    minimal={false}
-                    onOpenDetails={onOpenDetails}
-                  />
-                </div>
-              ))}
+          <div className={`relative ${railPaddingClassName}`}>
+            <div
+              className={`pb-1 overflow-x-auto overflow-y-hidden ${
+                hideScrollbar ? 'no-scrollbar' : 'custom-scrollbar'
+              }`}
+            >
+              <div className="flex gap-1.5 min-w-max">
+                {suggestions.map((item) => (
+                  <div key={item.id} className={`${cardWidthClassName} shrink-0`}>
+                    <ItemCard
+                      item={item}
+                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      minimal={false}
+                      onOpenDetails={onOpenDetails}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
+            {showEdgeFade && (
+              <>
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-stone-950/85 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-stone-950/85 to-transparent" />
+              </>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {suggestions.map((item) => (
               <ItemCard
                 key={item.id}

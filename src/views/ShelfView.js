@@ -127,7 +127,7 @@ const ShelfView = ({
   // Apply type filters to unwatched items
   const unwatched = useMemo(() => {
     return items.filter((i) => {
-      if (i.status !== 'unwatched' && i.status !== 'watching') return false;
+      if (i.status !== 'unwatched') return false;
       if (!showMovies && i.type === 'movie') return false;
       if (!showShows && i.type === 'show') return false;
       return true;
@@ -143,11 +143,14 @@ const ShelfView = ({
       normalizeSearchText(item.title || '').includes(normalizedQuery),
     );
   }, [isSearching, normalizedQuery, searchBaseItems]);
+  const contentGapClassName = 'space-y-4';
+  const sectionGapClassName = 'space-y-1.5';
+  const cardGridClassName =
+    'grid [grid-template-columns:repeat(auto-fill,minmax(clamp(5.85rem,12.6vw,7.65rem),1fr))] gap-1.5';
 
   // Group/sort unwatched based on sortBy setting
   const itemsByVibe = useMemo(() => {
-    const watching = unwatched.filter((i) => i.status === 'watching');
-    const backlog = unwatched.filter((i) => i.status === 'unwatched');
+    const backlog = unwatched;
     const groups = {};
 
     if (sortBy === 'alphabetical') {
@@ -181,21 +184,12 @@ const ShelfView = ({
       });
     }
 
-    if (watching.length > 0) {
-      return {
-        currently_watching: watching.sort((a, b) =>
-          a.title.localeCompare(b.title),
-        ),
-        ...groups,
-      };
-    }
-
     return groups;
   }, [unwatched, sortBy]);
 
   return (
     <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
-      <header className="px-6 py-8 bg-stone-950/95 sticky top-0 z-20 border-b border-stone-900">
+      <header className="px-2 sm:px-3 py-3 bg-stone-950/95 sticky top-0 z-20 border-b border-stone-900">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-serif text-stone-200">
             {viewTab === 'library' ? 'Library' : 'Memories'}
@@ -253,7 +247,7 @@ const ShelfView = ({
       </header>
 
       {/* Tabs */}
-      <div className="px-6 py-4 border-b border-stone-900 bg-stone-950/50 sticky top-[73px] z-10 flex gap-6">
+      <div className="px-2 sm:px-3 py-1.5 border-b border-stone-900 bg-stone-950/50 sticky top-[73px] z-10 flex gap-6">
         <button
           onClick={() => setViewTab('library')}
           className={`pb-2 px-2 font-medium text-sm transition-colors border-b-2 ${
@@ -278,7 +272,7 @@ const ShelfView = ({
 
       {/* Sort and Type Filter Buttons - Only show for Library */}
       {viewTab === 'library' && (
-        <div className="px-6 py-4 border-b border-stone-900 bg-stone-950/50 sticky top-[120px] z-10 flex items-center gap-3">
+        <div className="px-2 sm:px-3 py-1.5 pb-4 border-b border-stone-900 bg-stone-950/50 sticky top-[120px] z-10 flex items-center gap-3">
           {/* Sort Buttons */}
           <div className="flex gap-2">
             <button
@@ -366,17 +360,17 @@ const ShelfView = ({
         </div>
       )}
 
-      <div className="p-6 pb-40 space-y-10">
+      <div className={`px-2 sm:px-3 pt-2 pb-40 ${contentGapClassName}`}>
         {viewTab === 'library' && (
           <>
             {isSearching ? (
-              <div className="space-y-4">
+              <div className={sectionGapClassName}>
                 {filteredItems.length === 0 ? (
                   <div className="text-sm text-stone-400 text-center py-12">
                     No matches yet. Try another title.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className={cardGridClassName}>
                     {filteredItems.map((item) => (
                       <PosterCard
                         key={item.id}
@@ -406,10 +400,7 @@ const ShelfView = ({
                   let header = null;
                   let HeaderIcon = null;
 
-                  if (groupId === 'currently_watching') {
-                    header = 'Currently Watching';
-                    HeaderIcon = Tv;
-                  } else if (sortBy === 'alphabetical') {
+                  if (sortBy === 'alphabetical') {
                     header = 'All Items';
                   } else if (sortBy === 'energy') {
                     const energyDef = ENERGIES.find((e) => e.id === groupId);
@@ -427,14 +418,14 @@ const ShelfView = ({
                   }
 
                   return (
-                    <div key={groupId} className="space-y-4">
+                    <div key={groupId} className={sectionGapClassName}>
                       <div className="flex items-center gap-2 text-stone-400/80 pl-1">
                         {HeaderIcon && <HeaderIcon className="w-4 h-4" />}
                         <h3 className="text-xs font-bold uppercase tracking-widest">
                           {header}
                         </h3>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className={cardGridClassName}>
                         {groupItems.map((item) => (
                           <PosterCard
                             key={item.id}
@@ -458,14 +449,14 @@ const ShelfView = ({
           </>
         )}
         {viewTab === 'memories' && (
-          <div className="space-y-6">
+          <div className={sectionGapClassName}>
             {isSearching ? (
               filteredItems.length === 0 ? (
                 <div className="text-sm text-stone-400 text-center py-12">
                   No matches yet. Try another title.
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-2">
+                <div className={cardGridClassName}>
                   {filteredItems.map((item) => (
                     <PosterCard
                       key={item.id}
@@ -493,7 +484,7 @@ const ShelfView = ({
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-2">
+              <div className={cardGridClassName}>
                 {watched.map((item) => (
                   <PosterCard
                     key={item.id}

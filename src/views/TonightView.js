@@ -72,12 +72,12 @@ const TonightView = ({
     [items],
   );
   const unwatchedMovies = useMemo(
-    () => unwatched.filter((i) => i.type === 'movie'),
-    [unwatched],
+    () => items.filter((i) => i.type === 'movie' && i.status === 'unwatched'),
+    [items],
   );
   const unwatchedShows = useMemo(
-    () => unwatched.filter((i) => i.type === 'show'),
-    [unwatched],
+    () => items.filter((i) => i.type === 'show' && i.status === 'unwatched'),
+    [items],
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -215,10 +215,10 @@ const TonightView = ({
         onSignOut={onSignOut}
       />
 
-      <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 flex flex-col gap-4 pb-2 overflow-hidden">
+      <div className="flex-1 min-h-0 px-3 sm:px-4 pb-6 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 flex flex-col gap-1.5 pb-2 overflow-hidden">
           {showImportBanner && (
-            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
+            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-2 py-1.5 space-y-0.5">
               <div className="text-sm text-amber-200 tabular-nums">
                 Importing {activeImportProcessed}/{activeImportTotal}
               </div>
@@ -229,7 +229,7 @@ const TonightView = ({
               )}
             </div>
           )}
-          <div className="flex-1 min-h-0 grid grid-rows-3 gap-4 overflow-hidden">
+          <div className="flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto pb-2">
             <SuggestionSection
               title="Movies"
               pool={unwatchedMovies}
@@ -245,7 +245,7 @@ const TonightView = ({
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
               layout="rail"
-              className="min-h-0"
+              className="shrink-0"
             />
             <SuggestionSection
               title="TV Shows"
@@ -262,7 +262,7 @@ const TonightView = ({
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
               layout="rail"
-              className="min-h-0"
+              className="shrink-0"
             />
             <SuggestionSection
               title="Currently Watching"
@@ -272,8 +272,11 @@ const TonightView = ({
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
               layout="rail"
+              hideScrollbar
+              showEdgeFade
+              railPaddingClassName="px-1"
               hideDecide
-              className="min-h-0"
+              className="shrink-0"
             />
           </div>
         </div>

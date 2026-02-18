@@ -225,31 +225,6 @@ const PosterCard = ({
         )}
       </div>
 
-      {/* Title Only - No Vibe (it's already grouped by vibe on library page) */}
-      <div className="flex flex-col gap-1 flex-1 px-1 py-2 min-h-0">
-        {selectionMode || onOpenDetails ? (
-          <button
-            type="button"
-            onClick={handleClick}
-            className={`text-left text-[11px] leading-tight font-serif line-clamp-2 flex-shrink-0 transition-colors ${
-              isSelected
-                ? 'text-stone-500'
-                : 'text-stone-200 hover:text-amber-200'
-            }`}
-            aria-label={
-              selectionMode
-                ? `${isSelected ? 'Deselect' : 'Select'} ${item.title}`
-                : `View details for ${item.title}`
-            }
-          >
-            {item.title}
-          </button>
-        ) : (
-          <div className="text-[11px] leading-tight text-stone-200 font-serif line-clamp-2 flex-shrink-0">
-            {item.title}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { getShowEntryTarget } from './showProgress';
 
 describe('getShowEntryTarget', () => {
-  it('targets latest season with remaining unwatched episodes', () => {
+  it('targets next unwatched episode in chronological order', () => {
     const seasons = [
       {
         number: 1,
@@ -31,6 +31,28 @@ describe('getShowEntryTarget', () => {
     });
   });
 
+  it('starts brand new shows at season 1 episode 1', () => {
+    const seasons = [
+      {
+        number: 1,
+        episodes: [{ id: 's1e1', number: 1 }],
+      },
+      {
+        number: 4,
+        episodes: [{ id: 's4e1', number: 1 }],
+      },
+      {
+        number: 9,
+        episodes: [{ id: 's9e1', number: 1 }],
+      },
+    ];
+
+    expect(getShowEntryTarget({ seasons, episodeProgress: {} })).toEqual({
+      seasonNumber: 1,
+      episodeId: 's1e1',
+    });
+  });
+
   it('does not leak progress between shows', () => {
     const showASeasons = [
       { number: 2, episodes: [{ id: 'a-s2e1', number: 1 }] },
@@ -50,7 +72,7 @@ describe('getShowEntryTarget', () => {
     });
 
     expect(showAResult).toEqual({ seasonNumber: 2, episodeId: 'a-s2e1' });
-    expect(showBResult).toEqual({ seasonNumber: 2, episodeId: 'b-s2e1' });
+    expect(showBResult).toEqual({ seasonNumber: 1, episodeId: 'b-s1e1' });
   });
 
   it('targets latest episode in latest season when show is fully watched', () => {

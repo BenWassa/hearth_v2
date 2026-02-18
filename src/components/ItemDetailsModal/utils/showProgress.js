@@ -27,7 +27,7 @@ export const getShowEntryTarget = ({ seasons, episodeProgress }) => {
   const progress = episodeProgress || {};
   const orderedSeasons = sortSeasonsAsc(seasons);
 
-  for (let seasonIndex = orderedSeasons.length - 1; seasonIndex >= 0; seasonIndex -= 1) {
+  for (let seasonIndex = 0; seasonIndex < orderedSeasons.length; seasonIndex += 1) {
     const season = orderedSeasons[seasonIndex];
     const orderedEpisodes = sortEpisodesAsc(season.episodes || []);
     const nextUnwatched = orderedEpisodes.find(

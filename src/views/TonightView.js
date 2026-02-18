@@ -225,7 +225,7 @@ const TonightView = ({
             onOpenDeleteAll={handleOpenDeleteAll}
             onSignOut={onSignOut}
           />
-          <div className="h-[60px]" />
+          <div className="h-[68px]" />
 
           <div className="px-3 sm:px-4 pt-2 pb-24 flex flex-col gap-5">
             {showImportBanner && (

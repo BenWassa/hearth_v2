@@ -154,13 +154,15 @@ const TonightHeaderMenu = ({
           )}
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 text-stone-100">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5 text-stone-100">
           <img
             src={hearthVector}
             alt="Hearth"
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
           />
-          <h1 className="text-xl font-serif tracking-wide">Hearth</h1>
+          <h1 className="text-2xl sm:text-[1.7rem] leading-none font-serif tracking-wide">
+            Hearth
+          </h1>
         </div>
 
         <div className="relative z-10 w-10 flex justify-end">

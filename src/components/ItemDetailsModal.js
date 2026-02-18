@@ -110,6 +110,8 @@ const ItemDetailsModal = ({
   const persistedHydrationRef = useRef(new Set());
   const initializedShowRef = useRef(null);
   const seasonScrollRef = useRef(null);
+  const contentScrollRef = useRef(null);
+  const episodeAutoScrollRef = useRef(null);
   const [seasonScrollState, setSeasonScrollState] = useState({
     canScrollLeft: false,
     canScrollRight: false,
@@ -483,6 +485,50 @@ const ItemDetailsModal = ({
     scrollToSeason(activeSeason.number);
   }, [activeSeason?.number, scrollToSeason]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      episodeAutoScrollRef.current = null;
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !isShow || !item?.id) return;
+    const targetEpisodeId = showEntryTarget?.episodeId;
+    const targetSeasonNumber = showEntryTarget?.seasonNumber;
+    if (!targetEpisodeId || !targetSeasonNumber) return;
+    if (activeSeason?.number !== targetSeasonNumber) return;
+    const dedupeKey = `${item.id}:${targetSeasonNumber}:${targetEpisodeId}`;
+    if (episodeAutoScrollRef.current === dedupeKey) return;
+
+    const scrollContainer = contentScrollRef.current;
+    if (!scrollContainer) return;
+    const runScroll = () => {
+      const candidates = scrollContainer.querySelectorAll('[data-episode-id]');
+      const target = Array.from(candidates).find(
+        (element) => element.getAttribute('data-episode-id') === targetEpisodeId,
+      );
+      if (!target) return;
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+      episodeAutoScrollRef.current = dedupeKey;
+    };
+
+    const frameOne = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(runScroll);
+    });
+    return () => window.cancelAnimationFrame(frameOne);
+  }, [
+    isOpen,
+    isShow,
+    item?.id,
+    activeSeason?.number,
+    showEntryTarget?.episodeId,
+    showEntryTarget?.seasonNumber,
+  ]);
+
   if (!isOpen || !item) return null;
 
   const backdropSrc = getBackdropSrc(item);
@@ -507,8 +553,17 @@ const ItemDetailsModal = ({
     );
   };
 
-  const handleToggleEpisode = (episodeId) => {
-    if (!item?.id || !episodeId) return;
+  const handleToggleEpisode = (episodeInput) => {
+    if (!item?.id || !episodeInput) return;
+    const episodeId =
+      typeof episodeInput === 'string'
+        ? episodeInput
+        : episodeInput.id || getEpisodeProgressKeys(episodeInput)[0];
+    const currentEpisode =
+      (typeof episodeInput === 'object' && episodeInput) ||
+      activeSeason?.episodes?.find((episode) => episode.id === episodeId) ||
+      null;
+    if (!currentEpisode) return;
     const nextSeasonNumber = (() => {
       const currentIndex = seasons.findIndex(
         (season) => season.number === activeSeason?.number,
@@ -519,9 +574,8 @@ const ItemDetailsModal = ({
     })();
     setLocalEpisodeProgress((prev) => {
       const next = { ...(prev || {}) };
-      const currentEpisode =
-        activeSeason?.episodes?.find((episode) => episode.id === episodeId) || null;
       const episodeKeys = getEpisodeProgressKeys(currentEpisode);
+      if (!episodeKeys.length) return prev || {};
       const wasWatched = episodeKeys.some((key) => Boolean(next[key]));
       if (wasWatched) {
         episodeKeys.forEach((key) => {
@@ -533,8 +587,8 @@ const ItemDetailsModal = ({
         });
       }
       const currentEpisodeIndex =
-        activeSeason?.episodes?.findIndex(
-          (episode) => episode.id === episodeId,
+        activeSeason?.episodes?.findIndex((episode) =>
+          getEpisodeProgressKeys(episode).some((key) => episodeKeys.includes(key)),
         ) ?? -1;
       const nextUnwatchedEpisode =
         currentEpisodeIndex === -1
@@ -713,7 +767,10 @@ const ItemDetailsModal = ({
         {/* Content Section */}
         <div className="flex-1 flex flex-col min-w-0 bg-stone-950/95 relative -mt-12 sm:mt-0 z-10 rounded-t-3xl sm:rounded-none overflow-hidden">
           {/* Scrollable Content */}
-          <div className="relative flex-1 overflow-y-auto no-scrollbar">
+          <div
+            ref={contentScrollRef}
+            className="relative flex-1 overflow-y-auto no-scrollbar"
+          >
             <div className="p-5 sm:p-8 space-y-6">
               {/* Header: Vibe/Energy & Close (Desktop) */}
               <ModalContentHeader

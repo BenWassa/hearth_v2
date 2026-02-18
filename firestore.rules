@@ -16,7 +16,9 @@ service cloud.firestore {
     }
 
     function isValidWatchlistStatus(status) {
-      return status == 'unwatched' || status == 'watched';
+      return status == 'unwatched'
+        || status == 'watching'
+        || status == 'watched';
     }
 
     function isValidCatalogData(data, mediaId) {

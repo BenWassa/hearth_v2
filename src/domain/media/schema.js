@@ -1,3 +1,5 @@
+import { normalizeWatchStatus } from './status.js';
+
 const asString = (value) => (typeof value === 'string' ? value.trim() : '');
 
 const asNumberOrNull = (value) => {
@@ -51,6 +53,7 @@ export const isV2Payload = (item = {}) => {
 
 export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   const mediaId = buildMediaId(item);
+  const status = normalizeWatchStatus(item.status || 'unwatched');
   const payload = {
     mediaId,
     title: asString(item.title),
@@ -58,7 +61,7 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
     vibe: asString(item.vibe),
     energy: asString(item.energy),
     addedBy: userId,
-    status: asString(item.status || 'unwatched'),
+    status,
   };
 
   if (item.note) payload.note = asString(item.note);
@@ -89,7 +92,7 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const mediaCast = asArray(media.cast);
   const showSeasons = asArray(showData.seasons);
 
-  const status = asString(userState.status || item.status || 'unwatched');
+  const status = normalizeWatchStatus(userState.status || item.status || 'unwatched');
   const title = asString(media.title || item.title);
   const type = asString(media.type || item.type || 'movie');
   const primaryDirector = asString(item.director);

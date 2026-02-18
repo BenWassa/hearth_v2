@@ -22,6 +22,7 @@ const EpisodeItem = ({
 
   return (
     <div
+      data-episode-id={episode.id}
       className={`
         relative group rounded-xl border transition-all duration-200 overflow-hidden mb-2
         ${

@@ -10,6 +10,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { buildMediaId } from '../../domain/media/schema.js';
+import { normalizeWatchStatus } from '../../domain/media/status.js';
 
 const asObject = (value) =>
   value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -146,7 +147,9 @@ const buildWatchlistPayload = (
 ) => {
   const userState = asObject(payload.userState);
   const media = asObject(payload.media);
-  const status = asString(userState.status || payload.status || 'unwatched');
+  const status = normalizeWatchStatus(
+    userState.status || payload.status || 'unwatched',
+  );
   const vibe = asString(userState.vibe || payload.vibe);
   const energy = asString(userState.energy || payload.energy);
   const note = asString(userState.note || payload.note);
@@ -331,9 +334,10 @@ export const updateWatchlistStatus = async ({
   itemId,
   status,
 }) => {
+  const normalizedStatus = normalizeWatchStatus(status);
   return updateDoc(getWatchlistDocRef(db, appId, spaceId, itemId), {
-    status,
-    'userState.status': status,
+    status: normalizedStatus,
+    'userState.status': normalizedStatus,
     updatedAt: serverTimestamp(),
   });
 };
@@ -373,6 +377,7 @@ export const updateWatchlistItem = async ({
   });
 
   if (Object.prototype.hasOwnProperty.call(watchlistUpdates, 'status')) {
+    watchlistUpdates.status = normalizeWatchStatus(watchlistUpdates.status);
     watchlistUpdates['userState.status'] = watchlistUpdates.status;
   }
   if (Object.prototype.hasOwnProperty.call(watchlistUpdates, 'vibe')) {

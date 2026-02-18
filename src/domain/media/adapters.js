@@ -1,4 +1,5 @@
 import { WATCHLIST_SCHEMA_VERSION } from './schema.js';
+import { normalizeWatchStatus } from './status.js';
 
 const asObject = (value) =>
   value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -41,7 +42,9 @@ export const adaptWatchlistItem = (rawItem = {}) => {
     media,
     showData,
     userState,
-    status: asString(userState.status) || asString(rawItem.status),
+    status: normalizeWatchStatus(
+      asString(userState.status) || asString(rawItem.status),
+    ),
     title: asString(media.title) || asString(rawItem.title),
     type,
     vibe: asString(userState.vibe) || asString(rawItem.vibe),
@@ -78,7 +81,9 @@ export const mapWatchlistUpdatesForWrite = (item = {}, updates = {}) => {
   const mapped = { ...updates };
 
   if (Object.prototype.hasOwnProperty.call(updates, 'status')) {
-    mapped['userState.status'] = updates.status;
+    const normalizedStatus = normalizeWatchStatus(updates.status);
+    mapped.status = normalizedStatus;
+    mapped['userState.status'] = normalizedStatus;
   }
   if (Object.prototype.hasOwnProperty.call(updates, 'vibe')) {
     mapped['userState.vibe'] = updates.vibe;

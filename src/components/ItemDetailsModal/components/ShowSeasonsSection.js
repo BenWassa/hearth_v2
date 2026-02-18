@@ -156,7 +156,7 @@ const ShowSeasonsSection = ({
                         expandedEpisodeId === episode.id ? null : episode.id,
                       )
                     }
-                    onToggleWatched={() => handleToggleEpisode(episode.id)}
+                    onToggleWatched={() => handleToggleEpisode(episode)}
                     onToggleSpoiler={() =>
                       setRevealedEpisodeIds((prev) => ({
                         ...(prev || {}),

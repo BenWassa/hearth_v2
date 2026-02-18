@@ -56,6 +56,7 @@ const TonightView = ({
       items
         .filter((item) => {
           if (item?.type !== 'show') return false;
+          if (item?.status === 'watched') return false;
           const watchedAny = Object.values(item?.episodeProgress || {}).some(Boolean);
           if (!watchedAny) return false;
           const hasSeasonData =

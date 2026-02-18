@@ -24,6 +24,10 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 4. Validate add flow in preview:
    - search -> select -> enrich -> save
    - manual fallback still saves
+5. Validate show/movie details behavior in preview:
+   - show opens to latest in-progress season + next unwatched episode
+   - show details do not render bottom "Mark Watched"/"Back to Shelf" CTA
+   - movie details still render bottom status CTA and can toggle status
 
 ## Deploy Steps
 1. Merge approved release commit to deploy branch.
@@ -36,6 +40,9 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 - App loads at root path (`/`).
 - Search latency and error rate within expected bounds.
 - Add flow writes v2 records successfully.
+- Show details resume at expected season/episode from `episodeProgress`.
+- Show progress updates remain episode-driven (no show-level status CTA).
+- Movie status toggle remains functional in details modal.
 - Metadata refresh action works on existing provider-backed items.
 - No stale UI caused by service worker cache.
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   buildImportDedupeKey,
   hasUsableProviderIdentity,
@@ -15,6 +15,7 @@ import {
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
 import { copyToClipboard } from '../utils/clipboard.js';
+import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
@@ -45,6 +46,11 @@ import {
 const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
 const VIEW_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const AUTO_SHOW_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
+const AUTO_SHOW_REFRESH_MAX_ITEMS = 12;
+const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh';
+const logAutoShowRefresh = (...args) =>
+  console.info('[auto-show-refresh]', ...args);
 
 const getInitialView = () => {
   if (typeof localStorage === 'undefined') return 'onboarding';
@@ -69,13 +75,13 @@ const getInitialView = () => {
 const isShowFullyWatched = (item) => {
   if (!item || item.type !== 'show') return true;
   const seasons = Array.isArray(item.seasons) ? item.seasons : [];
-  if (!seasons.length) return false;
+  const seasonsWithEpisodes = seasons.filter(
+    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
+  );
+  if (!seasonsWithEpisodes.length) return false;
   const progress = item.episodeProgress || {};
-  return seasons.every(
-    (season) =>
-      Array.isArray(season.episodes) &&
-      season.episodes.length > 0 &&
-      season.episodes.every((episode) => Boolean(progress[episode.id])),
+  return seasonsWithEpisodes.every((season) =>
+    season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
   );
 };
 
@@ -307,7 +313,7 @@ const getMetadataGaps = (item = {}) => {
   if (!sourceProvider || !sourceProviderId) gaps.push('source');
   if (!poster) gaps.push('poster');
   if (!backdrop) gaps.push('backdrop');
-  if (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0) {
+  if (!isShow && (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0)) {
     gaps.push('runtimeMinutes');
   }
   if (!year) gaps.push('year');
@@ -435,6 +441,7 @@ export const useAppState = () => {
   const [isMetadataRepairing, setIsMetadataRepairing] = useState(false);
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
+  const autoShowRefreshInFlightRef = useRef(false);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
 
@@ -1325,7 +1332,7 @@ export const useAppState = () => {
     }
   };
 
-  const buildUpdatesFromRefreshed = (refreshed = {}) => {
+  const buildUpdatesFromRefreshed = (currentItem, refreshed = {}) => {
     const updates = {
       schemaVersion: 2,
       source: refreshed.source,
@@ -1377,6 +1384,23 @@ export const useAppState = () => {
     if (Array.isArray(refreshed.showData?.seasons)) {
       updates.seasons = refreshed.showData.seasons;
     }
+    if (isShow && Array.isArray(refreshed.showData?.seasons)) {
+      const nextItem = {
+        ...currentItem,
+        ...updates,
+        type: 'show',
+        seasons: refreshed.showData.seasons,
+      };
+      const fullyWatched = isShowFullyWatched(nextItem);
+      const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
+        Boolean,
+      );
+      updates.status = fullyWatched
+        ? 'watched'
+        : watchedAny
+        ? 'watching'
+        : 'unwatched';
+    }
 
     return updates;
   };
@@ -1405,7 +1429,7 @@ export const useAppState = () => {
         appId,
         spaceId,
         itemId: id,
-        updates: buildUpdatesFromRefreshed(refreshed),
+        updates: buildUpdatesFromRefreshed(item, refreshed),
       });
       notifyUpdate('Metadata refreshed.');
     } catch (err) {
@@ -1488,7 +1512,7 @@ export const useAppState = () => {
             appId,
             spaceId,
             itemId: item.id,
-            updates: buildUpdatesFromRefreshed(refreshed),
+            updates: buildUpdatesFromRefreshed(item, refreshed),
           });
           repaired += 1;
         } catch (error) {
@@ -1507,6 +1531,108 @@ export const useAppState = () => {
       notifyError(`${failed} title(s) still missing metadata after repair.`);
     }
   };
+
+  useEffect(() => {
+    if (!db || !spaceId || !user || loading) return;
+    if (typeof localStorage === 'undefined') return;
+    if (autoShowRefreshInFlightRef.current) {
+      logAutoShowRefresh('Skipped: refresh already in flight.');
+      return;
+    }
+
+    const storageKey = `${AUTO_SHOW_REFRESH_STORAGE_PREFIX}:${spaceId}`;
+    let lastRunAt = 0;
+    let cursor = 0;
+
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      lastRunAt = Number(parsed?.lastRunAt || 0);
+      cursor = Number(parsed?.cursor || 0);
+    } catch (err) {
+      console.warn('Failed to parse auto show refresh state:', err);
+    }
+
+    if (Date.now() - lastRunAt < AUTO_SHOW_REFRESH_INTERVAL_MS) {
+      logAutoShowRefresh(
+        `Skipped: last run at ${new Date(lastRunAt).toISOString()} (interval not reached).`,
+      );
+      return;
+    }
+
+    const candidates = items
+      .filter((item) => {
+        if (item?.type !== 'show') return false;
+        if (item?.status !== 'watched') return false;
+        return Boolean(item?.source?.provider && item?.source?.providerId);
+      })
+      .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+
+    if (!candidates.length) {
+      logAutoShowRefresh('No watched shows with provider IDs to refresh.');
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ lastRunAt: Date.now(), cursor: 0 }),
+      );
+      return;
+    }
+
+    const safeCursor = Math.max(0, cursor) % candidates.length;
+    const batchSize = Math.min(AUTO_SHOW_REFRESH_MAX_ITEMS, candidates.length);
+    const batch = Array.from({ length: batchSize }, (_, index) => {
+      const candidateIndex = (safeCursor + index) % candidates.length;
+      return candidates[candidateIndex];
+    });
+    const nextCursor = (safeCursor + batchSize) % candidates.length;
+
+    autoShowRefreshInFlightRef.current = true;
+    logAutoShowRefresh(
+      `Starting refresh for ${batch.length} watched show(s). Cursor ${safeCursor} -> ${nextCursor}.`,
+    );
+    const runAutoRefresh = async () => {
+      let refreshedCount = 0;
+      try {
+        for (const item of batch) {
+          try {
+            const refreshed = await refreshMediaMetadata({
+              provider: item.source.provider,
+              providerId: item.source.providerId,
+              type: 'show',
+            });
+
+            await updateWatchlistItem({
+              db,
+              appId,
+              spaceId,
+              itemId: item.id,
+              updates: mapWatchlistUpdatesForWrite(
+                item,
+                buildUpdatesFromRefreshed(item, refreshed),
+              ),
+            });
+            refreshedCount += 1;
+            logAutoShowRefresh(`Refreshed: ${item?.title || item?.id}`);
+          } catch (error) {
+            console.warn(
+              'Background show metadata refresh failed for item:',
+              item?.title,
+              error,
+            );
+          }
+        }
+      } finally {
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({ lastRunAt: Date.now(), cursor: nextCursor }),
+        );
+        logAutoShowRefresh(
+          `Completed. Refreshed ${refreshedCount}/${batch.length} show(s).`,
+        );
+        autoShowRefreshInFlightRef.current = false;
+      }
+    };
+
+    runAutoRefresh();
+  }, [db, items, loading, spaceId, user]);
 
   const handleBulkDelete = async (ids, options = {}) => {
     if (!db || !spaceId) {

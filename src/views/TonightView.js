@@ -18,13 +18,13 @@ const getModifiedAt = (item) =>
 
 const isShowComplete = (item) => {
   const seasons = Array.isArray(item?.seasons) ? item.seasons : [];
-  if (!seasons.length) return false;
+  const seasonsWithEpisodes = seasons.filter(
+    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
+  );
+  if (!seasonsWithEpisodes.length) return false;
   const progress = item?.episodeProgress || {};
-  return seasons.every(
-    (season) =>
-      Array.isArray(season?.episodes) &&
-      season.episodes.length > 0 &&
-      season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
+  return seasonsWithEpisodes.every((season) =>
+    season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
   );
 };
 

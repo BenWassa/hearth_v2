@@ -127,7 +127,7 @@ const ShelfView = ({
   // Apply type filters to unwatched items
   const unwatched = useMemo(() => {
     return items.filter((i) => {
-      if (i.status !== 'unwatched') return false;
+      if (i.status !== 'unwatched' && i.status !== 'watching') return false;
       if (!showMovies && i.type === 'movie') return false;
       if (!showShows && i.type === 'show') return false;
       return true;
@@ -146,51 +146,51 @@ const ShelfView = ({
 
   // Group/sort unwatched based on sortBy setting
   const itemsByVibe = useMemo(() => {
+    const watching = unwatched.filter((i) => i.status === 'watching');
+    const backlog = unwatched.filter((i) => i.status === 'unwatched');
+    const groups = {};
+
     if (sortBy === 'alphabetical') {
-      // Sort alphabetically - return as single group
-      const sorted = [...unwatched].sort((a, b) =>
+      groups.alphabetical = [...backlog].sort((a, b) =>
         a.title.localeCompare(b.title),
       );
-      return { alphabetical: sorted };
     } else if (sortBy === 'energy') {
-      // Group by energy
-      const groups = {};
       ENERGIES.forEach((e) => (groups[e.id] = []));
 
-      unwatched.forEach((item) => {
+      backlog.forEach((item) => {
         const energyId = item.energy || 'balanced';
         if (groups[energyId]) {
           groups[energyId].push(item);
         }
       });
 
-      // Sort within each energy group alphabetically
       Object.keys(groups).forEach((key) => {
         groups[key].sort((a, b) => a.title.localeCompare(b.title));
       });
-
-      return groups;
     } else {
-      // Default: group by vibe
-      const groups = {};
       VIBES.forEach((v) => (groups[v.id] = []));
-      let others = [];
 
-      unwatched.forEach((item) => {
+      backlog.forEach((item) => {
         if (groups[item.vibe]) {
           groups[item.vibe].push(item);
-        } else {
-          others.push(item);
         }
       });
 
-      // Sort within each vibe group alphabetically
       Object.keys(groups).forEach((key) => {
         groups[key].sort((a, b) => a.title.localeCompare(b.title));
       });
-
-      return groups;
     }
+
+    if (watching.length > 0) {
+      return {
+        currently_watching: watching.sort((a, b) =>
+          a.title.localeCompare(b.title),
+        ),
+        ...groups,
+      };
+    }
+
+    return groups;
   }, [unwatched, sortBy]);
 
   return (
@@ -383,7 +383,7 @@ const ShelfView = ({
                         item={item}
                         onToggle={() => onToggleStatus(item.id, item.status)}
                         onDelete={
-                          item.status === 'unwatched'
+                          item.status !== 'watched'
                             ? () => onDelete(item.id)
                             : null
                         }
@@ -406,7 +406,10 @@ const ShelfView = ({
                   let header = null;
                   let HeaderIcon = null;
 
-                  if (sortBy === 'alphabetical') {
+                  if (groupId === 'currently_watching') {
+                    header = 'Currently Watching';
+                    HeaderIcon = Tv;
+                  } else if (sortBy === 'alphabetical') {
                     header = 'All Items';
                   } else if (sortBy === 'energy') {
                     const energyDef = ENERGIES.find((e) => e.id === groupId);

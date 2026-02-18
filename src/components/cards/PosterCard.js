@@ -1,9 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Plus, Check, Trash2, CheckCircle2 } from 'lucide-react';
 import { ENERGIES } from '../../config/constants.js';
 import { getPosterSrc } from '../../utils/poster.js';
 import PosterPlaceholder from './PosterPlaceholder.js';
 import LazyMediaImage from '../media/LazyMediaImage.js';
+
+const getEpisodeProgressKeys = (episode) => {
+  if (!episode || typeof episode !== 'object') return [];
+  const fallbackKey =
+    Number.isFinite(episode.seasonNumber) && Number.isFinite(episode.number)
+      ? `s${episode.seasonNumber}e${episode.number}`
+      : null;
+  return Array.from(
+    new Set(
+      [episode.id, ...(episode.progressKeys || []), fallbackKey]
+        .filter(Boolean)
+        .map((key) => `${key}`),
+    ),
+  );
+};
+
+const isEpisodeWatched = (episodeProgress, episode) =>
+  getEpisodeProgressKeys(episode).some((key) => Boolean(episodeProgress?.[key]));
 
 const PosterCard = ({
   item,
@@ -17,7 +35,43 @@ const PosterCard = ({
   const [posterMissing, setPosterMissing] = useState(false);
   const posterSrc = getPosterSrc(item);
   const isWatched = item.status === 'watched';
+  const isWatching = item.status === 'watching';
   const energyDef = ENERGIES.find((e) => e.id === item.energy);
+
+  const progressPercentage = useMemo(() => {
+    if (item.type !== 'show') return 0;
+    const progressObj = item.episodeProgress || {};
+    const seasons = Array.isArray(item.seasons) ? item.seasons : [];
+
+    if (seasons.length > 0) {
+      let watchedEpisodes = 0;
+      let totalEpisodes = 0;
+
+      seasons.forEach((season) => {
+        const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
+        if (episodes.length > 0) {
+          totalEpisodes += episodes.length;
+          episodes.forEach((episode) => {
+            if (isEpisodeWatched(progressObj, episode)) {
+              watchedEpisodes += 1;
+            }
+          });
+        } else if (Number.isFinite(season?.episodeCount) && season.episodeCount > 0) {
+          totalEpisodes += season.episodeCount;
+        }
+      });
+
+      if (totalEpisodes > 0) {
+        return Math.min(
+          Math.round((watchedEpisodes / totalEpisodes) * 100),
+          100,
+        );
+      }
+    }
+
+    const watchedCount = Object.values(progressObj).filter(Boolean).length;
+    return watchedCount > 0 ? 5 : 0;
+  }, [item.type, item.episodeProgress, item.seasons]);
 
   // Energy-based styling tokens
   const energyStyles = {
@@ -64,7 +118,7 @@ const PosterCard = ({
           <button
             type="button"
             onClick={handleClick}
-            className={`aspect-[2/3] w-full bg-stone-900/50 overflow-hidden border-b border-l border-r border-stone-800 shadow-lg shadow-black/30 transition-all ${
+            className={`relative aspect-[2/3] w-full bg-stone-900/50 overflow-hidden border-b border-l border-r border-stone-800 shadow-lg shadow-black/30 transition-all ${
               isSelected
                 ? 'opacity-40 ring-2 ring-amber-500 ring-inset'
                 : 'opacity-100'
@@ -91,9 +145,17 @@ const PosterCard = ({
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />
             )}
+            {isWatching && (
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-stone-950/90 backdrop-blur-md z-10 border-t border-stone-800">
+                <div
+                  className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] transition-all duration-500 ease-out"
+                  style={{ width: `${Math.max(progressPercentage, 2)}%` }}
+                />
+              </div>
+            )}
           </button>
         ) : (
-          <div className="aspect-[2/3] w-full bg-stone-900/50 overflow-hidden border-b border-l border-r border-stone-800 shadow-lg shadow-black/30">
+          <div className="relative aspect-[2/3] w-full bg-stone-900/50 overflow-hidden border-b border-l border-r border-stone-800 shadow-lg shadow-black/30">
             {posterSrc && !posterMissing ? (
               <LazyMediaImage
                 src={posterSrc}
@@ -109,6 +171,14 @@ const PosterCard = ({
               />
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />
+            )}
+            {isWatching && (
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-stone-950/90 backdrop-blur-md z-10 border-t border-stone-800">
+                <div
+                  className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] transition-all duration-500 ease-out"
+                  style={{ width: `${Math.max(progressPercentage, 2)}%` }}
+                />
+              </div>
             )}
           </div>
         )}

@@ -139,6 +139,13 @@ const normalizeStatus = (value) => {
     return 'watched';
   }
   if (
+    ['watching', 'in progress', 'in-progress', 'currently watching'].includes(
+      normalized,
+    )
+  ) {
+    return 'watching';
+  }
+  if (
     [
       'unwatched',
       'not watched',

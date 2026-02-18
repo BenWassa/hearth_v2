@@ -548,12 +548,13 @@ const ItemDetailsModal = ({
           activeSeason.episodes.every((episode) => isEpisodeWatched(next, episode)),
       );
       const showComplete = isShowComplete(next);
-      const statusUpdate =
-        showComplete && item.status !== 'watched'
-          ? 'watched'
-          : !showComplete && item.status === 'watched'
-          ? 'unwatched'
-          : null;
+      const watchedAny = Object.values(next).some(Boolean);
+      const nextStatus = showComplete
+        ? 'watched'
+        : watchedAny
+        ? 'watching'
+        : 'unwatched';
+      const statusUpdate = item.status !== nextStatus ? nextStatus : null;
       const updatePayload = statusUpdate
         ? { episodeProgress: next, status: statusUpdate }
         : { episodeProgress: next };
@@ -590,12 +591,13 @@ const ItemDetailsModal = ({
           ? seasons[currentIndex + 1]?.number
           : null;
       const showComplete = isShowComplete(next);
-      const statusUpdate =
-        showComplete && item.status !== 'watched'
-          ? 'watched'
-          : !showComplete && item.status === 'watched'
-          ? 'unwatched'
-          : null;
+      const watchedAny = Object.values(next).some(Boolean);
+      const nextStatus = showComplete
+        ? 'watched'
+        : watchedAny
+        ? 'watching'
+        : 'unwatched';
+      const statusUpdate = item.status !== nextStatus ? nextStatus : null;
       const updatePayload = statusUpdate
         ? { episodeProgress: next, status: statusUpdate }
         : { episodeProgress: next };
@@ -619,12 +621,13 @@ const ItemDetailsModal = ({
         });
       });
       const showComplete = isShowComplete(next);
-      const statusUpdate =
-        showComplete && item.status !== 'watched'
-          ? 'watched'
-          : !showComplete && item.status === 'watched'
-          ? 'unwatched'
-          : null;
+      const watchedAny = Object.values(next).some(Boolean);
+      const nextStatus = showComplete
+        ? 'watched'
+        : watchedAny
+        ? 'watching'
+        : 'unwatched';
+      const statusUpdate = item.status !== nextStatus ? nextStatus : null;
       const updatePayload = statusUpdate
         ? { episodeProgress: next, status: statusUpdate }
         : { episodeProgress: next };

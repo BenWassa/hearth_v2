@@ -1277,10 +1277,16 @@ export const useAppState = () => {
     ) {
       const nextItem = { ...item, ...updates };
       const fullyWatched = isShowFullyWatched(nextItem);
-      if (fullyWatched && item.status !== 'watched') {
-        nextUpdates.status = 'watched';
-      } else if (!fullyWatched && item.status === 'watched') {
-        nextUpdates.status = 'unwatched';
+      const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
+        Boolean,
+      );
+      const nextStatus = fullyWatched
+        ? 'watched'
+        : watchedAny
+        ? 'watching'
+        : 'unwatched';
+      if (nextUpdates.status !== nextStatus) {
+        nextUpdates.status = nextStatus;
       }
     }
     const writeUpdates = mapWatchlistUpdatesForWrite(item, nextUpdates);
@@ -1580,7 +1586,9 @@ export const useAppState = () => {
     const pool =
       poolOfItems && poolOfItems.length > 0
         ? poolOfItems
-        : items.filter((i) => i.status === 'unwatched');
+        : items.filter(
+            (i) => i.status === 'unwatched' || i.status === 'watching',
+          );
 
     if (pool.length === 0) return;
 

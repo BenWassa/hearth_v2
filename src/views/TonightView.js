@@ -4,15 +4,29 @@ import {
   buildTonightTray,
   isTonightTrayValidForPool,
 } from '../domain/watchlist.js';
+import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.js';
 import BottomNav from './components/tonight/BottomNav.js';
-import EnergyPickModal from './components/tonight/EnergyPickModal.js';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
-import PickForUsCard from './components/tonight/PickForUsCard.js';
 import SuggestionSection from './components/tonight/SuggestionSection.js';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
-import VibePickModal from './components/tonight/VibePickModal.js';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
+import { toMillis } from '../utils/time.js';
+
+const getModifiedAt = (item) =>
+  toMillis(item?.updatedAt || item?.startedAt || item?.createdAt || item?.timestamp);
+
+const isShowComplete = (item) => {
+  const seasons = Array.isArray(item?.seasons) ? item.seasons : [];
+  if (!seasons.length) return false;
+  const progress = item?.episodeProgress || {};
+  return seasons.every(
+    (season) =>
+      Array.isArray(season?.episodes) &&
+      season.episodes.length > 0 &&
+      season.episodes.every((episode) => isEpisodeWatched(progress, episode)),
+  );
+};
 
 const TonightView = ({
   items,
@@ -37,6 +51,25 @@ const TonightView = ({
   onSignOut,
 }) => {
   const unwatched = items.filter((i) => i.status === 'unwatched');
+  const currentlyWatchingShows = useMemo(
+    () =>
+      items
+        .filter((item) => {
+          if (item?.type !== 'show') return false;
+          const watchedAny = Object.values(item?.episodeProgress || {}).some(Boolean);
+          if (!watchedAny) return false;
+          const hasSeasonData =
+            Array.isArray(item?.seasons) && item.seasons.some((season) => season?.episodes?.length);
+          if (hasSeasonData) return !isShowComplete(item);
+          return item?.status === 'watching';
+        })
+        .sort((a, b) => {
+          const delta = getModifiedAt(b) - getModifiedAt(a);
+          if (delta !== 0) return delta;
+          return a.title.localeCompare(b.title);
+        }),
+    [items],
+  );
   const unwatchedMovies = useMemo(
     () => unwatched.filter((i) => i.type === 'movie'),
     [unwatched],
@@ -54,12 +87,6 @@ const TonightView = ({
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [auditReport, setAuditReport] = useState(null);
-  const [isVibeModalOpen, setIsVibeModalOpen] = useState(false);
-  const [selectedVibe, setSelectedVibe] = useState('');
-  const [vibePickError, setVibePickError] = useState('');
-  const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
-  const [selectedEnergy, setSelectedEnergy] = useState('');
-  const [energyPickError, setEnergyPickError] = useState('');
 
   const spaceLabel =
     spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
@@ -168,52 +195,6 @@ const TonightView = ({
     }
   };
 
-  const handlePickVibe = () => {
-    if (unwatched.length === 0) return;
-    setSelectedVibe('');
-    setVibePickError('');
-    setIsVibeModalOpen(true);
-  };
-
-  const handlePickEnergy = () => {
-    if (unwatched.length === 0) return;
-    setSelectedEnergy('');
-    setEnergyPickError('');
-    setIsEnergyModalOpen(true);
-  };
-
-  const handleSelectVibe = (vibeId) => {
-    setSelectedVibe(vibeId);
-    const pool = unwatched.filter((item) => item.vibe === vibeId);
-    if (pool.length === 0) {
-      setVibePickError('No unwatched titles in that vibe yet.');
-      return;
-    }
-    setVibePickError('');
-    setIsVibeModalOpen(false);
-    onDecide?.(pool, {
-      source: 'pick_for_us',
-      filterType: 'vibe',
-      filterId: vibeId,
-    });
-  };
-
-  const handleSelectEnergy = (energyId) => {
-    setSelectedEnergy(energyId);
-    const pool = unwatched.filter((item) => item.energy === energyId);
-    if (pool.length === 0) {
-      setEnergyPickError('No unwatched titles at that energy yet.');
-      return;
-    }
-    setEnergyPickError('');
-    setIsEnergyModalOpen(false);
-    onDecide?.(pool, {
-      source: 'pick_for_us',
-      filterType: 'energy',
-      filterId: energyId,
-    });
-  };
-
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
       <TonightHeaderMenu
@@ -234,20 +215,20 @@ const TonightView = ({
       />
 
       <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-y-auto pb-8 custom-scrollbar">
-          <div className="space-y-6">
-            {showImportBanner && (
-              <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
-                <div className="text-sm text-amber-200 tabular-nums">
-                  Importing {activeImportProcessed}/{activeImportTotal}
-                </div>
-                {importProgress?.isRateLimitedBackoff && (
-                  <div className="text-xs text-amber-300/90">
-                    Retrying after rate limit...
-                  </div>
-                )}
+        <div className="flex-1 min-h-0 flex flex-col gap-4 pb-2 overflow-hidden">
+          {showImportBanner && (
+            <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-3 py-2 space-y-1">
+              <div className="text-sm text-amber-200 tabular-nums">
+                Importing {activeImportProcessed}/{activeImportTotal}
               </div>
-            )}
+              {importProgress?.isRateLimitedBackoff && (
+                <div className="text-xs text-amber-300/90">
+                  Retrying after rate limit...
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex-1 min-h-0 grid grid-rows-3 gap-4 overflow-hidden">
             <SuggestionSection
               title="Movies"
               pool={unwatchedMovies}
@@ -262,8 +243,9 @@ const TonightView = ({
               }
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
+              layout="rail"
+              className="min-h-0"
             />
-
             <SuggestionSection
               title="TV Shows"
               pool={unwatchedShows}
@@ -278,10 +260,19 @@ const TonightView = ({
               }
               onToggleStatus={onToggleStatus}
               onOpenDetails={openDetails}
+              layout="rail"
+              className="min-h-0"
             />
-            <PickForUsCard
-              onPickVibe={handlePickVibe}
-              onPickEnergy={handlePickEnergy}
+            <SuggestionSection
+              title="Currently Watching"
+              pool={currentlyWatchingShows}
+              suggestions={currentlyWatchingShows}
+              emptyLabel="No shows in progress yet."
+              onToggleStatus={onToggleStatus}
+              onOpenDetails={openDetails}
+              layout="rail"
+              hideDecide
+              className="min-h-0"
             />
           </div>
         </div>
@@ -303,22 +294,6 @@ const TonightView = ({
         onClose={() => setIsAuditModalOpen(false)}
         isAuditLoading={isAuditLoading}
         auditReport={auditReport}
-      />
-
-      <VibePickModal
-        isOpen={isVibeModalOpen}
-        selectedVibe={selectedVibe}
-        onClose={() => setIsVibeModalOpen(false)}
-        onSelectVibe={handleSelectVibe}
-        localPickError={vibePickError}
-      />
-
-      <EnergyPickModal
-        isOpen={isEnergyModalOpen}
-        selectedEnergy={selectedEnergy}
-        onClose={() => setIsEnergyModalOpen(false)}
-        onSelectEnergy={handleSelectEnergy}
-        localPickError={energyPickError}
       />
 
       <WipeConfirmModal

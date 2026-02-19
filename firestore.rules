@@ -13,8 +13,16 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider == 'anonymous';
     }
 
+    function isWhitelistedUid() {
+      return isSignedIn()
+        && request.auth.uid in [
+          'CdP5YrCYW1d1RjqVQVbnm5QJCLV2',
+          '7lGXb8XSW4NVSoIPWW8udn3tntK2',
+        ];
+    }
+
     function isTrustedUser() {
-      return isSignedIn() && !isAnonymousUser();
+      return isSignedIn() && !isAnonymousUser() && isWhitelistedUid();
     }
 
     function isDemoSpace(spaceId) {

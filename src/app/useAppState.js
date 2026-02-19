@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildImportDedupeKey,
   hasUsableProviderIdentity,
@@ -12,6 +12,7 @@ import {
   DAILY_TRAY_STORAGE_PREFIX,
   SPACE_ID_STORAGE_KEY,
 } from '../config/constants.js';
+import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -50,6 +51,8 @@ const VIEW_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const AUTO_SHOW_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
 const AUTO_SHOW_REFRESH_MAX_ITEMS = 12;
 const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh';
+const ACCESS_BLOCKED_MESSAGE =
+  'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
   console.info('[auto-show-refresh]', ...args);
 
@@ -463,6 +466,7 @@ export const useAppState = () => {
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
   const autoShowRefreshInFlightRef = useRef(false);
+  const forcedDemoRedirectRef = useRef(false);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
 
@@ -480,6 +484,37 @@ export const useAppState = () => {
     setErrorMessage(message);
     setTimeout(() => setErrorMessage(''), 4000);
   };
+
+  const forceRedirectToDemoMode = useCallback(async () => {
+    if (forcedDemoRedirectRef.current) return;
+    forcedDemoRedirectRef.current = true;
+
+    setIsSigningIn(false);
+    setUser(null);
+    setSpaceId('');
+    setSpaceName('');
+    setJoinSpaceId('');
+    setJoinError('');
+    setItems([]);
+    setAuthResolved(true);
+    setLoading(false);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(SPACE_ID_STORAGE_KEY);
+    }
+
+    try {
+      await signOutUser(auth);
+    } catch (err) {
+      console.warn('Failed to sign out blocked user session:', err);
+    }
+
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('mode', 'demo');
+      url.searchParams.set('blocked', '1');
+      window.location.replace(url.toString());
+    }
+  }, [auth]);
 
   useEffect(() => {
     const onReady = (client) => {
@@ -523,6 +558,11 @@ export const useAppState = () => {
 
     try {
       const unsubscribe = subscribeToAuth(auth, (u) => {
+        if (forcedDemoRedirectRef.current) {
+          setAuthResolved(true);
+          return;
+        }
+
         if (isAnonymousAuthUser(u)) {
           // Regular app mode is Google-only; clear anonymous sessions.
           signOutUser(auth).catch(() => {});
@@ -530,6 +570,13 @@ export const useAppState = () => {
           setAuthResolved(true);
           return;
         }
+
+        if (u && !isWhitelistedUid(u.uid)) {
+          notifyError(ACCESS_BLOCKED_MESSAGE);
+          forceRedirectToDemoMode();
+          return;
+        }
+
         setUser(u);
         setAuthResolved(true);
       });
@@ -541,7 +588,7 @@ export const useAppState = () => {
 
     setLoading(false);
     return undefined;
-  }, [auth, firebaseInitResolved]);
+  }, [auth, firebaseInitResolved, forceRedirectToDemoMode]);
 
   useEffect(() => {
     if (!user) return;

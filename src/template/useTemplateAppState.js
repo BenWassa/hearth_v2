@@ -9,6 +9,7 @@ import { getMediaDetails } from '../services/mediaApi/client.js';
 import { initializeFirebase } from '../services/firebase/client.js';
 import {
   signInAnonymousUser,
+  signOutUser,
   subscribeToAuth,
 } from '../services/firebase/auth.js';
 
@@ -615,8 +616,23 @@ export const useTemplateAppState = () => {
         return;
       }
 
+      if (nextAuth.currentUser && !nextAuth.currentUser.isAnonymous) {
+        try {
+          await signOutUser(nextAuth);
+        } catch (err) {
+          console.warn('Template mode sign-out failed:', err);
+        }
+      }
+
       unsubscribe = subscribeToAuth(nextAuth, (user) => {
         if (!isMounted) return;
+        if (user && !user.isAnonymous) {
+          setAuthUser(null);
+          signOutUser(nextAuth).catch((err) => {
+            console.warn('Blocked non-anonymous template session:', err);
+          });
+          return;
+        }
         setAuthUser(user || null);
         setAuthResolved(true);
       });

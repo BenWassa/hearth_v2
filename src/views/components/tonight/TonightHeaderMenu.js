@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LogOut, MoreHorizontal, Upload, Download, Trash2, Wrench } from 'lucide-react';
+import {
+  LogOut,
+  MoreHorizontal,
+  Upload,
+  Download,
+  Trash2,
+  Wrench,
+} from 'lucide-react';
 import { APP_VERSION } from '../../../version';
 import hearthVector from '../../../assets/hearth_vector_up.png';
 
@@ -41,7 +48,6 @@ const TonightHeaderMenu = ({
   return (
     <>
       <header className="fixed top-0 inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md px-3 sm:px-4 py-3 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/80 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
-
         {/* Left — utility actions (import/export/dev/delete) */}
         <div ref={utilityRef} className="relative z-10 w-10 flex justify-start">
           {showUtilityMenu ? (
@@ -185,8 +191,12 @@ const TonightHeaderMenu = ({
             >
               {/* Space identity */}
               <div className="px-4 py-3 border-b border-stone-900">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-stone-600 mb-0.5">Space</p>
-                <p className="text-sm font-medium text-stone-200 truncate">{spaceLabel || '—'}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-stone-600 mb-0.5">
+                  Space
+                </p>
+                <p className="text-sm font-medium text-stone-200 truncate">
+                  {spaceLabel || '—'}
+                </p>
                 {isTemplateSession && (
                   <p className="mt-1 text-[11px] text-stone-500">
                     Session resets on refresh.
@@ -209,7 +219,6 @@ const TonightHeaderMenu = ({
             </div>
           )}
         </div>
-
       </header>
     </>
   );

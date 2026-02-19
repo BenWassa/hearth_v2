@@ -176,7 +176,6 @@ const PosterCard = ({
           </div>
         )}
       </div>
-
     </div>
   );
 };

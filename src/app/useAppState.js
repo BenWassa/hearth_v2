@@ -19,6 +19,7 @@ import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgr
 import { useVersionUpdates } from './useVersionUpdates.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
+  isAnonymousAuthUser,
   signInWithGoogle,
   signInUser,
   signOutUser,
@@ -87,9 +88,7 @@ const isShowFullyWatched = (item) => {
         seasonNumber:
           episode?.seasonNumber ?? episode?.season_number ?? season?.number,
         number:
-          episode?.number ??
-          episode?.episodeNumber ??
-          episode?.episode_number,
+          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
       }),
     ),
   );
@@ -294,7 +293,11 @@ const getMetadataGaps = (item = {}) => {
   const poster = String(item?.poster || item?.media?.poster || '').trim();
   const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
   const logo = String(
-    item?.logo || item?.logoUrl || item?.media?.logo || item?.media?.logoUrl || '',
+    item?.logo ||
+      item?.logoUrl ||
+      item?.media?.logo ||
+      item?.media?.logoUrl ||
+      '',
   ).trim();
   const runtimeMinutes = Number(
     item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
@@ -520,6 +523,13 @@ export const useAppState = () => {
 
     try {
       const unsubscribe = subscribeToAuth(auth, (u) => {
+        if (isAnonymousAuthUser(u)) {
+          // Regular app mode is Google-only; clear anonymous sessions.
+          signOutUser(auth).catch(() => {});
+          setUser(null);
+          setAuthResolved(true);
+          return;
+        }
         setUser(u);
         setAuthResolved(true);
       });
@@ -1398,7 +1408,11 @@ export const useAppState = () => {
     if (Array.isArray(refreshed.showData?.seasons)) {
       updates.seasons = refreshed.showData.seasons;
     }
-    if (recomputeShowStatus && isShow && Array.isArray(refreshed.showData?.seasons)) {
+    if (
+      recomputeShowStatus &&
+      isShow &&
+      Array.isArray(refreshed.showData?.seasons)
+    ) {
       const nextItem = {
         ...currentItem,
         ...updates,
@@ -1570,7 +1584,9 @@ export const useAppState = () => {
 
     if (Date.now() - lastRunAt < AUTO_SHOW_REFRESH_INTERVAL_MS) {
       logAutoShowRefresh(
-        `Skipped: last run at ${new Date(lastRunAt).toISOString()} (interval not reached).`,
+        `Skipped: last run at ${new Date(
+          lastRunAt,
+        ).toISOString()} (interval not reached).`,
       );
       return;
     }
@@ -1581,7 +1597,9 @@ export const useAppState = () => {
         if (item?.status !== 'watched') return false;
         return Boolean(item?.source?.provider && item?.source?.providerId);
       })
-      .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+      .sort((a, b) =>
+        String(a.title || '').localeCompare(String(b.title || '')),
+      );
 
     if (!candidates.length) {
       logAutoShowRefresh('No watched shows with provider IDs to refresh.');

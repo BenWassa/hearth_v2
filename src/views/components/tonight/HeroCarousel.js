@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { getBackdropSrc, getPosterSrc } from '../../../utils/poster.js';
 
 const getItemKey = (item, index) =>
-  item?.id || item?.mediaId || item?.providerId || `${item?.title || 'item'}-${index}`;
+  item?.id ||
+  item?.mediaId ||
+  item?.providerId ||
+  `${item?.title || 'item'}-${index}`;
 
 const HeroCarousel = ({ items = [], onOpenDetails }) => {
   const safeItems = useMemo(
@@ -100,7 +103,9 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           <div
             key={`${getItemKey(item, index)}-dot`}
             className={`h-1 rounded-full transition-all duration-300 ${
-              index === currentIndex ? 'w-4 bg-amber-500' : 'w-1.5 bg-stone-500/50'
+              index === currentIndex
+                ? 'w-4 bg-amber-500'
+                : 'w-1.5 bg-stone-500/50'
             }`}
           />
         ))}

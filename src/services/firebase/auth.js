@@ -3,6 +3,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   setPersistence,
+  signInAnonymously,
   signInWithCustomToken,
   signInWithPopup,
   signInWithRedirect,
@@ -49,6 +50,14 @@ export const signInWithGoogle = async (auth) => {
     throw err;
   }
 };
+
+export const signInAnonymousUser = async (auth) => {
+  if (!auth || !auth.app) return null;
+  if (auth.currentUser) return auth.currentUser;
+  return signInAnonymously(auth);
+};
+
+export const isAnonymousAuthUser = (user) => Boolean(user?.isAnonymous);
 
 export const subscribeToAuth = (auth, onUser) => {
   if (!auth || !auth.app || typeof onAuthStateChanged !== 'function')

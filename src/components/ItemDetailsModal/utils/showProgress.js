@@ -39,14 +39,20 @@ export const getEpisodeProgressKeys = (episode) => {
 };
 
 export const isEpisodeWatched = (episodeProgress, episode) =>
-  getEpisodeProgressKeys(episode).some((key) => Boolean(episodeProgress?.[key]));
+  getEpisodeProgressKeys(episode).some((key) =>
+    Boolean(episodeProgress?.[key]),
+  );
 
 export const getShowEntryTarget = ({ seasons, episodeProgress }) => {
   if (!Array.isArray(seasons) || seasons.length === 0) return null;
   const progress = episodeProgress || {};
   const orderedSeasons = sortSeasonsAsc(seasons);
 
-  for (let seasonIndex = 0; seasonIndex < orderedSeasons.length; seasonIndex += 1) {
+  for (
+    let seasonIndex = 0;
+    seasonIndex < orderedSeasons.length;
+    seasonIndex += 1
+  ) {
     const season = orderedSeasons[seasonIndex];
     const orderedEpisodes = sortEpisodesAsc(season.episodes || []);
     const nextUnwatched = orderedEpisodes.find(

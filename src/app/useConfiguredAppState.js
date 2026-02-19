@@ -8,14 +8,18 @@ const envMode = String(
   .trim();
 
 const isTruthyFlag = (value) => {
-  const normalized = String(value || '').toLowerCase().trim();
+  const normalized = String(value || '')
+    .toLowerCase()
+    .trim();
   return normalized === '1' || normalized === 'true' || normalized === 'yes';
 };
 
 const getQueryMode = () => {
   if (typeof window === 'undefined') return '';
   const params = new URLSearchParams(window.location.search);
-  const mode = String(params.get('mode') || '').toLowerCase().trim();
+  const mode = String(params.get('mode') || '')
+    .toLowerCase()
+    .trim();
   const demoParam = params.get('demo');
 
   if (mode === 'demo' || mode === 'template') return 'template';

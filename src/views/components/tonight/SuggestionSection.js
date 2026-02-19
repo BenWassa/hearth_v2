@@ -30,7 +30,10 @@ const SuggestionSection = ({
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    if (
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function'
+    ) {
       return undefined;
     }
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -43,7 +46,8 @@ const SuggestionSection = ({
   // For looping rails we clone the first N cards at the end.
   // When the user scrolls into the clone zone we silently jump back
   // to the equivalent real position — no visible snap, seamless loop.
-  const loopEnabled = enableRewind && !prefersReducedMotion && suggestions.length > 2;
+  const loopEnabled =
+    enableRewind && !prefersReducedMotion && suggestions.length > 2;
   const clones = loopEnabled ? suggestions.slice(0, CLONE_COUNT) : [];
 
   const updateEdgeState = () => {
@@ -69,7 +73,8 @@ const SuggestionSection = ({
 
     if (rail.scrollLeft >= realContentWidth) {
       // Cancel any pending frame so we don't double-fire
-      if (teleportFrameRef.current) cancelAnimationFrame(teleportFrameRef.current);
+      if (teleportFrameRef.current)
+        cancelAnimationFrame(teleportFrameRef.current);
       teleportFrameRef.current = requestAnimationFrame(() => {
         const overshoot = rail.scrollLeft - realContentWidth;
         // Disable scroll-snap temporarily so the instant jump doesn't animate
@@ -95,7 +100,8 @@ const SuggestionSection = ({
 
   useEffect(() => {
     return () => {
-      if (teleportFrameRef.current) cancelAnimationFrame(teleportFrameRef.current);
+      if (teleportFrameRef.current)
+        cancelAnimationFrame(teleportFrameRef.current);
     };
   }, []);
 
@@ -123,11 +129,18 @@ const SuggestionSection = ({
               className={`pb-1 overflow-x-auto overflow-y-hidden ${
                 hideScrollbar ? 'no-scrollbar' : 'custom-scrollbar'
               }`}
-              style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              style={{
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+              }}
               onScroll={handleScroll}
-              onPointerDown={() => { isPointerDownRef.current = true; }}
+              onPointerDown={() => {
+                isPointerDownRef.current = true;
+              }}
               onPointerUp={handlePointerUp}
-              onPointerCancel={() => { isPointerDownRef.current = false; }}
+              onPointerCancel={() => {
+                isPointerDownRef.current = false;
+              }}
             >
               <div className="flex gap-2.5 min-w-max">
                 {suggestions.map((item) => (
@@ -170,9 +183,7 @@ const SuggestionSection = ({
                   style={{ opacity: atStart ? 0 : 1 }}
                 />
                 {/* Right fade always visible on looping rails — there's always more content */}
-                <div
-                  className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-stone-950/90 to-transparent"
-                />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-stone-950/90 to-transparent" />
               </>
             )}
           </div>

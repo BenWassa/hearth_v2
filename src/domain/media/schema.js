@@ -67,7 +67,8 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   if (item.note) payload.note = asString(item.note);
   if (item.poster) payload.poster = asString(item.poster);
   if (item.backdrop) payload.backdrop = asString(item.backdrop);
-  if (item.logo || item.logoUrl) payload.logo = asString(item.logo || item.logoUrl);
+  if (item.logo || item.logoUrl)
+    payload.logo = asString(item.logo || item.logoUrl);
   if (item.year) payload.year = asString(item.year);
   if (item.director) payload.director = asString(item.director);
   if (Array.isArray(item.genres) && item.genres.length)
@@ -93,7 +94,9 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const mediaCast = asArray(media.cast);
   const showSeasons = asArray(showData.seasons);
 
-  const status = normalizeWatchStatus(userState.status || item.status || 'unwatched');
+  const status = normalizeWatchStatus(
+    userState.status || item.status || 'unwatched',
+  );
   const title = asString(media.title || item.title);
   const type = asString(media.type || item.type || 'movie');
   const primaryDirector = asString(item.director);

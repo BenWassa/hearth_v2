@@ -7,12 +7,34 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isAnonymousUser() {
+      return isSignedIn()
+        && request.auth.token.firebase is map
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function isTrustedUser() {
+      return isSignedIn() && !isAnonymousUser();
+    }
+
+    function isDemoSpace(spaceId) {
+      return spaceId == 'template-demo-space';
+    }
+
+    function isAnonymousDemoAccess(spaceId) {
+      return isAnonymousUser() && isDemoSpace(spaceId);
+    }
+
     function spacePath(appId, spaceId) {
       return /databases/$(database)/documents/artifacts/$(appId)/spaces/$(spaceId);
     }
 
     function isSpaceMember(appId, spaceId) {
-      return isSignedIn() && request.auth.uid in get(spacePath(appId, spaceId)).data.members;
+      return isAnonymousDemoAccess(spaceId)
+        || (
+          isTrustedUser()
+          && request.auth.uid in get(spacePath(appId, spaceId)).data.members
+        );
     }
 
     function isValidWatchlistStatus(status) {
@@ -51,9 +73,13 @@ service cloud.firestore {
 
     // Space documents
     match /artifacts/{appId}/spaces/{spaceId} {
-      allow read: if isSignedIn() && request.auth.uid in resource.data.members;
+      allow read: if isAnonymousDemoAccess(spaceId)
+        || (
+          isTrustedUser()
+          && request.auth.uid in resource.data.members
+        );
 
-      allow create: if isSignedIn()
+      allow create: if isTrustedUser()
         && request.resource.data.name is string
         && request.resource.data.nameLower is string
         && request.resource.data.ownerUid == request.auth.uid
@@ -62,7 +88,7 @@ service cloud.firestore {
         && request.resource.data.members.hasAny([request.auth.uid]);
 
       // Allow adding self to members (idempotent)
-      allow update: if isSignedIn()
+      allow update: if isTrustedUser()
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'updatedAt'])
         && request.resource.data.members is list
         && request.resource.data.members.hasAny([request.auth.uid])
@@ -82,8 +108,8 @@ service cloud.firestore {
 
     // Shared media catalog
     match /artifacts/{appId}/media_catalog/{mediaId} {
-      allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && isValidCatalogData(request.resource.data, mediaId);
+      allow read: if isTrustedUser();
+      allow create, update: if isTrustedUser() && isValidCatalogData(request.resource.data, mediaId);
       allow delete: if false;
     }
 

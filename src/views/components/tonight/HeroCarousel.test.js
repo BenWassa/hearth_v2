@@ -51,7 +51,9 @@ describe('HeroCarousel', () => {
       logo.dispatchEvent(new Event('error'));
     });
 
-    expect(mounted.container.querySelector('img[alt="Severance logo"]')).toBeNull();
+    expect(
+      mounted.container.querySelector('img[alt="Severance logo"]'),
+    ).toBeNull();
     expect(mounted.container.textContent).not.toContain('Severance');
 
     await cleanupDom(mounted);

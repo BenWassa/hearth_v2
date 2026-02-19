@@ -6,6 +6,11 @@ import {
   TEMPLATE_SPACE_NAME,
 } from './seedLibrary.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
+import { initializeFirebase } from '../services/firebase/client.js';
+import {
+  signInAnonymousUser,
+  subscribeToAuth,
+} from '../services/firebase/auth.js';
 
 const TEMPLATE_SESSION_MESSAGE = 'Template mode: all changes reset on refresh.';
 
@@ -85,7 +90,11 @@ const getMetadataGaps = (item = {}) => {
   const poster = String(item?.poster || item?.media?.poster || '').trim();
   const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
   const logo = String(
-    item?.logo || item?.logoUrl || item?.media?.logo || item?.media?.logoUrl || '',
+    item?.logo ||
+      item?.logoUrl ||
+      item?.media?.logo ||
+      item?.media?.logoUrl ||
+      '',
   ).trim();
   const runtimeMinutes = Number(
     item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
@@ -251,16 +260,16 @@ const isShowFullyWatched = (item) => {
         seasonNumber:
           episode?.seasonNumber ?? episode?.season_number ?? season?.number,
         number:
-          episode?.number ??
-          episode?.episodeNumber ??
-          episode?.episode_number,
+          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
       }),
     ),
   );
 };
 
 const setValueByPath = (target, path, value) => {
-  const segments = String(path || '').split('.').filter(Boolean);
+  const segments = String(path || '')
+    .split('.')
+    .filter(Boolean);
   if (!segments.length) return;
   let cursor = target;
   for (let index = 0; index < segments.length - 1; index += 1) {
@@ -274,7 +283,8 @@ const setValueByPath = (target, path, value) => {
 };
 
 const clearHearthStorage = () => {
-  const shouldDelete = (key) => key.startsWith('hearth') || key.startsWith('hearth:');
+  const shouldDelete = (key) =>
+    key.startsWith('hearth') || key.startsWith('hearth:');
 
   if (typeof localStorage !== 'undefined') {
     for (let index = localStorage.length - 1; index >= 0; index -= 1) {
@@ -322,20 +332,31 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
   const now = Date.now();
   const seasons = normalizeSeasons(showData.seasons || item.seasons);
   const title = asString(media.title || item.title) || 'Untitled';
-  const createdAt = item.createdAt || item.timestamp || fallbackCreatedAt || now;
+  const createdAt =
+    item.createdAt || item.timestamp || fallbackCreatedAt || now;
   const vibe = asString(userState.vibe || item.vibe) || 'comfort';
   const energy = asString(userState.energy || item.energy) || 'balanced';
   const overview = asString(media.overview || item.overview);
   const poster = asString(media.poster || media.posterUrl || item.poster);
-  const backdrop = asString(media.backdrop || media.backdropUrl || item.backdrop);
-  const logo = asString(media.logo || media.logoUrl || item.logo || item.logoUrl);
-  const runtimeMinutes = toNumericOrNull(media.runtimeMinutes ?? item.runtimeMinutes);
+  const backdrop = asString(
+    media.backdrop || media.backdropUrl || item.backdrop,
+  );
+  const logo = asString(
+    media.logo || media.logoUrl || item.logo || item.logoUrl,
+  );
+  const runtimeMinutes = toNumericOrNull(
+    media.runtimeMinutes ?? item.runtimeMinutes,
+  );
   const genres = asArray(media.genres).length
     ? asArray(media.genres)
     : asArray(item.genres);
-  const actors = asArray(media.cast).length ? asArray(media.cast) : asArray(item.actors);
+  const actors = asArray(media.cast).length
+    ? asArray(media.cast)
+    : asArray(item.actors);
   const seasonCountRaw =
-    toNumericOrNull(showData.seasonCount ?? item.totalSeasons) || seasons.length || null;
+    toNumericOrNull(showData.seasonCount ?? item.totalSeasons) ||
+    seasons.length ||
+    null;
   const seasonCount = type === 'show' ? seasonCountRaw : null;
 
   return {
@@ -390,7 +411,9 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
         : { seasonCount: null, seasons: [] },
     totalSeasons: type === 'show' ? seasonCount : null,
     seasons,
-    episodeProgress: asObject(userState.episodeProgress || item.episodeProgress),
+    episodeProgress: asObject(
+      userState.episodeProgress || item.episodeProgress,
+    ),
     createdAt,
     updatedAt: now,
     startedAt: item.startedAt || null,
@@ -416,7 +439,9 @@ const hydrateTemplateItem = async (item, state = {}) => {
     });
 
     const year = asString(details?.year || item?.year);
-    const runtimeMinutes = toNumericOrNull(details?.runtimeMinutes ?? item?.runtimeMinutes);
+    const runtimeMinutes = toNumericOrNull(
+      details?.runtimeMinutes ?? item?.runtimeMinutes,
+    );
     const genres =
       Array.isArray(details?.genres) && details.genres.length
         ? details.genres
@@ -428,7 +453,9 @@ const hydrateTemplateItem = async (item, state = {}) => {
     const overview = asString(details?.overview || item?.overview);
     const director =
       baseType === 'show'
-        ? asString(details?.creators?.[0] || details?.directors?.[0] || item?.director)
+        ? asString(
+            details?.creators?.[0] || details?.directors?.[0] || item?.director,
+          )
         : asString(details?.directors?.[0] || item?.director);
     const seasons =
       baseType === 'show'
@@ -550,6 +577,8 @@ const applyTemplateUpdates = (currentItem, updates) => {
 };
 
 export const useTemplateAppState = () => {
+  const [authResolved, setAuthResolved] = useState(false);
+  const [authUser, setAuthUser] = useState(null);
   const [items, setItems] = useState(() =>
     buildTemplateSeedItems().map((item) =>
       normalizeTemplateItem(item, item.id, item.createdAt),
@@ -573,6 +602,43 @@ export const useTemplateAppState = () => {
 
   useEffect(() => {
     clearHearthStorage();
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    let unsubscribe = () => {};
+
+    const attachAuth = async (nextAuth) => {
+      if (!isMounted) return;
+      if (!nextAuth || !nextAuth.app) {
+        setAuthResolved(true);
+        return;
+      }
+
+      unsubscribe = subscribeToAuth(nextAuth, (user) => {
+        if (!isMounted) return;
+        setAuthUser(user || null);
+        setAuthResolved(true);
+      });
+
+      try {
+        await signInAnonymousUser(nextAuth);
+      } catch (err) {
+        console.warn('Template anonymous sign-in failed:', err);
+        if (isMounted) {
+          setAuthResolved(true);
+        }
+      }
+    };
+
+    initializeFirebase(({ auth }) => {
+      attachAuth(auth);
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -601,7 +667,11 @@ export const useTemplateAppState = () => {
   };
 
   const handleAddItem = async (itemData) => {
-    const normalized = normalizeTemplateItem(itemData, createItemId(), Date.now());
+    const normalized = normalizeTemplateItem(
+      itemData,
+      createItemId(),
+      Date.now(),
+    );
 
     const duplicateExists = items.some((existing) => {
       return (
@@ -713,7 +783,8 @@ export const useTemplateAppState = () => {
           notifyError('Finish every episode to mark this show watched.');
           return item;
         }
-        const nextStatus = currentStatus === 'watched' ? 'unwatched' : 'watched';
+        const nextStatus =
+          currentStatus === 'watched' ? 'unwatched' : 'watched';
         return {
           ...item,
           status: nextStatus,
@@ -789,7 +860,8 @@ export const useTemplateAppState = () => {
       poolOfItems && poolOfItems.length > 0
         ? poolOfItems
         : items.filter(
-            (entry) => entry.status === 'unwatched' || entry.status === 'watching',
+            (entry) =>
+              entry.status === 'unwatched' || entry.status === 'watching',
           );
 
     if (pool.length === 0) return;
@@ -817,7 +889,7 @@ export const useTemplateAppState = () => {
   }, [updateMessage]);
 
   return {
-    authResolved: true,
+    authResolved,
     autoReloadCountdown: null,
     contextItems,
     decisionContext,
@@ -859,7 +931,15 @@ export const useTemplateAppState = () => {
     spaceName: TEMPLATE_SPACE_NAME,
     startDecision,
     updateMessage: resolvedUpdateMessage,
-    user: { uid: 'template-user', displayName: 'Template User' },
+    user:
+      authUser && authUser.uid
+        ? {
+            uid: authUser.uid,
+            displayName: authUser.displayName || 'Demo User',
+            email: authUser.email || '',
+            isAnonymous: Boolean(authUser.isAnonymous),
+          }
+        : { uid: 'template-user', displayName: 'Template User' },
     view,
   };
 };

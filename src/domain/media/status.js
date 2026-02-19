@@ -1,7 +1,8 @@
 const VALID_WATCH_STATUSES = new Set(['unwatched', 'watching', 'watched']);
 
 export const normalizeWatchStatus = (value, fallback = 'unwatched') => {
-  const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  const normalized =
+    typeof value === 'string' ? value.trim().toLowerCase() : '';
   if (VALID_WATCH_STATUSES.has(normalized)) return normalized;
   return fallback;
 };

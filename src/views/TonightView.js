@@ -11,7 +11,9 @@ import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
 
 const getModifiedAt = (item) =>
-  toMillis(item?.updatedAt || item?.startedAt || item?.createdAt || item?.timestamp);
+  toMillis(
+    item?.updatedAt || item?.startedAt || item?.createdAt || item?.timestamp,
+  );
 
 const isShowComplete = (item) => {
   const seasons = Array.isArray(item?.seasons) ? item.seasons : [];
@@ -27,9 +29,7 @@ const isShowComplete = (item) => {
         seasonNumber:
           episode?.seasonNumber ?? episode?.season_number ?? season?.number,
         number:
-          episode?.number ??
-          episode?.episodeNumber ??
-          episode?.episode_number,
+          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
       }),
     ),
   );
@@ -50,7 +50,10 @@ const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
 
 const SkeletonRail = ({ title, count = 6 }) => (
   <div className="space-y-1.5 shrink-0">
-    <div className="h-3 w-28 rounded bg-stone-800/90 animate-pulse" aria-label={title} />
+    <div
+      className="h-3 w-28 rounded bg-stone-800/90 animate-pulse"
+      aria-label={title}
+    />
     <div className="relative px-1">
       <div className="pb-1 overflow-x-hidden">
         <div className="flex gap-1.5 min-w-max">
@@ -101,10 +104,13 @@ const TonightView = ({
         .filter((item) => {
           if (item?.type !== 'show') return false;
           if (item?.status === 'watched') return false;
-          const watchedAny = Object.values(item?.episodeProgress || {}).some(Boolean);
+          const watchedAny = Object.values(item?.episodeProgress || {}).some(
+            Boolean,
+          );
           if (!watchedAny) return false;
           const hasSeasonData =
-            Array.isArray(item?.seasons) && item.seasons.some((season) => season?.episodes?.length);
+            Array.isArray(item?.seasons) &&
+            item.seasons.some((season) => season?.episodes?.length);
           if (hasSeasonData) return !isShowComplete(item);
           return item?.status === 'watching';
         })
@@ -254,7 +260,9 @@ const TonightView = ({
                       <div
                         key={`hero-dot-skeleton-${index}`}
                         className={`h-1 rounded-full ${
-                          index === 0 ? 'w-4 bg-stone-600' : 'w-1.5 bg-stone-700'
+                          index === 0
+                            ? 'w-4 bg-stone-600'
+                            : 'w-1.5 bg-stone-700'
                         }`}
                       />
                     ))}

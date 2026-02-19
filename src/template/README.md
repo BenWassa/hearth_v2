@@ -6,6 +6,7 @@ This folder contains the standalone-friendly demo mode for Hearth.
 
 - Seeds a starter library of 30 titles (`seedLibrary.js`)
 - Runs entirely in local in-memory state (`useTemplateAppState.js`)
+- Authenticates demo visitors with Firebase anonymous auth when available
 - Hydrates seed titles with API metadata (poster, backdrop, logo, overview, cast, runtime, and seasons)
 - Uses existing app placeholders when metadata is still loading or unavailable
 - Resets to seed data on page refresh

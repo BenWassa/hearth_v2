@@ -15,7 +15,11 @@ const toEpisodeSlotKey = (seasonNumber, episodeNumber) => {
 
 const toEpisodeIdentityKey = (episode) => {
   const raw =
-    episode?.id ?? episode?.episodeId ?? episode?.tmdb_id ?? episode?.tmdbId ?? null;
+    episode?.id ??
+    episode?.episodeId ??
+    episode?.tmdb_id ??
+    episode?.tmdbId ??
+    null;
   return raw ? `id:${raw}` : null;
 };
 
@@ -84,4 +88,3 @@ export const getShowWatchProgressPercent = (item) => {
   const watchedCount = Object.values(progressObj).filter(Boolean).length;
   return watchedCount > 0 ? 5 : 0;
 };
-

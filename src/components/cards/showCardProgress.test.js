@@ -59,4 +59,3 @@ describe('getShowWatchProgressPercent', () => {
     expect(progress).toBe(5);
   });
 });
-

@@ -59,9 +59,18 @@ describe('SuggestionSection rewind', () => {
 
     const rail = mounted.container.querySelector('.overflow-x-auto');
     rail.scrollTo = jest.fn();
-    Object.defineProperty(rail, 'scrollWidth', { value: 600, configurable: true });
-    Object.defineProperty(rail, 'clientWidth', { value: 300, configurable: true });
-    Object.defineProperty(rail, 'scrollLeft', { value: 280, configurable: true });
+    Object.defineProperty(rail, 'scrollWidth', {
+      value: 600,
+      configurable: true,
+    });
+    Object.defineProperty(rail, 'clientWidth', {
+      value: 300,
+      configurable: true,
+    });
+    Object.defineProperty(rail, 'scrollLeft', {
+      value: 280,
+      configurable: true,
+    });
 
     await act(async () => {
       rail.dispatchEvent(new Event('scroll', { bubbles: true }));

@@ -139,8 +139,20 @@ const MOVIE_SEEDS = [
 ];
 
 const SHOW_SEEDS = [
-  { title: 'Ted Lasso', providerId: '97546', year: '2020', vibe: 'comfort', energy: 'light' },
-  { title: 'Gilmore Girls', providerId: '4586', year: '2000', vibe: 'comfort', energy: 'balanced' },
+  {
+    title: 'Ted Lasso',
+    providerId: '97546',
+    year: '2020',
+    vibe: 'comfort',
+    energy: 'light',
+  },
+  {
+    title: 'Gilmore Girls',
+    providerId: '4586',
+    year: '2000',
+    vibe: 'comfort',
+    energy: 'balanced',
+  },
   {
     title: 'Friday Night Lights',
     providerId: '4278',
@@ -183,7 +195,13 @@ const SHOW_SEEDS = [
     vibe: 'gripping',
     energy: 'balanced',
   },
-  { title: 'Severance', providerId: '95396', year: '2022', vibe: 'gripping', energy: 'focused' },
+  {
+    title: 'Severance',
+    providerId: '95396',
+    year: '2022',
+    vibe: 'gripping',
+    energy: 'focused',
+  },
   {
     title: 'Planet Earth II',
     providerId: '68595',
@@ -191,9 +209,27 @@ const SHOW_SEEDS = [
     vibe: 'visual',
     energy: 'light',
   },
-  { title: 'The Crown', providerId: '65494', year: '2016', vibe: 'visual', energy: 'balanced' },
-  { title: 'Arcane', providerId: '94605', year: '2021', vibe: 'visual', energy: 'focused' },
-  { title: 'I Love Lucy', providerId: '2730', year: '1951', vibe: 'classic', energy: 'light' },
+  {
+    title: 'The Crown',
+    providerId: '65494',
+    year: '2016',
+    vibe: 'visual',
+    energy: 'balanced',
+  },
+  {
+    title: 'Arcane',
+    providerId: '94605',
+    year: '2021',
+    vibe: 'visual',
+    energy: 'focused',
+  },
+  {
+    title: 'I Love Lucy',
+    providerId: '2730',
+    year: '1951',
+    vibe: 'classic',
+    energy: 'light',
+  },
   {
     title: 'The Twilight Zone',
     providerId: '6357',
@@ -201,7 +237,13 @@ const SHOW_SEEDS = [
     vibe: 'classic',
     energy: 'balanced',
   },
-  { title: 'The Wire', providerId: '1438', year: '2002', vibe: 'classic', energy: 'focused' },
+  {
+    title: 'The Wire',
+    providerId: '1438',
+    year: '2002',
+    vibe: 'classic',
+    energy: 'focused',
+  },
 ];
 
 const TEMPLATE_BASE_TIME = Date.UTC(2025, 0, 1, 20, 0, 0);
@@ -267,15 +309,14 @@ const createTemplateItem = (seed, index, type) => {
     totalSeasons: isShow ? 1 : null,
     seasons,
     episodeProgress: {},
-    source:
-      seed.providerId
-        ? {
-            provider: 'tmdb',
-            providerId: String(seed.providerId),
-            fetchedAt: createdAt,
-            locale: 'en-US',
-          }
-        : {},
+    source: seed.providerId
+      ? {
+          provider: 'tmdb',
+          providerId: String(seed.providerId),
+          fetchedAt: createdAt,
+          locale: 'en-US',
+        }
+      : {},
   };
 };
 

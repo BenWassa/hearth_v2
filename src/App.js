@@ -1,7 +1,10 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { ENERGIES, VIBES } from './config/constants.js';
-import { isTemplateMode, useConfiguredAppState } from './app/useConfiguredAppState.js';
+import {
+  isTemplateMode,
+  useConfiguredAppState,
+} from './app/useConfiguredAppState.js';
 import OnboardingView from './views/OnboardingView.js';
 import TonightView from './views/TonightView.js';
 import ShelfView from './views/ShelfView.js';

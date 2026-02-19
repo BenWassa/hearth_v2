@@ -377,7 +377,10 @@ const ItemDetailsModal = ({
       setExpandedEpisodeId(showEntryTarget?.episodeId ?? null);
       return;
     }
-    if (activeSeasonNum && seasons.some((season) => season.number === activeSeasonNum))
+    if (
+      activeSeasonNum &&
+      seasons.some((season) => season.number === activeSeasonNum)
+    )
       return;
     setActiveSeasonNum(showEntryTarget?.seasonNumber ?? seasons[0].number);
   }, [
@@ -432,8 +435,8 @@ const ItemDetailsModal = ({
         ? season.episodeCount
         : 0;
       const watched = season.episodes.length
-        ? season.episodes.filter(
-            (episode) => isEpisodeWatched(localEpisodeProgress, episode),
+        ? season.episodes.filter((episode) =>
+            isEpisodeWatched(localEpisodeProgress, episode),
           ).length
         : 0;
       const progress = total === 0 ? 0 : Math.round((watched / total) * 100);
@@ -511,7 +514,8 @@ const ItemDetailsModal = ({
     const runScroll = () => {
       const candidates = scrollContainer.querySelectorAll('[data-episode-id]');
       const target = Array.from(candidates).find(
-        (element) => element.getAttribute('data-episode-id') === targetEpisodeId,
+        (element) =>
+          element.getAttribute('data-episode-id') === targetEpisodeId,
       );
       if (!target) return;
       target.scrollIntoView({
@@ -594,7 +598,9 @@ const ItemDetailsModal = ({
       }
       const currentEpisodeIndex =
         activeSeason?.episodes?.findIndex((episode) =>
-          getEpisodeProgressKeys(episode).some((key) => episodeKeys.includes(key)),
+          getEpisodeProgressKeys(episode).some((key) =>
+            episodeKeys.includes(key),
+          ),
         ) ?? -1;
       const nextUnwatchedEpisode =
         currentEpisodeIndex === -1
@@ -605,7 +611,9 @@ const ItemDetailsModal = ({
             ) ?? null;
       const isSeasonComplete = Boolean(
         activeSeason?.episodes?.length &&
-          activeSeason.episodes.every((episode) => isEpisodeWatched(next, episode)),
+          activeSeason.episodes.every((episode) =>
+            isEpisodeWatched(next, episode),
+          ),
       );
       const showComplete = isShowComplete(next);
       const watchedAny = Object.values(next).some(Boolean);

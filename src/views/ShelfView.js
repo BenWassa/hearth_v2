@@ -507,57 +507,59 @@ const ShelfView = ({
               </div>
             ) : (
               <>
-                {Object.entries(memoriesByGroup).map(([groupId, groupItems]) => {
-                  if (groupItems.length === 0) return null;
+                {Object.entries(memoriesByGroup).map(
+                  ([groupId, groupItems]) => {
+                    if (groupItems.length === 0) return null;
 
-                  let header = null;
-                  let HeaderIcon = null;
+                    let header = null;
+                    let HeaderIcon = null;
 
-                  if (sortBy === 'alphabetical') {
-                    header = 'All Items';
-                  } else if (sortBy === 'energy') {
-                    const energyDef = ENERGIES.find((e) => e.id === groupId);
-                    if (energyDef) {
-                      header = energyDef.label;
-                      HeaderIcon = energyDef.icon;
+                    if (sortBy === 'alphabetical') {
+                      header = 'All Items';
+                    } else if (sortBy === 'energy') {
+                      const energyDef = ENERGIES.find((e) => e.id === groupId);
+                      if (energyDef) {
+                        header = energyDef.label;
+                        HeaderIcon = energyDef.icon;
+                      }
+                    } else {
+                      const vibeDef = VIBES.find((v) => v.id === groupId);
+                      if (vibeDef) {
+                        header = vibeDef.label;
+                        HeaderIcon = vibeDef.icon;
+                      }
                     }
-                  } else {
-                    const vibeDef = VIBES.find((v) => v.id === groupId);
-                    if (vibeDef) {
-                      header = vibeDef.label;
-                      HeaderIcon = vibeDef.icon;
-                    }
-                  }
 
-                  return (
-                    <div key={groupId} className={sectionGapClassName}>
-                      <div className="flex items-center gap-1.5 pl-0.5 pt-1">
-                        {HeaderIcon && (
-                          <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
-                        )}
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
-                          {header}
-                        </h3>
+                    return (
+                      <div key={groupId} className={sectionGapClassName}>
+                        <div className="flex items-center gap-1.5 pl-0.5 pt-1">
+                          {HeaderIcon && (
+                            <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
+                          )}
+                          <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
+                            {header}
+                          </h3>
+                        </div>
+                        <div className={cardGridClassName}>
+                          {groupItems.map((item) => (
+                            <PosterCard
+                              key={item.id}
+                              item={item}
+                              onToggle={() =>
+                                onToggleStatus(item.id, item.status)
+                              }
+                              onDelete={null}
+                              selectionMode={false}
+                              isSelected={false}
+                              onSelect={null}
+                              onOpenDetails={openDetails}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      <div className={cardGridClassName}>
-                        {groupItems.map((item) => (
-                          <PosterCard
-                            key={item.id}
-                            item={item}
-                            onToggle={() =>
-                              onToggleStatus(item.id, item.status)
-                            }
-                            onDelete={null}
-                            selectionMode={false}
-                            isSelected={false}
-                            onSelect={null}
-                            onOpenDetails={openDetails}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </>
             )}
           </div>

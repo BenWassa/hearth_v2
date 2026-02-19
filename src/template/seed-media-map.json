@@ -12,11 +12,7 @@
       "type": "movie",
       "runtimeMinutes": 104,
       "overview": "Paddington, now happily settled with the Browns, picks up a series of odd jobs to buy the perfect present for his Aunt Lucy, but it is stolen.",
-      "genres": [
-        "Adventure",
-        "Comedy",
-        "Family"
-      ],
+      "genres": ["Adventure", "Comedy", "Family"],
       "actors": [
         "Ben Whishaw",
         "Sally Hawkins",
@@ -52,11 +48,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/1OJ9vkD5xPt3skC6KguyXAgagRZ.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/kRVUMsXFzhuXjr20JcCGc6TapxA.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/zH0U0qCB8fOq3UEvbOJKgI3sFGK.png",
-        "genres": [
-          "Adventure",
-          "Comedy",
-          "Family"
-        ],
+        "genres": ["Adventure", "Comedy", "Family"],
         "cast": [
           "Ben Whishaw",
           "Sally Hawkins",
@@ -72,14 +64,9 @@
           "Ben Miller"
         ],
         "creators": [],
-        "directors": [
-          "Paul King"
-        ],
+        "directors": ["Paul King"],
         "language": "en",
-        "country": [
-          "France",
-          "United Kingdom"
-        ],
+        "country": ["France", "United Kingdom"],
         "rating": 7.47,
         "providerUpdatedAt": "2026-02-19T00:59:53.268Z"
       },
@@ -97,9 +84,7 @@
       "type": "movie",
       "runtimeMinutes": 121,
       "overview": "70-year-old widower Ben Whittaker has discovered that retirement isn't all it's cracked up to be. Seizing an opportunity to get back in the game, he becomes a senior intern at an online fashion site, founded and run by Jules Ostin.",
-      "genres": [
-        "Comedy"
-      ],
+      "genres": ["Comedy"],
       "actors": [
         "Robert De Niro",
         "Anne Hathaway",
@@ -135,9 +120,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/bTQ46fupPbjBfFBHuzfD3hxxL0Q.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/rFY9V4Dhq7lbIu6LlpzbL9u2K2E.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/iwUQ7dO1vWYcfn2onLbF0JqoXsW.png",
-        "genres": [
-          "Comedy"
-        ],
+        "genres": ["Comedy"],
         "cast": [
           "Robert De Niro",
           "Anne Hathaway",
@@ -153,13 +136,9 @@
           "Linda Lavin"
         ],
         "creators": [],
-        "directors": [
-          "Nancy Meyers"
-        ],
+        "directors": ["Nancy Meyers"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.227,
         "providerUpdatedAt": "2026-02-19T00:59:53.510Z"
       },
@@ -177,11 +156,7 @@
       "type": "movie",
       "runtimeMinutes": 141,
       "overview": "During a manned mission to Mars, Astronaut Mark Watney is presumed dead after a fierce storm and left behind by his crew. But Watney has survived and finds himself stranded and alone on the hostile planet. With only meager supplies, he must draw upon his ingenuity, wit and spirit to subsist and find a way to signal to Earth that he is alive.",
-      "genres": [
-        "Drama",
-        "Adventure",
-        "Science Fiction"
-      ],
+      "genres": ["Drama", "Adventure", "Science Fiction"],
       "actors": [
         "Matt Damon",
         "Jessica Chastain",
@@ -217,11 +192,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/3ndAx3weG6KDkJIRMCi5vXX6Dyb.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/sq8oUjbBvKkqv9h0Ns5rQbbquhZ.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/7v2v9WdCPZCHWrWZwsIvooZty7k.png",
-        "genres": [
-          "Drama",
-          "Adventure",
-          "Science Fiction"
-        ],
+        "genres": ["Drama", "Adventure", "Science Fiction"],
         "cast": [
           "Matt Damon",
           "Jessica Chastain",
@@ -237,13 +208,9 @@
           "Mackenzie Davis"
         ],
         "creators": [],
-        "directors": [
-          "Ridley Scott"
-        ],
+        "directors": ["Ridley Scott"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.691,
         "providerUpdatedAt": "2026-02-19T00:59:53.749Z"
       },
@@ -261,9 +228,7 @@
       "type": "movie",
       "runtimeMinutes": 96,
       "overview": "Fashionable sorority queen Elle Woods has it all, but, she wants nothing more than to be Mrs. Warner Huntington III. But he dumps her before heading to Harvard Law School. Elle rallies all of her resources and gets into Harvard, determined to win him back. While there, she figures out that there is more to herself than just good looks.",
-      "genres": [
-        "Comedy"
-      ],
+      "genres": ["Comedy"],
       "actors": [
         "Reese Witherspoon",
         "Luke Wilson",
@@ -299,9 +264,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/9ohlMrJHQqKhfUKh7Zr3JQqHNLZ.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/viU23X3BIycUFf6TOlm9c7TxLgM.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/lInBEH0FwPhdJGumYd12Ve4jqNV.png",
-        "genres": [
-          "Comedy"
-        ],
+        "genres": ["Comedy"],
         "cast": [
           "Reese Witherspoon",
           "Luke Wilson",
@@ -317,13 +280,9 @@
           "Linda Cardellini"
         ],
         "creators": [],
-        "directors": [
-          "Robert Luketic"
-        ],
+        "directors": ["Robert Luketic"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 6.807,
         "providerUpdatedAt": "2026-02-19T00:59:53.988Z"
       },
@@ -341,11 +300,7 @@
       "type": "movie",
       "runtimeMinutes": 110,
       "overview": "Fired from his band and hard up for cash, guitarist and vocalist Dewey Finn finagles his way into a job as a fifth-grade substitute teacher at a private school, where he secretly begins teaching his students the finer points of rock 'n' roll. The school's hard-nosed principal is rightly suspicious of Finn's activities. But Finn's roommate remains in the dark about what he's doing.",
-      "genres": [
-        "Comedy",
-        "Music",
-        "Family"
-      ],
+      "genres": ["Comedy", "Music", "Family"],
       "actors": [
         "Jack Black",
         "Joan Cusack",
@@ -381,11 +336,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/zXLXaepIBvFVLU25DH3wv4IPSbe.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/k5MTAtE9CCi5TWA84qaFMYv3ajB.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/AgpFwwR4kx5UFj6JHZICz2Jor2y.png",
-        "genres": [
-          "Comedy",
-          "Music",
-          "Family"
-        ],
+        "genres": ["Comedy", "Music", "Family"],
         "cast": [
           "Jack Black",
           "Joan Cusack",
@@ -401,13 +352,9 @@
           "Caitlin Hale"
         ],
         "creators": [],
-        "directors": [
-          "Richard Linklater"
-        ],
+        "directors": ["Richard Linklater"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.082,
         "providerUpdatedAt": "2026-02-19T00:59:54.228Z"
       },
@@ -425,11 +372,7 @@
       "type": "movie",
       "runtimeMinutes": 131,
       "overview": "When renowned crime novelist Harlan Thrombey is found dead at his estate just after his 85th birthday, the inquisitive and debonair Detective Benoit Blanc is mysteriously enlisted to investigate. From Harlan's dysfunctional family to his devoted staff, Blanc sifts through a web of red herrings and self-serving lies to uncover the truth behind Harlan's untimely death.",
-      "genres": [
-        "Comedy",
-        "Crime",
-        "Mystery"
-      ],
+      "genres": ["Comedy", "Crime", "Mystery"],
       "actors": [
         "Daniel Craig",
         "Chris Evans",
@@ -465,11 +408,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/pThyQovXQrw2m0s9x82twj48Jq4.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/4HWAQu28e2yaWrtupFPGFkdNU7V.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/aYKRKkxwkHTP3sGHp8E5tnNHhvy.png",
-        "genres": [
-          "Comedy",
-          "Crime",
-          "Mystery"
-        ],
+        "genres": ["Comedy", "Crime", "Mystery"],
         "cast": [
           "Daniel Craig",
           "Chris Evans",
@@ -485,13 +424,9 @@
           "Riki Lindhome"
         ],
         "creators": [],
-        "directors": [
-          "Rian Johnson"
-        ],
+        "directors": ["Rian Johnson"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.842,
         "providerUpdatedAt": "2026-02-19T00:59:54.468Z"
       },
@@ -509,10 +444,7 @@
       "type": "movie",
       "runtimeMinutes": 116,
       "overview": "Less than 24 hours into his parole, charismatic thief Danny Ocean is already rolling out his next plan: In one night, Danny's hand-picked crew of specialists will attempt to steal more than $150 million from three Las Vegas casinos. But to score the cash, Danny risks his chances of reconciling with ex-wife, Tess.",
-      "genres": [
-        "Thriller",
-        "Crime"
-      ],
+      "genres": ["Thriller", "Crime"],
       "actors": [
         "George Clooney",
         "Brad Pitt",
@@ -548,10 +480,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/hQQCdZrsHtZyR6NbKH2YyCqd2fR.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/ncoqdHs1poUaBqyKic9YI8ai7MP.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/p8OAQOQWdTjuGsBJCleal3n6Bfk.png",
-        "genres": [
-          "Thriller",
-          "Crime"
-        ],
+        "genres": ["Thriller", "Crime"],
         "cast": [
           "George Clooney",
           "Brad Pitt",
@@ -567,13 +496,9 @@
           "Carl Reiner"
         ],
         "creators": [],
-        "directors": [
-          "Steven Soderbergh"
-        ],
+        "directors": ["Steven Soderbergh"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.455,
         "providerUpdatedAt": "2026-02-19T00:59:54.715Z"
       },
@@ -591,11 +516,7 @@
       "type": "movie",
       "runtimeMinutes": 149,
       "overview": "With his wife's disappearance having become the focus of an intense media circus, a man sees the spotlight turned on him when it's suspected that he may not be innocent.",
-      "genres": [
-        "Mystery",
-        "Thriller",
-        "Drama"
-      ],
+      "genres": ["Mystery", "Thriller", "Drama"],
       "actors": [
         "Ben Affleck",
         "Rosamund Pike",
@@ -631,11 +552,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/ts996lKsxvjkO2yiYG0ht4qAicO.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/iWak7wT0j6ycCc8lKr4NBz9c7n5.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/9XppjJk4i9tk8q4NWIPcs4pVm0w.png",
-        "genres": [
-          "Mystery",
-          "Thriller",
-          "Drama"
-        ],
+        "genres": ["Mystery", "Thriller", "Drama"],
         "cast": [
           "Ben Affleck",
           "Rosamund Pike",
@@ -651,13 +568,9 @@
           "Casey Wilson"
         ],
         "creators": [],
-        "directors": [
-          "David Fincher"
-        ],
+        "directors": ["David Fincher"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.889,
         "providerUpdatedAt": "2026-02-19T00:59:54.956Z"
       },
@@ -675,11 +588,7 @@
       "type": "movie",
       "runtimeMinutes": 152,
       "overview": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
-      "genres": [
-        "Action",
-        "Crime",
-        "Thriller"
-      ],
+      "genres": ["Action", "Crime", "Thriller"],
       "actors": [
         "Christian Bale",
         "Heath Ledger",
@@ -715,11 +624,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/dqK9Hag1054tghRQSqLSfrkvQnA.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/nO5Uix3Qr4WjOyU1BMPv0okyNWm.png",
-        "genres": [
-          "Action",
-          "Crime",
-          "Thriller"
-        ],
+        "genres": ["Action", "Crime", "Thriller"],
         "cast": [
           "Christian Bale",
           "Heath Ledger",
@@ -735,14 +640,9 @@
           "Nestor Carbonell"
         ],
         "creators": [],
-        "directors": [
-          "Christopher Nolan"
-        ],
+        "directors": ["Christopher Nolan"],
         "language": "en",
-        "country": [
-          "United Kingdom",
-          "United States of America"
-        ],
+        "country": ["United Kingdom", "United States of America"],
         "rating": 8.526,
         "providerUpdatedAt": "2026-02-19T00:59:55.216Z"
       },
@@ -760,12 +660,7 @@
       "type": "movie",
       "runtimeMinutes": 117,
       "overview": "Struggling to find his place in the world while juggling school and family, Brooklyn teenager Miles Morales is unexpectedly bitten by a radioactive spider and develops unfathomable powers just like the one and only Spider-Man. While wrestling with the implications of his new abilities, Miles discovers a super collider created by the madman Wilson \"Kingpin\" Fisk, causing others from across the Spider-Verse to be inadvertently transported to his dimension.",
-      "genres": [
-        "Animation",
-        "Action",
-        "Adventure",
-        "Science Fiction"
-      ],
+      "genres": ["Animation", "Action", "Adventure", "Science Fiction"],
       "actors": [
         "Shameik Moore",
         "Jake Johnson",
@@ -801,12 +696,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/8mnXR9rey5uQ08rZAvzojKWbDQS.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/xrM5rEtoW0Hd0QXmy5b4WBGZuHd.png",
-        "genres": [
-          "Animation",
-          "Action",
-          "Adventure",
-          "Science Fiction"
-        ],
+        "genres": ["Animation", "Action", "Adventure", "Science Fiction"],
         "cast": [
           "Shameik Moore",
           "Jake Johnson",
@@ -822,15 +712,9 @@
           "Kathryn Hahn"
         ],
         "creators": [],
-        "directors": [
-          "Bob Persichetti",
-          "Peter Ramsey",
-          "Rodney Rothman"
-        ],
+        "directors": ["Bob Persichetti", "Peter Ramsey", "Rodney Rothman"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 8.393,
         "providerUpdatedAt": "2026-02-19T00:59:55.455Z"
       },
@@ -848,10 +732,7 @@
       "type": "movie",
       "runtimeMinutes": 100,
       "overview": "The Grand Budapest Hotel tells of a legendary concierge at a famous European hotel between the wars and his friendship with a young employee who becomes his trusted protégé. The story involves the theft and recovery of a priceless Renaissance painting, the battle for an enormous family fortune and the slow and then sudden upheavals that transformed Europe during the first half of the 20th century.",
-      "genres": [
-        "Comedy",
-        "Drama"
-      ],
+      "genres": ["Comedy", "Drama"],
       "actors": [
         "Ralph Fiennes",
         "F. Murray Abraham",
@@ -887,10 +768,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/9udCLTxTFl28RxnK8Q05E154ZGa.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/9vBhDzMH8u43ekW2x45cAn2HNlZ.png",
-        "genres": [
-          "Comedy",
-          "Drama"
-        ],
+        "genres": ["Comedy", "Drama"],
         "cast": [
           "Ralph Fiennes",
           "F. Murray Abraham",
@@ -906,14 +784,9 @@
           "Jason Schwartzman"
         ],
         "creators": [],
-        "directors": [
-          "Wes Anderson"
-        ],
+        "directors": ["Wes Anderson"],
         "language": "en",
-        "country": [
-          "United States of America",
-          "Germany"
-        ],
+        "country": ["United States of America", "Germany"],
         "rating": 8.032,
         "providerUpdatedAt": "2026-02-19T00:59:55.736Z"
       },
@@ -931,10 +804,7 @@
       "type": "movie",
       "runtimeMinutes": 164,
       "overview": "Thirty years after the events of the first film, a new blade runner, LAPD Officer K, unearths a long-buried secret that has the potential to plunge what's left of society into chaos. K's discovery leads him on a quest to find Rick Deckard, a former LAPD blade runner who has been missing for 30 years.",
-      "genres": [
-        "Science Fiction",
-        "Drama"
-      ],
+      "genres": ["Science Fiction", "Drama"],
       "actors": [
         "Ryan Gosling",
         "Harrison Ford",
@@ -970,10 +840,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/ilRyazdMJwN05exqhwK4tMKBYZs.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/gUoDt6GggEFXVzdyDTyF8ggrEm8.png",
-        "genres": [
-          "Science Fiction",
-          "Drama"
-        ],
+        "genres": ["Science Fiction", "Drama"],
         "cast": [
           "Ryan Gosling",
           "Harrison Ford",
@@ -989,15 +856,9 @@
           "David Dastmalchian"
         ],
         "creators": [],
-        "directors": [
-          "Denis Villeneuve"
-        ],
+        "directors": ["Denis Villeneuve"],
         "language": "en",
-        "country": [
-          "Canada",
-          "United Kingdom",
-          "United States of America"
-        ],
+        "country": ["Canada", "United Kingdom", "United States of America"],
         "rating": 7.589,
         "providerUpdatedAt": "2026-02-19T00:59:55.978Z"
       },
@@ -1015,11 +876,7 @@
       "type": "movie",
       "runtimeMinutes": 119,
       "overview": "Overwhelmed by her suffocating schedule, touring European princess Ann takes off for a night while in Rome. When a sedative she took from her doctor kicks in, however, she falls asleep on a park bench and is found by an American reporter, Joe Bradley, who takes her back to his apartment for safety. At work the next morning, Joe finds out Ann's regal identity and bets his editor he can get exclusive interview with her, but romance soon gets in the way.",
-      "genres": [
-        "Romance",
-        "Comedy",
-        "Drama"
-      ],
+      "genres": ["Romance", "Comedy", "Drama"],
       "actors": [
         "Audrey Hepburn",
         "Gregory Peck",
@@ -1055,11 +912,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/8lI9dmz1RH20FAqltkGelY1v4BE.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/n0MyuZW9WJBGCYhzhfCI3d4zlRo.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/1n1rsqarosw1uo1EWhhEVpH4pYi.png",
-        "genres": [
-          "Romance",
-          "Comedy",
-          "Drama"
-        ],
+        "genres": ["Romance", "Comedy", "Drama"],
         "cast": [
           "Audrey Hepburn",
           "Gregory Peck",
@@ -1075,13 +928,9 @@
           "Laura Solari"
         ],
         "creators": [],
-        "directors": [
-          "William Wyler"
-        ],
+        "directors": ["William Wyler"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 7.9,
         "providerUpdatedAt": "2026-02-19T00:59:56.262Z"
       },
@@ -1099,10 +948,7 @@
       "type": "movie",
       "runtimeMinutes": 98,
       "overview": "In Casablanca, Morocco in December 1941, a cynical American expatriate meets a former lover, with unforeseen complications.",
-      "genres": [
-        "Drama",
-        "Romance"
-      ],
+      "genres": ["Drama", "Romance"],
       "actors": [
         "Humphrey Bogart",
         "Ingrid Bergman",
@@ -1138,10 +984,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/87wqeMeUeMRLjsE1IWNKJcPlpuC.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/jQwYsh4DyPZEb5xJmEpnMeVOKMk.png",
-        "genres": [
-          "Drama",
-          "Romance"
-        ],
+        "genres": ["Drama", "Romance"],
         "cast": [
           "Humphrey Bogart",
           "Ingrid Bergman",
@@ -1157,13 +1000,9 @@
           "John Qualen"
         ],
         "creators": [],
-        "directors": [
-          "Michael Curtiz"
-        ],
+        "directors": ["Michael Curtiz"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 8.144,
         "providerUpdatedAt": "2026-02-19T00:59:56.499Z"
       },
@@ -1181,10 +1020,7 @@
       "type": "movie",
       "runtimeMinutes": 175,
       "overview": "Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family. When organized crime family patriarch, Vito Corleone barely survives an attempt on his life, his youngest son, Michael steps in to take care of the would-be killers, launching a campaign of bloody revenge.",
-      "genres": [
-        "Drama",
-        "Crime"
-      ],
+      "genres": ["Drama", "Crime"],
       "actors": [
         "Marlon Brando",
         "Al Pacino",
@@ -1220,10 +1056,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/tSPT36ZKlP2WVHJLM4cQPLSzv3b.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/kysDTCloxUPJ1BILI4f8gs74fcr.png",
-        "genres": [
-          "Drama",
-          "Crime"
-        ],
+        "genres": ["Drama", "Crime"],
         "cast": [
           "Marlon Brando",
           "Al Pacino",
@@ -1239,13 +1072,9 @@
           "Al Lettieri"
         ],
         "creators": [],
-        "directors": [
-          "Francis Ford Coppola"
-        ],
+        "directors": ["Francis Ford Coppola"],
         "language": "en",
-        "country": [
-          "United States of America"
-        ],
+        "country": ["United States of America"],
         "rating": 8.7,
         "providerUpdatedAt": "2026-02-19T00:59:56.789Z"
       },
@@ -1263,10 +1092,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "Ted Lasso, an American football coach, moves to England when he's hired to manage a soccer team—despite having no experience. With cynical players and a doubtful town, will he get them to see the Ted Lasso Way?",
-      "genres": [
-        "Drama",
-        "Comedy"
-      ],
+      "genres": ["Drama", "Comedy"],
       "actors": [
         "Jason Sudeikis",
         "Hannah Waddingham",
@@ -1302,10 +1128,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/5fhZdwP1DVJ0FyVH6vrFdHwpXIn.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/wImNeqxKsqmJ5OBw8j3I37GNFN3.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/iNudegFbTBAGBB529k7wGVivqE4.png",
-        "genres": [
-          "Drama",
-          "Comedy"
-        ],
+        "genres": ["Drama", "Comedy"],
         "cast": [
           "Jason Sudeikis",
           "Hannah Waddingham",
@@ -1328,9 +1151,7 @@
         ],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.347,
         "providerUpdatedAt": "2026-02-19T01:01:32.917Z"
       },
@@ -2294,10 +2115,7 @@
       "type": "show",
       "runtimeMinutes": 44,
       "overview": "Set in the charming town of Stars Hollow, Connecticut, the series follows the captivating lives of Lorelai and Rory Gilmore, a mother/daughter pair who have a relationship most people only dream of.",
-      "genres": [
-        "Comedy",
-        "Drama"
-      ],
+      "genres": ["Comedy", "Drama"],
       "actors": [
         "Lauren Graham",
         "Alexis Bledel",
@@ -2332,10 +2150,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/gwtzCwU2wdLLf8oejQu2TINiWfQ.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/8U2ndZrneigI2zkvGuTJtt1ZsxK.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/knLz8N6ADgqfRyfgFTFJIEYG3jM.png",
-        "genres": [
-          "Comedy",
-          "Drama"
-        ],
+        "genres": ["Comedy", "Drama"],
         "cast": [
           "Lauren Graham",
           "Alexis Bledel",
@@ -2349,14 +2164,10 @@
           "Kelly Bishop",
           "Edward Herrmann"
         ],
-        "creators": [
-          "Amy Sherman-Palladino"
-        ],
+        "creators": ["Amy Sherman-Palladino"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 7.9,
         "providerUpdatedAt": "2026-02-19T00:59:57.980Z"
       },
@@ -6494,9 +6305,7 @@
       "type": "show",
       "runtimeMinutes": 43,
       "overview": "The trials and triumphs of life in the small town of Dillon, Texas, where high school football is everything.",
-      "genres": [
-        "Drama"
-      ],
+      "genres": ["Drama"],
       "actors": [
         "Kyle Chandler",
         "Connie Britton",
@@ -6528,9 +6337,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/Eu7MzZY1DldJ683z7vLkILHNRD.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/dzHSMD1IY6RriYxkS3T2ysFdvdp.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/ry5LK0Sv37QlDA1dKynf9I1ccnH.png",
-        "genres": [
-          "Drama"
-        ],
+        "genres": ["Drama"],
         "cast": [
           "Kyle Chandler",
           "Connie Britton",
@@ -6541,15 +6348,10 @@
           "Grey Damon",
           "Matt Lauria"
         ],
-        "creators": [
-          "Brian Grazer",
-          "Peter Berg"
-        ],
+        "creators": ["Brian Grazer", "Peter Berg"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8,
         "providerUpdatedAt": "2026-02-19T00:59:59.603Z"
       },
@@ -8645,9 +8447,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "In this workplace comedy, a group of dedicated, passionate teachers — and a slightly tone-deaf principal — are brought together in a Philadelphia public school where, despite the odds stacked against them, they are determined to help their students succeed in life. Though these incredible public servants may be outnumbered and underfunded, they love what they do — even if they don’t love the school district’s less-than-stellar attitude toward educating children.",
-      "genres": [
-        "Comedy"
-      ],
+      "genres": ["Comedy"],
       "actors": [
         "Quinta Brunson",
         "Tyler James Williams",
@@ -8678,9 +8478,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/nBe1e3JJEZ6veGrVXNF0fRoLu56.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/asDINJT3b7tEa76uWI1rZ5TWdJF.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/saH7wQ5K6oCzgCdGUgeXJlETYvo.png",
-        "genres": [
-          "Comedy"
-        ],
+        "genres": ["Comedy"],
         "cast": [
           "Quinta Brunson",
           "Tyler James Williams",
@@ -8690,14 +8488,10 @@
           "Janelle James",
           "William Stanford Davis"
         ],
-        "creators": [
-          "Quinta Brunson"
-        ],
+        "creators": ["Quinta Brunson"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 7.4,
         "providerUpdatedAt": "2026-02-19T01:00:00.975Z"
       },
@@ -11105,10 +10899,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "A single-camera ensemble comedy following the lives of an eclectic group of detectives in a New York precinct, including one slacker who is forced to shape up when he gets a new boss.",
-      "genres": [
-        "Comedy",
-        "Crime"
-      ],
+      "genres": ["Comedy", "Crime"],
       "actors": [
         "Andy Samberg",
         "Melissa Fumero",
@@ -11140,10 +10931,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/A3SymGlOHefSKbz1bCOz56moupS.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/wyspZaGs7CXceV3Ct7NJhcKNDkn.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/c4B02LhSKL6xLrI8vJ5IbLHL0Ue.png",
-        "genres": [
-          "Comedy",
-          "Crime"
-        ],
+        "genres": ["Comedy", "Crime"],
         "cast": [
           "Andy Samberg",
           "Melissa Fumero",
@@ -11154,15 +10942,10 @@
           "Dirk Blocker",
           "Joel McKinnon Miller"
         ],
-        "creators": [
-          "Daniel J. Goor",
-          "Michael Schur"
-        ],
+        "creators": ["Daniel J. Goor", "Michael Schur"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.215,
         "providerUpdatedAt": "2026-02-19T01:00:02.215Z"
       },
@@ -15294,15 +15077,8 @@
       "type": "show",
       "runtimeMinutes": 60,
       "overview": "This British television baking competition selects from amongst its competitors the best amateur baker. The series is credited with reinvigorating interest in baking throughout the UK, and many of its participants, including winners, have gone on to start a career based on baking.",
-      "genres": [
-        "Reality"
-      ],
-      "actors": [
-        "Mel Giedroyc",
-        "Sue Perkins",
-        "Mary Berry",
-        "Paul Hollywood"
-      ],
+      "genres": ["Reality"],
+      "actors": ["Mel Giedroyc", "Sue Perkins", "Mary Berry", "Paul Hollywood"],
       "director": "Mel Giedroyc",
       "poster": "https://image.tmdb.org/t/p/w500/bNa02AorKSBRfWfVPmsL7SJrdfs.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w780/7rB1VhVXtLFTnOCY1Hz7ZEIz7CO.jpg",
@@ -15324,21 +15100,12 @@
         "poster": "https://image.tmdb.org/t/p/w500/bNa02AorKSBRfWfVPmsL7SJrdfs.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/7rB1VhVXtLFTnOCY1Hz7ZEIz7CO.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/p7TfEwrVRF2ZkP74apbgBD9zayF.svg",
-        "genres": [
-          "Reality"
-        ],
-        "cast": [
-          "Mel Giedroyc",
-          "Sue Perkins",
-          "Mary Berry",
-          "Paul Hollywood"
-        ],
+        "genres": ["Reality"],
+        "cast": ["Mel Giedroyc", "Sue Perkins", "Mary Berry", "Paul Hollywood"],
         "creators": [],
         "directors": [],
         "language": "en",
-        "country": [
-          "GB"
-        ],
+        "country": ["GB"],
         "rating": 7.5,
         "providerUpdatedAt": "2026-02-19T01:00:04.022Z"
       },
@@ -17812,11 +17579,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "Three strangers share an obsession with true crime and suddenly find themselves wrapped up in one.",
-      "genres": [
-        "Comedy",
-        "Mystery",
-        "Crime"
-      ],
+      "genres": ["Comedy", "Mystery", "Crime"],
       "actors": [
         "Steve Martin",
         "Martin Short",
@@ -17844,26 +17607,17 @@
         "poster": "https://image.tmdb.org/t/p/w500/1yjFVQZuW8aofZ5Cgol8iImsVFp.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/WCnEPf4ZNPjszndmrFlDxZ5Uvd.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/yEa3q1MtRbd27Ui64LVaH1f4FSQ.svg",
-        "genres": [
-          "Comedy",
-          "Mystery",
-          "Crime"
-        ],
+        "genres": ["Comedy", "Mystery", "Crime"],
         "cast": [
           "Steve Martin",
           "Martin Short",
           "Selena Gomez",
           "Michael Cyril Creighton"
         ],
-        "creators": [
-          "Steve Martin",
-          "John Hoffman"
-        ],
+        "creators": ["Steve Martin", "John Hoffman"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.479,
         "providerUpdatedAt": "2026-02-19T01:00:05.594Z"
       },
@@ -19283,11 +19037,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
-      "genres": [
-        "Sci-Fi & Fantasy",
-        "Mystery",
-        "Action & Adventure"
-      ],
+      "genres": ["Sci-Fi & Fantasy", "Mystery", "Action & Adventure"],
       "actors": [
         "Winona Ryder",
         "David Harbour",
@@ -19323,11 +19073,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/uOOtwVbSr4QDjAGIifLDwpb2Pdl.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/8zbAoryWbtH0DKdev8abFAjdufy.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/uyVM5qGksUzCgwo6UU0UrHex8Oj.png",
-        "genres": [
-          "Sci-Fi & Fantasy",
-          "Mystery",
-          "Action & Adventure"
-        ],
+        "genres": ["Sci-Fi & Fantasy", "Mystery", "Action & Adventure"],
         "cast": [
           "Winona Ryder",
           "David Harbour",
@@ -19342,15 +19088,10 @@
           "Joe Keery",
           "Maya Hawke"
         ],
-        "creators": [
-          "Ross Duffer",
-          "Matt Duffer"
-        ],
+        "creators": ["Ross Duffer", "Matt Duffer"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.579,
         "providerUpdatedAt": "2026-02-19T01:00:06.873Z"
       },
@@ -20562,11 +20303,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives. When a mysterious colleague appears outside of work, it begins a journey to discover the truth about their jobs.",
-      "genres": [
-        "Drama",
-        "Mystery",
-        "Sci-Fi & Fantasy"
-      ],
+      "genres": ["Drama", "Mystery", "Sci-Fi & Fantasy"],
       "actors": [
         "Adam Scott",
         "Britt Lower",
@@ -20600,11 +20337,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/pPHpeI2X1qEd1CS1SeyrdhZ4qnT.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/ixgFmf1X59PUZam2qbAfskx2gQr.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/yyS1tALk7t3YdTNMOvR5gsnXINA.png",
-        "genres": [
-          "Drama",
-          "Mystery",
-          "Sci-Fi & Fantasy"
-        ],
+        "genres": ["Drama", "Mystery", "Sci-Fi & Fantasy"],
         "cast": [
           "Adam Scott",
           "Britt Lower",
@@ -20617,14 +20350,10 @@
           "Christopher Walken",
           "Patricia Arquette"
         ],
-        "creators": [
-          "Dan Erickson"
-        ],
+        "creators": ["Dan Erickson"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.393,
         "providerUpdatedAt": "2026-02-19T01:01:33.676Z"
       },
@@ -21178,13 +20907,8 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "David Attenborough presents a documentary series exploring how animals meet the challenges of surviving in the most iconic habitats on earth.",
-      "genres": [
-        "Documentary",
-        "Family"
-      ],
-      "actors": [
-        "David Attenborough"
-      ],
+      "genres": ["Documentary", "Family"],
+      "actors": ["David Attenborough"],
       "director": "David Attenborough",
       "poster": "https://image.tmdb.org/t/p/w500/tUKomxy50suT4MyxjYfOJDkZUq3.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w780/mGcfMh6BndPUdKVvC5nLGKyZMa9.jpg",
@@ -21206,19 +20930,12 @@
         "poster": "https://image.tmdb.org/t/p/w500/tUKomxy50suT4MyxjYfOJDkZUq3.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/mGcfMh6BndPUdKVvC5nLGKyZMa9.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/6KdshSYx3Ml4V01nJwJerq93VnO.png",
-        "genres": [
-          "Documentary",
-          "Family"
-        ],
-        "cast": [
-          "David Attenborough"
-        ],
+        "genres": ["Documentary", "Family"],
+        "cast": ["David Attenborough"],
         "creators": [],
         "directors": [],
         "language": "en",
-        "country": [
-          "GB"
-        ],
+        "country": ["GB"],
         "rating": 8.6,
         "providerUpdatedAt": "2026-02-19T01:00:09.023Z"
       },
@@ -21414,9 +21131,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "The gripping, decades-spanning inside story of Her Majesty Queen Elizabeth II and the Prime Ministers who shaped Britain's post-war destiny. \n\nThe Crown tells the inside story of two of the most famous addresses in the world – Buckingham Palace and 10 Downing Street – and the intrigues, love lives and machinations behind the great events that shaped the second half of the 20th century. Two houses, two courts, one Crown.",
-      "genres": [
-        "Drama"
-      ],
+      "genres": ["Drama"],
       "actors": [
         "Imelda Staunton",
         "Jonathan Pryce",
@@ -21446,9 +21161,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/1DDE0Z2Y805rqfkEjPbZsMLyPwa.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/8VXhcrl5z2I1zEU9X3pkkNrZlD.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/63ILiGjBJ9Q3D8yFft1cndPh8sl.png",
-        "genres": [
-          "Drama"
-        ],
+        "genres": ["Drama"],
         "cast": [
           "Imelda Staunton",
           "Jonathan Pryce",
@@ -21457,15 +21170,10 @@
           "Claudia Harrison",
           "Marcia Warren"
         ],
-        "creators": [
-          "Peter Morgan"
-        ],
+        "creators": ["Peter Morgan"],
         "directors": [],
         "language": "en",
-        "country": [
-          "GB",
-          "US"
-        ],
+        "country": ["GB", "US"],
         "rating": 8.191,
         "providerUpdatedAt": "2026-02-19T01:00:09.512Z"
       },
@@ -23165,14 +22873,8 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "Amid the stark discord of twin cities Piltover and Zaun, two sisters fight on rival sides of a war between magic technologies and clashing convictions.",
-      "genres": [
-        "Animation",
-        "Action & Adventure"
-      ],
-      "actors": [
-        "Hailee Steinfeld",
-        "Ella Purnell"
-      ],
+      "genres": ["Animation", "Action & Adventure"],
+      "actors": ["Hailee Steinfeld", "Ella Purnell"],
       "director": "Christian Linke",
       "poster": "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w780/q8eejQcg1bAqImEV8jh8RtBD4uH.jpg",
@@ -23194,23 +22896,12 @@
         "poster": "https://image.tmdb.org/t/p/w500/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/q8eejQcg1bAqImEV8jh8RtBD4uH.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/jXLNOzeEA8AoJy92dJTUUZXTMxK.png",
-        "genres": [
-          "Animation",
-          "Action & Adventure"
-        ],
-        "cast": [
-          "Hailee Steinfeld",
-          "Ella Purnell"
-        ],
-        "creators": [
-          "Christian Linke",
-          "Alex Yee"
-        ],
+        "genres": ["Animation", "Action & Adventure"],
+        "cast": ["Hailee Steinfeld", "Ella Purnell"],
+        "creators": ["Christian Linke", "Alex Yee"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.751,
         "providerUpdatedAt": "2026-02-19T01:00:11.000Z"
       },
@@ -23738,10 +23429,7 @@
       "type": "show",
       "runtimeMinutes": 30,
       "overview": "Cuban Bandleader Ricky Ricardo would be happy if his wife Lucy would just be a housewife. Instead she tries constantly to perform at the Tropicana where he works, and make life comically frantic in the apartment building they share with landlords Fred and Ethel Mertz, who also happen to be their best friends.",
-      "genres": [
-        "Comedy",
-        "Family"
-      ],
+      "genres": ["Comedy", "Family"],
       "actors": [
         "Lucille Ball",
         "Desi Arnaz",
@@ -23769,26 +23457,17 @@
         "poster": "https://image.tmdb.org/t/p/w500/mPUSrFTvQqwEqTtfukxJBtkbxWj.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/5tGYbT3irV4ZuO7M65HewlVT6fx.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/98k2unYRV6GRUE0icVSSZdl4vr9.png",
-        "genres": [
-          "Comedy",
-          "Family"
-        ],
+        "genres": ["Comedy", "Family"],
         "cast": [
           "Lucille Ball",
           "Desi Arnaz",
           "Vivian Vance",
           "William Frawley"
         ],
-        "creators": [
-          "Bob Carroll Jr.",
-          "Jess Oppenheimer",
-          "Madelyn Pugh"
-        ],
+        "creators": ["Bob Carroll Jr.", "Jess Oppenheimer", "Madelyn Pugh"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 7.907,
         "providerUpdatedAt": "2026-02-19T01:00:59.724Z"
       },
@@ -28608,14 +28287,8 @@
       "type": "show",
       "runtimeMinutes": 25,
       "overview": "An anthology series containing drama, psychological thriller, fantasy, science fiction, suspense, and/or horror, often concluding with a macabre or unexpected twist.",
-      "genres": [
-        "Sci-Fi & Fantasy",
-        "Mystery",
-        "Drama"
-      ],
-      "actors": [
-        "Rod Serling"
-      ],
+      "genres": ["Sci-Fi & Fantasy", "Mystery", "Drama"],
+      "actors": ["Rod Serling"],
       "director": "Rod Serling",
       "poster": "https://image.tmdb.org/t/p/w500/7uY4pCOxbEdv4M8jTE4uMPVoSIW.jpg",
       "backdrop": "https://image.tmdb.org/t/p/w780/fg5GcstgP9H8OCNS0MjOMp6MH8R.jpg",
@@ -28637,22 +28310,12 @@
         "poster": "https://image.tmdb.org/t/p/w500/7uY4pCOxbEdv4M8jTE4uMPVoSIW.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/fg5GcstgP9H8OCNS0MjOMp6MH8R.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/tBgOfxI9Lo89T9hUsEwlhlpAe7E.png",
-        "genres": [
-          "Sci-Fi & Fantasy",
-          "Mystery",
-          "Drama"
-        ],
-        "cast": [
-          "Rod Serling"
-        ],
-        "creators": [
-          "Rod Serling"
-        ],
+        "genres": ["Sci-Fi & Fantasy", "Mystery", "Drama"],
+        "cast": ["Rod Serling"],
+        "creators": ["Rod Serling"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.473,
         "providerUpdatedAt": "2026-02-19T01:01:01.142Z"
       },
@@ -32828,10 +32491,7 @@
       "type": "show",
       "runtimeMinutes": null,
       "overview": "Told from the points of view of both the Baltimore homicide and narcotics detectives and their targets, the series captures a universe in which the national war on drugs has become a permanent, self-sustaining bureaucracy, and distinctions between good and evil are routinely obliterated.",
-      "genres": [
-        "Crime",
-        "Drama"
-      ],
+      "genres": ["Crime", "Drama"],
       "actors": [
         "Dominic West",
         "Lance Reddick",
@@ -32867,10 +32527,7 @@
         "poster": "https://image.tmdb.org/t/p/w500/4lbclFySvugI51fwsyxBTOm4DqK.jpg",
         "backdrop": "https://image.tmdb.org/t/p/w780/layPSOJGckJv3PXZDIVluMq69mn.jpg",
         "logo": "https://image.tmdb.org/t/p/w500/tIWcnwZegcY5Ix2649P2hJOxcSx.png",
-        "genres": [
-          "Crime",
-          "Drama"
-        ],
+        "genres": ["Crime", "Drama"],
         "cast": [
           "Dominic West",
           "Lance Reddick",
@@ -32885,14 +32542,10 @@
           "Aidan Gillen",
           "Seth Gilliam"
         ],
-        "creators": [
-          "David Simon"
-        ],
+        "creators": ["David Simon"],
         "directors": [],
         "language": "en",
-        "country": [
-          "US"
-        ],
+        "country": ["US"],
         "rating": 8.6,
         "providerUpdatedAt": "2026-02-19T01:01:02.545Z"
       },

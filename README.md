@@ -95,6 +95,32 @@ For Firebase App Hosting production builds, set these build env vars:
 npm run dev
 ```
 
+### Run Template Variant (Ephemeral Demo)
+
+Use this mode when you want a dummy account with seeded titles and no durable state.
+
+```bash
+VITE_HEARTH_MODE=template npm run dev
+```
+
+Or on a hosted build, add a query param:
+
+```text
+?demo=1
+```
+
+Also supported:
+
+```text
+?mode=demo
+```
+
+Template mode behavior:
+- Seeds 30 titles on load (15 TV shows, 15 movies) with `vibe`, `energy`, and `year`
+- Allows add/edit/delete/testing flows locally in-memory
+- Resets everything back to seed data on browser refresh
+- Hides import/export, dev metadata tools, and sign-out actions
+
 ### Build (Prod)
 
 ```bash

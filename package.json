@@ -22,6 +22,7 @@
     "dev": "vite",
     "start": "vite",
     "start:apphosting": "node server/index.js",
+    "template:media-map": "node scripts/generateTemplateMediaMap.mjs",
     "prebuild": "node scripts/setupFirebaseConfig.js --require-env && node scripts/versioning.js check && node scripts/versioning.js generate",
     "build": "vite build",
     "preview": "vite preview",

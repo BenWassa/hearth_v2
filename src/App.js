@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { ENERGIES, VIBES } from './config/constants.js';
-import { useAppState } from './app/useAppState.js';
+import { isTemplateMode, useConfiguredAppState } from './app/useConfiguredAppState.js';
 import OnboardingView from './views/OnboardingView.js';
 import TonightView from './views/TonightView.js';
 import ShelfView from './views/ShelfView.js';
@@ -53,12 +53,15 @@ export default function HearthApp() {
     updateMessage,
     user,
     view,
-  } = useAppState();
+  } = useConfiguredAppState();
   const isLocalHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1');
-  const showDevMetadataTools = Boolean(import.meta?.env?.DEV) || isLocalHost;
+  const isDevToolsContext = Boolean(import.meta?.env?.DEV) || isLocalHost;
+  const allowTemplateDevMenu = isTemplateMode && isDevToolsContext;
+  const showDevMetadataTools =
+    (!isTemplateMode && isDevToolsContext) || allowTemplateDevMenu;
 
   if (!authResolved || isBootstrapping) {
     return (
@@ -166,6 +169,9 @@ export default function HearthApp() {
             spaceName={spaceName}
             isDeletingAll={isWipingSpace}
             onSignOut={handleSignOut}
+            showUtilityMenu={!isTemplateMode || allowTemplateDevMenu}
+            showSignOut={!isTemplateMode}
+            isTemplateSession={isTemplateMode}
           />
         )}
 
@@ -183,7 +189,11 @@ export default function HearthApp() {
         )}
 
         {view === 'add' && (
-          <AddView onBack={() => setView('tonight')} onSubmit={handleAddItem} />
+          <AddView
+            onBack={() => setView('tonight')}
+            onSubmit={handleAddItem}
+            allowManualEntry={isTemplateMode}
+          />
         )}
 
         {view === 'decision' && (
@@ -201,7 +211,7 @@ export default function HearthApp() {
           />
         )}
 
-        {isImportOpen && (
+        {isImportOpen && !isTemplateMode && (
           <ImportModal
             onClose={() => setIsImportOpen(false)}
             onImport={handleImportItems}

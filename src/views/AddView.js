@@ -8,9 +8,10 @@ import { getMediaDetails } from '../services/mediaApi/client.js';
 import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
 
-const AddView = ({ onBack, onSubmit }) => {
+const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [title, setTitle] = useState('');
+  const [year, setYear] = useState('');
   const [type, setType] = useState('movie');
   const [vibe, setVibe] = useState('');
   const [energy, setEnergy] = useState('');
@@ -32,6 +33,7 @@ const AddView = ({ onBack, onSubmit }) => {
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
     setTitle(result.title || '');
+    setYear(result.year || '');
     setSubmitError('');
     setType(result.type === 'show' ? 'show' : 'movie');
     setRuntimeMinutes('');
@@ -47,6 +49,9 @@ const AddView = ({ onBack, onSubmit }) => {
 
       const nextType = details.type === 'show' ? 'show' : 'movie';
       setType(nextType);
+      if (details.year) {
+        setYear(String(details.year));
+      }
       if (Number.isFinite(details.runtimeMinutes)) {
         setRuntimeMinutes(String(details.runtimeMinutes));
       }
@@ -88,18 +93,27 @@ const AddView = ({ onBack, onSubmit }) => {
     setEnrichError('');
     setSubmitError('');
     setTitle('');
+    setYear('');
   };
 
   const handleSubmit = () => {
-    if (!selectedResult) {
+    const manualTitle = title.trim() || searchQuery.trim();
+    if (!allowManualEntry && !selectedResult) {
       setSubmitError('Select a movie or show from Live Search before saving.');
+      return;
+    }
+    if (allowManualEntry && !selectedResult && !manualTitle) {
+      setSubmitError('Add a title before saving.');
       return;
     }
     if (isEnriching) {
       setSubmitError('Wait for metadata to finish loading before saving.');
       return;
     }
-    if (!enrichedPayload?.source?.providerId || !enrichedPayload?.media) {
+    if (
+      !allowManualEntry &&
+      (!enrichedPayload?.source?.providerId || !enrichedPayload?.media)
+    ) {
       setSubmitError(
         'Could not verify this title metadata. Re-select the title and try again.',
       );
@@ -108,12 +122,13 @@ const AddView = ({ onBack, onSubmit }) => {
     setSubmitError('');
 
     const payload = {
-      title: title.trim(),
+      title: selectedResult ? title.trim() : manualTitle,
       type,
       vibe,
       energy,
       note: note.trim(),
       status: 'unwatched',
+      year: year.trim(),
     };
 
     if (enrichedPayload?.media && selectedResult) {
@@ -271,7 +286,25 @@ const AddView = ({ onBack, onSubmit }) => {
           {submitError && (
             <div className="text-xs text-red-400">{submitError}</div>
           )}
+          {allowManualEntry && (
+            <div className="text-xs text-stone-500">
+              Template mode: pick from search or type any title and save.
+            </div>
+          )}
         </div>
+
+        {allowManualEntry && (
+          <div className="space-y-3">
+            <div className="text-[10px] uppercase tracking-widest text-stone-400">
+              Title for save
+            </div>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Or type your own title..."
+            />
+          </div>
+        )}
 
         {/* Type */}
         <div className="space-y-2">
@@ -384,6 +417,22 @@ const AddView = ({ onBack, onSubmit }) => {
           </div>
         )}
 
+        {/* Year */}
+        {allowManualEntry && (
+          <div className="space-y-3">
+            <label className="text-[10px] uppercase tracking-widest text-stone-400">
+              Year (Optional)
+            </label>
+            <Input
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="e.g. 2019"
+              maxLength={4}
+              inputMode="numeric"
+            />
+          </div>
+        )}
+
         {/* Note */}
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400">
@@ -405,10 +454,10 @@ const AddView = ({ onBack, onSubmit }) => {
         <Button
           onClick={handleSubmit}
           disabled={
-            !title.trim() ||
+            !(title.trim() || searchQuery.trim()) ||
             isEnriching ||
-            !selectedResult ||
-            !enrichedPayload?.source?.providerId
+            (!allowManualEntry &&
+              (!selectedResult || !enrichedPayload?.source?.providerId))
           }
           className="w-full"
         >

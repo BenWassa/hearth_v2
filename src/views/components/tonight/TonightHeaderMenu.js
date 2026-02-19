@@ -16,6 +16,9 @@ const TonightHeaderMenu = ({
   onDeleteAll,
   onOpenDeleteAll,
   onSignOut,
+  showUtilityMenu = true,
+  showSignOut = true,
+  isTemplateSession = false,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -41,81 +44,104 @@ const TonightHeaderMenu = ({
 
         {/* Left — utility actions (import/export/dev/delete) */}
         <div ref={utilityRef} className="relative z-10 w-10 flex justify-start">
-          <button
-            onClick={() => {
-              setIsMenuOpen((prev) => !prev);
-              setIsProfileOpen(false);
-            }}
-            className={`p-2 -ml-2 rounded-lg transition-colors ${
-              isMenuOpen
-                ? 'text-stone-200 bg-stone-800/80'
-                : 'text-stone-500 hover:text-stone-300'
-            }`}
-            aria-expanded={isMenuOpen}
-            aria-haspopup="menu"
-            title="More options"
-          >
-            <MoreHorizontal className="w-5 h-5" />
-          </button>
-          {isMenuOpen && (
-            <div
-              className="absolute left-0 top-full mt-2 w-52 bg-stone-950 border border-stone-800/80 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-30"
-              role="menu"
-            >
+          {showUtilityMenu ? (
+            <>
               <button
-                onClick={() => { setIsMenuOpen(false); onImport(); }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-100 transition-colors flex items-center gap-3"
-                role="menuitem"
+                onClick={() => {
+                  setIsMenuOpen((prev) => !prev);
+                  setIsProfileOpen(false);
+                }}
+                className={`p-2 -ml-2 rounded-lg transition-colors ${
+                  isMenuOpen
+                    ? 'text-stone-200 bg-stone-800/80'
+                    : 'text-stone-500 hover:text-stone-300'
+                }`}
+                aria-expanded={isMenuOpen}
+                aria-haspopup="menu"
+                title="More options"
               >
-                <Upload className="w-4 h-4 text-stone-500 shrink-0" />
-                Import library
+                <MoreHorizontal className="w-5 h-5" />
               </button>
-              <button
-                onClick={() => { setIsMenuOpen(false); onExport(); }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-100 transition-colors flex items-center gap-3 border-t border-stone-900"
-                role="menuitem"
-              >
-                <Download className="w-4 h-4 text-stone-500 shrink-0" />
-                Export library
-              </button>
-              {onDeleteAll && (
-                <button
-                  onClick={() => { setIsMenuOpen(false); onOpenDeleteAll(); }}
-                  className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-950/30 hover:text-red-300 transition-colors flex items-center gap-3 border-t border-stone-900"
-                  role="menuitem"
+              {isMenuOpen && (
+                <div
+                  className="absolute left-0 top-full mt-2 w-52 bg-stone-950 border border-stone-800/80 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-30"
+                  role="menu"
                 >
-                  <Trash2 className="w-4 h-4 shrink-0" />
-                  Delete all titles
-                </button>
-              )}
-              {showDevMetadataTools && (
-                <>
-                  <div className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-stone-600 border-t border-stone-900">
-                    Dev tools
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onImport();
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-100 transition-colors flex items-center gap-3"
+                    role="menuitem"
+                  >
+                    <Upload className="w-4 h-4 text-stone-500 shrink-0" />
+                    Import library
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      onExport();
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-100 transition-colors flex items-center gap-3 border-t border-stone-900"
+                    role="menuitem"
+                  >
+                    <Download className="w-4 h-4 text-stone-500 shrink-0" />
+                    Export library
+                  </button>
+                  {onDeleteAll && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenDeleteAll();
+                      }}
+                      className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-950/30 hover:text-red-300 transition-colors flex items-center gap-3 border-t border-stone-900"
+                      role="menuitem"
+                    >
+                      <Trash2 className="w-4 h-4 shrink-0" />
+                      Delete all titles
+                    </button>
+                  )}
+                  {showDevMetadataTools && (
+                    <>
+                      <div className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-stone-600 border-t border-stone-900">
+                        Dev tools
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          openAuditModal();
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-amber-400/80 hover:bg-amber-950/20 hover:text-amber-300 transition-colors flex items-center gap-3"
+                        role="menuitem"
+                      >
+                        <Wrench className="w-4 h-4 shrink-0" />
+                        Audit metadata
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          onMetadataRepairMissing?.();
+                        }}
+                        disabled={isMetadataRepairing}
+                        className="w-full px-4 py-2.5 text-left text-sm text-amber-400/80 hover:bg-amber-950/20 hover:text-amber-300 transition-colors flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
+                        role="menuitem"
+                      >
+                        <Wrench className="w-4 h-4 shrink-0" />
+                        {isMetadataRepairing
+                          ? 'Repairing...'
+                          : 'Repair missing metadata'}
+                      </button>
+                    </>
+                  )}
+                  <div className="px-4 py-2.5 text-[10px] text-stone-600 border-t border-stone-900">
+                    v{APP_VERSION}
                   </div>
-                  <button
-                    onClick={() => { setIsMenuOpen(false); openAuditModal(); }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-amber-400/80 hover:bg-amber-950/20 hover:text-amber-300 transition-colors flex items-center gap-3"
-                    role="menuitem"
-                  >
-                    <Wrench className="w-4 h-4 shrink-0" />
-                    Audit metadata
-                  </button>
-                  <button
-                    onClick={() => { setIsMenuOpen(false); onMetadataRepairMissing?.(); }}
-                    disabled={isMetadataRepairing}
-                    className="w-full px-4 py-2.5 text-left text-sm text-amber-400/80 hover:bg-amber-950/20 hover:text-amber-300 transition-colors flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                    role="menuitem"
-                  >
-                    <Wrench className="w-4 h-4 shrink-0" />
-                    {isMetadataRepairing ? 'Repairing…' : 'Repair missing metadata'}
-                  </button>
-                </>
+                </div>
               )}
-              <div className="px-4 py-2.5 text-[10px] text-stone-600 border-t border-stone-900">
-                v{APP_VERSION}
-              </div>
-            </div>
+            </>
+          ) : (
+            <div className="w-8 h-8" />
           )}
         </div>
 
@@ -161,15 +187,25 @@ const TonightHeaderMenu = ({
               <div className="px-4 py-3 border-b border-stone-900">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-stone-600 mb-0.5">Space</p>
                 <p className="text-sm font-medium text-stone-200 truncate">{spaceLabel || '—'}</p>
+                {isTemplateSession && (
+                  <p className="mt-1 text-[11px] text-stone-500">
+                    Session resets on refresh.
+                  </p>
+                )}
               </div>
-              <button
-                onClick={() => { setIsProfileOpen(false); onSignOut(); }}
-                className="w-full px-4 py-3 text-left text-sm text-stone-400 hover:bg-stone-900/60 hover:text-stone-200 transition-colors flex items-center gap-3"
-                role="menuitem"
-              >
-                <LogOut className="w-4 h-4 shrink-0" />
-                Sign out
-              </button>
+              {showSignOut && (
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    onSignOut();
+                  }}
+                  className="w-full px-4 py-3 text-left text-sm text-stone-400 hover:bg-stone-900/60 hover:text-stone-200 transition-colors flex items-center gap-3"
+                  role="menuitem"
+                >
+                  <LogOut className="w-4 h-4 shrink-0" />
+                  Sign out
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -180,4 +216,3 @@ const TonightHeaderMenu = ({
 };
 
 export default TonightHeaderMenu;
-

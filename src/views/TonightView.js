@@ -91,6 +91,9 @@ const TonightView = ({
   spaceName,
   isDeletingAll,
   onSignOut,
+  showUtilityMenu = true,
+  showSignOut = true,
+  isTemplateSession = false,
 }) => {
   const currentlyWatchingShows = useMemo(
     () =>
@@ -222,6 +225,9 @@ const TonightView = ({
             onDeleteAll={onDeleteAll}
             onOpenDeleteAll={handleOpenDeleteAll}
             onSignOut={onSignOut}
+            showUtilityMenu={showUtilityMenu}
+            showSignOut={showSignOut}
+            isTemplateSession={isTemplateSession}
           />
           <div className="h-[68px]" />
 

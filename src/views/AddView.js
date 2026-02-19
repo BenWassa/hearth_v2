@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Clock, Film, MessageSquare, Tv } from 'lucide-react';
+import { Film, MessageSquare, Tv } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import Button from '../components/ui/Button.js';
 import Input from '../components/ui/Input.js';
@@ -10,12 +10,9 @@ import { useMediaSearch } from './hooks/useMediaSearch.js';
 
 const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [title, setTitle] = useState('');
-  const [year, setYear] = useState('');
   const [type, setType] = useState('movie');
   const [vibe, setVibe] = useState('');
   const [energy, setEnergy] = useState('');
-  const [runtimeMinutes, setRuntimeMinutes] = useState('');
   const [note, setNote] = useState('');
   const [selectedResult, setSelectedResult] = useState(null);
   const [enrichedPayload, setEnrichedPayload] = useState(null);
@@ -32,11 +29,8 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
-    setTitle(result.title || '');
-    setYear(result.year || '');
     setSubmitError('');
     setType(result.type === 'show' ? 'show' : 'movie');
-    setRuntimeMinutes('');
     setEnrichError('');
     setIsEnriching(true);
 
@@ -49,12 +43,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
       const nextType = details.type === 'show' ? 'show' : 'movie';
       setType(nextType);
-      if (details.year) {
-        setYear(String(details.year));
-      }
-      if (Number.isFinite(details.runtimeMinutes)) {
-        setRuntimeMinutes(String(details.runtimeMinutes));
-      }
 
       const showData =
         nextType === 'show'
@@ -92,28 +80,18 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
     setEnrichedPayload(null);
     setEnrichError('');
     setSubmitError('');
-    setTitle('');
-    setYear('');
   };
 
   const handleSubmit = () => {
-    const manualTitle = title.trim() || searchQuery.trim();
-    if (!allowManualEntry && !selectedResult) {
+    if (!selectedResult) {
       setSubmitError('Select a movie or show from Live Search before saving.');
-      return;
-    }
-    if (allowManualEntry && !selectedResult && !manualTitle) {
-      setSubmitError('Add a title before saving.');
       return;
     }
     if (isEnriching) {
       setSubmitError('Wait for metadata to finish loading before saving.');
       return;
     }
-    if (
-      !allowManualEntry &&
-      (!enrichedPayload?.source?.providerId || !enrichedPayload?.media)
-    ) {
+    if (!enrichedPayload?.source?.providerId || !enrichedPayload?.media) {
       setSubmitError(
         'Could not verify this title metadata. Re-select the title and try again.',
       );
@@ -122,21 +100,17 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
     setSubmitError('');
 
     const payload = {
-      title: selectedResult ? title.trim() : manualTitle,
+      title: String(
+        enrichedPayload?.media?.title || selectedResult?.title || searchQuery,
+      ).trim(),
       type,
       vibe,
       energy,
       note: note.trim(),
       status: 'unwatched',
-      year: year.trim(),
     };
 
-    if (enrichedPayload?.media && selectedResult) {
-      const runtimeOverride = Number.parseInt(runtimeMinutes, 10);
-      const runtime = Number.isFinite(runtimeOverride)
-        ? runtimeOverride
-        : enrichedPayload.media.runtimeMinutes;
-
+    if (enrichedPayload?.media) {
       payload.schemaVersion = 2;
       payload.source = {
         ...enrichedPayload.source,
@@ -145,7 +119,9 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
         ...enrichedPayload.media,
         type,
         title: payload.title,
-        runtimeMinutes: Number.isFinite(runtime) ? runtime : null,
+        runtimeMinutes: Number.isFinite(enrichedPayload.media.runtimeMinutes)
+          ? enrichedPayload.media.runtimeMinutes
+          : null,
         poster: enrichedPayload.media.poster || '',
         backdrop: enrichedPayload.media.backdrop || '',
         logo: enrichedPayload.media.logo || '',
@@ -182,12 +158,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
       }
     }
 
-    if (type === 'movie') {
-      const parsedRuntime = Number.parseInt(runtimeMinutes, 10);
-      if (Number.isFinite(parsedRuntime) && parsedRuntime > 0) {
-        payload.runtimeMinutes = parsedRuntime;
-      }
-    }
     onSubmit(payload);
   };
 
@@ -288,23 +258,10 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
           )}
           {allowManualEntry && (
             <div className="text-xs text-stone-500">
-              Template mode: pick from search or type any title and save.
+              Choose the official title from search before saving.
             </div>
           )}
         </div>
-
-        {allowManualEntry && (
-          <div className="space-y-3">
-            <div className="text-[10px] uppercase tracking-widest text-stone-400">
-              Title for save
-            </div>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Or type your own title..."
-            />
-          </div>
-        )}
 
         {/* Type */}
         <div className="space-y-2">
@@ -320,7 +277,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                   key={t}
                   onClick={() => {
                     setType(t);
-                    if (t === 'show') setRuntimeMinutes('');
                   }}
                   className={`flex-1 py-2 rounded-lg border text-xs uppercase tracking-widest transition-all ${
                     isSelected
@@ -396,43 +352,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
           </div>
         </div>
 
-        {/* Runtime */}
-        {type === 'movie' && (
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400">
-              <Clock className="w-3 h-3" />
-              Runtime{' '}
-              <span className="text-stone-700 font-normal normal-case">
-                (Minutes, optional)
-              </span>
-            </label>
-            <Input
-              value={runtimeMinutes}
-              onChange={(e) => setRuntimeMinutes(e.target.value)}
-              placeholder="e.g. 97"
-              type="number"
-              min="1"
-              inputMode="numeric"
-            />
-          </div>
-        )}
-
-        {/* Year */}
-        {allowManualEntry && (
-          <div className="space-y-3">
-            <label className="text-[10px] uppercase tracking-widest text-stone-400">
-              Year (Optional)
-            </label>
-            <Input
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="e.g. 2019"
-              maxLength={4}
-              inputMode="numeric"
-            />
-          </div>
-        )}
-
         {/* Note */}
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400">
@@ -454,10 +373,10 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
         <Button
           onClick={handleSubmit}
           disabled={
-            !(title.trim() || searchQuery.trim()) ||
+            !searchQuery.trim() ||
             isEnriching ||
-            (!allowManualEntry &&
-              (!selectedResult || !enrichedPayload?.source?.providerId))
+            !selectedResult ||
+            !enrichedPayload?.source?.providerId
           }
           className="w-full"
         >

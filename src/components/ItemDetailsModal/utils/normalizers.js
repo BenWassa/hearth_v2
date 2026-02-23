@@ -46,6 +46,8 @@ export const normalizeSeasons = (seasons) => {
         season.number ?? season.seasonNumber ?? season.season_number,
         index + 1,
       );
+      // Season 0 is extras/featurettes — exclude from progress tracking
+      if (number === 0) return null;
       const rawEpisodes = Array.isArray(season.episodes) ? season.episodes : [];
       const episodes = rawEpisodes
         .map((episode, episodeIndex) => {

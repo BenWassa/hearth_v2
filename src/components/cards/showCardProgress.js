@@ -41,10 +41,12 @@ export const getShowWatchProgress = (item) => {
   let totalEpisodesFromSeasons = 0;
 
   seasons.forEach((season) => {
-    totalEpisodesFromSeasons += normalizeEpisodeTotal(season);
     const seasonNumber = toFiniteNumber(
       season?.number ?? season?.seasonNumber ?? season?.season_number,
     );
+    // Season 0 is extras/featurettes – exclude from progress tracking
+    if (seasonNumber === 0) return;
+    totalEpisodesFromSeasons += normalizeEpisodeTotal(season);
     const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
     episodes.forEach((episode) => {
       if (
@@ -76,10 +78,10 @@ export const getShowWatchProgress = (item) => {
   Object.entries(progressObj).forEach(([key, watched]) => {
     if (!watched) return;
     const match = /^s(\d+)e(\d+)$/i.exec(`${key}`);
-    const normalizedKey = match
-      ? `s${Number(match[1])}e${Number(match[2])}`
-      : `${key}`;
-    watchedSlots.add(normalizedKey);
+    if (!match) return;
+    const sNum = Number(match[1]);
+    if (sNum === 0) return; // ignore Season 0 extras
+    watchedSlots.add(`s${sNum}e${Number(match[2])}`);
   });
 
   const explicitTotal = toFiniteNumber(

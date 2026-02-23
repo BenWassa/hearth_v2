@@ -1272,6 +1272,7 @@ export const useAppState = () => {
         entry.runtimeMinutes = item.runtimeMinutes;
       }
       if (item.totalSeasons) entry.totalSeasons = item.totalSeasons;
+      if (item.totalEpisodes) entry.totalEpisodes = item.totalEpisodes;
       if (Array.isArray(item.seasons) && item.seasons.length) {
         entry.seasons = item.seasons;
       }
@@ -1280,12 +1281,20 @@ export const useAppState = () => {
       return entry;
     });
     const exportText = JSON.stringify(payload, null, 2);
-    const copied = await copyToClipboard(exportText);
-    if (copied) {
-      notifyUpdate('Export copied to clipboard.');
-    } else {
-      notifyError('Could not copy export. Try again.');
-    }
+    
+    // Create a blob and download as file instead of clipboard
+    const blob = new Blob([exportText], { type: 'application/json;charset=utf-8' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.setAttribute('href', url);
+    link.setAttribute('download', `hearth-export-${timestamp}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    notifyUpdate('Export downloaded as JSON file.');
   };
 
   const handleSignOut = async () => {

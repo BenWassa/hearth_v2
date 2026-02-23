@@ -222,7 +222,7 @@ const getShowSeasons = async ({ id }) => {
         : null,
       seasons: seasons
         .map(mapSeason)
-        .filter((season) => Number.isFinite(season.seasonNumber)),
+        .filter((season) => Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1),
     },
   };
 };

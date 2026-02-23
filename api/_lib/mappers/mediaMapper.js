@@ -35,7 +35,7 @@ const mapSeasonSummaries = (seasons = []) =>
       airDate: season?.air_date || '',
       posterUrl: toImageUrl(season?.poster_path, 'w342'),
     }))
-    .filter((season) => Number.isFinite(season.seasonNumber));
+    .filter((season) => Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1);
 
 const mapLogoUrl = (images) => {
   const logos = Array.isArray(images?.logos) ? images.logos : [];

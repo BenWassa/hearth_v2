@@ -20,6 +20,7 @@ import {
   normalizeGenres,
   normalizeSeasons,
 } from './ItemDetailsModal/utils/normalizers.js';
+import { getShowWatchProgress } from './cards/showCardProgress.js';
 import {
   getEpisodeProgressKeys,
   getShowEntryTarget,
@@ -66,6 +67,7 @@ const normalizeHydratedShowData = (showData = {}) => {
       Number.isFinite(showData?.seasonCount) && showData.seasonCount > 0
         ? showData.seasonCount
         : seasons.length || null,
+    episodeCount: showData?.episodeCount || null,
     seasons,
   };
 };
@@ -102,6 +104,7 @@ const ItemDetailsModal = ({
   const [expandedEpisodeId, setExpandedEpisodeId] = useState(null);
   const [localEpisodeProgress, setLocalEpisodeProgress] = useState({});
   const [episodeMapSeasons, setEpisodeMapSeasons] = useState(null);
+  const [hydratedEpisodeCount, setHydratedEpisodeCount] = useState(null);
   const [episodeMapStatus, setEpisodeMapStatus] = useState('idle');
   const [episodeFetchSeed, setEpisodeFetchSeed] = useState(0);
   const [revealedEpisodeIds, setRevealedEpisodeIds] = useState({});
@@ -289,6 +292,7 @@ const ItemDetailsModal = ({
           if (Array.isArray(hydrated?.seasons) && hydrated.seasons.length) {
             setEpisodeMapSeasons(hydrated.seasons);
             setEpisodeMapStatus('ready');
+            setHydratedEpisodeCount(hydrated.episodeCount ?? null);
             if (
               item?.id &&
               !persistedHydrationRef.current.has(item.id) &&
@@ -298,6 +302,7 @@ const ItemDetailsModal = ({
               onUpdate(item.id, {
                 showData: hydrated,
                 totalSeasons: hydrated.seasonCount || null,
+                totalEpisodes: hydrated.episodeCount || null,
                 seasons: hydrated.seasons,
               });
             }
@@ -443,6 +448,42 @@ const ItemDetailsModal = ({
       return { season, total, watched, progress };
     });
   }, [seasons, localEpisodeProgress]);
+
+  const entireShowProgress = useMemo(() => {
+    if (!isShow) return { percent: 0, watched: 0, total: 0 };
+    const progress = getShowWatchProgress({
+      ...item,
+      seasons,
+      episodeProgress: localEpisodeProgress,
+      totalEpisodes: hydratedEpisodeCount ?? item.totalEpisodes,
+    });
+
+    console.debug(`[Progress Debug] "${item.title}":`, {
+      watched: progress.watched,
+      total: progress.total,
+      percent: progress.percent,
+      hydratedEpisodeCount,
+      itemTotalEpisodes: item.totalEpisodes,
+      showDataEpisodeCount: item.showData?.episodeCount,
+      denominatorSource:
+        hydratedEpisodeCount != null
+          ? 'hydratedEpisodeCount (fresh from API)'
+          : item.totalEpisodes
+          ? 'item.totalEpisodes (persisted)'
+          : 'sum of season episodeCounts',
+      episodeProgressKeys: Object.keys(localEpisodeProgress).filter(
+        (k) => localEpisodeProgress[k],
+      ),
+      loadedSeasonsCount: seasons.length,
+      totalFromSeasonSum: seasons.reduce(
+        (sum, s) => sum + (s.episodeCount || s.episodes?.length || 0),
+        0,
+      ),
+    });
+
+    return progress;
+  }, [isShow, item, seasons, localEpisodeProgress, hydratedEpisodeCount]);
+
   const actors = useMemo(() => {
     if (!item?.actors) return [];
     if (Array.isArray(item.actors))
@@ -818,6 +859,7 @@ const ItemDetailsModal = ({
                   seasonScrollRef={seasonScrollRef}
                   handleSeasonKeyDown={handleSeasonKeyDown}
                   seasonProgress={seasonProgress}
+                  entireShowProgress={entireShowProgress}
                   activeSeason={activeSeason}
                   setActiveSeasonNum={setActiveSeasonNum}
                   scrollToSeason={scrollToSeason}

@@ -241,6 +241,11 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
         catalogData.totalSeasons ??
         watchData.totalSeasons,
     ),
+    totalEpisodes: asNumberOrNull(
+      showData.episodeCount ??
+        catalogData.totalEpisodes ??
+        watchData.totalEpisodes,
+    ),
     seasons: asArray(showData.seasons).length
       ? asArray(showData.seasons)
       : asArray(catalogData.seasons).length
@@ -260,6 +265,7 @@ const CATALOG_PATH_ALIASES = {
   genres: 'media.genres',
   actors: 'media.cast',
   totalSeasons: 'showData.seasonCount',
+  totalEpisodes: 'showData.episodeCount',
   seasons: 'showData.seasons',
 };
 

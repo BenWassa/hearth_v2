@@ -98,6 +98,9 @@ const mapShowDetails = (data = {}) => ({
   seasonCount: Number.isFinite(data.number_of_seasons)
     ? data.number_of_seasons
     : null,
+  episodeCount: Number.isFinite(data.number_of_episodes)
+    ? data.number_of_episodes
+    : null,
   seasonSummaries: mapSeasonSummaries(data.seasons),
   providerUpdatedAt: new Date().toISOString(),
 });

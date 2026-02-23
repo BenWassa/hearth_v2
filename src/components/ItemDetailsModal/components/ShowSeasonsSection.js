@@ -8,6 +8,7 @@ const ShowSeasonsSection = ({
   seasonScrollRef,
   handleSeasonKeyDown,
   seasonProgress,
+  entireShowProgress,
   activeSeason,
   setActiveSeasonNum,
   scrollToSeason,
@@ -38,6 +39,26 @@ const ShowSeasonsSection = ({
             <div className="text-xs text-stone-500">{totalSeasons} seasons</div>
           ) : null}
         </div>
+
+        {/* Series Progress Bar */}
+        {entireShowProgress.percent > 0 && (
+          <div className="bg-stone-900/40 rounded-xl p-3 border border-stone-800/40 shadow-inner">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-bold text-stone-400 uppercase tracking-tight">
+                Series Progress
+              </div>
+              <div className="text-[10px] font-mono text-amber-500/90 font-bold">
+                {entireShowProgress.watched} / {entireShowProgress.total || '?'} episodes ({entireShowProgress.percent}%)
+              </div>
+            </div>
+            <div className="h-1.5 w-full bg-stone-800/80 rounded-full overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
+              <div
+                className="h-full bg-gradient-to-r from-amber-600 to-amber-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                style={{ width: `${entireShowProgress.percent}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {seasons.length ? (
           <>

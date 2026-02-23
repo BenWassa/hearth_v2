@@ -73,6 +73,10 @@ export const adaptWatchlistItem = (rawItem = {}) => {
       rawItem.totalSeasons ||
       asArray(showData.seasons).length ||
       '',
+    totalEpisodes:
+      showData.episodeCount ||
+      rawItem.totalEpisodes ||
+      '',
     seasons: asArray(showData.seasons).length
       ? asArray(showData.seasons)
       : asArray(rawItem.seasons),

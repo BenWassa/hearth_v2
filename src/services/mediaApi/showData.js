@@ -74,6 +74,7 @@ export const hydrateShowData = async ({ provider, providerId }) => {
 
   return {
     seasonCount: seasonResponse?.seasonCount || seasonData.length,
+    episodeCount: seasonResponse?.episodeCount || 0,
     seasons: seasonData,
   };
 };

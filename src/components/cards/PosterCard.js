@@ -25,6 +25,9 @@ const PosterCard = ({
     return getShowWatchProgressPercent(item);
   }, [item]);
 
+  const showProgressBar =
+    !isWatched && progressPercentage > 0 && item.type === 'show';
+
   // Energy-based styling tokens
   const energyStyles = {
     light: {
@@ -97,7 +100,7 @@ const PosterCard = ({
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />
             )}
-            {isWatching && (
+            {showProgressBar && (
               <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-stone-950/90 backdrop-blur-md z-10 border-t border-stone-800">
                 <div
                   className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] transition-all duration-500 ease-out"
@@ -124,7 +127,7 @@ const PosterCard = ({
             ) : (
               <PosterPlaceholder title={item.title} type={item.type} />
             )}
-            {isWatching && (
+            {showProgressBar && (
               <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-stone-950/90 backdrop-blur-md z-10 border-t border-stone-800">
                 <div
                   className="h-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] transition-all duration-500 ease-out"

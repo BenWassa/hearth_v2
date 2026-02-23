@@ -78,6 +78,7 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   if (Number.isFinite(item.runtimeMinutes))
     payload.runtimeMinutes = item.runtimeMinutes;
   if (item.totalSeasons) payload.totalSeasons = item.totalSeasons;
+  if (item.totalEpisodes) payload.totalEpisodes = item.totalEpisodes;
   if (Array.isArray(item.seasons) && item.seasons.length)
     payload.seasons = item.seasons;
   if (item.episodeProgress) payload.episodeProgress = item.episodeProgress;

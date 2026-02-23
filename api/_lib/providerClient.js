@@ -217,6 +217,9 @@ const getShowSeasons = async ({ id }) => {
       seasonCount: Number.isFinite(response.data.number_of_seasons)
         ? response.data.number_of_seasons
         : seasons.length,
+      episodeCount: Number.isFinite(response.data.number_of_episodes)
+        ? response.data.number_of_episodes
+        : null,
       seasons: seasons
         .map(mapSeason)
         .filter((season) => Number.isFinite(season.seasonNumber)),

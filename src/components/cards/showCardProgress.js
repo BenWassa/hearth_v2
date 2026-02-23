@@ -32,16 +32,16 @@ const normalizeEpisodeTotal = (season) => {
   return episodes.length;
 };
 
-export const getShowWatchProgressPercent = (item) => {
-  if (item?.type !== 'show') return 0;
+export const getShowWatchProgress = (item) => {
+  if (item?.type !== 'show') return { percent: 0, watched: 0, total: 0 };
 
   const progressObj = item?.episodeProgress || {};
   const seasons = Array.isArray(item?.seasons) ? item.seasons : [];
   const watchedSlots = new Set();
-  let totalEpisodes = 0;
+  let totalEpisodesFromSeasons = 0;
 
   seasons.forEach((season) => {
-    totalEpisodes += normalizeEpisodeTotal(season);
+    totalEpisodesFromSeasons += normalizeEpisodeTotal(season);
     const seasonNumber = toFiniteNumber(
       season?.number ?? season?.seasonNumber ?? season?.season_number,
     );
@@ -76,15 +76,37 @@ export const getShowWatchProgressPercent = (item) => {
   Object.entries(progressObj).forEach(([key, watched]) => {
     if (!watched) return;
     const match = /^s(\d+)e(\d+)$/i.exec(`${key}`);
-    if (!match) return;
-    watchedSlots.add(`s${Number(match[1])}e${Number(match[2])}`);
+    const normalizedKey = match
+      ? `s${Number(match[1])}e${Number(match[2])}`
+      : `${key}`;
+    watchedSlots.add(normalizedKey);
   });
 
-  if (totalEpisodes > 0) {
-    const watchedEpisodes = Math.min(watchedSlots.size, totalEpisodes);
-    return Math.min(Math.round((watchedEpisodes / totalEpisodes) * 100), 100);
+  const explicitTotal = toFiniteNumber(
+    item.totalEpisodes ??
+      item.media?.totalEpisodes ??
+      item.showData?.episodeCount,
+  );
+  const denominator = Math.max(totalEpisodesFromSeasons, explicitTotal || 0);
+  const watchedCount = watchedSlots.size;
+
+  if (denominator > 0) {
+    const clampedWatched = Math.min(watchedCount, denominator);
+    return {
+      percent: Math.min(Math.round((clampedWatched / denominator) * 100), 100),
+      watched: clampedWatched,
+      total: denominator,
+    };
   }
 
-  const watchedCount = Object.values(progressObj).filter(Boolean).length;
-  return watchedCount > 0 ? 5 : 0;
+  const fallbackWatched = Object.values(progressObj).filter(Boolean).length;
+  return {
+    percent: fallbackWatched > 0 ? 5 : 0,
+    watched: fallbackWatched,
+    total: 0,
+  };
 };
+
+export const getShowWatchProgressPercent = (item) =>
+  getShowWatchProgress(item).percent;
+

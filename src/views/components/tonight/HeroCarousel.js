@@ -14,6 +14,31 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [logoFailed, setLogoFailed] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const MIN_SWIPE_DISTANCE = 50;
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+    if (!touchStart) return;
+
+    const distance = touchStart - e.changedTouches[0].clientX;
+    const isLeftSwipe = distance > MIN_SWIPE_DISTANCE;
+    const isRightSwipe = distance < -MIN_SWIPE_DISTANCE;
+
+    if (isLeftSwipe) {
+      setCurrentIndex((prev) => (prev + 1) % safeItems.length);
+    } else if (isRightSwipe) {
+      setCurrentIndex((prev) => (prev - 1 + safeItems.length) % safeItems.length);
+    }
+
+    setTouchStart(null);
+  };
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -46,6 +71,8 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     <div
       className="relative w-full aspect-video bg-stone-900 overflow-hidden cursor-pointer rounded-2xl"
       onClick={() => onOpenDetails?.(currentItem)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => {

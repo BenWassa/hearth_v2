@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const LazyMediaImage = ({
   src,
@@ -12,13 +12,16 @@ const LazyMediaImage = ({
   onError,
   fallback = null,
 }) => {
+  const prevSrcRef = useRef(src);
+  // Synchronously reset on src change to avoid a render with stale error state
   const [isLoading, setIsLoading] = useState(Boolean(src));
   const [isErrored, setIsErrored] = useState(false);
 
-  useEffect(() => {
+  if (prevSrcRef.current !== src) {
+    prevSrcRef.current = src;
     setIsLoading(Boolean(src));
     setIsErrored(false);
-  }, [src]);
+  }
 
   if (!src || isErrored) {
     return fallback;

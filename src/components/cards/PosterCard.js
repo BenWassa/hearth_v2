@@ -51,7 +51,7 @@ const PosterCard = ({
 
   useEffect(() => {
     setPosterMissing(false);
-  }, [posterSrc]);
+  }, [item.id, posterSrc]);
 
   const handleClick = () => {
     if (selectionMode && onSelect) {

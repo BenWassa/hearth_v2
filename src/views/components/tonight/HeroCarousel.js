@@ -115,12 +115,8 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       '',
   ).trim();
 
-  // Each slide is 100% of the container. The strip is N slides wide.
+  // Each slide is absolutely positioned and translated by its offset from currentIndex.
   // Use measured pixel width for precise drag tracking; fall back to % on first paint.
-  const pxOffset = containerWidth > 0
-    ? `${-currentIndex * containerWidth + dragOffset}px`
-    : `calc(${-currentIndex * 100}% + ${dragOffset}px)`;
-  const stripTransition = isDragging ? 'none' : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)';
 
   return (
     <div
@@ -146,39 +142,39 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       }}
       aria-label={`Open details for ${currentItem?.title || 'featured title'}`}
     >
-      {/* Sliding strip — N slides, each 100% of container, laid out horizontally */}
-      <div
-        className="absolute inset-y-0 left-0 flex"
-        style={{
-          width: `${safeItems.length * 100}%`,
-          transform: `translateX(${pxOffset})`,
-          transition: stripTransition,
-          willChange: 'transform',
-        }}
-      >
-        {safeItems.map((item, index) => {
-          const backdrop = getBackdropSrc(item) || getPosterSrc(item);
-          return (
-            <div
-              key={getItemKey(item, index)}
-              className="relative h-full flex-shrink-0 overflow-hidden"
-              style={{ width: `${100 / safeItems.length}%` }}
-            >
-              {backdrop ? (
-                <img
-                  src={backdrop}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover object-center"
-                  draggable={false}
-                  loading="eager"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-stone-800" />
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* Slides — each absolutely fills the container, translated by index */}
+      {safeItems.map((item, index) => {
+        const backdrop = getBackdropSrc(item) || getPosterSrc(item);
+        // Offset from current: slide left of current is -1, right is +1, etc.
+        const offset = index - currentIndex;
+        // During drag, apply the live dragOffset on top of the slot position
+        const translateX = containerWidth > 0
+          ? `${offset * containerWidth + dragOffset}px`
+          : `calc(${offset * 100}% + ${dragOffset}px)`;
+        return (
+          <div
+            key={getItemKey(item, index)}
+            className="absolute inset-0 overflow-hidden"
+            style={{
+              transform: `translateX(${translateX})`,
+              transition: isDragging ? 'none' : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
+              willChange: 'transform',
+            }}
+          >
+            {backdrop ? (
+              <img
+                src={backdrop}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover object-center"
+                draggable={false}
+                loading="eager"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-stone-800" />
+            )}
+          </div>
+        );
+      })}
 
       {/* Scrim: strong bottom-left gradient to stage the logo */}
       <div className="absolute inset-0 bg-gradient-to-tr from-stone-950/80 via-stone-950/30 to-transparent pointer-events-none" />

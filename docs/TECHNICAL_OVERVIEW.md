@@ -46,7 +46,7 @@ Compatibility adapters flatten v2 into UI-friendly fields (e.g. `poster`, `backd
 `TonightView` currently includes:
 
 - Cinematic header with centered Hearth mark
-- Hero carousel (auto-advance) using backdrop + bottom-right logo overlay + progress dots
+- Hero carousel (auto-advance) using backdrop + bottom-left logo overlay + progress dots
 - Horizontal rails:
   - Currently Watching
   - Movies (full unwatched list)
@@ -100,6 +100,7 @@ Logo is persisted into canonical `logo` field and consumed in Tonight hero.
 - Key targeted areas:
   - media mapper and request params
   - show progress utilities
+  - space identity and deterministic IDs (`src/services/firebase/spaces.test.js`)
   - tonight hero/rail behavior
 
 ## 10. Deployment Shape

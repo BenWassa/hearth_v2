@@ -170,7 +170,7 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover object-center"
                   draggable={false}
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  loading="eager"
                 />
               ) : (
                 <div className="absolute inset-0 bg-stone-800" />

@@ -189,7 +189,24 @@ const TonightView = ({
     const withBackdrop = candidates.filter((item) => hasHeroBackdrop(item));
     const withLogo = withBackdrop.filter((item) => hasHeroLogo(item));
     const withoutLogo = withBackdrop.filter((item) => !hasHeroLogo(item));
-    return [...withLogo, ...withoutLogo].slice(0, 5);
+    const ordered = [...withLogo, ...withoutLogo];
+
+    // Stable daily shuffle: seed from YYYYMMDD so it changes each day
+    // but stays consistent within a session
+    const today = new Date();
+    const seed =
+      today.getFullYear() * 10000 +
+      (today.getMonth() + 1) * 100 +
+      today.getDate();
+    const seededRandom = (i) => {
+      const x = Math.sin(seed + i) * 10000;
+      return x - Math.floor(x);
+    };
+    const shuffled = [...ordered].sort(
+      (a, b) => seededRandom(ordered.indexOf(a)) - seededRandom(ordered.indexOf(b)),
+    );
+
+    return shuffled.slice(0, 5);
   }, [unwatchedMovies, unwatchedShows]);
   const showSkeleton = isLoading && items.length === 0;
 

@@ -181,7 +181,7 @@ const TonightHeaderMenu = ({
             title={spaceLabel}
           >
             <span className="text-[11px] font-bold uppercase leading-none">
-              {(spaceLabel || '?').slice(0, 2)}
+              {((spaceLabel || '?').replace(/[^a-z]/gi, '').slice(0, 2)) || '?'}
             </span>
           </button>
           {isProfileOpen && (

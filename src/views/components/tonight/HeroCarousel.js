@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getBackdropSrc, getPosterSrc } from '../../../utils/poster.js';
 
 const MIN_SWIPE_DISTANCE = 40;
-// Resistance factor when dragging past the first/last slide
 const EDGE_RESISTANCE = 0.25;
 
 const getItemKey = (item, index) =>
@@ -18,11 +17,24 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [logoFailed, setLogoFailed] = useState(false);
-  // dragOffset is the live pixel delta while the finger is down (0 when idle)
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
   const touchStartXRef = useRef(null);
   const autoAdvanceRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Measure container width so pixel-perfect translation works on all screen sizes
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerWidth(el.offsetWidth);
+    const ro = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const resetAutoAdvance = useCallback(() => {
     if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
@@ -49,7 +61,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     touchStartXRef.current = e.targetTouches[0].clientX;
     setIsDragging(true);
     setDragOffset(0);
-    // Pause auto-advance while user is touching
     if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
   }, []);
 
@@ -59,7 +70,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       const delta = e.targetTouches[0].clientX - touchStartXRef.current;
       const isAtStart = currentIndex === 0;
       const isAtEnd = currentIndex === safeItems.length - 1;
-      // Apply rubber-band resistance at the edges
       let clamped = delta;
       if ((isAtStart && delta > 0) || (isAtEnd && delta < 0)) {
         clamped = delta * EDGE_RESISTANCE;
@@ -84,20 +94,15 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           setCurrentIndex((prev) => prev - 1);
         }
       }
-      // Restart auto-advance after interaction
       resetAutoAdvance();
     },
     [currentIndex, safeItems.length, resetAutoAdvance],
   );
 
-  const handleClick = useCallback(
-    (e) => {
-      // Suppress click if the touch was actually a swipe
-      if (Math.abs(dragOffset) > 5) return;
-      onOpenDetails?.(safeItems[currentIndex]);
-    },
-    [dragOffset, currentIndex, safeItems, onOpenDetails],
-  );
+  const handleClick = useCallback(() => {
+    if (Math.abs(dragOffset) > 5) return;
+    onOpenDetails?.(safeItems[currentIndex]);
+  }, [dragOffset, currentIndex, safeItems, onOpenDetails]);
 
   if (!safeItems.length) return null;
 
@@ -110,12 +115,16 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       '',
   ).trim();
 
-  // The slide strip translates by: (-currentIndex * 100%) + dragOffset px
-  const stripTransform = `translateX(calc(${-currentIndex * 100}% + ${dragOffset}px))`;
+  // Each slide is 100% of the container. The strip is N slides wide.
+  // Use measured pixel width for precise drag tracking; fall back to % on first paint.
+  const pxOffset = containerWidth > 0
+    ? `${-currentIndex * containerWidth + dragOffset}px`
+    : `calc(${-currentIndex * 100}% + ${dragOffset}px)`;
   const stripTransition = isDragging ? 'none' : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)';
 
   return (
     <div
+      ref={containerRef}
       className="relative w-full aspect-video bg-stone-900 overflow-hidden rounded-2xl select-none"
       onClick={handleClick}
       onTouchStart={handleTouchStart}
@@ -137,12 +146,12 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       }}
       aria-label={`Open details for ${currentItem?.title || 'featured title'}`}
     >
-      {/* Sliding strip — all slides laid out horizontally */}
+      {/* Sliding strip — N slides, each 100% of container, laid out horizontally */}
       <div
-        className="absolute inset-0 flex"
+        className="absolute inset-y-0 left-0 flex"
         style={{
           width: `${safeItems.length * 100}%`,
-          transform: stripTransform,
+          transform: `translateX(${pxOffset})`,
           transition: stripTransition,
           willChange: 'transform',
         }}
@@ -152,14 +161,21 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           return (
             <div
               key={getItemKey(item, index)}
-              className="relative h-full flex-shrink-0"
-              style={{
-                width: `${100 / safeItems.length}%`,
-                backgroundImage: backdrop ? `url(${backdrop})` : 'none',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
+              className="relative h-full flex-shrink-0 overflow-hidden"
+              style={{ width: `${100 / safeItems.length}%` }}
+            >
+              {backdrop ? (
+                <img
+                  src={backdrop}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover object-center"
+                  draggable={false}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-stone-800" />
+              )}
+            </div>
           );
         })}
       </div>

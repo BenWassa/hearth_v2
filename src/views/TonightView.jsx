@@ -48,6 +48,35 @@ const hasHeroLogo = (item) =>
 
 const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
 
+// Creates a stable daily shuffle that is unique per category (salt)
+const getStableShuffled = (items, saltStr = '') => {
+  if (!items || items.length <= 1) return items;
+
+  const today = new Date();
+  // Base seed: YYYYMMDD (Changes at midnight)
+  const baseSeed =
+    today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+
+  // Convert the category name into a simple number to offset the seed
+  let salt = 0;
+  for (let i = 0; i < saltStr.length; i++) {
+    salt += saltStr.charCodeAt(i);
+  }
+
+  const seed = baseSeed + salt;
+
+  // Predictable pseudo-random number generator
+  const seededRandom = (index) => {
+    const x = Math.sin(seed + index) * 10000;
+    return x - Math.floor(x);
+  };
+
+  // Sort using the seeded value
+  return [...items].sort(
+    (a, b) => seededRandom(items.indexOf(a)) - seededRandom(items.indexOf(b)),
+  );
+};
+
 const SkeletonRail = ({ title, count = 6 }) => (
   <div className="space-y-1.5 shrink-0">
     <div
@@ -124,38 +153,50 @@ const TonightView = ({
 
   const unwatched = useMemo(
     () => items.filter((i) => i.status === 'unwatched'),
-    [items]
+    [items],
   );
 
   // 1. Low friction, easy viewing
-  const comfortWatches = useMemo(
-    () => unwatched.filter((i) => i.vibe === 'comfort' || i.energy === 'light'),
-    [unwatched]
-  );
+  const comfortWatches = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) => i.vibe === 'comfort' || i.energy === 'light',
+    );
+    return getStableShuffled(filtered, 'comfort');
+  }, [unwatched]);
 
   // 2. High attention, gripping narratives
-  const focusedWatches = useMemo(
-    () => unwatched.filter((i) => i.energy === 'focused' || i.vibe === 'gripping'),
-    [unwatched]
-  );
+  const focusedWatches = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) => i.energy === 'focused' || i.vibe === 'gripping',
+    );
+    return getStableShuffled(filtered, 'focused');
+  }, [unwatched]);
 
   // 3. 30 mins or less (Great for weeknights)
-  const quickBites = useMemo(
-    () => unwatched.filter((i) => i.type === 'show' && (i.runtimeMinutes <= 35 || i.runtime <= 35)),
-    [unwatched]
-  );
+  const quickBites = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) => i.type === 'show' && (i.runtimeMinutes <= 35 || i.runtime <= 35),
+    );
+    return getStableShuffled(filtered, 'quick');
+  }, [unwatched]);
 
   // 4. Guaranteed laughs
-  const comedies = useMemo(
-    () => unwatched.filter((i) => Array.isArray(i.genres) && i.genres.some(g => g.toLowerCase().includes('comedy'))),
-    [unwatched]
-  );
+  const comedies = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) =>
+        Array.isArray(i.genres) &&
+        i.genres.some((g) => g.toLowerCase().includes('comedy')),
+    );
+    return getStableShuffled(filtered, 'comedy');
+  }, [unwatched]);
 
   // 5. Visually stunning films
-  const visualMovies = useMemo(
-    () => unwatched.filter((i) => i.type === 'movie' && i.vibe === 'visual'),
-    [unwatched]
-  );
+  const visualMovies = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) => i.type === 'movie' && i.vibe === 'visual',
+    );
+    return getStableShuffled(filtered, 'visual');
+  }, [unwatched]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
@@ -218,22 +259,7 @@ const TonightView = ({
     const withoutLogo = withBackdrop.filter((item) => !hasHeroLogo(item));
     const ordered = [...withLogo, ...withoutLogo];
 
-    // Stable daily shuffle: seed from YYYYMMDD so it changes each day
-    // but stays consistent within a session
-    const today = new Date();
-    const seed =
-      today.getFullYear() * 10000 +
-      (today.getMonth() + 1) * 100 +
-      today.getDate();
-    const seededRandom = (i) => {
-      const x = Math.sin(seed + i) * 10000;
-      return x - Math.floor(x);
-    };
-    const shuffled = [...ordered].sort(
-      (a, b) => seededRandom(ordered.indexOf(a)) - seededRandom(ordered.indexOf(b)),
-    );
-
-    return shuffled.slice(0, 5);
+    return getStableShuffled(ordered, 'hero').slice(0, 5);
   }, [unwatched]);
   const showSkeleton = isLoading && items.length === 0;
 

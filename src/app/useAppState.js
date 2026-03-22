@@ -129,6 +129,8 @@ const scoreSearchResult = ({ result, title, type, year }) => {
 };
 
 const MIN_AUTO_MATCH_SCORE = 50;
+const NON_BLOCKING_METADATA_GAPS = new Set(['logo']);
+const MAX_REPAIR_SEARCH_CANDIDATES = 5;
 
 const pickBestSearchResult = ({ results, title, type, year }) => {
   if (!Array.isArray(results) || !results.length) return null;
@@ -143,6 +145,26 @@ const pickBestSearchResult = ({ results, title, type, year }) => {
   const top = ranked[0];
   if (!top || top.score < MIN_AUTO_MATCH_SCORE) return null;
   return top.result;
+};
+
+const countBlockingMetadataGaps = (gaps = []) =>
+  gaps.filter((gap) => !NON_BLOCKING_METADATA_GAPS.has(gap)).length;
+
+const isRepairAttemptBetter = (currentBest, challenger) => {
+  if (!challenger) return false;
+  if (!currentBest) return true;
+
+  const challengerBlocking = countBlockingMetadataGaps(challenger.remainingGaps);
+  const currentBlocking = countBlockingMetadataGaps(currentBest.remainingGaps);
+  if (challengerBlocking !== currentBlocking) {
+    return challengerBlocking < currentBlocking;
+  }
+
+  if (challenger.remainingGaps.length !== currentBest.remainingGaps.length) {
+    return challenger.remainingGaps.length < currentBest.remainingGaps.length;
+  }
+
+  return challenger.score > currentBest.score;
 };
 
 const resolveProviderIdentityFromImport = (item = {}) => {
@@ -294,13 +316,6 @@ const getMetadataGaps = (item = {}) => {
   const sourceProviderId = String(item?.source?.providerId || '').trim();
   const poster = String(item?.poster || item?.media?.poster || '').trim();
   const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
-  const logo = String(
-    item?.logo ||
-      item?.logoUrl ||
-      item?.media?.logo ||
-      item?.media?.logoUrl ||
-      '',
-  ).trim();
   const runtimeMinutes = Number(
     item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
   );
@@ -332,7 +347,6 @@ const getMetadataGaps = (item = {}) => {
   if (!sourceProvider || !sourceProviderId) gaps.push('source');
   if (!poster) gaps.push('poster');
   if (!backdrop) gaps.push('backdrop');
-  if (!logo) gaps.push('logo');
   if (!isShow && (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0)) {
     gaps.push('runtimeMinutes');
   }
@@ -348,6 +362,43 @@ const getMetadataGaps = (item = {}) => {
   }
 
   return gaps;
+};
+
+const mergeRefreshedItemState = (currentItem = {}, updates = {}) => {
+  const nextMedia = {
+    ...(currentItem?.media || {}),
+    ...(updates?.media || {}),
+  };
+  const nextShowData = updates?.showData || currentItem?.showData || {};
+
+  return {
+    ...currentItem,
+    ...updates,
+    source: updates?.source || currentItem?.source || {},
+    media: nextMedia,
+    showData: nextShowData,
+    title: updates?.title ?? nextMedia.title ?? currentItem?.title,
+    type: updates?.type ?? nextMedia.type ?? currentItem?.type,
+    year: updates?.year ?? nextMedia.year ?? currentItem?.year,
+    overview: updates?.overview ?? nextMedia.overview ?? currentItem?.overview,
+    runtimeMinutes:
+      updates?.runtimeMinutes ??
+      nextMedia.runtimeMinutes ??
+      currentItem?.runtimeMinutes,
+    genres: updates?.genres ?? nextMedia.genres ?? currentItem?.genres,
+    actors: updates?.actors ?? nextMedia.cast ?? currentItem?.actors,
+    director: updates?.director ?? currentItem?.director,
+    poster: updates?.poster ?? nextMedia.poster ?? currentItem?.poster,
+    backdrop:
+      updates?.backdrop ?? nextMedia.backdrop ?? currentItem?.backdrop,
+    logo: updates?.logo ?? nextMedia.logo ?? currentItem?.logo,
+    totalSeasons:
+      updates?.totalSeasons ??
+      nextShowData?.seasonCount ??
+      currentItem?.totalSeasons,
+    seasons: updates?.seasons ?? nextShowData?.seasons ?? currentItem?.seasons,
+    episodeProgress: updates?.episodeProgress ?? currentItem?.episodeProgress,
+  };
 };
 
 const buildMetadataAuditReport = (items = []) => {
@@ -1555,22 +1606,26 @@ export const useAppState = () => {
     setIsMetadataRepairing(true);
     let repaired = 0;
     let failed = 0;
+    const stillMissing = [];
     try {
       for (const item of candidates) {
         try {
           let provider = String(item?.source?.provider || '').trim();
           let providerId = String(item?.source?.providerId || '').trim();
-          let refreshed = null;
+          const itemType = item?.type === 'show' ? 'show' : 'movie';
+          let searchResults = null;
 
           if (!provider || !providerId) {
-            const itemType = item?.type === 'show' ? 'show' : 'movie';
             const searchData = await searchMedia({
               q: item.title,
               type: itemType,
               page: 1,
             });
+            searchResults = Array.isArray(searchData?.results)
+              ? searchData.results
+              : [];
             const best = pickBestSearchResult({
-              results: searchData?.results,
+              results: searchResults,
               title: item.title,
               type: itemType,
               year: item?.year,
@@ -1584,22 +1639,131 @@ export const useAppState = () => {
             continue;
           }
 
-          refreshed = await refreshMediaMetadata({
+          const refreshed = await refreshMediaMetadata({
             provider,
             providerId,
             type: item?.type || 'auto',
           });
+
+          const initialUpdates = buildUpdatesFromRefreshed(item, refreshed, {
+            recomputeShowStatus: false,
+          });
+          const initialNextItem = mergeRefreshedItemState(item, initialUpdates);
+          let bestAttempt = {
+            provider,
+            providerId,
+            refreshed,
+            updates: initialUpdates,
+            remainingGaps: getMetadataGaps(initialNextItem),
+            score: scoreSearchResult({
+              result: {
+                title: refreshed?.media?.title || item?.title,
+                type: refreshed?.media?.type || itemType,
+                year: refreshed?.media?.year || item?.year,
+              },
+              title: item?.title,
+              type: itemType,
+              year: item?.year,
+            }),
+          };
+
+          if (
+            countBlockingMetadataGaps(bestAttempt.remainingGaps) > 0 &&
+            item?.title
+          ) {
+            if (!searchResults) {
+              const searchData = await searchMedia({
+                q: item.title,
+                type: itemType,
+                page: 1,
+              });
+              searchResults = Array.isArray(searchData?.results)
+                ? searchData.results
+                : [];
+            }
+
+            for (const result of searchResults.slice(0, MAX_REPAIR_SEARCH_CANDIDATES)) {
+              const candidateProvider = String(result?.provider || '').trim();
+              const candidateProviderId = String(result?.providerId || '').trim();
+              if (!candidateProvider || !candidateProviderId) continue;
+              if (
+                candidateProvider === bestAttempt.provider &&
+                candidateProviderId === bestAttempt.providerId
+              ) {
+                continue;
+              }
+
+              try {
+                const candidateRefreshed = await refreshMediaMetadata({
+                  provider: candidateProvider,
+                  providerId: candidateProviderId,
+                  type: item?.type || 'auto',
+                });
+                const candidateUpdates = buildUpdatesFromRefreshed(
+                  item,
+                  candidateRefreshed,
+                  {
+                    recomputeShowStatus: false,
+                  },
+                );
+                const candidateNextItem = mergeRefreshedItemState(
+                  item,
+                  candidateUpdates,
+                );
+                const challenger = {
+                  provider: candidateProvider,
+                  providerId: candidateProviderId,
+                  refreshed: candidateRefreshed,
+                  updates: candidateUpdates,
+                  remainingGaps: getMetadataGaps(candidateNextItem),
+                  score: scoreSearchResult({
+                    result,
+                    title: item?.title,
+                    type: itemType,
+                    year: item?.year,
+                  }),
+                };
+
+                if (isRepairAttemptBetter(bestAttempt, challenger)) {
+                  bestAttempt = challenger;
+                }
+                if (countBlockingMetadataGaps(bestAttempt.remainingGaps) === 0) {
+                  break;
+                }
+              } catch (error) {
+                console.warn(
+                  'Metadata repair candidate failed for item:',
+                  item?.title,
+                  candidateProvider,
+                  candidateProviderId,
+                  error,
+                );
+              }
+            }
+          }
 
           await updateWatchlistItem({
             db,
             appId,
             spaceId,
             itemId: item.id,
-            updates: buildUpdatesFromRefreshed(item, refreshed, {
-              recomputeShowStatus: false,
-            }),
+            updates: bestAttempt.updates,
           });
-          repaired += 1;
+
+          if (countBlockingMetadataGaps(bestAttempt.remainingGaps) === 0) {
+            repaired += 1;
+          } else {
+            failed += 1;
+            stillMissing.push({
+              title: item?.title || '[untitled]',
+              gaps: bestAttempt.remainingGaps,
+            });
+            console.warn(
+              'Metadata repair incomplete for item:',
+              item?.title,
+              bestAttempt.remainingGaps,
+            );
+          }
         } catch (error) {
           console.warn('Metadata repair failed for item:', item?.title, error);
           failed += 1;
@@ -1613,7 +1777,17 @@ export const useAppState = () => {
       notifyUpdate(`Metadata repair completed for ${repaired} title(s).`);
     }
     if (failed > 0) {
-      notifyError(`${failed} title(s) still missing metadata after repair.`);
+      const detail = stillMissing
+        .slice(0, 3)
+        .map((entry) => `${entry.title} (${entry.gaps.join(', ')})`)
+        .join('; ');
+      notifyError(
+        `${
+          failed
+        } title(s) still missing metadata after repair.${
+          detail ? ` ${detail}` : ''
+        }`,
+      );
     }
   };
 

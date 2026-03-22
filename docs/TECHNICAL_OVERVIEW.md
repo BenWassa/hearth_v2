@@ -96,7 +96,7 @@ Logo is persisted into canonical `logo` field and consumed in Tonight hero.
 ## 9. Testing Strategy
 
 - API route tests: `npm run test:api` (`api/__tests__/*.test.js`)
-- Frontend/component tests: `react-scripts test`
+- Frontend/component tests: `npm run test:unit` (Vitest + jsdom)
 - Key targeted areas:
   - media mapper and request params
   - show progress utilities

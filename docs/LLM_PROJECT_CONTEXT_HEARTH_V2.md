@@ -43,7 +43,7 @@ Use this as `LLM_CONTEXT.md` when handing Hearth to another LLM.
 
 ## 4) Tech Stack
 ### Frontend
-- Framework: React 18 + Vite 5
+- Framework: React 18 + Vite 8
 - Language: JavaScript (ES modules, JSX — no TypeScript)
 - Styling: Tailwind CSS v3 + component-level CSS
 - UI utilities: `lucide-react` (icons), `clsx` + `tailwind-merge` (class composition)
@@ -72,8 +72,8 @@ Use this as `LLM_CONTEXT.md` when handing Hearth to another LLM.
 
 ### Tooling
 - Package manager: npm
-- Build tool: Vite 5
-- Test frameworks: `node --test` (built-in Node test runner) for API tests; React Scripts / Jest for frontend tests
+- Build tool: Vite 8
+- Test frameworks: `node --test` (built-in Node test runner) for API tests; Vitest + jsdom for frontend tests
 - Lint / format: ESLint + Prettier
 - Git hooks: `simple-git-hooks` (lockfile check on pre-push)
 - CI/CD: Firebase App Hosting automated deploy flow + manual release process
@@ -113,7 +113,7 @@ Use this as `LLM_CONTEXT.md` when handing Hearth to another LLM.
 - Install:
   - `npm ci`
 - Run:
-  - `npm run dev` — starts Vite dev server on port `5174`; `/api` requests are proxied to the API server on port `8080`
+  - `npm run dev` — starts the local dev servers; frontend runs on port `5174` and `/api` requests are served from the local backend on port `8080`
   - Demo mode locally: `VITE_HEARTH_MODE=template npm run dev`
   - App Hosting-style local runtime (serves built frontend + API from one process): `npm run start:apphosting`
 - Build:
@@ -152,11 +152,11 @@ Use this as `LLM_CONTEXT.md` when handing Hearth to another LLM.
     - Why used: auth, shared space data, watchlist persistence
     - Constraints: security rules enforce member/trusted-user constraints; demo-mode anonymous access is restricted to demo scope
 - Vendor SDKs with pinned versions:
-  - `firebase@^10.7.1`
-  - `firebase-admin@^13.6.1`
+  - `firebase@^12.11.0`
+  - `firebase-admin@^13.7.0`
   - `react@^18.2.0`
   - `react-dom@^18.2.0`
-  - `vite@^5.4.11`
+  - `vite@^8.0.1`
   - `express@^4.18.2`
 
 ## 9) Data Contracts

@@ -1,5 +1,6 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { vi } from 'vitest';
 import HeroCarousel from './HeroCarousel';
 
 const renderIntoDom = async (element) => {
@@ -25,7 +26,7 @@ describe('HeroCarousel', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('uses logo art when available and shows no title text fallback on image failure', async () => {
@@ -60,8 +61,8 @@ describe('HeroCarousel', () => {
   });
 
   it('auto-advances every 6 seconds and opens currently active item', async () => {
-    jest.useFakeTimers();
-    const onOpenDetails = jest.fn();
+    vi.useFakeTimers();
+    const onOpenDetails = vi.fn();
 
     const mounted = await renderIntoDom(
       <HeroCarousel
@@ -86,7 +87,7 @@ describe('HeroCarousel', () => {
     );
 
     await act(async () => {
-      jest.advanceTimersByTime(6000);
+      vi.advanceTimersByTime(6000);
     });
 
     const heroButton = mounted.container.querySelector('[role="button"]');

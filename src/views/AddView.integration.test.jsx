@@ -1,11 +1,12 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { vi } from 'vitest';
 import AddView from './AddView';
 import { useMediaSearch } from './hooks/useMediaSearch';
 import { getMediaDetails } from '../services/mediaApi/client';
 
-jest.mock('./hooks/useMediaSearch');
-jest.mock('../services/mediaApi/client');
+vi.mock('./hooks/useMediaSearch');
+vi.mock('../services/mediaApi/client');
 
 const renderIntoDom = async (element) => {
   const container = document.createElement('div');
@@ -67,7 +68,7 @@ describe('AddView integration', () => {
       cast: ['Actor A'],
     });
 
-    const onSubmit = jest.fn();
+    const onSubmit = vi.fn();
     const mounted = await renderIntoDom(
       <AddView onBack={() => {}} onSubmit={onSubmit} />,
     );

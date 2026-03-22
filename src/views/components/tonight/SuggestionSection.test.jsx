@@ -1,8 +1,9 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { vi } from 'vitest';
 import SuggestionSection from './SuggestionSection';
 
-jest.mock('../../../components/cards/ItemCard.js', () => {
+vi.mock('../../../components/cards/ItemCard.js', () => {
   return function MockItemCard({ item }) {
     return <div data-testid={`item-${item.id}`}>{item.title}</div>;
   };
@@ -31,15 +32,15 @@ describe('SuggestionSection rewind', () => {
   });
 
   beforeEach(() => {
-    window.matchMedia = jest.fn().mockImplementation(() => ({
+    window.matchMedia = vi.fn().mockImplementation(() => ({
       matches: false,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     }));
   });
 
   it('rewinds to start when scrolled to the end and rewind is enabled', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const mounted = await renderIntoDom(
       <SuggestionSection
         title="Movies"
@@ -58,7 +59,7 @@ describe('SuggestionSection rewind', () => {
     );
 
     const rail = mounted.container.querySelector('.overflow-x-auto');
-    rail.scrollTo = jest.fn();
+    rail.scrollTo = vi.fn();
     Object.defineProperty(rail, 'scrollWidth', {
       value: 600,
       configurable: true,
@@ -74,7 +75,7 @@ describe('SuggestionSection rewind', () => {
 
     await act(async () => {
       rail.dispatchEvent(new Event('scroll', { bubbles: true }));
-      jest.advanceTimersByTime(1200);
+      vi.advanceTimersByTime(1200);
     });
 
     expect(rail.scrollTo).toHaveBeenCalledWith({
@@ -83,6 +84,6 @@ describe('SuggestionSection rewind', () => {
     });
 
     await cleanupDom(mounted);
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

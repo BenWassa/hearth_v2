@@ -1,5 +1,6 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { vi } from 'vitest';
 import ActionBar from './ActionBar';
 
 const renderIntoDom = async (element) => {
@@ -28,7 +29,7 @@ describe('ActionBar', () => {
     const mounted = await renderIntoDom(
       <ActionBar
         item={{ id: 'show-1', type: 'show', status: 'unwatched' }}
-        onToggleStatus={jest.fn()}
+        onToggleStatus={vi.fn()}
       />,
     );
 
@@ -37,7 +38,7 @@ describe('ActionBar', () => {
   });
 
   it('renders mark watched button for unwatched movies', async () => {
-    const onToggleStatus = jest.fn();
+    const onToggleStatus = vi.fn();
     const mounted = await renderIntoDom(
       <ActionBar
         item={{ id: 'movie-1', type: 'movie', status: 'unwatched' }}

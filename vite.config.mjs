@@ -4,6 +4,19 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  oxc: {
+    include: [/src\/.*\.[jt]sx?$/],
+    exclude: [],
+    jsx: {
+      runtime: 'automatic',
+    },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
   server: {
     port: 5174,
     strictPort: true,
@@ -24,11 +37,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-  },
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.js$/,
-    exclude: [],
   },
   optimizeDeps: {
     esbuildOptions: {

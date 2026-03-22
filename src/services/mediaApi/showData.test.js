@@ -1,14 +1,15 @@
+import { vi } from 'vitest';
 import { hydrateShowData } from './showData.js';
 import { getSeasonEpisodes, getShowSeasons } from './client.js';
 
-jest.mock('./client.js', () => ({
-  getSeasonEpisodes: jest.fn(),
-  getShowSeasons: jest.fn(),
+vi.mock('./client.js', () => ({
+  getSeasonEpisodes: vi.fn(),
+  getShowSeasons: vi.fn(),
 }));
 
 describe('hydrateShowData', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('does not request episodes for season 0', async () => {

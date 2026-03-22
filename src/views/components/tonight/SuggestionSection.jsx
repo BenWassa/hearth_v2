@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Moon, Sparkles } from 'lucide-react';
+import { Moon } from 'lucide-react';
 import ItemCard from '../../../components/cards/ItemCard.jsx';
 
 // How many cards to clone at the end to create the seamless loop illusion
@@ -7,13 +7,11 @@ const CLONE_COUNT = 6;
 
 const SuggestionSection = ({
   title,
-  pool,
   suggestions,
   emptyLabel,
   onOpenDetails,
   onToggleStatus,
   layout = 'grid',
-  hideDecide = false,
   hideScrollbar = false,
   showEdgeFade = false,
   railPaddingClassName = '',

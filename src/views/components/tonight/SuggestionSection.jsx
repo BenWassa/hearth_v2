@@ -5,69 +5,6 @@ import ItemCard from '../../../components/cards/ItemCard.jsx';
 // How many cards to clone at the end to create the seamless loop illusion
 const CLONE_COUNT = 6;
 
-const PickActionCard = ({ title, pool, onOpenDetails, prefersReducedMotion }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  const handleClick = () => {
-    // Prevent double clicks while animating
-    if (!pool || pool.length === 0 || !onOpenDetails || isAnimating) return;
-
-    setIsAnimating(true);
-
-    // Skip the delay entirely if the user has requested reduced motion at the OS level
-    const delay = prefersReducedMotion ? 0 : 600;
-
-    setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * pool.length);
-      onOpenDetails(pool[randomIndex]);
-      setIsAnimating(false);
-    }, delay);
-  };
-
-  return (
-    <button
-      onClick={handleClick}
-      className={`w-full aspect-[2/3] rounded-xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-500 relative overflow-hidden ${
-        isAnimating
-          ? 'border-amber-500/80 bg-stone-800/80 scale-[0.97] shadow-inner shadow-black'
-          : 'border-stone-800/80 bg-stone-900/20 hover:bg-stone-800/60 hover:border-amber-500/50'
-      }`}
-      aria-label={`Pick a random title from ${title}`}
-    >
-      {/* Subtle sweeping glow effect while animating */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-tr from-amber-500/0 via-amber-500/10 to-amber-500/0 transition-opacity duration-500 ${
-          isAnimating ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
-
-      <div
-        className={`w-10 h-10 rounded-full bg-stone-900 shadow-inner shadow-black/50 flex items-center justify-center transition-all duration-300 relative z-10 ${
-          isAnimating
-            ? 'scale-110 bg-amber-500/30'
-            : 'group-hover:scale-110 group-hover:bg-amber-500/20'
-        }`}
-      >
-        <Sparkles className={`w-4 h-4 transition-all duration-300 ${
-          isAnimating
-            ? 'text-amber-300 animate-spin scale-125'
-            : 'text-stone-500 group-hover:text-amber-400'
-        }`} />
-      </div>
-
-      <span
-        className={`text-[10px] font-bold uppercase tracking-widest px-2 text-center leading-tight transition-all duration-300 relative z-10 ${
-          isAnimating
-            ? 'text-amber-400 animate-pulse'
-            : 'text-stone-500 group-hover:text-amber-400'
-        }`}
-      >
-        {isAnimating ? 'Shuffling...' : 'Pick for us'}
-      </span>
-    </button>
-  );
-};
-
 const SuggestionSection = ({
   title,
   pool,
@@ -114,11 +51,8 @@ const SuggestionSection = ({
     return () => mq.removeEventListener?.('change', sync);
   }, []);
 
-  // Construct the array of items to render, injecting the action card if enabled
-  const showPickCard = !hideDecide && pool.length > 0 && onOpenDetails;
-  const itemsWithPickCard = showPickCard
-    ? [{ isPickAction: true, id: `pick-${title}` }, ...suggestions]
-    : suggestions;
+  // Construct the array of items to render
+  const itemsWithPickCard = suggestions;
 
   // For looping rails we clone the first N cards at the end.
   // When the user scrolls into the clone zone we silently jump back
@@ -219,21 +153,12 @@ const SuggestionSection = ({
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    {item.isPickAction ? (
-                      <PickActionCard
-                        title={title}
-                        pool={pool}
-                        onOpenDetails={onOpenDetails}
-                        prefersReducedMotion={prefersReducedMotion}
-                      />
-                    ) : (
-                      <ItemCard
-                        item={item}
-                        onToggle={() => onToggleStatus(item.id, item.status)}
-                        minimal={false}
-                        onOpenDetails={onOpenDetails}
-                      />
-                    )}
+                    <ItemCard
+                      item={item}
+                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      minimal={false}
+                      onOpenDetails={onOpenDetails}
+                    />
                   </div>
                 ))}
                 {/* Clone zone — invisible to the user, triggers seamless teleport */}
@@ -244,21 +169,12 @@ const SuggestionSection = ({
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    {item.isPickAction ? (
-                      <PickActionCard
-                        title={title}
-                        pool={pool}
-                        onOpenDetails={onOpenDetails}
-                        prefersReducedMotion={prefersReducedMotion}
-                      />
-                    ) : (
-                      <ItemCard
-                        item={item}
-                        onToggle={() => onToggleStatus(item.id, item.status)}
-                        minimal={false}
-                        onOpenDetails={onOpenDetails}
-                      />
-                    )}
+                    <ItemCard
+                      item={item}
+                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      minimal={false}
+                      onOpenDetails={onOpenDetails}
+                    />
                   </div>
                 ))}
               </div>
@@ -277,23 +193,13 @@ const SuggestionSection = ({
         ) : (
           <div className="grid grid-cols-3 gap-1.5">
             {itemsWithPickCard.map((item) => (
-              <React.Fragment key={item.id}>
-                {item.isPickAction ? (
-                  <PickActionCard
-                    title={title}
-                    pool={pool}
-                    onOpenDetails={onOpenDetails}
-                    prefersReducedMotion={prefersReducedMotion}
-                  />
-                ) : (
-                  <ItemCard
-                    item={item}
-                    onToggle={() => onToggleStatus(item.id, item.status)}
-                    minimal={false}
-                    onOpenDetails={onOpenDetails}
-                  />
-                )}
-              </React.Fragment>
+              <ItemCard
+                key={item.id}
+                item={item}
+                onToggle={() => onToggleStatus(item.id, item.status)}
+                minimal={false}
+                onOpenDetails={onOpenDetails}
+              />
             ))}
           </div>
         )

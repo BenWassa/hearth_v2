@@ -5,14 +5,76 @@ import ItemCard from '../../../components/cards/ItemCard.jsx';
 // How many cards to clone at the end to create the seamless loop illusion
 const CLONE_COUNT = 6;
 
+const PickActionCard = ({ title, pool, onOpenDetails, prefersReducedMotion }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleClick = () => {
+    // Prevent double clicks while animating
+    if (!pool || pool.length === 0 || !onOpenDetails || isAnimating) return;
+
+    setIsAnimating(true);
+
+    // Skip the delay entirely if the user has requested reduced motion at the OS level
+    const delay = prefersReducedMotion ? 0 : 600;
+
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      onOpenDetails(pool[randomIndex]);
+      setIsAnimating(false);
+    }, delay);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`w-full aspect-[2/3] rounded-xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-500 relative overflow-hidden ${
+        isAnimating
+          ? 'border-amber-500/80 bg-stone-800/80 scale-[0.97] shadow-inner shadow-black'
+          : 'border-stone-800/80 bg-stone-900/20 hover:bg-stone-800/60 hover:border-amber-500/50'
+      }`}
+      aria-label={`Pick a random title from ${title}`}
+    >
+      {/* Subtle sweeping glow effect while animating */}
+      <div
+        className={`absolute inset-0 bg-gradient-to-tr from-amber-500/0 via-amber-500/10 to-amber-500/0 transition-opacity duration-500 ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      <div
+        className={`w-10 h-10 rounded-full bg-stone-900 shadow-inner shadow-black/50 flex items-center justify-center transition-all duration-300 relative z-10 ${
+          isAnimating
+            ? 'scale-110 bg-amber-500/30'
+            : 'group-hover:scale-110 group-hover:bg-amber-500/20'
+        }`}
+      >
+        <Sparkles className={`w-4 h-4 transition-all duration-300 ${
+          isAnimating
+            ? 'text-amber-300 animate-spin scale-125'
+            : 'text-stone-500 group-hover:text-amber-400'
+        }`} />
+      </div>
+
+      <span
+        className={`text-[10px] font-bold uppercase tracking-widest px-2 text-center leading-tight transition-all duration-300 relative z-10 ${
+          isAnimating
+            ? 'text-amber-400 animate-pulse'
+            : 'text-stone-500 group-hover:text-amber-400'
+        }`}
+      >
+        {isAnimating ? 'Shuffling...' : 'Pick for us'}
+      </span>
+    </button>
+  );
+};
+
 const SuggestionSection = ({
   title,
   pool,
   suggestions,
   emptyLabel,
-  onDecide,
-  onToggleStatus,
   onOpenDetails,
+  onToggleStatus,
   layout = 'grid',
   hideDecide = false,
   hideScrollbar = false,
@@ -20,7 +82,6 @@ const SuggestionSection = ({
   railPaddingClassName = '',
   enableRewind = false,
   className = '',
-  // --- New Props ---
   Icon,
   size = 'md',
 }) => {
@@ -53,12 +114,18 @@ const SuggestionSection = ({
     return () => mq.removeEventListener?.('change', sync);
   }, []);
 
+  // Construct the array of items to render, injecting the action card if enabled
+  const showPickCard = !hideDecide && pool.length > 0 && onOpenDetails;
+  const itemsWithPickCard = showPickCard
+    ? [{ isPickAction: true, id: `pick-${title}` }, ...suggestions]
+    : suggestions;
+
   // For looping rails we clone the first N cards at the end.
   // When the user scrolls into the clone zone we silently jump back
   // to the equivalent real position — no visible snap, seamless loop.
   const loopEnabled =
-    enableRewind && !prefersReducedMotion && suggestions.length > 2;
-  const clones = loopEnabled ? suggestions.slice(0, CLONE_COUNT) : [];
+    enableRewind && !prefersReducedMotion && itemsWithPickCard.length > 2;
+  const clones = loopEnabled ? itemsWithPickCard.slice(0, CLONE_COUNT) : [];
 
   const updateEdgeState = () => {
     const rail = railRef.current;
@@ -79,7 +146,7 @@ const SuggestionSection = ({
     const firstCard = rail.querySelector('[data-rail-card]');
     if (!firstCard) return;
     const cardWidth = firstCard.offsetWidth + 10; // +gap (gap-2.5 = 10px)
-    const realContentWidth = cardWidth * suggestions.length;
+    const realContentWidth = cardWidth * itemsWithPickCard.length;
 
     if (rail.scrollLeft >= realContentWidth) {
       // Cancel any pending frame so we don't double-fire
@@ -117,22 +184,11 @@ const SuggestionSection = ({
 
   return (
     <div className={`space-y-2 ${isRail ? 'flex flex-col' : ''} ${className}`}>
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-1.5">
-          {Icon && <Icon className="w-4 h-4 text-stone-500" />}
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
-            {title}
-          </h3>
-        </div>
-        {!hideDecide && pool.length > 0 && onDecide && (
-          <button
-            onClick={() => onDecide(pool)}
-            className="text-xs text-amber-600 hover:text-amber-500 flex items-center gap-1"
-          >
-            <Sparkles className="w-3 h-3" />
-            Pick for us
-          </button>
-        )}
+      <div className="flex items-center gap-1.5 px-1">
+        {Icon && <Icon className="w-4 h-4 text-stone-500" />}
+        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
+          {title}
+        </h3>
       </div>
       {suggestions.length > 0 ? (
         isRail ? (
@@ -156,19 +212,28 @@ const SuggestionSection = ({
               }}
             >
               <div className="flex gap-2.5 min-w-max">
-                {suggestions.map((item) => (
+                {itemsWithPickCard.map((item, index) => (
                   <div
                     key={item.id}
-                    data-rail-card
+                    data-rail-card={index === 0 ? 'true' : undefined}
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    <ItemCard
-                      item={item}
-                      onToggle={() => onToggleStatus(item.id, item.status)}
-                      minimal={false}
-                      onOpenDetails={onOpenDetails}
-                    />
+                    {item.isPickAction ? (
+                      <PickActionCard
+                        title={title}
+                        pool={pool}
+                        onOpenDetails={onOpenDetails}
+                        prefersReducedMotion={prefersReducedMotion}
+                      />
+                    ) : (
+                      <ItemCard
+                        item={item}
+                        onToggle={() => onToggleStatus(item.id, item.status)}
+                        minimal={false}
+                        onOpenDetails={onOpenDetails}
+                      />
+                    )}
                   </div>
                 ))}
                 {/* Clone zone — invisible to the user, triggers seamless teleport */}
@@ -179,12 +244,21 @@ const SuggestionSection = ({
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    <ItemCard
-                      item={item}
-                      onToggle={() => onToggleStatus(item.id, item.status)}
-                      minimal={false}
-                      onOpenDetails={onOpenDetails}
-                    />
+                    {item.isPickAction ? (
+                      <PickActionCard
+                        title={title}
+                        pool={pool}
+                        onOpenDetails={onOpenDetails}
+                        prefersReducedMotion={prefersReducedMotion}
+                      />
+                    ) : (
+                      <ItemCard
+                        item={item}
+                        onToggle={() => onToggleStatus(item.id, item.status)}
+                        minimal={false}
+                        onOpenDetails={onOpenDetails}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -202,14 +276,24 @@ const SuggestionSection = ({
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-1.5">
-            {suggestions.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onToggle={() => onToggleStatus(item.id, item.status)}
-                minimal={false}
-                onOpenDetails={onOpenDetails}
-              />
+            {itemsWithPickCard.map((item) => (
+              <React.Fragment key={item.id}>
+                {item.isPickAction ? (
+                  <PickActionCard
+                    title={title}
+                    pool={pool}
+                    onOpenDetails={onOpenDetails}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                ) : (
+                  <ItemCard
+                    item={item}
+                    onToggle={() => onToggleStatus(item.id, item.status)}
+                    minimal={false}
+                    onOpenDetails={onOpenDetails}
+                  />
+                )}
+              </React.Fragment>
             ))}
           </div>
         )

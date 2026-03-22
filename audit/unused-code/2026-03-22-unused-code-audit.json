@@ -1,0 +1,218 @@
+{
+  "audit_date": "2026-03-22",
+  "scope": "deprecated old unused code and files audit",
+  "method": {
+    "entrypoints": [
+      "src/index.jsx",
+      "server/index.js",
+      "api/health.js",
+      "api/search.js",
+      "api/media/refresh.js",
+      "api/media/[provider]/[id].js",
+      "api/media/[provider]/[id]/seasons.js",
+      "api/media/[provider]/[id]/season/[seasonNumber].js",
+      "scripts/setupFirebaseConfig.js",
+      "scripts/versioning.js",
+      "scripts/startDevServers.js",
+      "scripts/findFreePort.js",
+      "scripts/installGitHooks.js",
+      "scripts/generateTemplateMediaMap.mjs"
+    ],
+    "scanned_code_files": 111,
+    "reachable_code_files": 85,
+    "unreachable_code_files": 26,
+    "notes": [
+      "Static import/require reachability only; dynamic references were manually cross-checked for flagged candidates.",
+      "Generated artifacts and test-only files were separated from runtime removal candidates."
+    ]
+  },
+  "candidates": [
+    {
+      "path": "src/components/ItemDetailsModal/hooks/useItemData.js",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unreferenced hook; equivalent item merge logic is inlined in src/components/ItemDetailsModal.jsx.",
+      "evidence": [
+        "No imports found in repo runtime or tests.",
+        "Functionality duplicated in active modal component."
+      ],
+      "recommended_action": "delete_after_diff_check"
+    },
+    {
+      "path": "src/components/ItemDetailsModal/hooks/useModalEffects.js",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unreferenced hook; equivalent modal side effects are inlined in src/components/ItemDetailsModal.jsx.",
+      "evidence": [
+        "No imports found in repo runtime or tests.",
+        "Body scroll, timer, and backdrop reset logic already exist in active modal component."
+      ],
+      "recommended_action": "delete_after_diff_check"
+    },
+    {
+      "path": "src/lib/utils.js",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unused cn() helper; appears to be leftover shadcn/ui scaffold.",
+      "evidence": [
+        "No cn() imports found.",
+        "File only exports className composition helper."
+      ],
+      "recommended_action": "delete_with_components_json_review"
+    },
+    {
+      "path": "src/views/components/tonight/EnergyPickModal.jsx",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unused orphaned modal component.",
+      "evidence": [
+        "No imports found in runtime or tests."
+      ],
+      "recommended_action": "delete_or_rewire"
+    },
+    {
+      "path": "src/views/components/tonight/VibePickModal.jsx",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unused orphaned modal component.",
+      "evidence": [
+        "No imports found in runtime or tests."
+      ],
+      "recommended_action": "delete_or_rewire"
+    },
+    {
+      "path": "src/views/components/tonight/PickForUsCard.jsx",
+      "kind": "code_file",
+      "confidence": "high",
+      "status": "candidate_remove",
+      "reason": "Unused orphaned card component tied to the same dormant pick-flow UI.",
+      "evidence": [
+        "No imports found in runtime or tests."
+      ],
+      "recommended_action": "delete_or_rewire"
+    },
+    {
+      "path": "src/domain/watchlist.js",
+      "kind": "code_file",
+      "confidence": "medium",
+      "status": "candidate_archive_or_remove",
+      "reason": "Only referenced by src/tonightTray.test.js; current runtime does not use this selection algorithm.",
+      "evidence": [
+        "No runtime imports found.",
+        "Only importer found is test file."
+      ],
+      "recommended_action": "confirm_feature_is_retired_then_delete_with_test"
+    },
+    {
+      "path": "components.json",
+      "kind": "config_file",
+      "confidence": "medium",
+      "status": "candidate_remove",
+      "reason": "Looks like leftover shadcn/ui config; no active generator workflow was found.",
+      "evidence": [
+        "Points at src/lib/utils alias, which is itself unused.",
+        "No tools/commands/docs in current repo require it."
+      ],
+      "recommended_action": "remove_if_shadcn_not_used"
+    },
+    {
+      "path": "package.json#dependencies.cors",
+      "kind": "dependency",
+      "confidence": "medium",
+      "status": "candidate_remove",
+      "reason": "Installed dependency with no repo-local usage found.",
+      "evidence": [
+        "No import/require usage found in src, server, api, scripts, or config files."
+      ],
+      "recommended_action": "remove_if_no_external_requirement"
+    },
+    {
+      "path": "package.json#devDependencies.yaml",
+      "kind": "dependency",
+      "confidence": "medium",
+      "status": "candidate_remove",
+      "reason": "Installed dependency with no repo-local usage found.",
+      "evidence": [
+        "No import/require usage found in repo-local code or config."
+      ],
+      "recommended_action": "remove_if_no_external_requirement"
+    }
+  ],
+  "test_only_unreachable_files": [
+    "api/__tests__/health.test.js",
+    "api/__tests__/media.test.js",
+    "api/__tests__/rateLimit.test.js",
+    "api/__tests__/search.test.js",
+    "api/__tests__/seasonEpisodes.test.js",
+    "api/__tests__/seasons.test.js",
+    "src/components/ItemDetailsModal/components/ActionBar.test.jsx",
+    "src/components/ItemDetailsModal/utils/normalizers.test.js",
+    "src/components/ItemDetailsModal/utils/showProgress.test.js",
+    "src/components/cards/showCardProgress.test.js",
+    "src/importer.test.js",
+    "src/services/firebase/spaces.test.js",
+    "src/services/mediaApi/showData.test.js",
+    "src/setupTests.js",
+    "src/tonightTray.test.js",
+    "src/views/AddView.integration.test.jsx",
+    "src/views/components/tonight/HeroCarousel.test.jsx",
+    "src/views/components/tonight/SuggestionSection.test.jsx",
+    "api/__tests__/testUtils.js"
+  ],
+  "known_live_assets_or_generated_files": [
+    "src/template/seed-media-map.json",
+    "src/media-map.json",
+    "src/backdrop-map.json",
+    "src/poster-map.json",
+    "public/episode-index.json",
+    "public/episode-map.json",
+    "public/episode-map/*",
+    "public/manifest.json",
+    "public/icons/*",
+    "public/apple-touch-icon.png",
+    "public/sw.js",
+    "public/version.json",
+    "src/version.js"
+  ],
+  "docs_drift": [
+    {
+      "path": "README.md",
+      "issue": "References src/App.js; actual file is src/App.jsx."
+    },
+    {
+      "path": "README.md",
+      "issue": "References absent paths: _archive/PRODUCT.md, _archive/SETUP_FIREBASE.md, _archive/SETUP_IMPORT.md, tools/hearth-poster-tool/, SPRINTS_NEW_REPO.md, docs/BACKEND_MIGRATION_CONTROL_PLANE.md, docs/VNEXT_APP_HOSTING_ROADMAP.md, docs/VNEXT_KEEP_ARCHIVE_MATRIX.md."
+    },
+    {
+      "path": "docs/TECHNICAL_OVERVIEW.md",
+      "issue": "References src/App.js instead of src/App.jsx."
+    },
+    {
+      "path": "docs/LLM_PROJECT_CONTEXT_HEARTH_V2.md",
+      "issue": "Uses several .js paths for current .jsx files, including TonightHeaderMenu."
+    }
+  ],
+  "verification": {
+    "lint": {
+      "command": "npm run lint",
+      "status": "failed",
+      "notes": [
+        "src/components/media/LazyMediaImage.jsx uses fetchpriority instead of fetchPriority."
+      ]
+    },
+    "unit_tests": {
+      "command": "npm run test:unit",
+      "status": "failed",
+      "notes": [
+        "HeroCarousel tests fail because ResizeObserver is not defined in test environment.",
+        "SuggestionSection rewind test currently fails its scrollTo assertion.",
+        "AddView integration test currently fails because onSubmit is not called."
+      ]
+    }
+  }
+}

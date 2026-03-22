@@ -1,4 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Cloud,
+  Smile,
+  Clock,
+  Zap,
+  MonitorPlay,
+} from 'lucide-react';
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
@@ -366,6 +373,8 @@ const TonightView = ({
                 {comfortWatches.length > 0 && (
                   <SuggestionSection
                     title="Easy & Comforting"
+                    Icon={Cloud}
+                    size="md"
                     pool={comfortWatches}
                     suggestions={comfortWatches}
                     emptyLabel="Nothing light queued right now."
@@ -383,6 +392,8 @@ const TonightView = ({
                 {comedies.length > 0 && (
                   <SuggestionSection
                     title="Need a Laugh"
+                    Icon={Smile}
+                    size="md"
                     pool={comedies}
                     suggestions={comedies}
                     emptyLabel="No comedies queued up."
@@ -400,6 +411,8 @@ const TonightView = ({
                 {quickBites.length > 0 && (
                   <SuggestionSection
                     title="Quick Bites (< 35m)"
+                    Icon={Clock}
+                    size="sm"
                     pool={quickBites}
                     suggestions={quickBites}
                     emptyLabel="No short episodes available."
@@ -417,6 +430,8 @@ const TonightView = ({
                 {focusedWatches.length > 0 && (
                   <SuggestionSection
                     title="Deep Dives (Phones Down)"
+                    Icon={Zap}
+                    size="lg"
                     pool={focusedWatches}
                     suggestions={focusedWatches}
                     emptyLabel="No intense watches queued."
@@ -434,6 +449,8 @@ const TonightView = ({
                 {visualMovies.length > 0 && (
                   <SuggestionSection
                     title="Spectacles"
+                    Icon={MonitorPlay}
+                    size="lg"
                     pool={visualMovies}
                     suggestions={visualMovies}
                     emptyLabel="No visually driven films right now."

@@ -18,9 +18,11 @@ const SuggestionSection = ({
   hideScrollbar = false,
   showEdgeFade = false,
   railPaddingClassName = '',
-  cardWidthClassName = 'w-[clamp(6.53rem,14.4vw,8.55rem)]',
   enableRewind = false,
   className = '',
+  // --- New Props ---
+  Icon,
+  size = 'md',
 }) => {
   const isRail = layout === 'rail';
   const railRef = useRef(null);
@@ -28,6 +30,14 @@ const SuggestionSection = ({
   const isPointerDownRef = useRef(false);
   const [atStart, setAtStart] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Map sizes to specific width clamps
+  const sizeStyles = {
+    sm: 'w-[clamp(5.5rem,13vw,7.5rem)]', // Tighter, smaller
+    md: 'w-[clamp(6.53rem,14.4vw,8.55rem)]', // Standard
+    lg: 'w-[clamp(8.5rem,18vw,12rem)]', // Wider, feature size
+  };
+  const activeWidthClass = sizeStyles[size] || sizeStyles.md;
 
   useEffect(() => {
     if (
@@ -108,9 +118,12 @@ const SuggestionSection = ({
   return (
     <div className={`space-y-2 ${isRail ? 'flex flex-col' : ''} ${className}`}>
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
-          {title}
-        </h3>
+        <div className="flex items-center gap-1.5">
+          {Icon && <Icon className="w-4 h-4 text-stone-500" />}
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
+            {title}
+          </h3>
+        </div>
         {!hideDecide && pool.length > 0 && onDecide && (
           <button
             onClick={() => onDecide(pool)}
@@ -147,7 +160,7 @@ const SuggestionSection = ({
                   <div
                     key={item.id}
                     data-rail-card
-                    className={`${cardWidthClassName} shrink-0`}
+                    className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ItemCard
@@ -163,7 +176,7 @@ const SuggestionSection = ({
                   <div
                     key={`clone-${item.id}-${i}`}
                     aria-hidden="true"
-                    className={`${cardWidthClassName} shrink-0`}
+                    className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ItemCard

@@ -9,9 +9,13 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 - Required secrets configured in Firebase App Hosting:
   - `MEDIA_PROVIDER_API_KEY` or `MEDIA_PROVIDER_READ_TOKEN`
   - `API_TIMEOUT_MS`
+  - `API_RATE_LIMIT_TOKENS_PER_SEC`
+  - `API_RATE_LIMIT_BURST`
+  - `API_RATE_LIMIT_SCOPE_WEIGHTS`
+  - `APP_ID`
+- Legacy fallback vars if token bucket is intentionally not configured:
   - `API_RATE_LIMIT_WINDOW_MS`
   - `API_RATE_LIMIT_MAX`
-  - `APP_ID`
 - Firestore rules and indexes deployed for v2 schema compatibility.
 
 ## Pre-Deploy Checklist

@@ -133,7 +133,8 @@ Use this as `LLM_CONTEXT.md` when handing Hearth to another LLM.
   - `APP_ID`: Firestore artifacts namespace (default: `hearth-default`)
   - `MEDIA_PROVIDER_READ_TOKEN` or `MEDIA_PROVIDER_API_KEY`: TMDB credentials for backend API
   - `API_TIMEOUT_MS`: upstream request timeout (default `7000`)
-  - `API_RATE_LIMIT_WINDOW_MS` + `API_RATE_LIMIT_MAX` or token-bucket vars: backend rate limiting
+  - `API_RATE_LIMIT_TOKENS_PER_SEC` + `API_RATE_LIMIT_BURST` (+ optional `API_RATE_LIMIT_SCOPE_WEIGHTS`) as the primary backend rate-limit config
+  - `API_RATE_LIMIT_WINDOW_MS` + `API_RATE_LIMIT_MAX` only for legacy fixed-window fallback
   - `PORT`: server port for apphosting runtime (default `8080`)
   - `FIREBASE_SERVICE_ACCOUNT_PATH` or `GOOGLE_APPLICATION_CREDENTIALS`: Firebase Admin credentials path
   - `VITE_HEARTH_MODE`: optional frontend mode override (`template`)

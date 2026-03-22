@@ -10,7 +10,7 @@ This app applies a local token-bucket limiter before TMDB calls to smooth bursts
   - default:
   - `{"search":1,"media-details":1,"media-seasons":1,"media-episodes":2,"refresh":2}`
 
-Legacy fallback remains supported:
+Legacy fixed-window fallback is still supported for compatibility, but should not be the primary configuration for new environments:
 - `API_RATE_LIMIT_WINDOW_MS`
 - `API_RATE_LIMIT_MAX`
 

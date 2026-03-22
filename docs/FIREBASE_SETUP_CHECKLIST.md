@@ -86,9 +86,14 @@ Set these in Firebase App Hosting (runtime/build environment as needed):
 
 - [ ] `MEDIA_PROVIDER_API_KEY` or `MEDIA_PROVIDER_READ_TOKEN`
 - [ ] `API_TIMEOUT_MS`
+- [ ] `API_RATE_LIMIT_TOKENS_PER_SEC`
+- [ ] `API_RATE_LIMIT_BURST`
+- [ ] `API_RATE_LIMIT_SCOPE_WEIGHTS`
+- [ ] `APP_ID`
+
+Legacy fallback only:
 - [ ] `API_RATE_LIMIT_WINDOW_MS`
 - [ ] `API_RATE_LIMIT_MAX`
-- [ ] `APP_ID`
 
 Recommended production source of truth:
 - `apphosting.production.yaml`

@@ -18,7 +18,6 @@ const PosterCard = ({
   const [posterMissing, setPosterMissing] = useState(false);
   const posterSrc = getPosterSrc(item);
   const isWatched = item.status === 'watched';
-  const isWatching = item.status === 'watching';
   const energyDef = ENERGIES.find((e) => e.id === item.energy);
 
   const progressPercentage = useMemo(() => {

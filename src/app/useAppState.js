@@ -15,7 +15,6 @@ import {
 import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
-import { copyToClipboard } from '../utils/clipboard.js';
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';

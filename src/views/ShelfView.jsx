@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { normalizeSearchText } from '../utils/text.js';
-import PosterCard from '../components/cards/PosterCard.js';
-import ItemDetailsModal from '../components/ItemDetailsModal.js';
+import PosterCard from '../components/cards/PosterCard.jsx';
+import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 
 const ShelfView = ({
   items,

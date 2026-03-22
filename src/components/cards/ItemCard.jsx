@@ -1,5 +1,5 @@
 import React from 'react';
-import PosterCard from './PosterCard.js';
+import PosterCard from './PosterCard.jsx';
 
 const ItemCard = (props) => <PosterCard {...props} />;
 

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Battery, ChevronLeft, Film, Sparkles, Tv } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { getPosterSrc } from '../utils/poster.js';
-import Button from '../components/ui/Button.js';
-import PosterPlaceholder from '../components/cards/PosterPlaceholder.js';
-import LazyMediaImage from '../components/media/LazyMediaImage.js';
+import Button from '../components/ui/Button.jsx';
+import PosterPlaceholder from '../components/cards/PosterPlaceholder.jsx';
+import LazyMediaImage from '../components/media/LazyMediaImage.jsx';
 
 const DecisionView = ({
   isDeciding,

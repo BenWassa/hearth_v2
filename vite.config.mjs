@@ -4,13 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  oxc: {
-    include: [/src\/.*\.[jt]sx?$/],
-    exclude: [],
-    jsx: {
-      runtime: 'automatic',
-    },
-  },
+  oxc: false,
   test: {
     globals: true,
     environment: 'jsdom',
@@ -18,17 +12,9 @@ export default defineConfig({
     include: ['src/**/*.test.{js,jsx}'],
   },
   server: {
-    port: 5174,
-    strictPort: true,
-    hmr: {
-      host: 'localhost',
-      protocol: 'ws',
-      clientPort: 5174,
-      port: 5174,
-    },
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        target: `http://127.0.0.1:${process.env.BACKEND_PORT || 8080}`,
         changeOrigin: true,
       },
     },
@@ -39,6 +25,8 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
+    // Vite 8 uses Rolldown. Currently there may be a gap configuring .js as jsx for scanner.
+    // Keeping esbuildOptions for now to ensure scanner works.
     esbuildOptions: {
       loader: {
         '.js': 'jsx',

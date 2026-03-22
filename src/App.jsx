@@ -5,12 +5,12 @@ import {
   isTemplateMode,
   useConfiguredAppState,
 } from './app/useConfiguredAppState.js';
-import OnboardingView from './views/OnboardingView.js';
-import TonightView from './views/TonightView.js';
-import ShelfView from './views/ShelfView.js';
-import AddView from './views/AddView.js';
-import ImportModal from './views/ImportModal.js';
-import DecisionView from './views/DecisionView.js';
+import OnboardingView from './views/OnboardingView.jsx';
+import TonightView from './views/TonightView.jsx';
+import ShelfView from './views/ShelfView.jsx';
+import AddView from './views/AddView.jsx';
+import ImportModal from './views/ImportModal.jsx';
+import DecisionView from './views/DecisionView.jsx';
 
 export default function HearthApp() {
   const {

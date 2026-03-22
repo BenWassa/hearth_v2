@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Film, MessageSquare, Tv } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
-import Button from '../components/ui/Button.js';
-import Input from '../components/ui/Input.js';
-import TextArea from '../components/ui/TextArea.js';
+import Button from '../components/ui/Button.jsx';
+import Input from '../components/ui/Input.jsx';
+import TextArea from '../components/ui/TextArea.jsx';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import EpisodeItem from './EpisodeItem.js';
+import EpisodeItem from './EpisodeItem.jsx';
 
 const ShowSeasonsSection = ({
   seasons,

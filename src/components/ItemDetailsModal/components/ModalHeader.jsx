@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import PosterPlaceholder from '../../cards/PosterPlaceholder.js';
-import LazyMediaImage from '../../media/LazyMediaImage.js';
+import PosterPlaceholder from '../../cards/PosterPlaceholder.jsx';
+import LazyMediaImage from '../../media/LazyMediaImage.jsx';
 
 const ModalHeader = ({
   backdropSrc,

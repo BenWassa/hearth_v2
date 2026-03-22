@@ -9,8 +9,8 @@ import {
   validateItem,
 } from '../domain/import/importer.js';
 import { copyToClipboard } from '../utils/clipboard.js';
-import Button from '../components/ui/Button.js';
-import TextArea from '../components/ui/TextArea.js';
+import Button from '../components/ui/Button.jsx';
+import TextArea from '../components/ui/TextArea.jsx';
 
 const UX_PROGRESS_FAST_MS = 2500;
 const UX_PROGRESS_SETTLE_MS = 2500;

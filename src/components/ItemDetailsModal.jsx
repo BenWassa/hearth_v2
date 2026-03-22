@@ -26,13 +26,13 @@ import {
   getShowEntryTarget,
   isEpisodeWatched,
 } from './ItemDetailsModal/utils/showProgress.js';
-import MovieTimingCard from './ItemDetailsModal/components/MovieTimingCard.js';
-import CastSection from './ItemDetailsModal/components/CastSection.js';
-import ActionBar from './ItemDetailsModal/components/ActionBar.js';
-import TitleBlock from './ItemDetailsModal/components/TitleBlock.js';
-import ModalHeader from './ItemDetailsModal/components/ModalHeader.js';
-import ModalContentHeader from './ItemDetailsModal/components/ModalContentHeader.js';
-import ShowSeasonsSection from './ItemDetailsModal/components/ShowSeasonsSection.js';
+import MovieTimingCard from './ItemDetailsModal/components/MovieTimingCard.jsx';
+import CastSection from './ItemDetailsModal/components/CastSection.jsx';
+import ActionBar from './ItemDetailsModal/components/ActionBar.jsx';
+import TitleBlock from './ItemDetailsModal/components/TitleBlock.jsx';
+import ModalHeader from './ItemDetailsModal/components/ModalHeader.jsx';
+import ModalContentHeader from './ItemDetailsModal/components/ModalContentHeader.jsx';
+import ShowSeasonsSection from './ItemDetailsModal/components/ShowSeasonsSection.jsx';
 
 const hydratedShowCache = new Map();
 const hydratedShowPromises = new Map();

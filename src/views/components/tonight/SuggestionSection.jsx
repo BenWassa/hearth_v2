@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Moon, Sparkles } from 'lucide-react';
-import ItemCard from '../../../components/cards/ItemCard.js';
+import ItemCard from '../../../components/cards/ItemCard.jsx';
 
 // How many cards to clone at the end to create the seamless loop illusion
 const CLONE_COUNT = 6;

@@ -3,8 +3,8 @@ import { Plus, Check, Trash2, CheckCircle2 } from 'lucide-react';
 import { ENERGIES } from '../../config/constants.js';
 import { getPosterSrc } from '../../utils/poster.js';
 import { getShowWatchProgressPercent } from './showCardProgress.js';
-import PosterPlaceholder from './PosterPlaceholder.js';
-import LazyMediaImage from '../media/LazyMediaImage.js';
+import PosterPlaceholder from './PosterPlaceholder.jsx';
+import LazyMediaImage from '../media/LazyMediaImage.jsx';
 
 const PosterCard = ({
   item,

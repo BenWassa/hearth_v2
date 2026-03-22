@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
-import ItemDetailsModal from '../components/ItemDetailsModal.js';
-import BottomNav from './components/tonight/BottomNav.js';
-import HeroCarousel from './components/tonight/HeroCarousel.js';
-import MetadataAuditModal from './components/tonight/MetadataAuditModal.js';
-import SuggestionSection from './components/tonight/SuggestionSection.js';
-import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.js';
-import WipeConfirmModal from './components/tonight/WipeConfirmModal.js';
+import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
+import BottomNav from './components/tonight/BottomNav.jsx';
+import HeroCarousel from './components/tonight/HeroCarousel.jsx';
+import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
+import SuggestionSection from './components/tonight/SuggestionSection.jsx';
+import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
+import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
 

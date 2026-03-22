@@ -40,7 +40,7 @@ const LazyMediaImage = ({
         alt={alt}
         loading={loading}
         decoding={decoding}
-        fetchpriority={fetchPriority}
+        fetchPriority={fetchPriority}
         className={`${className} transition-opacity duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
         }`.trim()}

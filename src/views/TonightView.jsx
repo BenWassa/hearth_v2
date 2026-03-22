@@ -121,13 +121,40 @@ const TonightView = ({
         }),
     [items],
   );
-  const unwatchedMovies = useMemo(
-    () => items.filter((i) => i.type === 'movie' && i.status === 'unwatched'),
-    [items],
+
+  const unwatched = useMemo(
+    () => items.filter((i) => i.status === 'unwatched'),
+    [items]
   );
-  const unwatchedShows = useMemo(
-    () => items.filter((i) => i.type === 'show' && i.status === 'unwatched'),
-    [items],
+
+  // 1. Low friction, easy viewing
+  const comfortWatches = useMemo(
+    () => unwatched.filter((i) => i.vibe === 'comfort' || i.energy === 'light'),
+    [unwatched]
+  );
+
+  // 2. High attention, gripping narratives
+  const focusedWatches = useMemo(
+    () => unwatched.filter((i) => i.energy === 'focused' || i.vibe === 'gripping'),
+    [unwatched]
+  );
+
+  // 3. 30 mins or less (Great for weeknights)
+  const quickBites = useMemo(
+    () => unwatched.filter((i) => i.type === 'show' && (i.runtimeMinutes <= 35 || i.runtime <= 35)),
+    [unwatched]
+  );
+
+  // 4. Guaranteed laughs
+  const comedies = useMemo(
+    () => unwatched.filter((i) => Array.isArray(i.genres) && i.genres.some(g => g.toLowerCase().includes('comedy'))),
+    [unwatched]
+  );
+
+  // 5. Visually stunning films
+  const visualMovies = useMemo(
+    () => unwatched.filter((i) => i.type === 'movie' && i.vibe === 'visual'),
+    [unwatched]
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -185,7 +212,7 @@ const TonightView = ({
   }, [detailItem, items]);
 
   const heroItems = useMemo(() => {
-    const candidates = [...unwatchedMovies, ...unwatchedShows];
+    const candidates = unwatched;
     const withBackdrop = candidates.filter((item) => hasHeroBackdrop(item));
     const withLogo = withBackdrop.filter((item) => hasHeroLogo(item));
     const withoutLogo = withBackdrop.filter((item) => !hasHeroLogo(item));
@@ -207,7 +234,7 @@ const TonightView = ({
     );
 
     return shuffled.slice(0, 5);
-  }, [unwatchedMovies, unwatchedShows]);
+  }, [unwatched]);
   const showSkeleton = isLoading && items.length === 0;
 
   const handleOpenDeleteAll = () => {
@@ -284,8 +311,8 @@ const TonightView = ({
                   </div>
                 </div>
                 <SkeletonRail title="Currently Watching" />
-                <SkeletonRail title="Movies" />
-                <SkeletonRail title="TV Shows" />
+                <SkeletonRail title="Easy & Comforting" />
+                <SkeletonRail title="Need a Laugh" />
               </>
             ) : (
               <>
@@ -308,36 +335,92 @@ const TonightView = ({
                   />
                 )}
 
-                <SuggestionSection
-                  title="Movies"
-                  pool={unwatchedMovies}
-                  suggestions={unwatchedMovies}
-                  emptyLabel="No movies queued yet."
-                  onToggleStatus={onToggleStatus}
-                  onOpenDetails={openDetails}
-                  layout="rail"
-                  hideScrollbar
-                  showEdgeFade
-                  railPaddingClassName="px-1"
-                  hideDecide
-                  enableRewind
-                  className="shrink-0"
-                />
-                <SuggestionSection
-                  title="TV Shows"
-                  pool={unwatchedShows}
-                  suggestions={unwatchedShows}
-                  emptyLabel="No shows queued yet."
-                  onToggleStatus={onToggleStatus}
-                  onOpenDetails={openDetails}
-                  layout="rail"
-                  hideScrollbar
-                  showEdgeFade
-                  railPaddingClassName="px-1"
-                  hideDecide
-                  enableRewind
-                  className="shrink-0"
-                />
+                {/* --- New Thematic Sections --- */}
+
+                {comfortWatches.length > 0 && (
+                  <SuggestionSection
+                    title="Easy & Comforting"
+                    pool={comfortWatches}
+                    suggestions={comfortWatches}
+                    emptyLabel="Nothing light queued right now."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
+
+                {comedies.length > 0 && (
+                  <SuggestionSection
+                    title="Need a Laugh"
+                    pool={comedies}
+                    suggestions={comedies}
+                    emptyLabel="No comedies queued up."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
+
+                {quickBites.length > 0 && (
+                  <SuggestionSection
+                    title="Quick Bites (< 35m)"
+                    pool={quickBites}
+                    suggestions={quickBites}
+                    emptyLabel="No short episodes available."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
+
+                {focusedWatches.length > 0 && (
+                  <SuggestionSection
+                    title="Deep Dives (Phones Down)"
+                    pool={focusedWatches}
+                    suggestions={focusedWatches}
+                    emptyLabel="No intense watches queued."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
+
+                {visualMovies.length > 0 && (
+                  <SuggestionSection
+                    title="Spectacles"
+                    pool={visualMovies}
+                    suggestions={visualMovies}
+                    emptyLabel="No visually driven films right now."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
               </>
             )}
           </div>

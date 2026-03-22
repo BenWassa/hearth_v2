@@ -18,8 +18,6 @@ const TonightHeaderMenu = ({
   onExport,
   showDevMetadataTools,
   openAuditModal,
-  onMetadataRepairMissing,
-  isMetadataRepairing,
   onDeleteAll,
   onOpenDeleteAll,
   onSignOut,
@@ -123,20 +121,6 @@ const TonightHeaderMenu = ({
                       >
                         <Wrench className="w-4 h-4 shrink-0" />
                         Audit metadata
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          onMetadataRepairMissing?.();
-                        }}
-                        disabled={isMetadataRepairing}
-                        className="w-full px-4 py-2.5 text-left text-sm text-amber-400/80 hover:bg-amber-950/20 hover:text-amber-300 transition-colors flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                        role="menuitem"
-                      >
-                        <Wrench className="w-4 h-4 shrink-0" />
-                        {isMetadataRepairing
-                          ? 'Repairing...'
-                          : 'Repair missing metadata'}
                       </button>
                     </>
                   )}

@@ -243,8 +243,6 @@ const TonightView = ({
             onExport={onExport}
             showDevMetadataTools={showDevMetadataTools}
             openAuditModal={openAuditModal}
-            onMetadataRepairMissing={onMetadataRepairMissing}
-            isMetadataRepairing={isMetadataRepairing}
             onDeleteAll={onDeleteAll}
             onOpenDeleteAll={handleOpenDeleteAll}
             onSignOut={onSignOut}
@@ -362,6 +360,8 @@ const TonightView = ({
         onClose={() => setIsAuditModalOpen(false)}
         isAuditLoading={isAuditLoading}
         auditReport={auditReport}
+        onMetadataRepairMissing={onMetadataRepairMissing}
+        isMetadataRepairing={isMetadataRepairing}
       />
 
       <WipeConfirmModal

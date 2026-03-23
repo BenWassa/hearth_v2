@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Cloud,
+  Armchair,
+  Coffee,
+  Eye,
   Smile,
   Clock,
+  Tv,
   Zap,
-  MonitorPlay,
 } from 'lucide-react';
 import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
@@ -205,6 +207,14 @@ const TonightView = ({
     return getStableShuffled(filtered, 'visual');
   }, [unwatched]);
 
+  // 6. Classic films
+  const classicMovies = useMemo(() => {
+    const filtered = unwatched.filter(
+      (i) => i.type === 'movie' && i.vibe === 'classic',
+    );
+    return getStableShuffled(filtered, 'classic');
+  }, [unwatched]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -354,6 +364,7 @@ const TonightView = ({
                 {currentlyWatchingShows.length > 0 && (
                   <SuggestionSection
                     title="Currently Watching"
+                    Icon={Tv}
                     pool={currentlyWatchingShows}
                     suggestions={currentlyWatchingShows}
                     emptyLabel="No shows in progress yet."
@@ -373,7 +384,7 @@ const TonightView = ({
                 {comfortWatches.length > 0 && (
                   <SuggestionSection
                     title="Easy & Comforting"
-                    Icon={Cloud}
+                    Icon={Coffee}
                     size="md"
                     pool={comfortWatches}
                     suggestions={comfortWatches}
@@ -449,11 +460,30 @@ const TonightView = ({
                 {visualMovies.length > 0 && (
                   <SuggestionSection
                     title="Spectacles"
-                    Icon={MonitorPlay}
+                    Icon={Eye}
                     size="lg"
                     pool={visualMovies}
                     suggestions={visualMovies}
                     emptyLabel="No visually driven films right now."
+                    onToggleStatus={onToggleStatus}
+                    onOpenDetails={openDetails}
+                    layout="rail"
+                    hideScrollbar
+                    showEdgeFade
+                    railPaddingClassName="px-1"
+                    enableRewind
+                    className="shrink-0"
+                  />
+                )}
+
+                {classicMovies.length > 0 && (
+                  <SuggestionSection
+                    title="The Classics"
+                    Icon={Armchair}
+                    size="lg"
+                    pool={classicMovies}
+                    suggestions={classicMovies}
+                    emptyLabel="No classics queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
                     layout="rail"

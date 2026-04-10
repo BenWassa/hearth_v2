@@ -13,10 +13,7 @@ import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
-import {
-  balanceRows,
-  dedupeRowsInOrder,
-} from './components/tonight/sectionBalance.js';
+import { balanceRows } from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
@@ -230,16 +227,14 @@ const TonightView = ({
     uniqueClassicMovies,
   ] = useMemo(
     () =>
-      balanceRows(
-        dedupeRowsInOrder([
-          comfortWatches,
-          comedies,
-          quickBites,
-          focusedWatches,
-          visualMovies,
-          classicMovies,
-        ]),
-      ),
+      balanceRows([
+        comfortWatches,
+        comedies,
+        quickBites,
+        focusedWatches,
+        visualMovies,
+        classicMovies,
+      ]),
     [
       comfortWatches,
       comedies,

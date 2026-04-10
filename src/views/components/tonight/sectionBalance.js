@@ -1,26 +1,3 @@
-const getItemDedupeKey = (item) => {
-  if (!item || typeof item !== 'object') return null;
-  if (item.id != null && item.id !== '') return `id:${item.id}`;
-  const title = String(item.title || '')
-    .trim()
-    .toLowerCase();
-  if (!title) return null;
-  return `fallback:${item.type || ''}:${title}:${item.year || ''}`;
-};
-
-export const dedupeRowsInOrder = (rows) => {
-  const seen = new Set();
-  return rows.map((row) =>
-    row.filter((item) => {
-      const key = getItemDedupeKey(item);
-      if (!key) return true;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    }),
-  );
-};
-
 export const getBalancedRowCounts = (lengths) => {
   const normalized = lengths.map((length) => Math.max(0, Number(length) || 0));
   const activeRowCount = normalized.filter((length) => length > 0).length;

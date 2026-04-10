@@ -1,6 +1,5 @@
 import {
   balanceRows,
-  dedupeRowsInOrder,
   getBalancedRowCounts,
 } from './sectionBalance.js';
 
@@ -9,20 +8,6 @@ const makeItems = (prefix, count) =>
     id: `${prefix}-${index + 1}`,
     title: `${prefix} ${index + 1}`,
   }));
-
-describe('dedupeRowsInOrder', () => {
-  it('removes duplicates from later rows while preserving row priority', () => {
-    const shared = { id: 'shared', title: 'Shared' };
-
-    const [first, second] = dedupeRowsInOrder([
-      [shared, { id: 'first-only', title: 'First only' }],
-      [shared, { id: 'second-only', title: 'Second only' }],
-    ]);
-
-    expect(first.map((item) => item.id)).toEqual(['shared', 'first-only']);
-    expect(second.map((item) => item.id)).toEqual(['second-only']);
-  });
-});
 
 describe('getBalancedRowCounts', () => {
   it('caps larger rows so counts stay closer together', () => {

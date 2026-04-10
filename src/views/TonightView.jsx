@@ -143,6 +143,7 @@ const TonightView = ({
         .filter((item) => {
           if (item?.type !== 'show') return false;
           if (item?.status === 'watched') return false;
+          if (item?.status === 'watching') return true;
           const watchedAny = Object.values(item?.episodeProgress || {}).some(
             Boolean,
           );

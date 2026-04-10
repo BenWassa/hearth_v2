@@ -27,6 +27,8 @@ const ShelfView = ({
   isBulkDeleting = false,
   onBack,
 }) => {
+  const FALLBACK_VIBE_GROUP = 'ungrouped';
+  const FALLBACK_ENERGY_GROUP = 'ungrouped';
   const watched = useMemo(
     () => items.filter((i) => i.status === 'watched'),
     [items],
@@ -165,12 +167,12 @@ const ShelfView = ({
       );
     } else if (sortBy === 'energy') {
       ENERGIES.forEach((e) => (groups[e.id] = []));
+      groups[FALLBACK_ENERGY_GROUP] = [];
 
       backlog.forEach((item) => {
-        const energyId = item.energy || 'balanced';
-        if (groups[energyId]) {
-          groups[energyId].push(item);
-        }
+        const energyId = item.energy || FALLBACK_ENERGY_GROUP;
+        const targetGroup = groups[energyId] ? energyId : FALLBACK_ENERGY_GROUP;
+        groups[targetGroup].push(item);
       });
 
       Object.keys(groups).forEach((key) => {
@@ -178,11 +180,12 @@ const ShelfView = ({
       });
     } else {
       VIBES.forEach((v) => (groups[v.id] = []));
+      groups[FALLBACK_VIBE_GROUP] = [];
 
       backlog.forEach((item) => {
-        if (groups[item.vibe]) {
-          groups[item.vibe].push(item);
-        }
+        const vibeId = item.vibe || FALLBACK_VIBE_GROUP;
+        const targetGroup = groups[vibeId] ? vibeId : FALLBACK_VIBE_GROUP;
+        groups[targetGroup].push(item);
       });
 
       Object.keys(groups).forEach((key) => {
@@ -416,22 +419,26 @@ const ShelfView = ({
                   let header = null;
                   let HeaderIcon = null;
 
-                  if (sortBy === 'alphabetical') {
-                    header = 'All Items';
-                  } else if (sortBy === 'energy') {
-                    const energyDef = ENERGIES.find((e) => e.id === groupId);
-                    if (energyDef) {
-                      header = energyDef.label;
-                      HeaderIcon = energyDef.icon;
+                    if (sortBy === 'alphabetical') {
+                      header = 'All Items';
+                    } else if (sortBy === 'energy') {
+                      const energyDef = ENERGIES.find((e) => e.id === groupId);
+                      if (energyDef) {
+                        header = energyDef.label;
+                        HeaderIcon = energyDef.icon;
+                      } else {
+                        header = 'Unsorted';
+                      }
+                    } else {
+                      // vibe mode
+                      const vibeDef = VIBES.find((v) => v.id === groupId);
+                      if (vibeDef) {
+                        header = vibeDef.label;
+                        HeaderIcon = vibeDef.icon;
+                      } else {
+                        header = 'Unsorted';
+                      }
                     }
-                  } else {
-                    // vibe mode
-                    const vibeDef = VIBES.find((v) => v.id === groupId);
-                    if (vibeDef) {
-                      header = vibeDef.label;
-                      HeaderIcon = vibeDef.icon;
-                    }
-                  }
 
                   return (
                     <div key={groupId} className={sectionGapClassName}>
@@ -521,12 +528,16 @@ const ShelfView = ({
                       if (energyDef) {
                         header = energyDef.label;
                         HeaderIcon = energyDef.icon;
+                      } else {
+                        header = 'Unsorted';
                       }
                     } else {
                       const vibeDef = VIBES.find((v) => v.id === groupId);
                       if (vibeDef) {
                         header = vibeDef.label;
                         HeaderIcon = vibeDef.icon;
+                      } else {
+                        header = 'Unsorted';
                       }
                     }
 

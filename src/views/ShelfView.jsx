@@ -124,10 +124,10 @@ const ShelfView = ({
     }
   };
 
-  // Apply type filters to unwatched items
-  const unwatched = useMemo(() => {
+  // Active library includes both untouched titles and in-progress shows.
+  const libraryItems = useMemo(() => {
     return items.filter((i) => {
-      if (i.status !== 'unwatched') return false;
+      if (i.status === 'watched') return false;
       if (!showMovies && i.type === 'movie') return false;
       if (!showShows && i.type === 'show') return false;
       return true;
@@ -141,8 +141,8 @@ const ShelfView = ({
     });
   }, [watched, showMovies, showShows]);
   const searchBaseItems = useMemo(
-    () => (viewTab === 'memories' ? watchedFiltered : unwatched),
-    [viewTab, watchedFiltered, unwatched],
+    () => (viewTab === 'memories' ? watchedFiltered : libraryItems),
+    [viewTab, watchedFiltered, libraryItems],
   );
   const filteredItems = useMemo(() => {
     if (!isSearching) return [];
@@ -193,10 +193,10 @@ const ShelfView = ({
     return groups;
   };
 
-  // Group/sort unwatched based on sortBy setting
+  // Group/sort active library items based on sortBy setting
   const itemsByVibe = useMemo(() => {
-    return buildGroupedItems(unwatched);
-  }, [unwatched, sortBy]);
+    return buildGroupedItems(libraryItems);
+  }, [libraryItems, sortBy]);
   const memoriesByGroup = useMemo(() => {
     return buildGroupedItems(watchedFiltered);
   }, [watchedFiltered, sortBy]);

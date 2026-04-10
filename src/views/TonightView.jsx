@@ -13,6 +13,10 @@ import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
+import {
+  balanceRows,
+  dedupeRowsInOrder,
+} from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
@@ -56,29 +60,6 @@ const hasHeroLogo = (item) =>
   );
 
 const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
-
-const getItemDedupeKey = (item) => {
-  if (!item || typeof item !== 'object') return null;
-  if (item.id != null && item.id !== '') return `id:${item.id}`;
-  const title = String(item.title || '')
-    .trim()
-    .toLowerCase();
-  if (!title) return null;
-  return `fallback:${item.type || ''}:${title}:${item.year || ''}`;
-};
-
-const dedupeRowsInOrder = (rows) => {
-  const seen = new Set();
-  return rows.map((row) =>
-    row.filter((item) => {
-      const key = getItemDedupeKey(item);
-      if (!key) return true;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    }),
-  );
-};
 
 // Creates a stable daily shuffle that is unique per category (salt)
 const getStableShuffled = (items, saltStr = '') => {
@@ -243,19 +224,30 @@ const TonightView = ({
   const [
     uniqueComfortWatches,
     uniqueComedies,
+    uniqueQuickBites,
     uniqueFocusedWatches,
     uniqueVisualMovies,
     uniqueClassicMovies,
   ] = useMemo(
     () =>
-      dedupeRowsInOrder([
-        comfortWatches,
-        comedies,
-        focusedWatches,
-        visualMovies,
-        classicMovies,
-      ]),
-    [comfortWatches, comedies, focusedWatches, visualMovies, classicMovies],
+      balanceRows(
+        dedupeRowsInOrder([
+          comfortWatches,
+          comedies,
+          quickBites,
+          focusedWatches,
+          visualMovies,
+          classicMovies,
+        ]),
+      ),
+    [
+      comfortWatches,
+      comedies,
+      quickBites,
+      focusedWatches,
+      visualMovies,
+      classicMovies,
+    ],
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -462,13 +454,13 @@ const TonightView = ({
                   />
                 )}
 
-                {quickBites.length > 0 && (
+                {uniqueQuickBites.length > 0 && (
                   <SuggestionSection
                     title="Quick Bites"
                     Icon={Clock}
                     size="sm"
-                    pool={quickBites}
-                    suggestions={quickBites}
+                    pool={uniqueQuickBites}
+                    suggestions={uniqueQuickBites}
                     emptyLabel="No short episodes available."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const LazyMediaImage = ({
   src,
@@ -13,6 +13,7 @@ const LazyMediaImage = ({
   fallback = null,
 }) => {
   const prevSrcRef = useRef(src);
+  const imgRef = useRef(null);
   // Synchronously reset on src change to avoid a render with stale error state
   const [isLoading, setIsLoading] = useState(Boolean(src));
   const [isErrored, setIsErrored] = useState(false);
@@ -22,6 +23,15 @@ const LazyMediaImage = ({
     setIsLoading(Boolean(src));
     setIsErrored(false);
   }
+
+  useEffect(() => {
+    if (!imgRef.current) return;
+    if (fetchPriority) {
+      imgRef.current.setAttribute('fetchpriority', fetchPriority);
+      return;
+    }
+    imgRef.current.removeAttribute('fetchpriority');
+  }, [fetchPriority, src]);
 
   if (!src || isErrored) {
     return fallback;
@@ -36,11 +46,11 @@ const LazyMediaImage = ({
         />
       )}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         loading={loading}
         decoding={decoding}
-        fetchPriority={fetchPriority}
         className={`${className} transition-opacity duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
         }`.trim()}

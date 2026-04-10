@@ -57,6 +57,29 @@ const hasHeroLogo = (item) =>
 
 const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
 
+const getItemDedupeKey = (item) => {
+  if (!item || typeof item !== 'object') return null;
+  if (item.id != null && item.id !== '') return `id:${item.id}`;
+  const title = String(item.title || '')
+    .trim()
+    .toLowerCase();
+  if (!title) return null;
+  return `fallback:${item.type || ''}:${title}:${item.year || ''}`;
+};
+
+const dedupeRowsInOrder = (rows) => {
+  const seen = new Set();
+  return rows.map((row) =>
+    row.filter((item) => {
+      const key = getItemDedupeKey(item);
+      if (!key) return true;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }),
+  );
+};
+
 // Creates a stable daily shuffle that is unique per category (salt)
 const getStableShuffled = (items, saltStr = '') => {
   if (!items || items.length <= 1) return items;
@@ -193,6 +216,8 @@ const TonightView = ({
   const comedies = useMemo(() => {
     const filtered = unwatched.filter(
       (i) =>
+        i.vibe !== 'gripping' &&
+        i.vibe !== 'visual' &&
         Array.isArray(i.genres) &&
         i.genres.some((g) => g.toLowerCase().includes('comedy')),
     );
@@ -214,6 +239,24 @@ const TonightView = ({
     );
     return getStableShuffled(filtered, 'classic');
   }, [unwatched]);
+
+  const [
+    uniqueComfortWatches,
+    uniqueComedies,
+    uniqueFocusedWatches,
+    uniqueVisualMovies,
+    uniqueClassicMovies,
+  ] = useMemo(
+    () =>
+      dedupeRowsInOrder([
+        comfortWatches,
+        comedies,
+        focusedWatches,
+        visualMovies,
+        classicMovies,
+      ]),
+    [comfortWatches, comedies, focusedWatches, visualMovies, classicMovies],
+  );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
@@ -381,13 +424,13 @@ const TonightView = ({
 
                 {/* --- New Thematic Sections --- */}
 
-                {comfortWatches.length > 0 && (
+                {uniqueComfortWatches.length > 0 && (
                   <SuggestionSection
                     title="Easy & Comforting"
                     Icon={Coffee}
                     size="md"
-                    pool={comfortWatches}
-                    suggestions={comfortWatches}
+                    pool={uniqueComfortWatches}
+                    suggestions={uniqueComfortWatches}
                     emptyLabel="Nothing light queued right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
@@ -400,13 +443,13 @@ const TonightView = ({
                   />
                 )}
 
-                {comedies.length > 0 && (
+                {uniqueComedies.length > 0 && (
                   <SuggestionSection
                     title="Need a Laugh"
                     Icon={Smile}
                     size="md"
-                    pool={comedies}
-                    suggestions={comedies}
+                    pool={uniqueComedies}
+                    suggestions={uniqueComedies}
                     emptyLabel="No comedies queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
@@ -421,7 +464,7 @@ const TonightView = ({
 
                 {quickBites.length > 0 && (
                   <SuggestionSection
-                    title="Quick Bites (< 35m)"
+                    title="Quick Bites"
                     Icon={Clock}
                     size="sm"
                     pool={quickBites}
@@ -438,13 +481,13 @@ const TonightView = ({
                   />
                 )}
 
-                {focusedWatches.length > 0 && (
+                {uniqueFocusedWatches.length > 0 && (
                   <SuggestionSection
-                    title="Deep Dives (Phones Down)"
+                    title="Deep Dives"
                     Icon={Zap}
                     size="lg"
-                    pool={focusedWatches}
-                    suggestions={focusedWatches}
+                    pool={uniqueFocusedWatches}
+                    suggestions={uniqueFocusedWatches}
                     emptyLabel="No intense watches queued."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
@@ -457,13 +500,13 @@ const TonightView = ({
                   />
                 )}
 
-                {visualMovies.length > 0 && (
+                {uniqueVisualMovies.length > 0 && (
                   <SuggestionSection
                     title="Spectacles"
                     Icon={Eye}
                     size="lg"
-                    pool={visualMovies}
-                    suggestions={visualMovies}
+                    pool={uniqueVisualMovies}
+                    suggestions={uniqueVisualMovies}
                     emptyLabel="No visually driven films right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
@@ -476,13 +519,13 @@ const TonightView = ({
                   />
                 )}
 
-                {classicMovies.length > 0 && (
+                {uniqueClassicMovies.length > 0 && (
                   <SuggestionSection
                     title="The Classics"
                     Icon={Armchair}
                     size="lg"
-                    pool={classicMovies}
-                    suggestions={classicMovies}
+                    pool={uniqueClassicMovies}
+                    suggestions={uniqueClassicMovies}
                     emptyLabel="No classics queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}

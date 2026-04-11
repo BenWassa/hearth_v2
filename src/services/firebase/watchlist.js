@@ -295,20 +295,30 @@ export const subscribeWatchlist = ({ db, appId, spaceId, onNext, onError }) => {
   const q = query(
     collection(db, 'artifacts', appId, 'spaces', spaceId, 'watchlist_items'),
   );
+  let snapshotGeneration = 0;
   return onSnapshot(
     q,
     (snapshot) => {
+      const generation = snapshotGeneration + 1;
+      snapshotGeneration = generation;
       Promise.all(
         snapshot.docs.map(async (docSnap) => {
           const watchData = docSnap.data();
           const mediaId = asString(watchData.mediaId || docSnap.id);
           let catalogData = {};
           if (mediaId) {
-            const catalogSnapshot = await getDoc(
-              getCatalogDocRef(db, appId, mediaId),
-            );
-            if (catalogSnapshot.exists()) {
-              catalogData = catalogSnapshot.data();
+            try {
+              const catalogSnapshot = await getDoc(
+                getCatalogDocRef(db, appId, mediaId),
+              );
+              if (catalogSnapshot.exists()) {
+                catalogData = catalogSnapshot.data();
+              }
+            } catch (err) {
+              console.warn('Failed to load catalog data for watchlist item', {
+                mediaId,
+                err,
+              });
             }
           }
           const merged = mergeWatchlistWithCatalog(watchData, catalogData);
@@ -318,7 +328,10 @@ export const subscribeWatchlist = ({ db, appId, spaceId, onNext, onError }) => {
           };
         }),
       )
-        .then((docs) => onNext({ docs }))
+        .then((docs) => {
+          if (generation !== snapshotGeneration) return;
+          onNext({ docs });
+        })
         .catch((err) => {
           if (onError) onError(err);
         });
@@ -334,7 +347,7 @@ export const addWatchlistItem = async ({ db, appId, spaceId, payload }) => {
 
   const batch = writeBatch(db);
   batch.set(mediaRef, buildCatalogPayload(payload, mediaId), { merge: true });
-  batch.set(watchRef, buildWatchlistPayload(payload, mediaId), { merge: true });
+  batch.set(watchRef, buildWatchlistPayload(payload, mediaId));
   await batch.commit();
   return watchRef;
 };

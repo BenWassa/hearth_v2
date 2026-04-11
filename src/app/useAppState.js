@@ -15,7 +15,7 @@ import {
 import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
-import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
@@ -73,27 +73,6 @@ const getInitialView = () => {
     console.warn('Failed to parse stored view', err);
     return 'onboarding';
   }
-};
-
-const isShowFullyWatched = (item) => {
-  if (!item || item.type !== 'show') return true;
-  const seasons = Array.isArray(item.seasons) ? item.seasons : [];
-  const seasonsWithEpisodes = seasons.filter(
-    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
-  );
-  if (!seasonsWithEpisodes.length) return false;
-  const progress = item.episodeProgress || {};
-  return seasonsWithEpisodes.every((season) =>
-    season.episodes.every((episode) =>
-      isEpisodeWatched(progress, {
-        ...episode,
-        seasonNumber:
-          episode?.seasonNumber ?? episode?.season_number ?? season?.number,
-        number:
-          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
-      }),
-    ),
-  );
 };
 
 const normalizeSearchText = (value) =>

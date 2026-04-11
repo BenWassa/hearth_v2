@@ -43,6 +43,28 @@ export const isEpisodeWatched = (episodeProgress, episode) =>
     Boolean(episodeProgress?.[key]),
   );
 
+const getEpisodeProgressShape = (episode, season) => ({
+  ...episode,
+  seasonNumber:
+    episode?.seasonNumber ?? episode?.season_number ?? season?.number,
+  number: episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
+});
+
+export const isShowFullyWatched = (item) => {
+  if (!item || item.type !== 'show') return true;
+  const seasons = Array.isArray(item.seasons) ? item.seasons : [];
+  const seasonsWithEpisodes = seasons.filter(
+    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
+  );
+  if (!seasonsWithEpisodes.length) return false;
+  const progress = item.episodeProgress || {};
+  return seasonsWithEpisodes.every((season) =>
+    season.episodes.every((episode) =>
+      isEpisodeWatched(progress, getEpisodeProgressShape(episode, season)),
+    ),
+  );
+};
+
 export const getShowEntryTarget = ({ seasons, episodeProgress }) => {
   if (!Array.isArray(seasons) || seasons.length === 0) return null;
   const progress = episodeProgress || {};

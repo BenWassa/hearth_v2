@@ -1,4 +1,4 @@
-import { getShowEntryTarget } from './showProgress';
+import { getShowEntryTarget, isShowFullyWatched } from './showProgress';
 
 describe('getShowEntryTarget', () => {
   it('targets next unwatched episode in chronological order', () => {
@@ -156,5 +156,48 @@ describe('getShowEntryTarget', () => {
       seasonNumber: 1,
       episodeId: 's1e2',
     });
+  });
+});
+
+describe('isShowFullyWatched', () => {
+  it('returns true when every episode is watched across normalized episode shapes', () => {
+    const item = {
+      type: 'show',
+      seasons: [
+        {
+          number: 1,
+          episodes: [
+            { episodeId: 's1e1', episodeNumber: 1 },
+            { id: 's1e2', number: 2 },
+          ],
+        },
+      ],
+      episodeProgress: {
+        s1e1: true,
+        s1e2: true,
+      },
+    };
+
+    expect(isShowFullyWatched(item)).toBe(true);
+  });
+
+  it('returns false when a show has season data but not all episodes are watched', () => {
+    const item = {
+      type: 'show',
+      seasons: [
+        {
+          number: 3,
+          episodes: [
+            { episodeId: 's3e1', episodeNumber: 1 },
+            { episodeId: 's3e2', episodeNumber: 2 },
+          ],
+        },
+      ],
+      episodeProgress: {
+        s3e1: true,
+      },
+    };
+
+    expect(isShowFullyWatched(item)).toBe(false);
   });
 });

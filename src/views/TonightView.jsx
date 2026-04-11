@@ -8,7 +8,7 @@ import {
   Tv,
   Zap,
 } from 'lucide-react';
-import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
@@ -24,26 +24,6 @@ const getModifiedAt = (item) =>
   toMillis(
     item?.updatedAt || item?.startedAt || item?.createdAt || item?.timestamp,
   );
-
-const isShowComplete = (item) => {
-  const seasons = Array.isArray(item?.seasons) ? item.seasons : [];
-  const seasonsWithEpisodes = seasons.filter(
-    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
-  );
-  if (!seasonsWithEpisodes.length) return false;
-  const progress = item?.episodeProgress || {};
-  return seasonsWithEpisodes.every((season) =>
-    season.episodes.every((episode) =>
-      isEpisodeWatched(progress, {
-        ...episode,
-        seasonNumber:
-          episode?.seasonNumber ?? episode?.season_number ?? season?.number,
-        number:
-          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
-      }),
-    ),
-  );
-};
 
 const hasHeroLogo = (item) =>
   Boolean(
@@ -151,7 +131,7 @@ const TonightView = ({
           const hasSeasonData =
             Array.isArray(item?.seasons) &&
             item.seasons.some((season) => season?.episodes?.length);
-          if (hasSeasonData) return !isShowComplete(item);
+          if (hasSeasonData) return !isShowFullyWatched(item);
           return item?.status === 'watching';
         })
         .sort((a, b) => {

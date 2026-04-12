@@ -66,7 +66,9 @@ const OnboardingView = ({
   const trimmedName = name.trim();
   const isAuthenticated = Boolean(user);
   return (
-    <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center gap-8 sm:gap-10 overflow-hidden bg-[#0c0a09] text-stone-200 font-sans selection:bg-amber-500/30 px-6 pt-8 pb-24 sm:px-8 sm:pt-12 sm:pb-28">
+    <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center gap-8 sm:gap-10 overflow-hidden bg-[#0c0a09] text-stone-200 font-sans selection:bg-amber-500/30 px-6 pb-24 sm:px-8 sm:pb-28" style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}>
+      {/* Safe Area Inset Fill */}
+      <div className="fixed inset-x-0 top-0 z-0 bg-[#0c0a09]" style={{ height: 'env(safe-area-inset-top)' }} />
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {/* Deep vignette */}

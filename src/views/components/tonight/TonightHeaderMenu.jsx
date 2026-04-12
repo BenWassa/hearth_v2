@@ -50,7 +50,7 @@ const TonightHeaderMenu = ({
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md px-3 sm:px-4 py-3 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/80 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+      <header className="fixed top-0 inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md px-3 sm:px-4 py-3 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/80 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}>
         {/* Left — utility actions (import/export/dev/delete) */}
         <div ref={utilityRef} className="relative z-10 w-10 flex justify-start">
           {showUtilityMenu ? (

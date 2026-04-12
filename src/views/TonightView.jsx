@@ -339,7 +339,7 @@ const TonightView = ({
             showSignOut={showSignOut}
             isTemplateSession={isTemplateSession}
           />
-          <div className="h-[68px]" />
+          <div style={{ height: 'calc(68px + env(safe-area-inset-top))' }} />
 
           <div className="px-3 sm:px-4 pt-2 pb-24 flex flex-col gap-5">
             {showImportBanner && (

@@ -111,6 +111,10 @@ const TonightView = ({
   goToShelf,
   importProgress,
   spaceName,
+  spaceId,
+  userSpaces = [],
+  onSwitchSpace,
+  onAddSpace,
   isDeletingAll,
   onSignOut,
   showUtilityMenu = true,
@@ -318,6 +322,10 @@ const TonightView = ({
           <TonightHeaderMenu
             greeting={greeting}
             spaceLabel={spaceLabel}
+            spaceId={spaceId}
+            userSpaces={userSpaces}
+            onSwitchSpace={onSwitchSpace}
+            onAddSpace={onAddSpace}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}
             onImport={onImport}

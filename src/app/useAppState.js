@@ -28,6 +28,7 @@ import {
 import {
   createOrJoinSpaceByName,
   fetchSpace,
+  fetchUserSpaces,
   joinSpace,
 } from '../services/firebase/spaces.js';
 import {
@@ -494,6 +495,7 @@ export const useAppState = () => {
   const [isMetadataRepairing, setIsMetadataRepairing] = useState(false);
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
+  const [userSpaces, setUserSpaces] = useState([]);
   const autoShowRefreshInFlightRef = useRef(false);
   const forcedDemoRedirectRef = useRef(false);
   const isBootstrapping =
@@ -626,6 +628,14 @@ export const useAppState = () => {
       setLoading(false);
     }
   }, [user, spaceId, joinSpaceId]);
+
+  // Load all spaces the user belongs to so the switcher dropdown is always populated
+  useEffect(() => {
+    if (!user || !db) return;
+    fetchUserSpaces({ db, appId, userId: user.uid })
+      .then(setUserSpaces)
+      .catch((err) => console.warn('Could not load user spaces:', err));
+  }, [user, db]);
 
   useEffect(() => {
     if (!authResolved) return;
@@ -1341,6 +1351,25 @@ export const useAppState = () => {
     }
   };
 
+  const handleLoadUserSpaces = async () => {
+    if (!user || !db) return;
+    try {
+      const spaces = await fetchUserSpaces({ db, appId, userId: user.uid });
+      setUserSpaces(spaces);
+    } catch (err) {
+      console.warn('Could not load user spaces:', err);
+    }
+  };
+
+  const handleSwitchSpace = (targetSpaceId, targetSpaceName) => {
+    if (!targetSpaceId || targetSpaceId === spaceId) return;
+    clearSpaceTrayCache(spaceId);
+    localStorage.setItem(SPACE_ID_STORAGE_KEY, targetSpaceId);
+    setSpaceId(targetSpaceId);
+    setSpaceName(targetSpaceName || '');
+    setItems([]);
+  };
+
   const handleMarkWatched = async (id, currentStatus) => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
@@ -1993,8 +2022,10 @@ export const useAppState = () => {
     handleMetadataRepairMissing,
     handleRefreshMetadata,
     handleReloadNow,
+    handleLoadUserSpaces,
     handleSignIn,
     handleSignOut,
+    handleSwitchSpace,
     handleUpdateItem,
     isBulkDeleting,
     isBootstrapping,
@@ -2016,6 +2047,7 @@ export const useAppState = () => {
     spaceId,
     spaceName,
     startDecision,
+    userSpaces,
     updateMessage,
     view,
   };

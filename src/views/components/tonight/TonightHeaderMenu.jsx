@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   LogOut,
   MoreHorizontal,
+  Plus,
   Upload,
   Download,
   Trash2,
@@ -12,6 +13,10 @@ import hearthVector from '../../../assets/hearth_vector_up.png';
 
 const TonightHeaderMenu = ({
   spaceLabel,
+  spaceId,
+  userSpaces = [],
+  onSwitchSpace,
+  onAddSpace,
   isMenuOpen,
   setIsMenuOpen,
   onImport,
@@ -170,10 +175,10 @@ const TonightHeaderMenu = ({
           </button>
           {isProfileOpen && (
             <div
-              className="absolute right-0 top-full mt-2 w-52 bg-stone-950 border border-stone-800/80 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-30"
+              className="absolute right-0 top-full mt-2 w-56 bg-stone-950 border border-stone-800/80 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-30"
               role="menu"
             >
-              {/* Space identity */}
+              {/* Current space */}
               <div className="px-4 py-3 border-b border-stone-900">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-stone-600 mb-0.5">
                   Space
@@ -187,6 +192,49 @@ const TonightHeaderMenu = ({
                   </p>
                 )}
               </div>
+
+              {/* Other spaces */}
+              {userSpaces.length > 1 && (
+                <div className="border-b border-stone-900">
+                  <p className="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-widest text-stone-600">
+                    Switch space
+                  </p>
+                  {userSpaces
+                    .filter((s) => s.id !== spaceId)
+                    .map((space) => (
+                      <button
+                        key={space.id}
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onSwitchSpace?.(space.id, space.name);
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-stone-300 hover:bg-stone-900/60 hover:text-stone-100 transition-colors flex items-center gap-3"
+                        role="menuitem"
+                      >
+                        <span className="w-5 h-5 rounded-full bg-stone-800 flex items-center justify-center text-[9px] font-bold uppercase text-stone-400 shrink-0">
+                          {(space.name.replace(/[^a-z]/gi, '').slice(0, 2) || '?').toUpperCase()}
+                        </span>
+                        <span className="truncate">{space.name}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
+
+              {/* Add space */}
+              {onAddSpace && !isTemplateSession && (
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    onAddSpace();
+                  }}
+                  className="w-full px-4 py-2.5 text-left text-sm text-stone-400 hover:bg-stone-900/60 hover:text-stone-200 transition-colors flex items-center gap-3 border-b border-stone-900"
+                  role="menuitem"
+                >
+                  <Plus className="w-4 h-4 shrink-0" />
+                  Add space
+                </button>
+              )}
+
               {showSignOut && (
                 <button
                   onClick={() => {

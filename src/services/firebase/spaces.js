@@ -124,6 +124,16 @@ export const findUserSpaceByName = async ({ db, appId, userId, name }) => {
   };
 };
 
+export const fetchUserSpaces = async ({ db, appId, userId }) => {
+  const spacesRef = collection(db, 'artifacts', appId, 'spaces');
+  const spacesQuery = query(
+    spacesRef,
+    where('members', 'array-contains', userId),
+  );
+  const snapshot = await getDocs(spacesQuery);
+  return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+};
+
 export const createOrJoinSpaceByName = async ({ db, appId, name, userId }) => {
   const trimmedName = typeof name === 'string' ? name.trim() : '';
   if (!trimmedName) return null;

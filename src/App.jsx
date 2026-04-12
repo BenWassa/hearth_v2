@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { ENERGIES, VIBES } from './config/constants.js';
 import {
@@ -11,6 +11,7 @@ import ShelfView from './views/ShelfView.jsx';
 import AddView from './views/AddView.jsx';
 import ImportModal from './views/ImportModal.jsx';
 import DecisionView from './views/DecisionView.jsx';
+import SpaceSwitcherModal from './views/components/SpaceSwitcherModal.jsx';
 
 export default function HearthApp() {
   const {
@@ -28,12 +29,14 @@ export default function HearthApp() {
     handleDelete,
     handleExportItems,
     handleImportItems,
+    handleLoadUserSpaces,
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRepairMissing,
     handleReloadNow,
     handleSignIn,
     handleSignOut,
+    handleSwitchSpace,
     handleUpdateItem,
     isBootstrapping,
     isBulkDeleting,
@@ -55,8 +58,36 @@ export default function HearthApp() {
     startDecision,
     updateMessage,
     user,
+    userSpaces,
     view,
   } = useConfiguredAppState();
+
+  const [isSpaceSwitcherOpen, setIsSpaceSwitcherOpen] = useState(false);
+
+  // On startup: if authenticated with known spaces but no space stored, show switcher
+  // Guard against the new-user onboarding flow (userSpaces.length === 0 means they haven't made one yet)
+  useEffect(() => {
+    if (!authResolved || !user || isBootstrapping || isTemplateMode) return;
+    if (!spaceId && userSpaces.length > 0) {
+      setIsSpaceSwitcherOpen(true);
+    }
+  }, [authResolved, user, spaceId, isBootstrapping, userSpaces]);
+
+  const handleOpenSpaceSwitcher = () => {
+    handleLoadUserSpaces();
+    setIsSpaceSwitcherOpen(true);
+  };
+
+  const handleSpaceSwitcherSelect = (id, name) => {
+    setIsSpaceSwitcherOpen(false);
+    handleSwitchSpace(id, name);
+    setView('tonight');
+  };
+
+  const handleSpaceSwitcherCreate = (name) => {
+    setIsSpaceSwitcherOpen(false);
+    handleCreateSpace(name);
+  };
   const isLocalHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' ||
@@ -170,6 +201,9 @@ export default function HearthApp() {
             importProgress={importProgress}
             spaceId={spaceId}
             spaceName={spaceName}
+            userSpaces={userSpaces}
+            onSwitchSpace={handleSwitchSpace}
+            onAddSpace={handleOpenSpaceSwitcher}
             isDeletingAll={isWipingSpace}
             onSignOut={handleSignOut}
             showUtilityMenu={!isTemplateMode || allowTemplateDevMenu}
@@ -225,6 +259,16 @@ export default function HearthApp() {
           />
         )}
       </div>
+
+      {isSpaceSwitcherOpen && (
+        <SpaceSwitcherModal
+          spaces={userSpaces}
+          currentSpaceId={spaceId}
+          onSelect={handleSpaceSwitcherSelect}
+          onCreateNew={handleSpaceSwitcherCreate}
+          isLoading={false}
+        />
+      )}
     </div>
   );
 }

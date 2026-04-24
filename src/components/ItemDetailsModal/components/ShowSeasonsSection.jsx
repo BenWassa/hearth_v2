@@ -48,7 +48,8 @@ const ShowSeasonsSection = ({
                 Series Progress
               </div>
               <div className="text-[10px] font-mono text-amber-500/90 font-bold">
-                {entireShowProgress.watched} / {entireShowProgress.total || '?'} episodes ({entireShowProgress.percent}%)
+                {entireShowProgress.watched} / {entireShowProgress.total || '?'}{' '}
+                episodes ({entireShowProgress.percent}%)
               </div>
             </div>
             <div className="h-1.5 w-full bg-stone-800/80 rounded-full overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">

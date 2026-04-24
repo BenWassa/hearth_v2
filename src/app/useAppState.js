@@ -140,7 +140,9 @@ const isRepairAttemptBetter = (currentBest, challenger) => {
   if (!challenger) return false;
   if (!currentBest) return true;
 
-  const challengerBlocking = countBlockingMetadataGaps(challenger.remainingGaps);
+  const challengerBlocking = countBlockingMetadataGaps(
+    challenger.remainingGaps,
+  );
   const currentBlocking = countBlockingMetadataGaps(currentBest.remainingGaps);
   if (challengerBlocking !== currentBlocking) {
     return challengerBlocking < currentBlocking;
@@ -292,8 +294,7 @@ const mergeRefreshedItemState = (currentItem = {}, updates = {}) => {
     actors: updates?.actors ?? nextMedia.cast ?? currentItem?.actors,
     director: updates?.director ?? currentItem?.director,
     poster: updates?.poster ?? nextMedia.poster ?? currentItem?.poster,
-    backdrop:
-      updates?.backdrop ?? nextMedia.backdrop ?? currentItem?.backdrop,
+    backdrop: updates?.backdrop ?? nextMedia.backdrop ?? currentItem?.backdrop,
     logo: updates?.logo ?? nextMedia.logo ?? currentItem?.logo,
     totalSeasons:
       updates?.totalSeasons ??
@@ -1185,9 +1186,11 @@ export const useAppState = () => {
       return entry;
     });
     const exportText = JSON.stringify(payload, null, 2);
-    
+
     // Create a blob and download as file instead of clipboard
-    const blob = new Blob([exportText], { type: 'application/json;charset=utf-8' });
+    const blob = new Blob([exportText], {
+      type: 'application/json;charset=utf-8',
+    });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     const timestamp = new Date().toISOString().split('T')[0];
@@ -1555,9 +1558,14 @@ export const useAppState = () => {
                 : [];
             }
 
-            for (const result of searchResults.slice(0, MAX_REPAIR_SEARCH_CANDIDATES)) {
+            for (const result of searchResults.slice(
+              0,
+              MAX_REPAIR_SEARCH_CANDIDATES,
+            )) {
               const candidateProvider = String(result?.provider || '').trim();
-              const candidateProviderId = String(result?.providerId || '').trim();
+              const candidateProviderId = String(
+                result?.providerId || '',
+              ).trim();
               if (!candidateProvider || !candidateProviderId) continue;
               if (
                 candidateProvider === bestAttempt.provider &&
@@ -1600,7 +1608,9 @@ export const useAppState = () => {
                 if (isRepairAttemptBetter(bestAttempt, challenger)) {
                   bestAttempt = challenger;
                 }
-                if (countBlockingMetadataGaps(bestAttempt.remainingGaps) === 0) {
+                if (
+                  countBlockingMetadataGaps(bestAttempt.remainingGaps) === 0
+                ) {
                   break;
                 }
               } catch (error) {
@@ -1655,9 +1665,7 @@ export const useAppState = () => {
         .map((entry) => `${entry.title} (${entry.gaps.join(', ')})`)
         .join('; ');
       notifyError(
-        `${
-          failed
-        } title(s) still missing metadata after repair.${
+        `${failed} title(s) still missing metadata after repair.${
           detail ? ` ${detail}` : ''
         }`,
       );

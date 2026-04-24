@@ -1,7 +1,4 @@
-import {
-  balanceRows,
-  getBalancedRowCounts,
-} from './sectionBalance.js';
+import { balanceRows, getBalancedRowCounts } from './sectionBalance.js';
 
 const makeItems = (prefix, count) =>
   Array.from({ length: count }, (_, index) => ({

@@ -5,4 +5,3 @@ const MAIN_APP_WHITELIST_UIDS = new Set([
 
 export const isWhitelistedUid = (uid) =>
   MAIN_APP_WHITELIST_UIDS.has(String(uid || '').trim());
-

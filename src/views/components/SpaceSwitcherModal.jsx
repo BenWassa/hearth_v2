@@ -104,7 +104,9 @@ const SpaceSwitcherModal = ({
                 autoFocus
                 value={newSpaceName}
                 onChange={(e) => setNewSpaceName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && trimmedName && handleCreate()}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' && trimmedName && handleCreate()
+                }
                 placeholder="Space name..."
                 maxLength={100}
                 className="w-full bg-stone-900/50 border border-stone-800/80 text-stone-100 placeholder:text-stone-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all"

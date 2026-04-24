@@ -242,7 +242,7 @@ const TonightHeaderMenu = ({
             >
               <div className="border-b border-stone-900 px-4 py-3">
                 <p className={`${menuEyebrow} mb-0.5`}>Space</p>
-                <p 
+                <p
                   className="text-sm font-medium text-stone-200 truncate max-w-[11rem]"
                   title={spaceLabel || 'Space unavailable'}
                 >
@@ -277,7 +277,9 @@ const TonightHeaderMenu = ({
                         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-stone-700/80 bg-stone-800 text-[9px] font-bold text-stone-400">
                           {getSpaceInitials(space.name)}
                         </span>
-                        <span className="truncate max-w-[9rem]">{truncateUsername(space.name, 18)}</span>
+                        <span className="truncate max-w-[9rem]">
+                          {truncateUsername(space.name, 18)}
+                        </span>
                       </button>
                     ))}
                 </div>

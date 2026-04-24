@@ -131,7 +131,10 @@ export const fetchUserSpaces = async ({ db, appId, userId }) => {
     where('members', 'array-contains', userId),
   );
   const snapshot = await getDocs(spacesQuery);
-  return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+  return snapshot.docs.map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }));
 };
 
 export const createOrJoinSpaceByName = async ({ db, appId, name, userId }) => {

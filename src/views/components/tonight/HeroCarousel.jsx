@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { getBackdropSrc, getPosterSrc } from '../../../utils/poster.js';
 
 const MIN_SWIPE_DISTANCE = 40;
@@ -148,16 +154,19 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
         // Offset from current: slide left of current is -1, right is +1, etc.
         const offset = index - currentIndex;
         // During drag, apply the live dragOffset on top of the slot position
-        const translateX = containerWidth > 0
-          ? `${offset * containerWidth + dragOffset}px`
-          : `calc(${offset * 100}% + ${dragOffset}px)`;
+        const translateX =
+          containerWidth > 0
+            ? `${offset * containerWidth + dragOffset}px`
+            : `calc(${offset * 100}% + ${dragOffset}px)`;
         return (
           <div
             key={getItemKey(item, index)}
             className="absolute inset-0 overflow-hidden"
             style={{
               transform: `translateX(${translateX})`,
-              transition: isDragging ? 'none' : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: isDragging
+                ? 'none'
+                : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
               willChange: 'transform',
             }}
           >

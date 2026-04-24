@@ -111,4 +111,3 @@ export const getShowWatchProgress = (item) => {
 
 export const getShowWatchProgressPercent = (item) =>
   getShowWatchProgress(item).percent;
-

@@ -120,7 +120,11 @@ describe('metadata helpers', () => {
       [
         completeMovie,
         { ...completeMovie, id: 'movie-2', title: '', poster: '' },
-        { ...completeShow, logo: '', media: { ...completeShow.media, logo: '' } },
+        {
+          ...completeShow,
+          logo: '',
+          media: { ...completeShow.media, logo: '' },
+        },
       ],
       { includeLogoGap: true },
     );

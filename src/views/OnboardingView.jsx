@@ -72,9 +72,15 @@ const OnboardingView = ({
   const trimmedName = name.trim();
   const isAuthenticated = Boolean(user);
   return (
-    <div className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center gap-8 sm:gap-10 overflow-hidden bg-[#0c0a09] text-stone-200 font-sans selection:bg-amber-500/30 px-6 pb-24 sm:px-8 sm:pb-28" style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}>
+    <div
+      className="fixed inset-0 w-full h-screen flex flex-col items-center justify-center gap-8 sm:gap-10 overflow-hidden bg-[#0c0a09] text-stone-200 font-sans selection:bg-amber-500/30 px-6 pb-24 sm:px-8 sm:pb-28"
+      style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}
+    >
       {/* Safe Area Inset Fill */}
-      <div className="fixed inset-x-0 top-0 z-0 bg-[#0c0a09]" style={{ height: 'env(safe-area-inset-top)' }} />
+      <div
+        className="fixed inset-x-0 top-0 z-0 bg-[#0c0a09]"
+        style={{ height: 'env(safe-area-inset-top)' }}
+      />
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {/* Deep vignette */}
@@ -150,11 +156,15 @@ const OnboardingView = ({
                   <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1">
                     Step 2 of 2 - Name your space
                   </div>
-                  <div 
+                  <div
                     className="text-[11px] text-stone-500 uppercase tracking-widest font-semibold ml-1 truncate max-w-xs"
                     title={user.email || user.displayName || user.uid}
                   >
-                    Signed in as {truncateUsername(user.email || user.displayName || user.uid, 28)}
+                    Signed in as{' '}
+                    {truncateUsername(
+                      user.email || user.displayName || user.uid,
+                      28,
+                    )}
                   </div>
                   <div className="space-y-2">
                     <label

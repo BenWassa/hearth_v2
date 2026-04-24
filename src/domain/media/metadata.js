@@ -39,10 +39,7 @@ export const getPrimaryCredit = ({ item = {}, isShow = false } = {}) => {
   return '';
 };
 
-export const getMetadataGaps = (
-  item = {},
-  { includeLogoGap = false } = {},
-) => {
+export const getMetadataGaps = (item = {}, { includeLogoGap = false } = {}) => {
   const gaps = [];
   const sourceProvider = String(item?.source?.provider || '').trim();
   const sourceProviderId = String(item?.source?.providerId || '').trim();

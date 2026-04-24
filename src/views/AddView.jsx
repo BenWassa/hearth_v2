@@ -23,6 +23,35 @@ const SectionLabel = ({ children, icon: Icon }) => (
   </div>
 );
 
+const getMediaTypeMeta = (mediaType) => {
+  if (mediaType === 'show') {
+    return {
+      icon: Tv,
+      label: 'TV show',
+    };
+  }
+  return {
+    icon: Film,
+    label: 'Movie',
+  };
+};
+
+const MediaTypeBadge = ({ type: mediaType, selected = false }) => {
+  const { icon: Icon, label } = getMediaTypeMeta(mediaType);
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+        selected
+          ? 'border-amber-500/30 bg-amber-400/10 text-amber-200'
+          : 'border-stone-700/80 bg-stone-950/50 text-stone-400'
+      }`}
+    >
+      <Icon className="h-3 w-3" />
+      {label}
+    </span>
+  );
+};
+
 const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [type, setType] = useState('movie');
@@ -37,7 +66,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
   const { results, loading, error, hasQuery } = useMediaSearch({
     query: searchQuery,
-    type,
+    type: 'all',
   });
 
   const visibleResults = useMemo(() => results.slice(0, 5), [results]);
@@ -275,12 +304,14 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                           ) : null}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-[15px] font-medium text-stone-100">
-                            {result.title}
+                          <div className="flex items-start gap-2">
+                            <div className="min-w-0 flex-1 truncate text-[15px] font-medium text-stone-100">
+                              {result.title}
+                            </div>
+                            <MediaTypeBadge type={result.type} />
                           </div>
                           <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-                            {result.type}{' '}
-                            {result.year ? `• ${result.year}` : ''}
+                            Top match {result.year ? `• ${result.year}` : ''}
                           </div>
                         </div>
                       </div>
@@ -298,7 +329,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                   No catalog matches yet.
                 </p>
                 <p className="mt-1 text-xs text-stone-500">
-                  Try the exact title or switch between movie and show.
+                  Try the exact title or a related keyword.
                 </p>
               </div>
             ) : null}
@@ -337,8 +368,13 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                     <div className="mt-1 truncate text-sm font-medium text-stone-100">
                       {selectedTitle}
                     </div>
-                    <div className="mt-0.5 text-xs text-stone-500">
-                      {type} {selectedYear ? `• ${selectedYear}` : ''}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <MediaTypeBadge type={type} selected />
+                      {selectedYear ? (
+                        <span className="text-xs text-stone-500">
+                          {selectedYear}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                   <button
@@ -366,37 +402,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                 Choose the official title from search before saving.
               </div>
             )}
-          </section>
-
-          {/* Type */}
-          <section className="space-y-2.5">
-            <SectionLabel>Search Type</SectionLabel>
-            <div className="flex gap-2">
-              {['movie', 'show'].map((t) => {
-                const isSelected = type === t;
-                const TypeIcon = t === 'movie' ? Film : Tv;
-                return (
-                  <button
-                    key={t}
-                    onClick={() => {
-                      setType(t);
-                      if (selectedResult) clearSelectedResult();
-                    }}
-                    className={`flex-1 rounded-lg border py-2.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
-                      isSelected
-                        ? 'bg-stone-800 border-stone-700 text-stone-100 shadow-sm shadow-stone-950/30'
-                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
-                    }`}
-                    type="button"
-                  >
-                    <span className="inline-flex items-center justify-center gap-2">
-                      <TypeIcon className="w-3.5 h-3.5" />
-                      {t}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
           </section>
 
           {/* Vibe */}

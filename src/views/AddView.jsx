@@ -1,5 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { Film, MessageSquare, Tv } from 'lucide-react';
+import {
+  Check,
+  Film,
+  Loader2,
+  MessageSquare,
+  Search,
+  Tv,
+  X,
+} from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
@@ -7,6 +15,13 @@ import TextArea from '../components/ui/TextArea.jsx';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
+
+const SectionLabel = ({ children, icon: Icon }) => (
+  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+    {Icon ? <Icon className="h-3 w-3 text-amber-500/70" /> : null}
+    {children}
+  </div>
+);
 
 const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +41,14 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   });
 
   const visibleResults = useMemo(() => results.slice(0, 5), [results]);
+  const selectedPoster =
+    enrichedPayload?.media?.poster ||
+    enrichedPayload?.media?.posterUrl ||
+    selectedResult?.posterUrl ||
+    '';
+  const selectedYear = enrichedPayload?.media?.year || selectedResult?.year;
+  const selectedTitle =
+    enrichedPayload?.media?.title || selectedResult?.title || '';
 
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
@@ -163,213 +186,294 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
   return (
     <div className="flex-1 flex flex-col bg-stone-950 animate-in slide-in-from-bottom duration-300 w-full">
-      <div className="p-6 flex items-center justify-between border-b border-stone-900">
+      <div className="px-5 py-4 sm:px-6 flex items-center justify-between border-b border-stone-900/80 bg-stone-950/95">
         <button
           onClick={onBack}
-          className="text-stone-400 hover:text-stone-200 text-sm font-medium"
+          className="rounded-lg px-2 py-1.5 text-sm font-medium text-stone-400 transition-colors hover:bg-stone-900 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
+          type="button"
         >
           Cancel
         </button>
-        <span className="font-serif text-stone-200">Save for Us</span>
-        <div className="w-12" /> {/* Spacer */}
+        <div className="text-center">
+          <h1 className="font-serif text-base text-stone-100">Save for Us</h1>
+          <p className="mt-0.5 text-[11px] text-stone-500">
+            Add a title to the shared shelf
+          </p>
+        </div>
+        <div className="w-[4.25rem]" aria-hidden="true" />
       </div>
 
-      <div className="p-6 space-y-8 flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
         {/* Live Search */}
-        <div className="space-y-3">
-          <div className="text-[10px] uppercase tracking-widest text-stone-400">
-            Title
-          </div>
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search movie or show title..."
-            data-testid="live-search-input"
-          />
-          {loading && (
-            <div className="text-xs text-stone-500">Searching catalog...</div>
-          )}
-          {error && <div className="text-xs text-red-400">{error}</div>}
-          {!selectedResult &&
-            hasQuery &&
-            !loading &&
-            visibleResults.length > 0 && (
-              <div className="rounded-xl border border-stone-800 bg-stone-900/40 divide-y divide-stone-800">
-                {visibleResults.map((result) => (
-                  <button
-                    key={`${result.provider}-${result.providerId}`}
-                    onClick={() => handleSelectResult(result)}
-                    className="w-full text-left px-3 py-3 hover:bg-stone-800/60 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded border border-stone-700 bg-stone-800">
-                        <div className="absolute inset-0 flex items-center justify-center text-stone-500">
-                          {result.type === 'show' ? (
-                            <Tv className="h-4 w-4" />
-                          ) : (
-                            <Film className="h-4 w-4" />
-                          )}
-                        </div>
-                        {result.posterUrl ? (
-                          <img
-                            src={result.posterUrl}
-                            alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
-                            loading="lazy"
-                            onError={(event) => {
-                              event.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        ) : null}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-base text-stone-200">
-                          {result.title}
-                        </div>
-                        <div className="mt-0.5 text-xs text-stone-500 uppercase tracking-wider">
-                          {result.type} {result.year ? `• ${result.year}` : ''}
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                ))}
+        <div className="space-y-7">
+          <section className="space-y-3">
+            <SectionLabel icon={Search}>Title</SectionLabel>
+            <div className="relative">
+              <Input
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (selectedResult) clearSelectedResult();
+                }}
+                placeholder="Search movie or show title"
+                data-testid="live-search-input"
+                autoComplete="off"
+                className="pr-11"
+              />
+              {searchQuery ? (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    clearSelectedResult();
+                  }}
+                  className="absolute right-3 top-1/2 rounded-full p-1 text-stone-500 transition-colors -translate-y-1/2 hover:bg-stone-700/70 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
+                  title="Clear search"
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+            {loading && (
+              <div className="flex items-center gap-2 text-xs text-stone-500">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-500/70" />
+                Searching catalog...
               </div>
             )}
-          {selectedResult && (
-            <div className="rounded-lg border border-amber-900/40 bg-amber-900/10 px-3 py-2 text-xs text-amber-200 flex items-center justify-between gap-3">
-              <span>
-                Selected: {selectedResult.title}
-                {isEnriching ? ' (loading metadata...)' : ''}
+            {error && <div className="text-xs text-red-400">{error}</div>}
+            {!selectedResult &&
+              hasQuery &&
+              !loading &&
+              visibleResults.length > 0 && (
+                <div className="overflow-hidden rounded-xl border border-stone-800 bg-stone-900/60 shadow-lg shadow-stone-950/30 divide-y divide-stone-800/80">
+                  {visibleResults.map((result) => (
+                    <button
+                      key={`${result.provider}-${result.providerId}`}
+                      onClick={() => handleSelectResult(result)}
+                      className="w-full px-3 py-3 text-left transition-colors hover:bg-stone-800/70 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-700/40"
+                      type="button"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="relative h-[4.5rem] w-12 shrink-0 overflow-hidden rounded-md border border-stone-700 bg-stone-800">
+                          <div className="absolute inset-0 flex items-center justify-center text-stone-500">
+                            {result.type === 'show' ? (
+                              <Tv className="h-4 w-4" />
+                            ) : (
+                              <Film className="h-4 w-4" />
+                            )}
+                          </div>
+                          {result.posterUrl ? (
+                            <img
+                              src={result.posterUrl}
+                              alt=""
+                              className="absolute inset-0 h-full w-full object-cover"
+                              loading="lazy"
+                              onError={(event) => {
+                                event.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : null}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[15px] font-medium text-stone-100">
+                            {result.title}
+                          </div>
+                          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                            {result.type}{' '}
+                            {result.year ? `• ${result.year}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            {!selectedResult &&
+            hasQuery &&
+            !loading &&
+            visibleResults.length === 0 &&
+            !error ? (
+              <div className="rounded-xl border border-stone-800 bg-stone-900/35 px-4 py-6 text-center">
+                <p className="text-sm text-stone-300">
+                  No catalog matches yet.
+                </p>
+                <p className="mt-1 text-xs text-stone-500">
+                  Try the exact title or switch between movie and show.
+                </p>
+              </div>
+            ) : null}
+            {selectedResult && (
+              <div className="rounded-xl border border-amber-700/30 bg-amber-500/10 p-3 shadow-lg shadow-stone-950/30">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-[4.75rem] w-[3.25rem] shrink-0 overflow-hidden rounded-md border border-amber-600/20 bg-stone-900">
+                    <div className="absolute inset-0 flex items-center justify-center text-amber-500/60">
+                      {type === 'show' ? (
+                        <Tv className="h-4 w-4" />
+                      ) : (
+                        <Film className="h-4 w-4" />
+                      )}
+                    </div>
+                    {selectedPoster ? (
+                      <img
+                        src={selectedPoster}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-300">
+                      {isEnriching ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Check className="h-3 w-3" />
+                      )}
+                      {isEnriching ? 'Loading metadata' : 'Selected'}
+                    </div>
+                    <div className="mt-1 truncate text-sm font-medium text-stone-100">
+                      {selectedTitle}
+                    </div>
+                    <div className="mt-0.5 text-xs text-stone-500">
+                      {type} {selectedYear ? `• ${selectedYear}` : ''}
+                    </div>
+                  </div>
+                  <button
+                    className="rounded-lg px-2 py-1 text-xs font-semibold text-amber-300 transition-colors hover:bg-amber-500/10 hover:text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
+                    onClick={clearSelectedResult}
+                    type="button"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            )}
+            {enrichError && (
+              <div className="rounded-lg border border-red-900/40 bg-red-950/20 px-3 py-2 text-xs text-red-300">
+                {enrichError}
+              </div>
+            )}
+            {submitError && (
+              <div className="rounded-lg border border-red-900/40 bg-red-950/20 px-3 py-2 text-xs text-red-300">
+                {submitError}
+              </div>
+            )}
+            {allowManualEntry && (
+              <div className="text-xs text-stone-500">
+                Choose the official title from search before saving.
+              </div>
+            )}
+          </section>
+
+          {/* Type */}
+          <section className="space-y-2.5">
+            <SectionLabel>Search Type</SectionLabel>
+            <div className="flex gap-2">
+              {['movie', 'show'].map((t) => {
+                const isSelected = type === t;
+                const TypeIcon = t === 'movie' ? Film : Tv;
+                return (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setType(t);
+                      if (selectedResult) clearSelectedResult();
+                    }}
+                    className={`flex-1 rounded-lg border py-2.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
+                      isSelected
+                        ? 'bg-stone-800 border-stone-700 text-stone-100 shadow-sm shadow-stone-950/30'
+                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
+                    }`}
+                    type="button"
+                  >
+                    <span className="inline-flex items-center justify-center gap-2">
+                      <TypeIcon className="w-3.5 h-3.5" />
+                      {t}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Vibe */}
+          <section className="space-y-2.5">
+            <SectionLabel>Vibe</SectionLabel>
+            <div className="flex flex-wrap gap-2">
+              {VIBES.map((v) => {
+                const isSelected = vibe === v.id;
+                const VibeIcon = v.icon;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => setVibe(v.id)}
+                    className={`rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
+                      isSelected
+                        ? 'bg-amber-500/15 border-amber-500/35 text-amber-200'
+                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
+                    }`}
+                    type="button"
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      <VibeIcon className="w-3.5 h-3.5" />
+                      {v.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Energy */}
+          <section className="space-y-2.5">
+            <SectionLabel>Energy</SectionLabel>
+            <div className="flex flex-wrap gap-2">
+              {ENERGIES.map((e) => {
+                const isSelected = energy === e.id;
+                const EnergyIcon = e.icon;
+                return (
+                  <button
+                    key={e.id}
+                    onClick={() => setEnergy(e.id)}
+                    className={`rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
+                      isSelected
+                        ? 'bg-amber-500/15 border-amber-500/35 text-amber-200'
+                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
+                    }`}
+                    type="button"
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      <EnergyIcon className="w-3.5 h-3.5" />
+                      {e.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Note */}
+          <section className="space-y-3">
+            <label className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+              <MessageSquare className="w-3 h-3 text-amber-500/70" />
+              Why this?{' '}
+              <span className="text-stone-600 font-normal normal-case tracking-normal">
+                (Optional)
               </span>
-              <button
-                className="text-amber-300 hover:text-amber-100"
-                onClick={clearSelectedResult}
-                type="button"
-              >
-                Clear
-              </button>
-            </div>
-          )}
-          {enrichError && (
-            <div className="text-xs text-red-400">{enrichError}</div>
-          )}
-          {submitError && (
-            <div className="text-xs text-red-400">{submitError}</div>
-          )}
-          {allowManualEntry && (
-            <div className="text-xs text-stone-500">
-              Choose the official title from search before saving.
-            </div>
-          )}
-        </div>
-
-        {/* Type */}
-        <div className="space-y-2">
-          <div className="text-[10px] uppercase tracking-widest text-stone-400">
-            Type
-          </div>
-          <div className="flex gap-2">
-            {['movie', 'show'].map((t) => {
-              const isSelected = type === t;
-              const TypeIcon = t === 'movie' ? Film : Tv;
-              return (
-                <button
-                  key={t}
-                  onClick={() => {
-                    setType(t);
-                  }}
-                  className={`flex-1 py-2 rounded-lg border text-xs uppercase tracking-widest transition-all ${
-                    isSelected
-                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                      : 'border-stone-800 text-stone-400 hover:bg-stone-900'
-                  }`}
-                >
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <TypeIcon className="w-3.5 h-3.5" />
-                    {t}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Vibe */}
-        <div className="space-y-2">
-          <div className="text-[10px] uppercase tracking-widest text-stone-400">
-            Vibe
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {VIBES.map((v) => {
-              const isSelected = vibe === v.id;
-              const VibeIcon = v.icon;
-              return (
-                <button
-                  key={v.id}
-                  onClick={() => setVibe(v.id)}
-                  className={`px-3 py-1.5 rounded-full border text-xs uppercase tracking-widest transition-all ${
-                    isSelected
-                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                      : 'border-stone-800 text-stone-500 hover:bg-stone-900'
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <VibeIcon className="w-3.5 h-3.5" />
-                    {v.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Energy */}
-        <div className="space-y-2">
-          <div className="text-[10px] uppercase tracking-widest text-stone-400">
-            Energy
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {ENERGIES.map((e) => {
-              const isSelected = energy === e.id;
-              const EnergyIcon = e.icon;
-              return (
-                <button
-                  key={e.id}
-                  onClick={() => setEnergy(e.id)}
-                  className={`px-3 py-1.5 rounded-full border text-xs uppercase tracking-widest transition-all ${
-                    isSelected
-                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                      : 'border-stone-800 text-stone-500 hover:bg-stone-900'
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <EnergyIcon className="w-3.5 h-3.5" />
-                    {e.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Note */}
-        <div className="space-y-3">
-          <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400">
-            <MessageSquare className="w-3 h-3" />
-            Why this?{' '}
-            <span className="text-stone-700 font-normal normal-case">
-              (Optional)
-            </span>
-          </label>
-          <TextArea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="e.g. Heard it's funny, Good for a rainy day..."
-          />
+            </label>
+            <TextArea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Heard it is funny, good for a rainy day..."
+            />
+          </section>
         </div>
       </div>
 
-      <div className="p-6 border-t border-stone-900 bg-stone-950/95 backdrop-blur">
+      <div className="border-t border-stone-900/80 bg-stone-950/95 px-5 py-4 sm:px-6 backdrop-blur">
         <Button
           onClick={handleSubmit}
           disabled={

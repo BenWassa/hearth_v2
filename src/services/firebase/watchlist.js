@@ -44,6 +44,20 @@ const asNumberOrNull = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const normalizeCollection = (value = {}) => {
+  const collectionData = asObject(value);
+  const providerId = asString(collectionData.providerId);
+  const name = asString(collectionData.name);
+  if (!providerId || !name) return null;
+  return {
+    provider: asString(collectionData.provider || 'tmdb'),
+    providerId,
+    name,
+    poster: asString(collectionData.poster),
+    backdrop: asString(collectionData.backdrop),
+  };
+};
+
 const getWatchlistDocRef = (db, appId, spaceId, itemId) =>
   doc(db, 'artifacts', appId, 'spaces', spaceId, 'watchlist_items', itemId);
 
@@ -122,6 +136,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
           ? media.rating
           : null,
       providerUpdatedAt: asString(media.providerUpdatedAt),
+      collection: normalizeCollection(media.collection),
     },
     showData: {
       seasonCount,
@@ -251,6 +266,7 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
       : asArray(catalogData.seasons).length
       ? asArray(catalogData.seasons)
       : asArray(watchData.seasons),
+    collection: normalizeCollection(media.collection),
   };
 };
 
@@ -267,6 +283,7 @@ const CATALOG_PATH_ALIASES = {
   totalSeasons: 'showData.seasonCount',
   totalEpisodes: 'showData.episodeCount',
   seasons: 'showData.seasons',
+  collection: 'media.collection',
 };
 
 const WATCHLIST_ONLY_KEYS = new Set([

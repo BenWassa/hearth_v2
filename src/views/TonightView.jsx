@@ -1,14 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Armchair,
-  Coffee,
-  Eye,
-  Smile,
-  Clock,
-  Tv,
-  Zap,
-} from 'lucide-react';
+import { Armchair, Coffee, Eye, Smile, Clock, Tv, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
@@ -45,7 +38,9 @@ const getStableShuffled = (items, saltStr = '') => {
   const today = new Date();
   // Base seed: YYYYMMDD (Changes at midnight)
   const baseSeed =
-    today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate();
 
   // Convert the category name into a simple number to offset the seed
   let salt = 0;
@@ -232,7 +227,9 @@ const TonightView = ({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
+  const [collectionDetail, setCollectionDetail] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
   const [isWipeConfirmOpen, setIsWipeConfirmOpen] = useState(false);
   const [wipeConfirmText, setWipeConfirmText] = useState('');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -260,9 +257,19 @@ const TonightView = ({
     setIsDetailOpen(true);
   };
 
+  const openCollection = (collection) => {
+    setCollectionDetail(collection);
+    setIsCollectionOpen(true);
+  };
+
   const closeDetails = () => {
     setIsDetailOpen(false);
     setDetailItem(null);
+  };
+
+  const closeCollection = () => {
+    setIsCollectionOpen(false);
+    setCollectionDetail(null);
   };
 
   const openAuditModal = async () => {
@@ -339,7 +346,11 @@ const TonightView = ({
             showSignOut={showSignOut}
             isTemplateSession={isTemplateSession}
           />
-          <div style={{ height: 'calc(68px + max(0px, env(safe-area-inset-top)))' }} />
+          <div
+            style={{
+              height: 'calc(68px + max(0px, env(safe-area-inset-top)))',
+            }}
+          />
 
           <div className="px-3 sm:px-4 pt-2 pb-24 flex flex-col gap-5">
             {showImportBanner && (
@@ -389,6 +400,7 @@ const TonightView = ({
                     emptyLabel="No shows in progress yet."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -410,6 +422,7 @@ const TonightView = ({
                     emptyLabel="Nothing light queued right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -429,6 +442,7 @@ const TonightView = ({
                     emptyLabel="No comedies queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -448,6 +462,7 @@ const TonightView = ({
                     emptyLabel="No short episodes available."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -467,6 +482,7 @@ const TonightView = ({
                     emptyLabel="No intense watches queued."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -486,6 +502,7 @@ const TonightView = ({
                     emptyLabel="No visually driven films right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -505,6 +522,7 @@ const TonightView = ({
                     emptyLabel="No classics queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
+                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -528,6 +546,13 @@ const TonightView = ({
         onToggleStatus={onToggleStatus}
         onDelete={onDelete}
         onUpdate={onUpdate}
+      />
+
+      <CollectionDetailsModal
+        isOpen={isCollectionOpen}
+        collection={collectionDetail}
+        onClose={closeCollection}
+        onOpenItem={openDetails}
       />
 
       <MetadataAuditModal

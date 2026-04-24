@@ -67,6 +67,15 @@ const mapMovieDetails = (data = {}) => ({
   country: mapNames(data.production_countries, 3),
   rating: Number.isFinite(data.vote_average) ? data.vote_average : null,
   seasonCount: null,
+  collection: data.belongs_to_collection
+    ? {
+        provider: 'tmdb',
+        providerId: String(data.belongs_to_collection.id),
+        name: String(data.belongs_to_collection.name),
+        poster: toImageUrl(data.belongs_to_collection.poster_path, 'w500'),
+        backdrop: toImageUrl(data.belongs_to_collection.backdrop_path, 'w780'),
+      }
+    : null,
   providerUpdatedAt: new Date().toISOString(),
 });
 

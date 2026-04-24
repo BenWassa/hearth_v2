@@ -8,6 +8,20 @@ const asArray = (value) => (Array.isArray(value) ? value : []);
 
 const asString = (value) => (typeof value === 'string' ? value : '');
 
+const normalizeCollection = (value = {}) => {
+  const collection = asObject(value);
+  const providerId = asString(collection.providerId).trim();
+  const name = asString(collection.name).trim();
+  if (!providerId || !name) return null;
+  return {
+    provider: asString(collection.provider).trim() || 'tmdb',
+    providerId,
+    name,
+    poster: asString(collection.poster).trim(),
+    backdrop: asString(collection.backdrop).trim(),
+  };
+};
+
 const pickPrimaryCredit = ({ rawItem = {}, media = {}, type = '' }) => {
   const direct = asString(rawItem.director).trim();
   if (direct) return direct;
@@ -73,14 +87,12 @@ export const adaptWatchlistItem = (rawItem = {}) => {
       rawItem.totalSeasons ||
       asArray(showData.seasons).length ||
       '',
-    totalEpisodes:
-      showData.episodeCount ||
-      rawItem.totalEpisodes ||
-      '',
+    totalEpisodes: showData.episodeCount || rawItem.totalEpisodes || '',
     seasons: asArray(showData.seasons).length
       ? asArray(showData.seasons)
       : asArray(rawItem.seasons),
     episodeProgress: asObject(userState.episodeProgress),
+    collection: normalizeCollection(media.collection),
   };
 };
 

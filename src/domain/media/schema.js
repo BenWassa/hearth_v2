@@ -184,6 +184,15 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
           ? media.rating
           : null,
       providerUpdatedAt: asString(media.providerUpdatedAt),
+      collection: media.collection
+        ? {
+            provider: asString(media.collection.provider),
+            providerId: asString(media.collection.providerId),
+            name: asString(media.collection.name),
+            poster: asString(media.collection.poster),
+            backdrop: asString(media.collection.backdrop),
+          }
+        : null,
     },
     showData: {
       seasonCount,

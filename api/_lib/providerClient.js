@@ -243,9 +243,37 @@ const getSeasonEpisodes = async ({ id, seasonNumber }) => {
   };
 };
 
+const getCollection = async ({ id, locale = 'en-US' }) => {
+  const response = await tmdbGet(`/collection/${id}`, {
+    language: locale,
+  });
+  if (!response.ok) return response;
+
+  const parts = Array.isArray(response.data.parts) ? response.data.parts : [];
+  return {
+    ok: true,
+    data: {
+      provider: 'tmdb',
+      providerId: String(response.data.id),
+      name: String(response.data.name),
+      overview: String(response.data.overview || ''),
+      poster: response.data.poster_path
+        ? `https://image.tmdb.org/t/p/w500${response.data.poster_path}`
+        : '',
+      backdrop: response.data.backdrop_path
+        ? `https://image.tmdb.org/t/p/w1280${response.data.backdrop_path}`
+        : '',
+      parts: parts
+        .map((part) => mapMovieDetails(part))
+        .sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999')),
+    },
+  };
+};
+
 module.exports = {
   getMediaDetails,
   getSeasonEpisodes,
   getShowSeasons,
+  getCollection,
   search,
 };

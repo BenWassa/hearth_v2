@@ -172,4 +172,42 @@ describe('addWatchlistItem', () => {
     expect(set.mock.calls[1][2]).toBeUndefined();
     expect(commit).toHaveBeenCalledTimes(1);
   });
+
+  it('persists collection metadata in the catalog document', async () => {
+    const set = vi.fn();
+    const commit = vi.fn().mockResolvedValue(undefined);
+    writeBatchMock.mockReturnValue({ set, commit });
+
+    const { addWatchlistItem } = await loadModule();
+
+    await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'space',
+      payload: {
+        title: 'Part One',
+        type: 'movie',
+        media: {
+          title: 'Part One',
+          type: 'movie',
+          collection: {
+            provider: 'tmdb',
+            providerId: '42',
+            name: 'The Saga',
+            poster: '/collection-poster.jpg',
+            backdrop: '/collection-backdrop.jpg',
+          },
+        },
+        source: { provider: 'tmdb', providerId: '101' },
+      },
+    });
+
+    expect(set.mock.calls[0][1].media.collection).toEqual({
+      provider: 'tmdb',
+      providerId: '42',
+      name: 'The Saga',
+      poster: '/collection-poster.jpg',
+      backdrop: '/collection-backdrop.jpg',
+    });
+  });
 });

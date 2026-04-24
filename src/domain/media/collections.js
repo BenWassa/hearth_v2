@@ -58,10 +58,13 @@ export const buildCollectionRollups = (items = []) => {
     const sortedItems = sortCollectionItems(groupItems);
     const first = sortedItems[0];
     const collection = getCollection(first);
+    const watchedItems = sortedItems.filter(
+      (item) => item.status === 'watched',
+    );
+    const watchedCount = watchedItems.length;
     const unwatchedItems = sortedItems.filter(
       (item) => item.status !== 'watched',
     );
-    const watchedCount = sortedItems.length - unwatchedItems.length;
     const nextItem = unwatchedItems[0] || sortedItems[sortedItems.length - 1];
     const years = sortedItems
       .map((item) => asNumber(item.year))

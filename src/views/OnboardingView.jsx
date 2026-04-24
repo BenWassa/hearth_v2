@@ -3,6 +3,12 @@ import { ArrowRight, Loader2, LogIn } from 'lucide-react';
 import { APP_VERSION } from '../version';
 import hearthVector from '../assets/hearth_vector.png';
 
+const truncateUsername = (name, maxLength = 24) => {
+  const trimmed = String(name || '').trim();
+  if (trimmed.length <= maxLength) return trimmed;
+  return trimmed.slice(0, maxLength - 1) + '…';
+};
+
 const Input = ({ className = '', ...props }) => (
   <input
     className={`
@@ -144,8 +150,11 @@ const OnboardingView = ({
                   <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold ml-1">
                     Step 2 of 2 - Name your space
                   </div>
-                  <div className="text-[11px] text-stone-500 uppercase tracking-widest font-semibold ml-1">
-                    Signed in as {user.email || user.displayName || user.uid}
+                  <div 
+                    className="text-[11px] text-stone-500 uppercase tracking-widest font-semibold ml-1 truncate max-w-xs"
+                    title={user.email || user.displayName || user.uid}
+                  >
+                    Signed in as {truncateUsername(user.email || user.displayName || user.uid, 28)}
                   </div>
                   <div className="space-y-2">
                     <label

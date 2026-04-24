@@ -19,5 +19,11 @@ ui-debug.log
 # Virtual environment
 .venv
 
+# Local agent/workflow artifacts
+.claude/
+.codex/
+AGENTS.md
+CLAUDE.md
+graphify-out/
 
 /_archive/

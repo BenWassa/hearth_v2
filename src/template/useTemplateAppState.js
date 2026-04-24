@@ -6,6 +6,10 @@ import {
   TEMPLATE_SPACE_NAME,
 } from './seedLibrary.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
+import {
+  buildMetadataAuditReport as buildSharedMetadataAuditReport,
+  getMetadataGaps as getSharedMetadataGaps,
+} from '../domain/media/metadata.js';
 import { initializeFirebase } from '../services/firebase/client.js';
 import {
   signInAnonymousUser,
@@ -14,6 +18,7 @@ import {
 } from '../services/firebase/auth.js';
 
 const TEMPLATE_SESSION_MESSAGE = 'Template mode: all changes reset on refresh.';
+const TEMPLATE_METADATA_OPTIONS = { includeLogoGap: true };
 
 const asString = (value) => String(value || '').trim();
 
@@ -64,145 +69,11 @@ const isRateLimitedError = (error) => {
   );
 };
 
-const pickPrimaryPerson = (values) => {
-  if (!Array.isArray(values)) return '';
-  return String(values[0] || '').trim();
-};
+const getMetadataGaps = (item = {}) =>
+  getSharedMetadataGaps(item, TEMPLATE_METADATA_OPTIONS);
 
-const getPrimaryCredit = ({ item = {}, isShow = false } = {}) => {
-  const direct = String(item?.director || '').trim();
-  if (direct) return direct;
-
-  const mediaDirectors = pickPrimaryPerson(item?.media?.directors);
-  if (mediaDirectors) return mediaDirectors;
-
-  if (isShow) {
-    const mediaCreators = pickPrimaryPerson(item?.media?.creators);
-    if (mediaCreators) return mediaCreators;
-  }
-
-  return '';
-};
-
-const getMetadataGaps = (item = {}) => {
-  const gaps = [];
-  const sourceProvider = String(item?.source?.provider || '').trim();
-  const sourceProviderId = String(item?.source?.providerId || '').trim();
-  const poster = String(item?.poster || item?.media?.poster || '').trim();
-  const backdrop = String(item?.backdrop || item?.media?.backdrop || '').trim();
-  const logo = String(
-    item?.logo ||
-      item?.logoUrl ||
-      item?.media?.logo ||
-      item?.media?.logoUrl ||
-      '',
-  ).trim();
-  const runtimeMinutes = Number(
-    item?.runtimeMinutes ?? item?.media?.runtimeMinutes,
-  );
-  const year = String(item?.year || item?.media?.year || '').trim();
-  const overview = String(item?.overview || item?.media?.overview || '').trim();
-  const genres = Array.isArray(item?.genres)
-    ? item.genres
-    : Array.isArray(item?.media?.genres)
-    ? item.media.genres
-    : [];
-  const actors = Array.isArray(item?.actors)
-    ? item.actors
-    : Array.isArray(item?.media?.cast)
-    ? item.media.cast
-    : [];
-  const isShow = item?.type === 'show';
-  const director = getPrimaryCredit({ item, isShow });
-  const seasonCount = Number(
-    item?.totalSeasons ??
-      item?.showData?.seasonCount ??
-      (Array.isArray(item?.seasons) ? item.seasons.length : 0),
-  );
-  const seasons = Array.isArray(item?.seasons)
-    ? item.seasons
-    : Array.isArray(item?.showData?.seasons)
-    ? item.showData.seasons
-    : [];
-
-  if (!sourceProvider || !sourceProviderId) gaps.push('source');
-  if (!poster) gaps.push('poster');
-  if (!backdrop) gaps.push('backdrop');
-  if (!logo) gaps.push('logo');
-  if (!isShow && (!Number.isFinite(runtimeMinutes) || runtimeMinutes <= 0)) {
-    gaps.push('runtimeMinutes');
-  }
-  if (!year) gaps.push('year');
-  if (!overview) gaps.push('overview');
-  if (!genres.length) gaps.push('genres');
-  if (!actors.length) gaps.push('actors');
-  if (!director) gaps.push('director');
-  if (isShow) {
-    if (!Number.isFinite(seasonCount) || seasonCount < 1)
-      gaps.push('seasonCount');
-    if (!seasons.length) gaps.push('seasons');
-  }
-
-  return gaps;
-};
-
-const buildMetadataAuditReport = (items = []) => {
-  const rows = items.map((item) => {
-    const gaps = getMetadataGaps(item);
-    return {
-      id: item.id,
-      title: item.title || '[untitled]',
-      type: item.type || 'unknown',
-      gaps,
-    };
-  });
-
-  const itemsWithGaps = rows.filter((row) => row.gaps.length > 0);
-  const gapCounts = itemsWithGaps.reduce(
-    (acc, row) => {
-      row.gaps.forEach((gap) => {
-        acc[gap] = (acc[gap] || 0) + 1;
-      });
-      return acc;
-    },
-    {
-      source: 0,
-      poster: 0,
-      backdrop: 0,
-      logo: 0,
-      runtimeMinutes: 0,
-      year: 0,
-      overview: 0,
-      genres: 0,
-      actors: 0,
-      director: 0,
-      seasonCount: 0,
-      seasons: 0,
-    },
-  );
-
-  const movieRows = rows.filter((row) => row.type === 'movie');
-  const showRows = rows.filter((row) => row.type === 'show');
-
-  return {
-    generatedAt: Date.now(),
-    totalItems: rows.length,
-    completeItems: rows.length - itemsWithGaps.length,
-    itemsWithGaps: itemsWithGaps.length,
-    gapCounts,
-    byType: {
-      movie: {
-        total: movieRows.length,
-        withGaps: movieRows.filter((row) => row.gaps.length > 0).length,
-      },
-      show: {
-        total: showRows.length,
-        withGaps: showRows.filter((row) => row.gaps.length > 0).length,
-      },
-    },
-    missingRows: itemsWithGaps,
-  };
-};
+const buildMetadataAuditReport = (items = []) =>
+  buildSharedMetadataAuditReport(items, TEMPLATE_METADATA_OPTIONS);
 
 const normalizeSeasons = (value) =>
   asArray(value).map((season, seasonIndex) => {

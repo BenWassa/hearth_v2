@@ -73,19 +73,39 @@ describe('AddView integration', () => {
       <AddView onBack={() => {}} onSubmit={onSubmit} />,
     );
 
+    const searchInput = mounted.container.querySelector(
+      '[data-testid="live-search-input"]',
+    );
+    await act(async () => {
+      const valueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        'value',
+      ).set;
+      valueSetter.call(searchInput, 'Spirited Away');
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
     const resultButton = Array.from(
       mounted.container.querySelectorAll('button'),
     ).find((button) => button.textContent.includes('Spirited Away'));
-    const submitButton = Array.from(
-      mounted.container.querySelectorAll('button'),
-    ).find((button) => button.textContent.includes('Put on Shelf'));
 
     await act(async () => {
       resultButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
+    for (let i = 0; i < 5; i += 1) {
+      await act(async () => {
+        await Promise.resolve();
+      });
+    }
 
+    const enabledSubmitButton = Array.from(
+      mounted.container.querySelectorAll('button'),
+    ).find((button) => button.textContent.includes('Put on Shelf'));
+    expect(enabledSubmitButton.disabled).toBe(false);
     await act(async () => {
-      submitButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      enabledSubmitButton.dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
     });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);

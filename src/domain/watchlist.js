@@ -8,7 +8,8 @@ const normalizeEnergy = (energy) => {
 
 const pickAndRemove = (items, rng = Math.random) => {
   if (!items.length) return null;
-  const value = Number.isFinite(rng()) ? rng() : 0;
+  const next = rng();
+  const value = Number.isFinite(next) ? next : 0;
   const bounded = Math.max(0, Math.min(value, 0.999999999999));
   const index = Math.floor(bounded * items.length);
   const [picked] = items.splice(index, 1);

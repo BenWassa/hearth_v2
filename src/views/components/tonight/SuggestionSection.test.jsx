@@ -44,10 +44,11 @@ describe('SuggestionSection rewind', () => {
     const mounted = await renderIntoDom(
       <SuggestionSection
         title="Movies"
-        pool={[{ id: '1' }, { id: '2' }]}
+        pool={[{ id: '1' }, { id: '2' }, { id: '3' }]}
         suggestions={[
           { id: '1', title: 'A', status: 'unwatched' },
           { id: '2', title: 'B', status: 'unwatched' },
+          { id: '3', title: 'C', status: 'unwatched' },
         ]}
         emptyLabel="none"
         onDecide={() => {}}
@@ -58,8 +59,16 @@ describe('SuggestionSection rewind', () => {
       />,
     );
 
+    const animationCallbacks = [];
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    window.requestAnimationFrame = vi.fn((callback) => {
+      animationCallbacks.push(callback);
+      return animationCallbacks.length;
+    });
+    window.cancelAnimationFrame = vi.fn();
+
     const rail = mounted.container.querySelector('.overflow-x-auto');
-    rail.scrollTo = vi.fn();
     Object.defineProperty(rail, 'scrollWidth', {
       value: 600,
       configurable: true,
@@ -69,21 +78,31 @@ describe('SuggestionSection rewind', () => {
       configurable: true,
     });
     Object.defineProperty(rail, 'scrollLeft', {
-      value: 280,
+      value: 240,
+      writable: true,
       configurable: true,
     });
+    Object.defineProperty(
+      rail.firstElementChild.firstElementChild,
+      'offsetWidth',
+      {
+        value: 70,
+        configurable: true,
+      },
+    );
 
     await act(async () => {
       rail.dispatchEvent(new Event('scroll', { bubbles: true }));
-      vi.advanceTimersByTime(1200);
+      animationCallbacks.shift()?.();
+      animationCallbacks.shift()?.();
     });
 
-    expect(rail.scrollTo).toHaveBeenCalledWith({
-      left: 0,
-      behavior: 'smooth',
-    });
+    expect(rail.scrollLeft).toBe(0);
+    expect(rail.style.scrollSnapType).toBe('');
 
     await cleanupDom(mounted);
+    window.requestAnimationFrame = originalRequestAnimationFrame;
+    window.cancelAnimationFrame = originalCancelAnimationFrame;
     vi.useRealTimers();
   });
 });

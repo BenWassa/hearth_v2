@@ -11,9 +11,15 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
   const [posterMissing, setPosterMissing] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
 
-  const firstItem = Array.isArray(collection?.items) ? collection.items[0] : null;
+  const firstItem = Array.isArray(collection?.items)
+    ? collection.items[0]
+    : null;
   const logoSrc = String(
-    firstItem?.logo || firstItem?.logoUrl || firstItem?.media?.logo || firstItem?.media?.logoUrl || '',
+    firstItem?.logo ||
+      firstItem?.logoUrl ||
+      firstItem?.media?.logo ||
+      firstItem?.media?.logoUrl ||
+      '',
   ).trim();
   const displayTitle = stripCollectionSuffix(collection?.title || '');
 
@@ -23,8 +29,8 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
     backdropSrc && !backdropMissing
       ? backdropSrc
       : posterSrc && !posterMissing
-        ? posterSrc
-        : '';
+      ? posterSrc
+      : '';
 
   const totalCount = Number(
     collection?.totalCount ||
@@ -85,9 +91,7 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-stone-950/70 via-stone-950/25 to-transparent" />
 
         {/* Bottom gradient — anchored at 70% for the title block */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-stone-950 via-stone-950/80 to-transparent transition-opacity duration-[400ms] group-hover:from-stone-950 group-hover:via-stone-950/85"
-        />
+        <div className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-stone-950 via-stone-950/80 to-transparent transition-opacity duration-[400ms] group-hover:from-stone-950 group-hover:via-stone-950/85" />
       </div>
 
       {/* Progress accent — top architectural line, mirrors PosterCard energy band */}

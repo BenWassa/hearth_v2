@@ -18,8 +18,7 @@ const CollectionsRail = ({ collections, onOpenCollection }) => {
             Collections
           </h3>
           <span className="text-[11px] font-medium text-stone-500">
-            {collections.length}{' '}
-            {collections.length === 1 ? 'saga' : 'sagas'}
+            {collections.length} {collections.length === 1 ? 'saga' : 'sagas'}
           </span>
         </div>
       </header>

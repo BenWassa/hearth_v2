@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle2, Clapperboard, Play, X } from 'lucide-react';
 import { getBackdropSrc, getPosterSrc } from '../utils/poster.js';
 import LazyMediaImage from './media/LazyMediaImage.jsx';
@@ -10,6 +10,18 @@ const CollectionDetailsModal = ({
   onClose,
   onOpenItem,
 }) => {
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return undefined;
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+    };
+  }, [isOpen]);
+
   if (!isOpen || !collection) return null;
 
   const items = Array.isArray(collection.items) ? collection.items : [];

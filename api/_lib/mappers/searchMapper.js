@@ -24,6 +24,17 @@ const yearFor = (item = {}, type = 'movie') => {
   return dateValue.slice(0, 4);
 };
 
+const releaseDateFor = (item = {}, type = 'movie') => {
+  const dateValue =
+    type === 'show' ? item.first_air_date || '' : item.release_date || '';
+  return typeof dateValue === 'string' ? dateValue : '';
+};
+
+const numberOrNull = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 const mapSearchItem = (item = {}, fallbackType = 'all') => {
   const type = inferType(item, fallbackType);
   return {
@@ -32,6 +43,11 @@ const mapSearchItem = (item = {}, fallbackType = 'all') => {
     type,
     title: titleFor(item, type),
     year: yearFor(item, type),
+    releaseDate: releaseDateFor(item, type),
+    originalTitle:
+      type === 'show' ? item.original_name || '' : item.original_title || '',
+    popularity: numberOrNull(item.popularity),
+    voteCount: numberOrNull(item.vote_count),
     posterUrl: toImageUrl(item.poster_path, 'w342'),
     backdropUrl: toImageUrl(item.backdrop_path, 'w780'),
     overview: item.overview || '',

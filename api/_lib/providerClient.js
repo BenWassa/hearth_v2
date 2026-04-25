@@ -157,6 +157,84 @@ const tryFetchDetails = async ({ id, type, locale = 'en-US' }) => {
   };
 };
 
+const normalizeSearchText = (value) => {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+};
+
+const isSupportedSearchResult = (item = {}, fallbackType = 'all') => {
+  if (fallbackType === 'movie' || fallbackType === 'show') return true;
+  return item.media_type === 'movie' || item.media_type === 'tv';
+};
+
+const getSearchTitles = (item = {}, type = 'movie') => {
+  if (type === 'show') {
+    return [item.name, item.original_name];
+  }
+  return [item.title, item.original_title];
+};
+
+const getSearchDate = (item = {}, type = 'movie') => {
+  const raw = type === 'show' ? item.first_air_date : item.release_date;
+  if (typeof raw !== 'string' || !raw) return 0;
+  const parsed = Date.parse(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getTitleMatchScore = ({ item, type, query }) => {
+  const normalizedTitles = getSearchTitles(item, type)
+    .map(normalizeSearchText)
+    .filter(Boolean);
+  if (normalizedTitles.some((title) => title === query)) return 10000;
+  if (normalizedTitles.some((title) => title.startsWith(query))) return 8000;
+  if (normalizedTitles.some((title) => title.includes(query))) return 6000;
+  if (normalizedTitles.some((title) => query.includes(title))) return 5000;
+  return 0;
+};
+
+const getSearchRankScore = ({ item, fallbackType, query, index }) => {
+  const type = item.media_type === 'tv' || fallbackType === 'show' ? 'show' : 'movie';
+  const titleScore = getTitleMatchScore({ item, type, query });
+  const popularity = Number.isFinite(Number(item.popularity))
+    ? Math.log1p(Number(item.popularity)) * 120
+    : 0;
+  const voteCount = Number.isFinite(Number(item.vote_count))
+    ? Math.log1p(Number(item.vote_count)) * 30
+    : 0;
+  const releaseDate = getSearchDate(item, type);
+  const recency =
+    releaseDate > 0
+      ? Math.max(
+          0,
+          220 -
+            Math.max(0, Date.now() - releaseDate) /
+              (1000 * 60 * 60 * 24 * 365.25),
+        )
+      : 0;
+
+  return titleScore + popularity + voteCount + recency - index / 10000;
+};
+
+const rankSearchResults = ({ results, q, type }) => {
+  const normalizedQuery = normalizeSearchText(q);
+  return results
+    .filter((item) => isSupportedSearchResult(item, type))
+    .map((item, index) => ({
+      item,
+      score: getSearchRankScore({
+        item,
+        fallbackType: type,
+        query: normalizedQuery,
+        index,
+      }),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .map(({ item }) => item);
+};
+
 const resolveDetailsType = async ({ id, preferredType, locale = 'en-US' }) => {
   const attempts =
     preferredType === 'movie'
@@ -189,10 +267,11 @@ const search = async ({ q, type, page }) => {
   if (!response.ok) return response;
 
   const results = Array.isArray(response.data.results) ? response.data.results : [];
+  const rankedResults = rankSearchResults({ results, q, type });
   return {
     ok: true,
     data: {
-      results: results.map((item) => mapSearchItem(item, type)),
+      results: rankedResults.map((item) => mapSearchItem(item, type)),
       page: response.data.page || page,
       totalPages: response.data.total_pages || 0,
       totalResults: response.data.total_results || results.length,

@@ -46,22 +46,22 @@ const CollectionDetailsModal = ({
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/10" />
             <button
               onClick={onClose}
-              className="absolute right-3 top-3 rounded-full border border-stone-700 bg-stone-950/80 p-2 text-stone-300 transition-colors hover:border-stone-500 hover:text-stone-100"
+              className="absolute right-3 top-3 rounded-lg border border-stone-700 bg-stone-950/80 p-2 text-stone-400 transition-all hover:border-stone-600 hover:bg-stone-900 hover:text-stone-200"
               aria-label="Close collection"
             >
               <X className="h-4 w-4" />
             </button>
             <div className="absolute bottom-4 left-4 right-14">
-              <div className="mb-2 inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-300 ring-1 ring-amber-500/25">
+              <div className="mb-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-500/15 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-amber-300 ring-1 ring-amber-500/25">
                 <Clapperboard className="h-3.5 w-3.5" />
                 Collection
               </div>
-              <h2 className="text-2xl font-serif leading-tight text-stone-100">
+              <h2 className="text-2xl font-serif leading-tight text-stone-50">
                 {collection.title}
               </h2>
-              <p className="mt-1 text-sm text-stone-300">
+              <p className="mt-2 text-sm font-medium text-stone-300">
                 {collection.watchedCount}/{collection.totalCount} watched
-                {collection.year ? ` / ${collection.year}` : ''}
+                {collection.year ? ` · ${collection.year}` : ''}
               </p>
             </div>
           </div>
@@ -71,21 +71,21 @@ const CollectionDetailsModal = ({
               <button
                 type="button"
                 onClick={() => openItem(nextItem)}
-                className="mb-4 flex w-full items-center justify-between rounded-xl border border-amber-700/35 bg-amber-500/10 px-3 py-2.5 text-left transition-colors hover:bg-amber-500/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                className="mb-5 flex w-full items-center justify-between rounded-xl border border-amber-600/30 bg-amber-500/12 px-4 py-3 text-left transition-all hover:border-amber-500/50 hover:bg-amber-500/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-amber-300">
+                  <div className="text-[9px] font-semibold uppercase tracking-wider text-amber-300">
                     Next Up
                   </div>
-                  <div className="mt-0.5 text-sm font-semibold text-stone-100">
+                  <div className="mt-1 text-sm font-semibold text-stone-100">
                     {nextItem.title}
                   </div>
                 </div>
-                <Play className="h-4 w-4 text-amber-300" />
+                <Play className="h-5 w-5 text-amber-300 shrink-0" />
               </button>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {items.map((item, index) => {
                 const poster = getPosterSrc(item);
                 const isWatched = item.status === 'watched';
@@ -94,9 +94,9 @@ const CollectionDetailsModal = ({
                     key={item.id || item.mediaId || `${item.title}-${index}`}
                     type="button"
                     onClick={() => openItem(item)}
-                    className="flex w-full items-center gap-3 rounded-xl border border-stone-800/80 bg-stone-900/45 p-2 text-left transition-colors hover:border-stone-700 hover:bg-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="flex w-full items-center gap-3 rounded-lg border border-stone-800/60 bg-stone-900/40 p-3 text-left transition-all hover:border-stone-700 hover:bg-stone-900/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                   >
-                    <div className="aspect-[2/3] w-12 shrink-0 overflow-hidden rounded bg-stone-900">
+                    <div className="aspect-[2/3] w-12 shrink-0 overflow-hidden rounded-lg bg-stone-900">
                       {poster ? (
                         <LazyMediaImage
                           src={poster}
@@ -114,14 +114,14 @@ const CollectionDetailsModal = ({
                       <div className="truncate text-sm font-semibold text-stone-100">
                         {item.title}
                       </div>
-                      <div className="mt-0.5 text-xs text-stone-500">
+                      <div className="mt-1 text-xs text-stone-500">
                         {item.year || 'Year pending'}
                       </div>
                     </div>
                     {isWatched ? (
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-400" />
+                      <CheckCircle2 className="h-5 w-5 shrink-0 text-amber-400" />
                     ) : (
-                      <span className="rounded bg-stone-800 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                      <span className="rounded-lg bg-stone-800/80 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-stone-400">
                         Queued
                       </span>
                     )}

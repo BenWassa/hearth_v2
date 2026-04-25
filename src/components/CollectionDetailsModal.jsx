@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Clapperboard, Play, X } from 'lucide-react';
 import { getBackdropSrc, getPosterSrc } from '../utils/poster.js';
 import LazyMediaImage from './media/LazyMediaImage.jsx';
 import PosterPlaceholder from './cards/PosterPlaceholder.jsx';
+
+const stripCollectionSuffix = (title = '') =>
+  title.replace(/\s+Collection$/i, '').trim();
 
 const CollectionDetailsModal = ({
   isOpen,
@@ -10,6 +13,18 @@ const CollectionDetailsModal = ({
   onClose,
   onOpenItem,
 }) => {
+  const [logoFailed, setLogoFailed] = useState(false);
+  const items = Array.isArray(collection?.items) ? collection.items : [];
+  const firstItem = items[0] || null;
+  const logoSrc = String(
+    firstItem?.logo ||
+      firstItem?.logoUrl ||
+      firstItem?.media?.logo ||
+      firstItem?.media?.logoUrl ||
+      '',
+  ).trim();
+  const displayTitle = stripCollectionSuffix(collection?.title || '');
+
   useEffect(() => {
     if (!isOpen || typeof document === 'undefined') return undefined;
     const originalOverflow = document.body.style.overflow;
@@ -22,9 +37,12 @@ const CollectionDetailsModal = ({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setLogoFailed(false);
+  }, [isOpen, collection?.id, logoSrc]);
+
   if (!isOpen || !collection) return null;
 
-  const items = Array.isArray(collection.items) ? collection.items : [];
   const backdrop = getBackdropSrc(collection) || getPosterSrc(collection);
   const nextItem = collection.nextItem;
   const totalCount = items.length || Number(collection.totalCount) || 0;
@@ -89,9 +107,19 @@ const CollectionDetailsModal = ({
                 )}
               </div>
 
-              <h2 className="mt-3 font-serif text-3xl leading-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] sm:text-4xl">
-                {collection.title}
-              </h2>
+              {logoSrc && !logoFailed ? (
+                <img
+                  src={logoSrc}
+                  alt={displayTitle}
+                  className="mt-3 max-h-16 max-w-[78%] object-contain object-left drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)] sm:max-h-20 sm:max-w-[62%]"
+                  onError={() => setLogoFailed(true)}
+                  loading="eager"
+                />
+              ) : (
+                <h2 className="mt-3 font-serif text-3xl leading-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] sm:text-4xl">
+                  {displayTitle}
+                </h2>
+              )}
 
               <div className="mt-3 flex items-center gap-3">
                 <div className="h-1 w-32 overflow-hidden rounded-full bg-stone-50/15 sm:w-40">

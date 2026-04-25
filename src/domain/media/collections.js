@@ -104,6 +104,11 @@ export const buildCollectionRollups = (items = []) => {
             ? String(firstYear)
             : `${firstYear}-${lastYear}`
           : '',
+      collectionCategory:
+        (firstYear !== null && firstYear < 1980) ||
+        sortedItems.every((item) => item.vibe === 'classic')
+          ? 'classic'
+          : 'modern',
     });
   });
 
@@ -120,6 +125,10 @@ export const buildCollectionRollups = (items = []) => {
     .filter(Boolean)
     .sort((a, b) => {
       if (a?.type !== 'collection' || b?.type !== 'collection') return 0;
+      const aIsClassic = a.collectionCategory === 'classic' ? 0 : 1;
+      const bIsClassic = b.collectionCategory === 'classic' ? 0 : 1;
+      const categoryDelta = aIsClassic - bIsClassic;
+      if (categoryDelta !== 0) return categoryDelta;
       const scoreDelta =
         (asFiniteNumber(b.significanceScore) || 0) -
         (asFiniteNumber(a.significanceScore) || 0);

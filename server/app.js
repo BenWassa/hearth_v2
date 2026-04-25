@@ -4,6 +4,7 @@ const path = require('path');
 const healthHandler = require('../api/health');
 const searchHandler = require('../api/search');
 const mediaHandler = require('../api/media/[provider]/[id]');
+const collectionHandler = require('../api/media/[provider]/collection/[id]');
 const seasonsHandler = require('../api/media/[provider]/[id]/seasons');
 const seasonEpisodesHandler = require('../api/media/[provider]/[id]/season/[seasonNumber]');
 const refreshHandler = require('../api/media/refresh');
@@ -31,6 +32,13 @@ app.get('/api/search', invoke(searchHandler));
 app.get(
   '/api/media/:provider/:id',
   invoke(mediaHandler, (req) => ({
+    provider: req.params.provider,
+    id: req.params.id,
+  })),
+);
+app.get(
+  '/api/media/:provider/collection/:id',
+  invoke(collectionHandler, (req) => ({
     provider: req.params.provider,
     id: req.params.id,
   })),

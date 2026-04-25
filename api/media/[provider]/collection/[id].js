@@ -1,7 +1,10 @@
-const { logError, logInfo } = require('../../_lib/logger');
-const { getCollection } = require('../../_lib/providerClient');
-const { checkRateLimit, setRateLimitHeaders } = require('../../_lib/rateLimit');
-const { fail, getRequestId, ok } = require('../../_lib/response');
+const { logError, logInfo } = require('../../../_lib/logger');
+const { getCollection } = require('../../../_lib/providerClient');
+const {
+  checkRateLimit,
+  setRateLimitHeaders,
+} = require('../../../_lib/rateLimit');
+const { fail, getRequestId, ok } = require('../../../_lib/response');
 
 const getParam = (value) => {
   if (typeof value !== 'string') return '';
@@ -15,8 +18,17 @@ module.exports = async (req, res) => {
   const rate = checkRateLimit(req, 'collection-details');
   setRateLimitHeaders(res, rate);
   if (!rate.allowed) {
-    logInfo('collection.details.rate_limited', { requestId, scope: 'collection-details' });
-    return fail(req, res, 429, 'RATE_LIMITED', 'Too many requests. Try again shortly.');
+    logInfo('collection.details.rate_limited', {
+      requestId,
+      scope: 'collection-details',
+    });
+    return fail(
+      req,
+      res,
+      429,
+      'RATE_LIMITED',
+      'Too many requests. Try again shortly.',
+    );
   }
 
   const provider = getParam(req?.query?.provider);

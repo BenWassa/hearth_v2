@@ -50,3 +50,24 @@ code {
 .safe-area-top {
   padding-top: env(safe-area-inset-top);
 }
+
+@keyframes collection-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.collection-card-enter {
+  animation: collection-card-enter 420ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-card-enter {
+    animation: none;
+  }
+}

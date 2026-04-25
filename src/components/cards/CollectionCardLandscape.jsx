@@ -25,7 +25,14 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
   const progressPercentage =
     totalCount > 0 ? Math.round((watchedCount / totalCount) * 100) : 0;
   const yearLabel = collection?.year || '';
-  const countLabel = totalCount === 1 ? '1 film' : `${totalCount} films`;
+  const isComplete = totalCount > 0 && watchedCount >= totalCount;
+
+  const watchedFragment =
+    watchedCount > 0
+      ? isComplete
+        ? 'All watched'
+        : `${watchedCount} of ${totalCount} watched`
+      : `${totalCount} ${totalCount === 1 ? 'film' : 'films'}`;
 
   useEffect(() => {
     setBackdropMissing(false);
@@ -36,10 +43,11 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
     <button
       type="button"
       onClick={() => onOpenCollection?.(collection)}
-      className="group relative block aspect-[16/9] w-full overflow-hidden rounded-xl border border-stone-800 bg-stone-900/70 text-left shadow-lg shadow-black/25 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 hover:border-stone-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+      className="group relative block aspect-[16/9] w-full overflow-hidden rounded-xl bg-stone-900 text-left ring-1 ring-white/5 shadow-lg shadow-black/30 transition-[transform,box-shadow,--tw-ring-color] duration-[400ms] ease-[cubic-bezier(0.25,1,0.5,1)] hover:ring-amber-400/40 hover:shadow-2xl hover:shadow-black/50 motion-safe:hover:-translate-y-0.5 active:scale-[0.985] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
       aria-label={`Open ${collection?.title || 'collection'}`}
     >
-      <div className="absolute inset-0">
+      {/* Hero image with subtle zoom on hover */}
+      <div className="absolute inset-0 overflow-hidden">
         {heroSrc ? (
           <LazyMediaImage
             src={heroSrc}
@@ -51,7 +59,7 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
                 setPosterMissing(true);
               }
             }}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-safe:group-hover:scale-[1.04]"
             loading="lazy"
             decoding="async"
             fetchPriority="auto"
@@ -62,30 +70,50 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
         ) : (
           <PosterPlaceholder title={collection?.title} type="movie" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-stone-950/10" />
+
+        {/* Top vignette — gives the badge a quiet shelf to sit on */}
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-stone-950/70 via-stone-950/25 to-transparent" />
+
+        {/* Bottom gradient — anchored at 70% for the title block */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-stone-950 via-stone-950/80 to-transparent transition-opacity duration-[400ms] group-hover:from-stone-950 group-hover:via-stone-950/85"
+        />
       </div>
 
-      <div className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-lg bg-stone-950/75 px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-amber-300 ring-1 ring-amber-500/10">
+      {/* Progress accent — top architectural line, mirrors PosterCard energy band */}
+      {watchedCount > 0 && (
+        <div className="absolute inset-x-0 top-0 z-10 h-0.5 bg-stone-950/40">
+          <div
+            className="h-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.55)] transition-[width] duration-[600ms] ease-out"
+            style={{ width: `${Math.max(progressPercentage, 4)}%` }}
+          />
+        </div>
+      )}
+
+      {/* Collection badge — kin to vibe/energy badges */}
+      <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg bg-stone-950/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-stone-100 ring-1 ring-stone-50/15 backdrop-blur-[2px]">
         <Clapperboard className="h-3 w-3" />
         Collection
       </div>
 
-      <div className="absolute inset-x-3 bottom-3 space-y-2">
-        <div className="line-clamp-2 text-sm font-semibold leading-tight text-stone-50 drop-shadow-lg sm:text-base">
-          {collection?.title}
+      {isComplete && (
+        <div className="absolute right-3 top-3 inline-flex items-center rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-950 ring-1 ring-amber-300/40">
+          Complete
         </div>
-        <div className="space-y-2">
-          <div className="text-[11px] font-medium text-stone-300">
-            {countLabel}
-            {yearLabel ? ` · ${yearLabel}` : ''}
-          </div>
-          {watchedCount > 0 && (
-            <div className="h-1.5 overflow-hidden rounded-full bg-stone-950/50">
-              <div
-                className="h-full bg-amber-500 transition-all duration-500 ease-out"
-                style={{ width: `${Math.max(progressPercentage, 3)}%` }}
-              />
-            </div>
+      )}
+
+      {/* Title block — marquee feel */}
+      <div className="absolute inset-x-4 bottom-3.5 space-y-1.5">
+        <h4 className="line-clamp-2 font-serif text-base leading-snug text-stone-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] sm:text-lg">
+          {collection?.title}
+        </h4>
+        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-300/90">
+          <span>{watchedFragment}</span>
+          {yearLabel && (
+            <>
+              <span className="h-0.5 w-0.5 rounded-full bg-stone-400/70" />
+              <span className="text-stone-400">{yearLabel}</span>
+            </>
           )}
         </div>
       </div>

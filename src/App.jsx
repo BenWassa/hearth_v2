@@ -193,6 +193,7 @@ export default function HearthApp() {
             onToggleStatus={handleMarkWatched}
             onDelete={handleDelete}
             onUpdate={handleUpdateItem}
+            onAddItem={handleAddItem}
             showDevMetadataTools={showDevMetadataTools}
             onMetadataAudit={handleMetadataAudit}
             onMetadataRepairMissing={handleMetadataRepairMissing}

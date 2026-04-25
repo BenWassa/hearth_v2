@@ -54,7 +54,6 @@ export const buildCollectionRollups = (items = []) => {
 
   const rollupsByKey = new Map();
   groups.forEach((groupItems, key) => {
-    if (groupItems.length < 2) return;
     const sortedItems = sortCollectionItems(groupItems);
     const first = sortedItems[0];
     const collection = getCollection(first);

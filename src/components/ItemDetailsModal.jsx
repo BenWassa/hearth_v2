@@ -96,6 +96,7 @@ const ItemDetailsModal = ({
   item: rawItem,
   onClose,
   onToggleStatus,
+  onAddItem,
   onUpdate,
 }) => {
   const [backdropMissing, setBackdropMissing] = useState(false);
@@ -110,6 +111,7 @@ const ItemDetailsModal = ({
   const [revealedEpisodeIds, setRevealedEpisodeIds] = useState({});
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
+  const [isAddingItem, setIsAddingItem] = useState(false);
   const persistedHydrationRef = useRef(new Set());
   const initializedShowRef = useRef(null);
   const seasonScrollRef = useRef(null);
@@ -190,6 +192,72 @@ const ItemDetailsModal = ({
         poster: rawItem.poster ?? mediaDetails?.poster,
       }
     : null;
+
+  const handleAddItem = async (itemToAdd) => {
+    if (!itemToAdd || isAddingItem) return;
+    const provider = String(
+      itemToAdd?.source?.provider || itemToAdd?.provider || 'tmdb',
+    ).trim();
+    const providerId = String(
+      itemToAdd?.source?.providerId || itemToAdd?.providerId || '',
+    ).trim();
+    const poster = String(
+      itemToAdd?.poster ||
+        itemToAdd?.posterUrl ||
+        itemToAdd?.media?.poster ||
+        '',
+    ).trim();
+    const backdrop = String(
+      itemToAdd?.backdrop ||
+        itemToAdd?.backdropUrl ||
+        itemToAdd?.media?.backdrop ||
+        '',
+    ).trim();
+    const logo = String(
+      itemToAdd?.logo || itemToAdd?.logoUrl || itemToAdd?.media?.logo || '',
+    ).trim();
+
+    setIsAddingItem(true);
+    try {
+      await onAddItem?.({
+        title: itemToAdd.title,
+        type: itemToAdd.type === 'show' ? 'show' : 'movie',
+        year: itemToAdd.year || '',
+        status: 'unwatched',
+        poster,
+        backdrop,
+        logo,
+        source: {
+          provider,
+          providerId,
+          fetchedAt: Date.now(),
+          locale: itemToAdd?.source?.locale || 'en-US',
+        },
+        media: {
+          ...itemToAdd.media,
+          ...itemToAdd,
+          provider,
+          providerId,
+          poster,
+          backdrop,
+          logo,
+          posterUrl: itemToAdd.posterUrl || poster,
+          backdropUrl: itemToAdd.backdropUrl || backdrop,
+          logoUrl: itemToAdd.logoUrl || logo,
+        },
+        userState: {
+          status: 'unwatched',
+          vibe: itemToAdd.vibe || '',
+          energy: itemToAdd.energy || '',
+          note: itemToAdd.note || '',
+          episodeProgress: {},
+        },
+      });
+      onClose?.();
+    } finally {
+      setIsAddingItem(false);
+    }
+  };
 
   useEffect(() => {
     setExpandedEpisodeId(null);
@@ -899,7 +967,12 @@ const ItemDetailsModal = ({
           </div>
 
           {/* Fixed Bottom Action Bar */}
-          <ActionBar item={item} onToggleStatus={onToggleStatus} />
+          <ActionBar
+            item={item}
+            onToggleStatus={onToggleStatus}
+            onAddItem={handleAddItem}
+            isAdding={isAddingItem}
+          />
         </div>
       </div>
     </div>

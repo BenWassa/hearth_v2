@@ -176,6 +176,17 @@ export const getSeasonEpisodes = async ({
   return getJson(`/api/media/${provider}/${providerId}/season/${seasonNumber}`);
 };
 
+export const getCollectionDetails = async ({
+  provider = 'tmdb',
+  providerId,
+  locale = 'en-US',
+}) => {
+  const params = new URLSearchParams();
+  if (locale) params.set('locale', locale);
+  const suffix = params.toString() ? `?${params.toString()}` : '';
+  return getJson(`/api/media/${provider}/collection/${providerId}${suffix}`);
+};
+
 export const refreshMediaMetadata = async ({
   provider,
   providerId,

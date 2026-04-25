@@ -49,11 +49,17 @@ describe('collection rollups', () => {
     expect(rollups[1].id).toBe('solo');
   });
 
-  it('leaves single collection members as normal movies', () => {
+  it('rolls up single collection members so collections can be discovered', () => {
     const rollups = buildCollectionRollups([makeMovie('a', 'Part One')]);
 
     expect(rollups).toHaveLength(1);
-    expect(rollups[0].id).toBe('a');
-    expect(rollups[0].type).toBe('movie');
+    expect(rollups[0]).toMatchObject({
+      id: 'collection:tmdb:42',
+      type: 'collection',
+      title: 'The Saga',
+      totalCount: 1,
+      watchedCount: 0,
+    });
+    expect(rollups[0].items.map((item) => item.id)).toEqual(['a']);
   });
 });

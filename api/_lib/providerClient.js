@@ -151,7 +151,10 @@ const tryFetchDetails = async ({ id, type, locale = 'en-US' }) => {
 
   return {
     ok: true,
-    data: type === 'show' ? mapShowDetails(response.data) : mapMovieDetails(response.data),
+    data:
+      type === 'show'
+        ? mapShowDetails(response.data)
+        : mapMovieDetails(response.data),
     raw: response.data,
     type,
   };
@@ -196,7 +199,8 @@ const getTitleMatchScore = ({ item, type, query }) => {
 };
 
 const getSearchRankScore = ({ item, fallbackType, query, index }) => {
-  const type = item.media_type === 'tv' || fallbackType === 'show' ? 'show' : 'movie';
+  const type =
+    item.media_type === 'tv' || fallbackType === 'show' ? 'show' : 'movie';
   const titleScore = getTitleMatchScore({ item, type, query });
   const popularity = Number.isFinite(Number(item.popularity))
     ? Math.log1p(Number(item.popularity)) * 120
@@ -266,7 +270,9 @@ const search = async ({ q, type, page }) => {
   });
   if (!response.ok) return response;
 
-  const results = Array.isArray(response.data.results) ? response.data.results : [];
+  const results = Array.isArray(response.data.results)
+    ? response.data.results
+    : [];
   const rankedResults = rankSearchResults({ results, q, type });
   return {
     ok: true,
@@ -287,7 +293,9 @@ const getShowSeasons = async ({ id }) => {
   const response = await tmdbGet(`/tv/${id}`, {});
   if (!response.ok) return response;
 
-  const seasons = Array.isArray(response.data.seasons) ? response.data.seasons : [];
+  const seasons = Array.isArray(response.data.seasons)
+    ? response.data.seasons
+    : [];
   return {
     ok: true,
     data: {
@@ -301,7 +309,10 @@ const getShowSeasons = async ({ id }) => {
         : null,
       seasons: seasons
         .map(mapSeason)
-        .filter((season) => Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1),
+        .filter(
+          (season) =>
+            Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1,
+        ),
     },
   };
 };
@@ -310,7 +321,9 @@ const getSeasonEpisodes = async ({ id, seasonNumber }) => {
   const response = await tmdbGet(`/tv/${id}/season/${seasonNumber}`, {});
   if (!response.ok) return response;
 
-  const episodes = Array.isArray(response.data.episodes) ? response.data.episodes : [];
+  const episodes = Array.isArray(response.data.episodes)
+    ? response.data.episodes
+    : [];
   return {
     ok: true,
     data: {
@@ -322,6 +335,61 @@ const getSeasonEpisodes = async ({ id, seasonNumber }) => {
   };
 };
 
+const sortCollectionParts = (parts = []) =>
+  [...parts].sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999'));
+
+const getNestedCollection = (part = {}, parentId = '') => {
+  const collection = part?.belongs_to_collection;
+  const providerId = String(collection?.id || '').trim();
+  if (!providerId || providerId === String(parentId)) return null;
+  return {
+    providerId,
+    name: String(collection?.name || '').trim(),
+  };
+};
+
+const fetchCollectionName = async ({ id, fallbackName, locale }) => {
+  const response = await tmdbGet(`/collection/${id}`, { language: locale });
+  if (!response.ok) return fallbackName || `Collection ${id}`;
+  return String(response.data?.name || fallbackName || `Collection ${id}`);
+};
+
+const buildSubCollections = async ({ parentId, parts, locale }) => {
+  const groups = new Map();
+
+  parts.forEach((part) => {
+    const collection = getNestedCollection(part, parentId);
+    if (!collection) return;
+    if (!groups.has(collection.providerId)) {
+      groups.set(collection.providerId, {
+        id: collection.providerId,
+        name: collection.name,
+        parts: [],
+      });
+    }
+    groups.get(collection.providerId).parts.push(mapMovieDetails(part));
+  });
+
+  const subCollections = await Promise.all(
+    Array.from(groups.values()).map(async (group) => ({
+      ...group,
+      name: await fetchCollectionName({
+        id: group.id,
+        fallbackName: group.name,
+        locale,
+      }),
+      parts: sortCollectionParts(group.parts),
+    })),
+  );
+
+  return subCollections.sort((a, b) => {
+    const firstYearA = a.parts[0]?.year || '9999';
+    const firstYearB = b.parts[0]?.year || '9999';
+    if (firstYearA !== firstYearB) return firstYearA.localeCompare(firstYearB);
+    return a.name.localeCompare(b.name);
+  });
+};
+
 const getCollection = async ({ id, locale = 'en-US' }) => {
   const response = await tmdbGet(`/collection/${id}`, {
     language: locale,
@@ -329,6 +397,15 @@ const getCollection = async ({ id, locale = 'en-US' }) => {
   if (!response.ok) return response;
 
   const parts = Array.isArray(response.data.parts) ? response.data.parts : [];
+  const mappedParts = sortCollectionParts(
+    parts.map((part) => mapMovieDetails(part)),
+  );
+  const subCollections = await buildSubCollections({
+    parentId: response.data.id || id,
+    parts,
+    locale,
+  });
+
   return {
     ok: true,
     data: {
@@ -342,9 +419,8 @@ const getCollection = async ({ id, locale = 'en-US' }) => {
       backdrop: response.data.backdrop_path
         ? `https://image.tmdb.org/t/p/w1280${response.data.backdrop_path}`
         : '',
-      parts: parts
-        .map((part) => mapMovieDetails(part))
-        .sort((a, b) => (a.year || '9999').localeCompare(b.year || '9999')),
+      parts: mappedParts,
+      subCollections,
     },
   };
 };

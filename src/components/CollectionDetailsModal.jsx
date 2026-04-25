@@ -1,11 +1,102 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle2, Clapperboard, Play, X } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clapperboard,
+  Library,
+  Play,
+  Plus,
+  X,
+} from 'lucide-react';
+import useCollectionDetails from '../hooks/useCollectionDetails.js';
 import { getBackdropSrc, getPosterSrc } from '../utils/poster.js';
 import LazyMediaImage from './media/LazyMediaImage.jsx';
 import PosterPlaceholder from './cards/PosterPlaceholder.jsx';
 
 const stripCollectionSuffix = (title = '') =>
   title.replace(/\s+Collection$/i, '').trim();
+
+const asString = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const getProviderKey = (item = {}) => {
+  const mediaId = asString(item.mediaId || item.media_id);
+  const [mediaProvider = '', mediaProviderId = ''] = mediaId.split(':');
+  const provider = asString(
+    item?.source?.provider ||
+      item?.media?.provider ||
+      item?.provider ||
+      mediaProvider ||
+      'tmdb',
+  ).toLowerCase();
+  const providerId = asString(
+    item?.source?.providerId ||
+      item?.media?.providerId ||
+      item?.providerId ||
+      mediaProviderId,
+  );
+  return provider && providerId ? `${provider}:${providerId}` : '';
+};
+
+const getFallbackKey = (item = {}) =>
+  `${asString(item.title).toLowerCase()}:${asString(item.year)}`;
+
+const getItemKey = (item = {}) => getProviderKey(item) || getFallbackKey(item);
+
+const mapDiscoveryItem = (part = {}, watchlistItem = null) => {
+  if (watchlistItem) {
+    return {
+      ...watchlistItem,
+      owned: true,
+      watchlistItem,
+      discoveryItem: part,
+    };
+  }
+
+  const provider = asString(part.provider) || 'tmdb';
+  const providerId = asString(part.providerId);
+  const poster = asString(part.poster || part.posterUrl);
+  const backdrop = asString(part.backdrop || part.backdropUrl);
+
+  return {
+    ...part,
+    id: '',
+    provider,
+    providerId,
+    source: {
+      provider,
+      providerId,
+      locale: 'en-US',
+    },
+    media: {
+      ...part,
+      provider,
+      providerId,
+      poster,
+      backdrop,
+      logo: asString(part.logo || part.logoUrl),
+    },
+    poster,
+    backdrop,
+    status: 'unwatched',
+    owned: false,
+    watchlistItem: null,
+    discoveryItem: part,
+  };
+};
+
+const CollectionShelfSkeleton = () => (
+  <div
+    className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4"
+    aria-hidden="true"
+  >
+    {Array.from({ length: 8 }).map((_, index) => (
+      <div key={`collection-part-skeleton-${index}`}>
+        <div className="aspect-[2/3] w-full animate-pulse rounded-lg bg-stone-900 ring-1 ring-stone-50/5" />
+        <div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-stone-800/90" />
+        <div className="mt-1 h-2.5 w-10 animate-pulse rounded bg-stone-800/60" />
+      </div>
+    ))}
+  </div>
+);
 
 const CollectionDetailsModal = ({
   isOpen,
@@ -16,6 +107,18 @@ const CollectionDetailsModal = ({
   const [logoFailed, setLogoFailed] = useState(false);
   const items = Array.isArray(collection?.items) ? collection.items : [];
   const firstItem = items[0] || null;
+  const collectionProvider =
+    asString(collection?.collection?.provider) || 'tmdb';
+  const collectionProviderId = asString(collection?.collection?.providerId);
+  const {
+    data: collectionDetails,
+    loading: isCollectionLoading,
+    error: collectionError,
+  } = useCollectionDetails({
+    provider: collectionProvider,
+    providerId: collectionProviderId,
+    enabled: isOpen && Boolean(collectionProviderId),
+  });
   const logoSrc = String(
     firstItem?.logo ||
       firstItem?.logoUrl ||
@@ -45,18 +148,132 @@ const CollectionDetailsModal = ({
 
   const backdrop = getBackdropSrc(collection) || getPosterSrc(collection);
   const nextItem = collection.nextItem;
-  const totalCount = items.length || Number(collection.totalCount) || 0;
+  const ownedByKey = new Map(
+    items.map((item) => [getItemKey(item), item]).filter(([key]) => key),
+  );
+  const fullParts = Array.isArray(collectionDetails?.parts)
+    ? collectionDetails.parts
+    : [];
+  const displayItems = (fullParts.length ? fullParts : items).map((part) => {
+    const ownedItem = ownedByKey.get(getItemKey(part)) || null;
+    return mapDiscoveryItem(part, fullParts.length ? ownedItem : part);
+  });
+  const subCollectionRows =
+    Array.isArray(collectionDetails?.subCollections) &&
+    collectionDetails.subCollections.length > 0
+      ? collectionDetails.subCollections
+          .map((subCollection) => ({
+            ...subCollection,
+            parts: (Array.isArray(subCollection.parts)
+              ? subCollection.parts
+              : []
+            ).map((part) =>
+              mapDiscoveryItem(part, ownedByKey.get(getItemKey(part)) || null),
+            ),
+          }))
+          .filter((subCollection) => subCollection.parts.length > 0)
+      : [];
+  const ownedTotalCount = items.length || Number(collection.totalCount) || 0;
+  const fullTotalCount =
+    fullParts.length || displayItems.length || ownedTotalCount;
   const watchedCount = Number(collection.watchedCount) || 0;
   const progressPercentage =
-    totalCount > 0 ? Math.round((watchedCount / totalCount) * 100) : 0;
-  const isComplete = totalCount > 0 && watchedCount >= totalCount;
+    ownedTotalCount > 0
+      ? Math.round((watchedCount / ownedTotalCount) * 100)
+      : 0;
+  const isComplete = ownedTotalCount > 0 && watchedCount >= ownedTotalCount;
   const showNextUp = nextItem && nextItem.status !== 'watched' && !isComplete;
   const nextItemPoster = nextItem ? getPosterSrc(nextItem) : '';
 
   const openItem = (item) => {
     onClose?.();
-    onOpenItem?.(item);
+    onOpenItem?.(item.watchlistItem || item);
   };
+
+  const renderPosterGrid = (gridItems) => (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4">
+      {gridItems.map((item, index) => {
+        const poster = getPosterSrc(item);
+        const isOwned = item.owned !== false;
+        const isWatched = isOwned && item.status === 'watched';
+        const queuePosition = isOwned
+          ? items.findIndex((ownedItem) => ownedItem === item.watchlistItem) +
+              1 || index + 1
+          : null;
+        const itemTitle = item.title || 'Untitled movie';
+        const key = getItemKey(item) || `${itemTitle}-${index}`;
+
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => openItem(item)}
+            className="group flex flex-col text-left focus:outline-none"
+            aria-label={
+              isOwned ? `Open ${itemTitle}` : `Add ${itemTitle} to shelf`
+            }
+          >
+            <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-stone-900 ring-1 ring-stone-50/5 shadow-md shadow-black/40 transition-[transform,box-shadow,--tw-ring-color] duration-[300ms] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:ring-amber-400/40 group-hover:shadow-lg group-hover:shadow-black/60 motion-safe:group-hover:-translate-y-0.5 group-active:scale-[0.98] group-focus-visible:ring-2 group-focus-visible:ring-amber-400">
+              {poster ? (
+                <LazyMediaImage
+                  src={poster}
+                  alt=""
+                  className={`h-full w-full object-cover transition-transform duration-[500ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-safe:group-hover:scale-[1.04] ${
+                    isOwned ? '' : 'opacity-40 grayscale'
+                  }`}
+                  loading="lazy"
+                  decoding="async"
+                  fetchPriority="auto"
+                  fallback={
+                    <PosterPlaceholder title={itemTitle} type="movie" />
+                  }
+                />
+              ) : (
+                <PosterPlaceholder title={itemTitle} type="movie" />
+              )}
+
+              {isWatched ? (
+                <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-amber-950 shadow-md shadow-black/40 ring-2 ring-stone-950/60">
+                  <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
+                </div>
+              ) : isOwned ? (
+                <div className="absolute right-1.5 top-1.5 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-stone-950/85 px-1.5 text-[10px] font-bold tabular-nums text-stone-300 ring-1 ring-stone-50/10 backdrop-blur-sm">
+                  {queuePosition}
+                </div>
+              ) : (
+                <div className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-stone-950/90 text-amber-300 shadow-md shadow-black/40 ring-1 ring-amber-400/35 backdrop-blur-sm">
+                  <Library className="h-3.5 w-3.5" />
+                  <Plus className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-amber-500 p-0.5 text-amber-950 ring-1 ring-stone-950" />
+                </div>
+              )}
+
+              {isWatched && (
+                <div className="pointer-events-none absolute inset-0 bg-stone-950/35" />
+              )}
+              {!isOwned && (
+                <div className="pointer-events-none absolute inset-0 bg-stone-950/20" />
+              )}
+            </div>
+
+            <div className="mt-2 px-0.5">
+              <div
+                className={`line-clamp-2 text-[13px] font-semibold leading-snug ${
+                  isOwned
+                    ? 'text-stone-100 group-hover:text-amber-50'
+                    : 'text-stone-400 group-hover:text-stone-200'
+                }`}
+              >
+                {itemTitle}
+              </div>
+              <div className="mt-0.5 text-[11px] text-stone-500">
+                {item.year || '-'}
+              </div>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
     <>
@@ -129,7 +346,7 @@ const CollectionDetailsModal = ({
                   />
                 </div>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-300">
-                  {watchedCount} / {totalCount} watched
+                  {watchedCount} / {ownedTotalCount} watched
                   {collection.year ? ` · ${collection.year}` : ''}
                 </span>
               </div>
@@ -190,73 +407,32 @@ const CollectionDetailsModal = ({
                 The collection
               </div>
               <div className="text-[11px] font-medium text-stone-500">
-                {totalCount} {totalCount === 1 ? 'film' : 'films'}
+                {fullTotalCount} {fullTotalCount === 1 ? 'film' : 'films'}
               </div>
             </div>
 
-            {/* Poster shelf — 2-col mobile, 3-col sm, 4-col md */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4">
-              {items.map((item, index) => {
-                const poster = getPosterSrc(item);
-                const isWatched = item.status === 'watched';
-                const queuePosition = index + 1;
-                return (
-                  <button
-                    key={item.id || item.mediaId || `${item.title}-${index}`}
-                    type="button"
-                    onClick={() => openItem(item)}
-                    className="group flex flex-col text-left focus:outline-none"
-                    aria-label={`Open ${item.title}`}
-                  >
-                    <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-stone-900 ring-1 ring-stone-50/5 shadow-md shadow-black/40 transition-[transform,box-shadow,--tw-ring-color] duration-[300ms] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:ring-amber-400/40 group-hover:shadow-lg group-hover:shadow-black/60 motion-safe:group-hover:-translate-y-0.5 group-active:scale-[0.98] group-focus-visible:ring-2 group-focus-visible:ring-amber-400">
-                      {poster ? (
-                        <LazyMediaImage
-                          src={poster}
-                          alt=""
-                          className="h-full w-full object-cover transition-transform duration-[500ms] ease-[cubic-bezier(0.25,1,0.5,1)] motion-safe:group-hover:scale-[1.04]"
-                          loading="lazy"
-                          decoding="async"
-                          fetchPriority="auto"
-                          fallback={
-                            <PosterPlaceholder
-                              title={item.title}
-                              type="movie"
-                            />
-                          }
-                        />
-                      ) : (
-                        <PosterPlaceholder title={item.title} type="movie" />
-                      )}
-
-                      {/* Watched / queue indicator */}
-                      {isWatched ? (
-                        <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-amber-950 shadow-md shadow-black/40 ring-2 ring-stone-950/60">
-                          <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
-                        </div>
-                      ) : (
-                        <div className="absolute right-1.5 top-1.5 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-stone-950/85 px-1.5 text-[10px] font-bold tabular-nums text-stone-300 ring-1 ring-stone-50/10 backdrop-blur-sm">
-                          {queuePosition}
-                        </div>
-                      )}
-
-                      {/* Soft dim for watched items */}
-                      {isWatched && (
-                        <div className="pointer-events-none absolute inset-0 bg-stone-950/35" />
-                      )}
+            {isCollectionLoading ? (
+              <CollectionShelfSkeleton />
+            ) : subCollectionRows.length > 0 ? (
+              <div className="space-y-7">
+                {subCollectionRows.map((subCollection) => (
+                  <section key={subCollection.id} className="space-y-3">
+                    <div className="px-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-stone-500">
+                      {stripCollectionSuffix(subCollection.name)}
                     </div>
+                    {renderPosterGrid(subCollection.parts)}
+                  </section>
+                ))}
+              </div>
+            ) : (
+              renderPosterGrid(displayItems)
+            )}
 
-                    <div className="mt-2 px-0.5">
-                      <div className="line-clamp-2 text-[13px] font-semibold leading-snug text-stone-100 group-hover:text-amber-50">
-                        {item.title}
-                      </div>
-                      <div className="mt-0.5 text-[11px] text-stone-500">
-                        {item.year || '—'}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {collectionError && !isCollectionLoading && (
+              <div className="mt-4 rounded-lg border border-stone-800 bg-stone-900/50 px-3 py-2 text-xs text-stone-400">
+                Full series details are unavailable right now.
+              </div>
+            )}
           </div>
         </div>
       </div>

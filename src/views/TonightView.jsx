@@ -101,6 +101,7 @@ const TonightView = ({
   onDelete,
   onToggleStatus,
   onUpdate,
+  onAddItem,
   showDevMetadataTools = false,
   onMetadataAudit,
   onMetadataRepairMissing,
@@ -553,6 +554,7 @@ const TonightView = ({
         onClose={closeDetails}
         onToggleStatus={onToggleStatus}
         onDelete={onDelete}
+        onAddItem={onAddItem}
         onUpdate={onUpdate}
       />
 

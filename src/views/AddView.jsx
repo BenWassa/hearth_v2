@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Check,
   Film,
@@ -52,6 +52,27 @@ const MediaTypeBadge = ({ type: mediaType, selected = false }) => {
   );
 };
 
+const SearchResultSkeleton = ({ count = 3 }) => (
+  <>
+    {Array.from({ length: count }).map((_, index) => (
+      <div
+        key={`search-skeleton-${index}`}
+        className="px-3 py-3"
+        data-testid="search-result-skeleton"
+      >
+        <div className="flex items-center gap-4">
+          <div className="h-[4.5rem] w-12 shrink-0 animate-pulse rounded-md border border-stone-800 bg-stone-800/80" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-4 w-3/4 animate-pulse rounded bg-stone-800/90" />
+            <div className="h-3 w-28 animate-pulse rounded bg-stone-800/70" />
+          </div>
+          <div className="h-6 w-16 shrink-0 animate-pulse rounded-full bg-stone-800/80" />
+        </div>
+      </div>
+    ))}
+  </>
+);
+
 const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [type, setType] = useState('movie');
@@ -64,12 +85,23 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const [enrichError, setEnrichError] = useState('');
   const [submitError, setSubmitError] = useState('');
 
-  const { results, loading, error, hasQuery } = useMediaSearch({
+  const {
+    results,
+    loading,
+    loadingInitial,
+    loadingMore,
+    error,
+    hasQuery,
+    hasMore,
+    loadMore,
+  } = useMediaSearch({
     query: searchQuery,
     type: 'all',
   });
+  const resultsScrollRef = useRef(null);
+  const loadMoreSentinelRef = useRef(null);
+  const loadMoreRef = useRef(loadMore);
 
-  const visibleResults = useMemo(() => results.slice(0, 5), [results]);
   const selectedPoster =
     enrichedPayload?.media?.poster ||
     enrichedPayload?.media?.posterUrl ||
@@ -78,6 +110,43 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   const selectedYear = enrichedPayload?.media?.year || selectedResult?.year;
   const selectedTitle =
     enrichedPayload?.media?.title || selectedResult?.title || '';
+
+  useEffect(() => {
+    loadMoreRef.current = loadMore;
+  }, [loadMore]);
+
+  useEffect(() => {
+    if (
+      selectedResult ||
+      !hasQuery ||
+      !hasMore ||
+      loading ||
+      loadingMore ||
+      typeof window === 'undefined' ||
+      !('IntersectionObserver' in window)
+    ) {
+      return undefined;
+    }
+
+    const sentinel = loadMoreSentinelRef.current;
+    if (!sentinel) return undefined;
+
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMoreRef.current();
+        }
+      },
+      {
+        root: resultsScrollRef.current,
+        rootMargin: '120px 0px',
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, hasQuery, loading, loadingMore, results.length, selectedResult]);
 
   const handleSelectResult = async (result) => {
     setSelectedResult(result);
@@ -263,66 +332,95 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                 </button>
               ) : null}
             </div>
-            {loading && (
-              <div className="flex items-center gap-2 text-xs text-stone-500">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-500/70" />
-                Searching catalog...
-              </div>
-            )}
             {error && <div className="text-xs text-red-400">{error}</div>}
             {!selectedResult &&
               hasQuery &&
-              !loading &&
-              visibleResults.length > 0 && (
-                <div className="overflow-hidden rounded-xl border border-stone-800 bg-stone-900/60 shadow-lg shadow-stone-950/30 divide-y divide-stone-800/80">
-                  {visibleResults.map((result) => (
-                    <button
-                      key={`${result.provider}-${result.providerId}`}
-                      onClick={() => handleSelectResult(result)}
-                      className="w-full px-3 py-3 text-left transition-colors hover:bg-stone-800/70 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-700/40"
-                      type="button"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="relative h-[4.5rem] w-12 shrink-0 overflow-hidden rounded-md border border-stone-700 bg-stone-800">
-                          <div className="absolute inset-0 flex items-center justify-center text-stone-500">
-                            {result.type === 'show' ? (
-                              <Tv className="h-4 w-4" />
-                            ) : (
-                              <Film className="h-4 w-4" />
-                            )}
-                          </div>
-                          {result.posterUrl ? (
-                            <img
-                              src={result.posterUrl}
-                              alt=""
-                              className="absolute inset-0 h-full w-full object-cover"
-                              loading="lazy"
-                              onError={(event) => {
-                                event.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          ) : null}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-start gap-2">
-                            <div className="min-w-0 flex-1 truncate text-[15px] font-medium text-stone-100">
-                              {result.title}
+              (loadingInitial || results.length > 0) && (
+                <div className="overflow-hidden rounded-xl border border-stone-800 bg-stone-900/60 shadow-lg shadow-stone-950/30">
+                  <div
+                    ref={resultsScrollRef}
+                    className="max-h-[22rem] overflow-y-auto divide-y divide-stone-800/80"
+                    aria-busy={loadingInitial || loadingMore}
+                    aria-live="polite"
+                  >
+                    {loadingInitial ? (
+                      <SearchResultSkeleton />
+                    ) : (
+                      <>
+                        {results.map((result) => (
+                          <button
+                            key={`${result.provider}-${result.providerId}`}
+                            onClick={() => handleSelectResult(result)}
+                            className="w-full px-3 py-3 text-left transition-colors hover:bg-stone-800/70 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-700/40"
+                            type="button"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="relative h-[4.5rem] w-12 shrink-0 overflow-hidden rounded-md border border-stone-700 bg-stone-800">
+                                <div className="absolute inset-0 flex items-center justify-center text-stone-500">
+                                  {result.type === 'show' ? (
+                                    <Tv className="h-4 w-4" />
+                                  ) : (
+                                    <Film className="h-4 w-4" />
+                                  )}
+                                </div>
+                                {result.posterUrl ? (
+                                  <img
+                                    src={result.posterUrl}
+                                    alt=""
+                                    className="absolute inset-0 h-full w-full object-cover"
+                                    loading="lazy"
+                                    onError={(event) => {
+                                      event.currentTarget.style.display =
+                                        'none';
+                                    }}
+                                  />
+                                ) : null}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-start gap-2">
+                                  <div className="min-w-0 flex-1 truncate text-[15px] font-medium text-stone-100">
+                                    {result.title}
+                                  </div>
+                                  <MediaTypeBadge type={result.type} />
+                                </div>
+                                <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                                  Top match{' '}
+                                  {result.year ? `• ${result.year}` : ''}
+                                </div>
+                              </div>
                             </div>
-                            <MediaTypeBadge type={result.type} />
+                          </button>
+                        ))}
+                        {loadingMore ? (
+                          <SearchResultSkeleton count={2} />
+                        ) : null}
+                        <div
+                          ref={loadMoreSentinelRef}
+                          className="h-px"
+                          aria-hidden="true"
+                          data-testid="search-load-more-sentinel"
+                        />
+                        {hasMore ? (
+                          <div className="px-3 py-3">
+                            <button
+                              className="w-full rounded-lg border border-stone-800 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-400 transition-colors hover:bg-stone-800/70 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40 disabled:cursor-not-allowed disabled:opacity-50"
+                              disabled={loadingMore}
+                              onClick={loadMore}
+                              type="button"
+                            >
+                              {loadingMore ? 'Loading more' : 'Load more'}
+                            </button>
                           </div>
-                          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-                            Top match {result.year ? `• ${result.year}` : ''}
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
+                        ) : null}
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
             {!selectedResult &&
             hasQuery &&
             !loading &&
-            visibleResults.length === 0 &&
+            results.length === 0 &&
             !error ? (
               <div className="rounded-xl border border-stone-800 bg-stone-900/35 px-4 py-6 text-center">
                 <p className="text-sm text-stone-300">

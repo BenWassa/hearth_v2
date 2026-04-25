@@ -21,9 +21,8 @@ ui-debug.log
 
 # Local agent/workflow artifacts
 .claude/
+.claude.code-vscode
 .codex/
-AGENTS.md
-CLAUDE.md
 graphify-out/
 
 /_archive/

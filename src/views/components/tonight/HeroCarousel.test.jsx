@@ -20,6 +20,18 @@ const cleanupDom = async ({ container, root }) => {
   container.remove();
 };
 
+const dispatchTouch = (element, type, { x, y }) => {
+  const event = new Event(type, { bubbles: true, cancelable: true });
+  const touch = { clientX: x, clientY: y };
+  Object.defineProperty(event, 'targetTouches', {
+    value: type === 'touchend' || type === 'touchcancel' ? [] : [touch],
+  });
+  Object.defineProperty(event, 'changedTouches', {
+    value: [touch],
+  });
+  element.dispatchEvent(event);
+};
+
 describe('HeroCarousel', () => {
   beforeAll(() => {
     global.IS_REACT_ACT_ENVIRONMENT = true;
@@ -91,6 +103,90 @@ describe('HeroCarousel', () => {
     });
 
     const heroButton = mounted.container.querySelector('[role="button"]');
+    await act(async () => {
+      heroButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(onOpenDetails).toHaveBeenCalledTimes(1);
+    expect(onOpenDetails.mock.calls[0][0].title).toBe('Movie Two');
+
+    await cleanupDom(mounted);
+  });
+
+  it('ignores mostly vertical touch movement so page scroll does not move slides', async () => {
+    const onOpenDetails = vi.fn();
+
+    const mounted = await renderIntoDom(
+      <HeroCarousel
+        items={[
+          {
+            id: '1',
+            title: 'Movie One',
+            type: 'movie',
+            year: '2001',
+            backdrop: '/one.jpg',
+          },
+          {
+            id: '2',
+            title: 'Movie Two',
+            type: 'movie',
+            year: '2002',
+            backdrop: '/two.jpg',
+          },
+        ]}
+        onOpenDetails={onOpenDetails}
+      />,
+    );
+
+    const heroButton = mounted.container.querySelector('[role="button"]');
+    await act(async () => {
+      dispatchTouch(heroButton, 'touchstart', { x: 100, y: 10 });
+      dispatchTouch(heroButton, 'touchmove', { x: 106, y: 80 });
+      dispatchTouch(heroButton, 'touchend', { x: 106, y: 80 });
+      heroButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(onOpenDetails).toHaveBeenCalledTimes(1);
+    expect(onOpenDetails.mock.calls[0][0].title).toBe('Movie One');
+
+    await cleanupDom(mounted);
+  });
+
+  it('suppresses the synthetic click after a horizontal swipe', async () => {
+    const onOpenDetails = vi.fn();
+
+    const mounted = await renderIntoDom(
+      <HeroCarousel
+        items={[
+          {
+            id: '1',
+            title: 'Movie One',
+            type: 'movie',
+            year: '2001',
+            backdrop: '/one.jpg',
+          },
+          {
+            id: '2',
+            title: 'Movie Two',
+            type: 'movie',
+            year: '2002',
+            backdrop: '/two.jpg',
+          },
+        ]}
+        onOpenDetails={onOpenDetails}
+      />,
+    );
+
+    const heroButton = mounted.container.querySelector('[role="button"]');
+    await act(async () => {
+      dispatchTouch(heroButton, 'touchstart', { x: 100, y: 10 });
+      dispatchTouch(heroButton, 'touchmove', { x: 50, y: 12 });
+      dispatchTouch(heroButton, 'touchend', { x: 50, y: 12 });
+      heroButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(onOpenDetails).not.toHaveBeenCalled();
+
     await act(async () => {
       heroButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });

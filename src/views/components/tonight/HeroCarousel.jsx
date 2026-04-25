@@ -8,6 +8,7 @@ import React, {
 import { getBackdropSrc, getPosterSrc } from '../../../utils/poster.js';
 
 const MIN_SWIPE_DISTANCE = 40;
+const GESTURE_LOCK_DISTANCE = 8;
 const EDGE_RESISTANCE = 0.25;
 
 const getItemKey = (item, index) =>
@@ -27,6 +28,9 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const touchStartXRef = useRef(null);
+  const touchStartYRef = useRef(null);
+  const gestureAxisRef = useRef(null);
+  const suppressNextClickRef = useRef(false);
   const autoAdvanceRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -64,16 +68,39 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   }, [resetAutoAdvance]);
 
   const handleTouchStart = useCallback((e) => {
-    touchStartXRef.current = e.targetTouches[0].clientX;
-    setIsDragging(true);
+    const touch = e.targetTouches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    gestureAxisRef.current = null;
     setDragOffset(0);
     if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
   }, []);
 
   const handleTouchMove = useCallback(
     (e) => {
-      if (touchStartXRef.current === null) return;
-      const delta = e.targetTouches[0].clientX - touchStartXRef.current;
+      if (touchStartXRef.current === null || touchStartYRef.current === null) {
+        return;
+      }
+      const touch = e.targetTouches[0];
+      const delta = touch.clientX - touchStartXRef.current;
+      const verticalDelta = touch.clientY - touchStartYRef.current;
+      const absDelta = Math.abs(delta);
+      const absVerticalDelta = Math.abs(verticalDelta);
+
+      if (gestureAxisRef.current === null) {
+        if (
+          absDelta < GESTURE_LOCK_DISTANCE &&
+          absVerticalDelta < GESTURE_LOCK_DISTANCE
+        ) {
+          return;
+        }
+        gestureAxisRef.current =
+          absDelta > absVerticalDelta * 1.2 ? 'horizontal' : 'vertical';
+      }
+
+      if (gestureAxisRef.current !== 'horizontal') return;
+
+      setIsDragging(true);
       const isAtStart = currentIndex === 0;
       const isAtEnd = currentIndex === safeItems.length - 1;
       let clamped = delta;
@@ -88,12 +115,20 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   const handleTouchEnd = useCallback(
     (e) => {
       if (touchStartXRef.current === null) return;
-      const delta = e.changedTouches[0].clientX - touchStartXRef.current;
+      const touch = e.changedTouches[0];
+      const delta = touch.clientX - touchStartXRef.current;
+      const wasHorizontalSwipe = gestureAxisRef.current === 'horizontal';
       touchStartXRef.current = null;
+      touchStartYRef.current = null;
+      gestureAxisRef.current = null;
       setIsDragging(false);
       setDragOffset(0);
 
-      if (Math.abs(delta) >= MIN_SWIPE_DISTANCE) {
+      if (wasHorizontalSwipe && Math.abs(delta) >= GESTURE_LOCK_DISTANCE) {
+        suppressNextClickRef.current = true;
+      }
+
+      if (wasHorizontalSwipe && Math.abs(delta) >= MIN_SWIPE_DISTANCE) {
         if (delta < 0 && currentIndex < safeItems.length - 1) {
           setCurrentIndex((prev) => prev + 1);
         } else if (delta > 0 && currentIndex > 0) {
@@ -105,10 +140,22 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     [currentIndex, safeItems.length, resetAutoAdvance],
   );
 
+  const handleTouchCancel = useCallback(() => {
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    gestureAxisRef.current = null;
+    setIsDragging(false);
+    setDragOffset(0);
+    resetAutoAdvance();
+  }, [resetAutoAdvance]);
+
   const handleClick = useCallback(() => {
-    if (Math.abs(dragOffset) > 5) return;
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false;
+      return;
+    }
     onOpenDetails?.(safeItems[currentIndex]);
-  }, [dragOffset, currentIndex, safeItems, onOpenDetails]);
+  }, [currentIndex, safeItems, onOpenDetails]);
 
   if (!safeItems.length) return null;
 
@@ -128,10 +175,12 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     <div
       ref={containerRef}
       className="relative w-full aspect-video bg-stone-900 overflow-hidden rounded-2xl select-none"
+      style={{ touchAction: 'pan-y' }}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => {

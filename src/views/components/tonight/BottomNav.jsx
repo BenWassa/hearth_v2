@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Moon, Plus } from 'lucide-react';
+import { Library, Moon, Plus } from 'lucide-react';
 
 const BottomNav = ({ onAdd, goToShelf }) => {
   return (
@@ -38,7 +38,7 @@ const BottomNav = ({ onAdd, goToShelf }) => {
             className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
             title="Go to Library"
           >
-            <BookOpen className="w-6 h-6 text-stone-300 group-hover:text-stone-100 transition-colors" />
+            <Library className="w-6 h-6 text-stone-300 group-hover:text-stone-100 transition-colors" />
             <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
               Library
             </span>

@@ -42,6 +42,7 @@ describe('collection rollups', () => {
       title: 'The Saga',
       totalCount: 2,
       watchedCount: 1,
+      significanceScore: 0,
       year: '2001-2002',
     });
     expect(rollups[0].items.map((item) => item.id)).toEqual(['a', 'b']);
@@ -59,7 +60,54 @@ describe('collection rollups', () => {
       title: 'The Saga',
       totalCount: 1,
       watchedCount: 0,
+      significanceScore: 0,
     });
     expect(rollups[0].items.map((item) => item.id)).toEqual(['a']);
+  });
+
+  it('sorts collection rollups by average rating significance', () => {
+    const items = [
+      makeMovie('low-a', 'Low Part One', {
+        rating: 5,
+        media: {
+          collection: {
+            provider: 'tmdb',
+            providerId: '1',
+            name: 'Lower Saga',
+          },
+        },
+      }),
+      makeMovie('high-a', 'High Part One', {
+        rating: 8,
+        media: {
+          collection: {
+            provider: 'tmdb',
+            providerId: '2',
+            name: 'Higher Saga',
+          },
+        },
+      }),
+      makeMovie('high-b', 'High Part Two', {
+        rating: 9,
+        media: {
+          collection: {
+            provider: 'tmdb',
+            providerId: '2',
+            name: 'Higher Saga',
+          },
+        },
+      }),
+    ];
+
+    const collections = buildCollectionRollups(items).filter(
+      (entry) => entry.type === 'collection',
+    );
+
+    expect(collections.map((collection) => collection.title)).toEqual([
+      'Higher Saga',
+      'Lower Saga',
+    ]);
+    expect(collections[0].significanceScore).toBe(8.5);
+    expect(collections[1].significanceScore).toBe(5);
   });
 });

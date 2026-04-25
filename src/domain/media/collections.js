@@ -8,6 +8,11 @@ const asNumber = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const asFiniteNumber = (value) => {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 const getCollection = (item = {}) => {
   const mediaCollection = asObject(item?.media?.collection);
   const directCollection = asObject(item?.collection);
@@ -70,6 +75,13 @@ export const buildCollectionRollups = (items = []) => {
       .filter((year) => year !== null);
     const firstYear = years.length ? Math.min(...years) : null;
     const lastYear = years.length ? Math.max(...years) : null;
+    const ratingTotal = sortedItems.reduce(
+      (sum, item) => sum + (asFiniteNumber(item.rating) || 0),
+      0,
+    );
+    const significanceScore = sortedItems.length
+      ? ratingTotal / sortedItems.length
+      : 0;
 
     rollupsByKey.set(key, {
       id: `collection:${key}`,
@@ -80,6 +92,7 @@ export const buildCollectionRollups = (items = []) => {
       totalCount: sortedItems.length,
       watchedCount,
       nextItem,
+      significanceScore,
       status: watchedCount === sortedItems.length ? 'watched' : 'unwatched',
       vibe: nextItem?.vibe || first?.vibe || '',
       energy: nextItem?.energy || first?.energy || 'balanced',
@@ -104,5 +117,13 @@ export const buildCollectionRollups = (items = []) => {
       usedCollectionKeys.add(key);
       return rollup;
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (a?.type !== 'collection' || b?.type !== 'collection') return 0;
+      const scoreDelta =
+        (asFiniteNumber(b.significanceScore) || 0) -
+        (asFiniteNumber(a.significanceScore) || 0);
+      if (scoreDelta !== 0) return scoreDelta;
+      return asString(a.title).localeCompare(asString(b.title));
+    });
 };

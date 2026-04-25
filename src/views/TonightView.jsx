@@ -12,6 +12,7 @@ import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
 import { buildCollectionRollups } from '../domain/media/collections.js';
+import useCollectionSizes from '../hooks/useCollectionSizes.js';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
 
@@ -149,12 +150,21 @@ const TonightView = ({
     [items],
   );
 
-  const collections = useMemo(
+  const rawCollections = useMemo(
     () =>
       buildCollectionRollups(items).filter(
         (entry) => entry?.type === 'collection',
       ),
     [items],
+  );
+  const collectionSizes = useCollectionSizes(rawCollections);
+  const collections = useMemo(
+    () =>
+      rawCollections.filter((collection) => {
+        const size = collectionSizes.get(collection.id);
+        return size === undefined || size >= 3;
+      }),
+    [collectionSizes, rawCollections],
   );
 
   // 1. Low friction, easy viewing

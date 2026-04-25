@@ -7,6 +7,8 @@ import useCollectionSizes from './useCollectionSizes.js';
 
 vi.mock('../services/mediaApi/client.js');
 
+const originalFetch = global.fetch;
+
 const flushPromises = async () => {
   await act(async () => {
     await Promise.resolve();
@@ -64,8 +66,13 @@ describe('useCollectionSizes', () => {
   });
 
   beforeEach(() => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true });
     getCollectionDetails.mockReset();
     latestHookValue = undefined;
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
   });
 
   it('returns collection part counts keyed by rollup id', async () => {
@@ -76,6 +83,7 @@ describe('useCollectionSizes', () => {
     });
 
     expect(latestHookValue.get('collection:tmdb:2002')).toBeUndefined();
+    await flushPromises();
     await act(async () => {
       collectionDetails.resolve({
         parts: [{ providerId: '1' }, { providerId: '2' }],
@@ -89,6 +97,23 @@ describe('useCollectionSizes', () => {
       locale: 'en-US',
     });
     expect(latestHookValue.get('collection:tmdb:2002')).toBe(2);
+
+    await mounted.cleanup();
+  });
+
+  it('skips collection lookups when the local API is unavailable', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false });
+    const mounted = await renderHookHarness({
+      collections: [makeCollection('404')],
+    });
+
+    await flushPromises();
+
+    expect(global.fetch).toHaveBeenCalledWith('/api/health', {
+      cache: 'no-store',
+    });
+    expect(getCollectionDetails).not.toHaveBeenCalled();
+    expect(latestHookValue.get('collection:tmdb:404')).toBeUndefined();
 
     await mounted.cleanup();
   });

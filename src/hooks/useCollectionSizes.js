@@ -25,6 +25,16 @@ const getCollectionSize = async ({ provider, providerId, locale }) => {
   }
 };
 
+const isApiAvailable = async () => {
+  if (typeof fetch !== 'function') return false;
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+};
+
 const useCollectionSizes = (collections = [], { locale = 'en-US' } = {}) => {
   const requests = useMemo(() => {
     const byCacheKey = new Map();
@@ -71,24 +81,28 @@ const useCollectionSizes = (collections = [], { locale = 'en-US' } = {}) => {
     });
     setSizes(nextSizes);
 
-    requests.forEach(({ collectionKey, provider, providerId }) => {
-      getCollectionSize({ provider, providerId, locale })
-        .then((size) => {
-          if (ignore) return;
-          setSizes((current) => {
-            if (current.get(collectionKey) === size) return current;
-            const updated = new Map(current);
-            updated.set(collectionKey, size);
-            return updated;
+    isApiAvailable().then((available) => {
+      if (ignore || !available) return;
+
+      requests.forEach(({ collectionKey, provider, providerId }) => {
+        getCollectionSize({ provider, providerId, locale })
+          .then((size) => {
+            if (ignore) return;
+            setSizes((current) => {
+              if (current.get(collectionKey) === size) return current;
+              const updated = new Map(current);
+              updated.set(collectionKey, size);
+              return updated;
+            });
+          })
+          .catch(() => {
+            if (ignore) return;
+            setSizes((current) => {
+              if (current.has(collectionKey)) return current;
+              return new Map(current);
+            });
           });
-        })
-        .catch(() => {
-          if (ignore) return;
-          setSizes((current) => {
-            if (current.has(collectionKey)) return current;
-            return new Map(current);
-          });
-        });
+      });
     });
 
     return () => {

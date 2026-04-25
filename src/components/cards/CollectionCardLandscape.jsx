@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Clapperboard } from 'lucide-react';
 import { getBackdropSrc, getPosterSrc } from '../../utils/poster.js';
 import LazyMediaImage from '../media/LazyMediaImage.jsx';
 import PosterPlaceholder from './PosterPlaceholder.jsx';
 
+const stripCollectionSuffix = (title = '') =>
+  title.replace(/\s+Collection$/i, '').trim();
+
 const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
   const [backdropMissing, setBackdropMissing] = useState(false);
   const [posterMissing, setPosterMissing] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  const firstItem = Array.isArray(collection?.items) ? collection.items[0] : null;
+  const logoSrc = String(
+    firstItem?.logo || firstItem?.logoUrl || firstItem?.media?.logo || firstItem?.media?.logoUrl || '',
+  ).trim();
+  const displayTitle = stripCollectionSuffix(collection?.title || '');
 
   const backdropSrc = getBackdropSrc(collection);
   const posterSrc = getPosterSrc(collection);
@@ -37,7 +46,8 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
   useEffect(() => {
     setBackdropMissing(false);
     setPosterMissing(false);
-  }, [collection?.id, backdropSrc, posterSrc]);
+    setLogoFailed(false);
+  }, [collection?.id, backdropSrc, posterSrc, logoSrc]);
 
   return (
     <button
@@ -90,12 +100,6 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
         </div>
       )}
 
-      {/* Collection badge — kin to vibe/energy badges */}
-      <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-lg bg-stone-950/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-stone-100 ring-1 ring-stone-50/15 backdrop-blur-[2px]">
-        <Clapperboard className="h-3 w-3" />
-        Collection
-      </div>
-
       {isComplete && (
         <div className="absolute right-3 top-3 inline-flex items-center rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-950 ring-1 ring-amber-300/40">
           Complete
@@ -104,9 +108,19 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
 
       {/* Title block — marquee feel */}
       <div className="absolute inset-x-4 bottom-3.5 space-y-1.5">
-        <h4 className="line-clamp-2 font-serif text-base leading-snug text-stone-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] sm:text-lg">
-          {collection?.title}
-        </h4>
+        {logoSrc && !logoFailed ? (
+          <img
+            src={logoSrc}
+            alt={displayTitle}
+            className="max-h-10 sm:max-h-12 max-w-[60%] object-contain object-left drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] mb-0.5"
+            onError={() => setLogoFailed(true)}
+            loading="lazy"
+          />
+        ) : (
+          <h4 className="line-clamp-2 font-serif text-base leading-snug text-stone-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] sm:text-lg">
+            {displayTitle}
+          </h4>
+        )}
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone-300/90">
           <span>{watchedFragment}</span>
           {yearLabel && (

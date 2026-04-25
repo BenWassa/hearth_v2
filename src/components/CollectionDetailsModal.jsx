@@ -24,11 +24,11 @@ const CollectionDetailsModal = ({
   return (
     <>
       <button
-        className="fixed inset-0 z-[70] cursor-default bg-black/75 backdrop-blur-sm"
+        className="fixed inset-0 z-[70] cursor-default bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
         aria-label="Close collection"
       />
-      <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center">
+      <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center animate-in fade-in duration-200">
         <div className="max-h-[88vh] w-full max-w-2xl overflow-hidden rounded-t-2xl border border-stone-800 bg-stone-950 shadow-2xl sm:rounded-2xl">
           <div className="relative h-44 overflow-hidden bg-stone-900">
             {backdrop ? (

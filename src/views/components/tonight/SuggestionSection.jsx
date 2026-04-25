@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Moon } from 'lucide-react';
-import { buildCollectionRollups } from '../../../domain/media/collections.js';
-import CollectionCard from '../../../components/cards/CollectionCard.jsx';
 import ItemCard from '../../../components/cards/ItemCard.jsx';
 
 // How many cards to clone at the end to create the seamless loop illusion
@@ -12,7 +10,6 @@ const SuggestionSection = ({
   suggestions,
   emptyLabel,
   onOpenDetails,
-  onOpenCollection,
   onToggleStatus,
   layout = 'grid',
   hideScrollbar = false,
@@ -52,8 +49,7 @@ const SuggestionSection = ({
     return () => mq.removeEventListener?.('change', sync);
   }, []);
 
-  // Construct the array of items to render
-  const itemsWithPickCard = buildCollectionRollups(suggestions);
+  const itemsWithPickCard = suggestions;
 
   // For looping rails we clone the first N cards at the end.
   // When the user scrolls into the clone zone we silently jump back
@@ -154,19 +150,12 @@ const SuggestionSection = ({
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    {item.type === 'collection' ? (
-                      <CollectionCard
-                        collection={item}
-                        onOpenCollection={onOpenCollection}
-                      />
-                    ) : (
-                      <ItemCard
-                        item={item}
-                        onToggle={() => onToggleStatus(item.id, item.status)}
-                        minimal={false}
-                        onOpenDetails={onOpenDetails}
-                      />
-                    )}
+                    <ItemCard
+                      item={item}
+                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      minimal={false}
+                      onOpenDetails={onOpenDetails}
+                    />
                   </div>
                 ))}
                 {/* Clone zone — invisible to the user, triggers seamless teleport */}
@@ -177,19 +166,12 @@ const SuggestionSection = ({
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    {item.type === 'collection' ? (
-                      <CollectionCard
-                        collection={item}
-                        onOpenCollection={onOpenCollection}
-                      />
-                    ) : (
-                      <ItemCard
-                        item={item}
-                        onToggle={() => onToggleStatus(item.id, item.status)}
-                        minimal={false}
-                        onOpenDetails={onOpenDetails}
-                      />
-                    )}
+                    <ItemCard
+                      item={item}
+                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      minimal={false}
+                      onOpenDetails={onOpenDetails}
+                    />
                   </div>
                 ))}
               </div>
@@ -207,23 +189,15 @@ const SuggestionSection = ({
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-1.5">
-            {itemsWithPickCard.map((item) =>
-              item.type === 'collection' ? (
-                <CollectionCard
-                  key={item.id}
-                  collection={item}
-                  onOpenCollection={onOpenCollection}
-                />
-              ) : (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  onToggle={() => onToggleStatus(item.id, item.status)}
-                  minimal={false}
-                  onOpenDetails={onOpenDetails}
-                />
-              ),
-            )}
+            {itemsWithPickCard.map((item) => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                onToggle={() => onToggleStatus(item.id, item.status)}
+                minimal={false}
+                onOpenDetails={onOpenDetails}
+              />
+            ))}
           </div>
         )
       ) : (

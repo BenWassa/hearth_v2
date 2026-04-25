@@ -14,9 +14,6 @@ import {
 } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { normalizeSearchText } from '../utils/text.js';
-import { buildCollectionRollups } from '../domain/media/collections.js';
-import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
-import CollectionCard from '../components/cards/CollectionCard.jsx';
 import PosterCard from '../components/cards/PosterCard.jsx';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 
@@ -41,9 +38,7 @@ const ShelfView = ({
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [detailItem, setDetailItem] = useState(null);
-  const [collectionDetail, setCollectionDetail] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
   const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
   const [isBulkMarking, setIsBulkMarking] = useState(false);
   const [sortBy, setSortBy] = useState('vibe'); // 'vibe', 'energy', or 'alphabetical'
@@ -84,19 +79,9 @@ const ShelfView = ({
     setIsDetailOpen(true);
   };
 
-  const openCollection = (collection) => {
-    setCollectionDetail(collection);
-    setIsCollectionOpen(true);
-  };
-
   const closeDetails = () => {
     setIsDetailOpen(false);
     setDetailItem(null);
-  };
-
-  const closeCollection = () => {
-    setIsCollectionOpen(false);
-    setCollectionDetail(null);
   };
 
   useEffect(() => {
@@ -163,25 +148,17 @@ const ShelfView = ({
   );
   const filteredItems = useMemo(() => {
     if (!isSearching) return [];
-    const matches = searchBaseItems.filter((item) => {
-      const collectionName =
-        item?.media?.collection?.name || item?.collection?.name || '';
-      return (
-        normalizeSearchText(item.title || '').includes(normalizedQuery) ||
-        normalizeSearchText(collectionName).includes(normalizedQuery)
-      );
-    });
-    return selectionMode ? matches : buildCollectionRollups(matches);
-  }, [isSearching, normalizedQuery, searchBaseItems, selectionMode]);
+    return searchBaseItems.filter((item) =>
+      normalizeSearchText(item.title || '').includes(normalizedQuery),
+    );
+  }, [isSearching, normalizedQuery, searchBaseItems]);
   const contentGapClassName = 'space-y-4';
   const sectionGapClassName = 'space-y-1.5';
   const cardGridClassName =
     'grid [grid-template-columns:repeat(auto-fill,minmax(clamp(5.85rem,12.6vw,7.65rem),1fr))] gap-1.5';
 
   const buildGroupedItems = (sourceItems = []) => {
-    const backlog = selectionMode
-      ? sourceItems
-      : buildCollectionRollups(sourceItems);
+    const backlog = sourceItems;
     const groups = {};
 
     if (sortBy === 'alphabetical') {
@@ -223,16 +200,6 @@ const ShelfView = ({
     item,
     { canDelete = true, canSelect = true } = {},
   ) => {
-    if (item.type === 'collection') {
-      return (
-        <CollectionCard
-          key={item.id}
-          collection={item}
-          onOpenCollection={openCollection}
-        />
-      );
-    }
-
     return (
       <PosterCard
         key={item.id}
@@ -250,10 +217,10 @@ const ShelfView = ({
   // Group/sort active library items based on sortBy setting
   const itemsByVibe = useMemo(() => {
     return buildGroupedItems(libraryItems);
-  }, [libraryItems, sortBy, selectionMode]);
+  }, [libraryItems, sortBy]);
   const memoriesByGroup = useMemo(() => {
     return buildGroupedItems(watchedFiltered);
-  }, [watchedFiltered, sortBy, selectionMode]);
+  }, [watchedFiltered, sortBy]);
 
   return (
     <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
@@ -596,13 +563,6 @@ const ShelfView = ({
         onClose={closeDetails}
         onToggleStatus={onToggleStatus}
         onUpdate={onUpdate}
-      />
-
-      <CollectionDetailsModal
-        isOpen={isCollectionOpen}
-        collection={collectionDetail}
-        onClose={closeCollection}
-        onOpenItem={openDetails}
       />
 
       {isBulkDeleteConfirmOpen && (

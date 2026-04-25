@@ -4,12 +4,14 @@ import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showPro
 import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
+import CollectionsRail from './components/tonight/CollectionsRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
 import { balanceRows } from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
+import { buildCollectionRollups } from '../domain/media/collections.js';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
 
@@ -143,6 +145,14 @@ const TonightView = ({
 
   const unwatched = useMemo(
     () => items.filter((i) => i.status === 'unwatched'),
+    [items],
+  );
+
+  const collections = useMemo(
+    () =>
+      buildCollectionRollups(items).filter(
+        (entry) => entry?.type === 'collection',
+      ),
     [items],
   );
 
@@ -391,6 +401,11 @@ const TonightView = ({
               <>
                 <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
 
+                <CollectionsRail
+                  collections={collections}
+                  onOpenCollection={openCollection}
+                />
+
                 {currentlyWatchingShows.length > 0 && (
                   <SuggestionSection
                     title="Currently Watching"
@@ -400,7 +415,6 @@ const TonightView = ({
                     emptyLabel="No shows in progress yet."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -422,7 +436,6 @@ const TonightView = ({
                     emptyLabel="Nothing light queued right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -442,7 +455,6 @@ const TonightView = ({
                     emptyLabel="No comedies queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -462,7 +474,6 @@ const TonightView = ({
                     emptyLabel="No short episodes available."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -482,7 +493,6 @@ const TonightView = ({
                     emptyLabel="No intense watches queued."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -502,7 +512,6 @@ const TonightView = ({
                     emptyLabel="No visually driven films right now."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade
@@ -522,7 +531,6 @@ const TonightView = ({
                     emptyLabel="No classics queued up."
                     onToggleStatus={onToggleStatus}
                     onOpenDetails={openDetails}
-                    onOpenCollection={openCollection}
                     layout="rail"
                     hideScrollbar
                     showEdgeFade

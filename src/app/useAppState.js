@@ -12,6 +12,7 @@ import {
   getMetadataGaps,
   hasListValues,
   hasValue,
+  shouldRefreshShowEpisodeMetadata,
 } from '../domain/media/metadata.js';
 import { buildWatchlistPayload } from '../domain/media/schema.js';
 import {
@@ -50,6 +51,7 @@ import {
   refreshMediaMetadata,
   searchMedia,
 } from '../services/mediaApi/client.js';
+import { refreshShowDataForMissingEpisodes } from '../services/mediaApi/showData.js';
 
 const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
@@ -61,6 +63,32 @@ const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
   console.info('[auto-show-refresh]', ...args);
+
+const areShowDataEqual = (left = {}, right = {}) =>
+  JSON.stringify(left || {}) === JSON.stringify(right || {});
+
+const getEpisodeSetSignature = (showData = {}) => {
+  const seasons = Array.isArray(showData?.seasons) ? showData.seasons : [];
+  return seasons
+    .map((season) => {
+      const seasonNumber =
+        season?.seasonNumber ?? season?.number ?? season?.season_number ?? '';
+      const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
+      const episodeKeys = episodes.map((episode) => {
+        const episodeNumber =
+          episode?.episodeNumber ??
+          episode?.number ??
+          episode?.episode_number ??
+          '';
+        return `${episode?.id || episode?.episodeId || ''}:${episodeNumber}`;
+      });
+      return `${seasonNumber}:${episodeKeys.join(',')}`;
+    })
+    .join('|');
+};
+
+const hasEpisodeSetChanged = (left = {}, right = {}) =>
+  getEpisodeSetSignature(left) !== getEpisodeSetSignature(right);
 
 const getInitialView = () => {
   if (typeof localStorage === 'undefined') return 'onboarding';
@@ -1703,16 +1731,14 @@ export const useAppState = () => {
 
     const candidates = items
       .filter((item) => {
-        if (item?.type !== 'show') return false;
-        if (item?.status !== 'watched') return false;
-        return Boolean(item?.source?.provider && item?.source?.providerId);
+        return shouldRefreshShowEpisodeMetadata(item);
       })
       .sort((a, b) =>
         String(a.title || '').localeCompare(String(b.title || '')),
       );
 
     if (!candidates.length) {
-      logAutoShowRefresh('No watched shows with provider IDs to refresh.');
+      logAutoShowRefresh('No shows with episode metadata gaps to refresh.');
       localStorage.setItem(
         storageKey,
         JSON.stringify({ lastRunAt: Date.now(), cursor: 0 }),
@@ -1730,28 +1756,71 @@ export const useAppState = () => {
 
     autoShowRefreshInFlightRef.current = true;
     logAutoShowRefresh(
-      `Starting refresh for ${batch.length} watched show(s). Cursor ${safeCursor} -> ${nextCursor}.`,
+      `Starting refresh for ${batch.length} show(s) with episode gaps. Cursor ${safeCursor} -> ${nextCursor}.`,
     );
     const runAutoRefresh = async () => {
       let refreshedCount = 0;
       try {
         for (const item of batch) {
           try {
-            const refreshed = await refreshMediaMetadata({
+            const refreshedShowData = await refreshShowDataForMissingEpisodes({
               provider: item.source.provider,
               providerId: item.source.providerId,
-              type: 'show',
+              currentShowData: {
+                ...(item.showData || {}),
+                seasons: Array.isArray(item.showData?.seasons)
+                  ? item.showData.seasons
+                  : item.seasons,
+              },
             });
+            const currentShowData = item.showData || {
+              seasonCount: item.totalSeasons || null,
+              episodeCount: item.totalEpisodes || null,
+              seasons: item.seasons || [],
+            };
+
+            if (areShowDataEqual(currentShowData, refreshedShowData)) {
+              logAutoShowRefresh(`No changes: ${item?.title || item?.id}`);
+              continue;
+            }
+
+            const episodeSetChanged = hasEpisodeSetChanged(
+              currentShowData,
+              refreshedShowData,
+            );
+            const nextItem = {
+              ...item,
+              showData: refreshedShowData,
+              seasons: refreshedShowData.seasons,
+              totalSeasons:
+                refreshedShowData.seasonCount || item.totalSeasons || null,
+              totalEpisodes:
+                refreshedShowData.episodeCount || item.totalEpisodes || null,
+            };
+            const fullyWatched = isShowFullyWatched(nextItem);
+            const watchedAny = Object.values(
+              nextItem.episodeProgress || {},
+            ).some(Boolean);
+            const updates = {
+              showData: refreshedShowData,
+              totalSeasons: refreshedShowData.seasonCount || null,
+              totalEpisodes: refreshedShowData.episodeCount || null,
+              seasons: refreshedShowData.seasons,
+            };
+            if (episodeSetChanged) {
+              updates.status = fullyWatched
+                ? 'watched'
+                : watchedAny
+                ? 'watching'
+                : 'unwatched';
+            }
 
             await updateWatchlistItem({
               db,
               appId,
               spaceId,
               itemId: item.id,
-              updates: mapWatchlistUpdatesForWrite(
-                item,
-                buildUpdatesFromRefreshed(item, refreshed),
-              ),
+              updates: mapWatchlistUpdatesForWrite(item, updates),
             });
             refreshedCount += 1;
             logAutoShowRefresh(`Refreshed: ${item?.title || item?.id}`);

@@ -4,7 +4,9 @@ import {
   getPrimaryCredit,
   hasListValues,
   hasValue,
+  hasShowEpisodeMetadataGaps,
   pickPrimaryPerson,
+  shouldRefreshShowEpisodeMetadata,
 } from './metadata.js';
 
 const completeMovie = {
@@ -40,7 +42,16 @@ const completeShow = {
   },
   showData: {
     seasonCount: 1,
-    seasons: [{ seasonNumber: 1 }],
+    seasons: [
+      {
+        seasonNumber: 1,
+        episodeCount: 2,
+        episodes: [
+          { episodeNumber: 1, name: 'Pilot', overview: 'A beginning.' },
+          { episodeNumber: 2, name: 'Second', overview: 'A follow-up.' },
+        ],
+      },
+    ],
   },
 };
 
@@ -113,6 +124,86 @@ describe('metadata helpers', () => {
         showData: { seasonCount: 0, seasons: [] },
       }),
     ).toEqual(['director', 'seasonCount', 'seasons']);
+  });
+
+  it('detects targeted TV episode metadata gaps', () => {
+    expect(hasShowEpisodeMetadataGaps(completeShow)).toBe(false);
+    expect(shouldRefreshShowEpisodeMetadata(completeShow)).toBe(false);
+
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: { seasonCount: 1, seasons: [] },
+      }),
+    ).toBe(true);
+
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 3,
+              episodes: [
+                { episodeNumber: 1, name: 'Pilot', overview: 'A beginning.' },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [{ episodeNumber: 1, name: '' }],
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [{ episodeNumber: 6, name: 'Episode 6' }],
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+  });
+
+  it('limits auto episode refresh candidates to TMDB-backed shows', () => {
+    expect(shouldRefreshShowEpisodeMetadata(completeMovie)).toBe(false);
+    expect(
+      shouldRefreshShowEpisodeMetadata({
+        ...completeShow,
+        source: {},
+        showData: { seasonCount: 1, seasons: [] },
+      }),
+    ).toBe(false);
+    expect(
+      shouldRefreshShowEpisodeMetadata({
+        ...completeShow,
+        source: { provider: 'tmdb', providerId: '456' },
+        showData: { seasonCount: 1, seasons: [] },
+      }),
+    ).toBe(true);
   });
 
   it('builds audit totals and gap counts', () => {

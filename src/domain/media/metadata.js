@@ -19,6 +19,86 @@ export const hasListValues = (value) => {
   return Array.isArray(value) && value.some((entry) => hasValue(entry));
 };
 
+const toPositiveInteger = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const parsed = Number.parseInt(String(value || '').trim(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+
+const getSeasonNumber = (season = {}) =>
+  toPositiveInteger(
+    season?.seasonNumber ?? season?.number ?? season?.season_number,
+  );
+
+const getEpisodeNumber = (episode = {}) =>
+  toPositiveInteger(
+    episode?.episodeNumber ?? episode?.number ?? episode?.episode_number,
+  );
+
+const getEpisodeTitle = (episode = {}) =>
+  String(episode?.name || episode?.title || '').trim();
+
+const hasRichEpisodeMetadata = (episode = {}) => {
+  const runtime = Number(
+    episode?.runtimeMinutes ?? episode?.runtime_minutes ?? episode?.runtime,
+  );
+  return (
+    hasValue(episode?.description) ||
+    hasValue(episode?.overview) ||
+    hasValue(episode?.still) ||
+    hasValue(episode?.stillUrl) ||
+    hasValue(episode?.airDate) ||
+    hasValue(episode?.air_date) ||
+    (Number.isFinite(runtime) && runtime > 0)
+  );
+};
+
+export const isEpisodeMetadataIncomplete = (episode = {}) => {
+  const title = getEpisodeTitle(episode);
+  if (!title) return true;
+
+  const episodeNumber = getEpisodeNumber(episode);
+  const genericTitle =
+    episodeNumber !== null &&
+    title.toLowerCase() === `episode ${episodeNumber}`;
+  return genericTitle && !hasRichEpisodeMetadata(episode);
+};
+
+export const hasSeasonEpisodeMetadataGaps = (season = {}) => {
+  const seasonNumber = getSeasonNumber(season);
+  if (seasonNumber === null) return false;
+
+  const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
+  const episodeCount = toPositiveInteger(
+    season?.episodeCount ?? season?.episode_count,
+  );
+
+  if (episodeCount !== null && episodeCount > episodes.length) return true;
+  return episodes.some((episode) => isEpisodeMetadataIncomplete(episode));
+};
+
+export const getShowSeasonsForMetadata = (item = {}) => {
+  if (Array.isArray(item?.showData?.seasons)) return item.showData.seasons;
+  if (Array.isArray(item?.seasons)) return item.seasons;
+  return [];
+};
+
+export const hasShowEpisodeMetadataGaps = (item = {}) => {
+  if (item?.type !== 'show') return false;
+  const seasons = getShowSeasonsForMetadata(item);
+  if (!seasons.length) return true;
+  return seasons.some((season) => hasSeasonEpisodeMetadataGaps(season));
+};
+
+export const shouldRefreshShowEpisodeMetadata = (item = {}) => {
+  if (!hasShowEpisodeMetadataGaps(item)) return false;
+  const provider = String(item?.source?.provider || '')
+    .trim()
+    .toLowerCase();
+  const providerId = String(item?.source?.providerId || '').trim();
+  return provider === 'tmdb' && Boolean(providerId);
+};
+
 export const pickPrimaryPerson = (values) => {
   if (!Array.isArray(values)) return '';
   return String(values[0] || '').trim();

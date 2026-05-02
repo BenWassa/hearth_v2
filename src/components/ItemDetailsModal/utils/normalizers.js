@@ -92,6 +92,7 @@ export const normalizeSeasons = (seasons) => {
         number,
         name: season.name ?? season.title ?? `Season ${number}`,
         airDate: season.airDate ?? season.air_date ?? '',
+        poster: season.poster ?? season.posterUrl ?? season.poster_path ?? '',
         episodeCount: toNumber(
           season.episodeCount ?? season.episode_count,
           episodes.length,

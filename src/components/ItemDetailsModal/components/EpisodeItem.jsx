@@ -1,6 +1,10 @@
 import React from 'react';
 import { Check, ChevronDown, ChevronUp, Eye, EyeOff, Play } from 'lucide-react';
 import { formatRuntime } from '../utils/formatters.js';
+import {
+  formatReleaseDate,
+  isUpcomingDate,
+} from '../../../utils/releaseDates.js';
 
 const EpisodeItem = ({
   episode,
@@ -16,6 +20,11 @@ const EpisodeItem = ({
     ? new Date(episode.airDate).getFullYear()
     : null;
   const runtimeLabel = formatRuntime(episode.runtimeMinutes);
+  const releaseLabel = isUpcomingDate(episode.airDate)
+    ? formatReleaseDate(episode.airDate)
+    : '';
+  const descriptionText =
+    episode.description || releaseLabel || 'Description not available.';
   const canToggleSpoiler =
     !isWatched && !isNextUp && Boolean(episode.description);
   const isSpoilerHidden = canToggleSpoiler && !isSpoilerRevealed;
@@ -145,7 +154,7 @@ const EpisodeItem = ({
                 : 'text-stone-400'
             }`}
           >
-            {episode.description || 'No description yet.'}
+            {descriptionText}
           </p>
           {canToggleSpoiler ? (
             <div className="mt-3 text-[10px] uppercase tracking-wider text-stone-600 flex items-center gap-1.5">

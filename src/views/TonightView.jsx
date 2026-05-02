@@ -5,12 +5,14 @@ import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
+import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
 import { balanceRows } from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
+import { getUpcomingReleases } from './components/tonight/upcomingReleases.js';
 import { buildCollectionRollups } from '../domain/media/collections.js';
 import useCollectionPartCounts from '../hooks/useCollectionPartCounts.js';
 import { toMillis } from '../utils/time.js';
@@ -144,6 +146,11 @@ const TonightView = ({
           if (delta !== 0) return delta;
           return a.title.localeCompare(b.title);
         }),
+    [items],
+  );
+
+  const upcomingReleases = useMemo(
+    () => getUpcomingReleases(items).slice(0, 12),
     [items],
   );
 
@@ -441,6 +448,11 @@ const TonightView = ({
                     className="shrink-0"
                   />
                 )}
+
+                <ComingSoonRail
+                  releases={upcomingReleases}
+                  onOpenDetails={openDetails}
+                />
 
                 {/* --- New Thematic Sections --- */}
 

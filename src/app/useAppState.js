@@ -58,7 +58,7 @@ const VIEW_STORAGE_KEY = 'hearth:last_view';
 const VIEW_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const AUTO_SHOW_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
 const AUTO_SHOW_REFRESH_MAX_ITEMS = 12;
-const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh';
+const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh:v2';
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
@@ -1720,15 +1720,6 @@ export const useAppState = () => {
       console.warn('Failed to parse auto show refresh state:', err);
     }
 
-    if (Date.now() - lastRunAt < AUTO_SHOW_REFRESH_INTERVAL_MS) {
-      logAutoShowRefresh(
-        `Skipped: last run at ${new Date(
-          lastRunAt,
-        ).toISOString()} (interval not reached).`,
-      );
-      return;
-    }
-
     const candidates = items
       .filter((item) => {
         return shouldRefreshShowEpisodeMetadata(item);
@@ -1739,9 +1730,14 @@ export const useAppState = () => {
 
     if (!candidates.length) {
       logAutoShowRefresh('No shows with episode metadata gaps to refresh.');
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ lastRunAt: Date.now(), cursor: 0 }),
+      return;
+    }
+
+    if (Date.now() - lastRunAt < AUTO_SHOW_REFRESH_INTERVAL_MS) {
+      logAutoShowRefresh(
+        `Skipped: last run at ${new Date(
+          lastRunAt,
+        ).toISOString()} (interval not reached).`,
       );
       return;
     }

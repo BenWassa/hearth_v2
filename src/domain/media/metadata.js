@@ -19,6 +19,19 @@ export const hasListValues = (value) => {
   return Array.isArray(value) && value.some((entry) => hasValue(entry));
 };
 
+const PLACEHOLDER_EPISODE_TEXT = new Set([
+  'no description yet.',
+  'no description yet',
+  'there is no description yet.',
+  'there is no description yet',
+  'no overview available.',
+  'no overview available',
+  'no overview yet.',
+  'no overview yet',
+  'tba',
+  'tbd',
+]);
+
 const toPositiveInteger = (value) => {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   const parsed = Number.parseInt(String(value || '').trim(), 10);
@@ -38,13 +51,20 @@ const getEpisodeNumber = (episode = {}) =>
 const getEpisodeTitle = (episode = {}) =>
   String(episode?.name || episode?.title || '').trim();
 
+const hasMeaningfulEpisodeText = (value) => {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
+  return Boolean(normalized) && !PLACEHOLDER_EPISODE_TEXT.has(normalized);
+};
+
 const hasRichEpisodeMetadata = (episode = {}) => {
   const runtime = Number(
     episode?.runtimeMinutes ?? episode?.runtime_minutes ?? episode?.runtime,
   );
   return (
-    hasValue(episode?.description) ||
-    hasValue(episode?.overview) ||
+    hasMeaningfulEpisodeText(episode?.description) ||
+    hasMeaningfulEpisodeText(episode?.overview) ||
     hasValue(episode?.still) ||
     hasValue(episode?.stillUrl) ||
     hasValue(episode?.airDate) ||

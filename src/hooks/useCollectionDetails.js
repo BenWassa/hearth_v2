@@ -12,6 +12,7 @@ const useCollectionDetails = ({
   enabled = false,
   locale = 'en-US',
   details = false,
+  optional = false,
 } = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ const useCollectionDetails = ({
     setLoading(true);
     setError(null);
 
-    getCollectionDetails({ provider, providerId, locale, details })
+    getCollectionDetails({ provider, providerId, locale, details, optional })
       .then((details) => {
         if (ignore) return;
         setData({
@@ -52,7 +53,7 @@ const useCollectionDetails = ({
     return () => {
       ignore = true;
     };
-  }, [details, enabled, locale, provider, providerId]);
+  }, [details, enabled, locale, optional, provider, providerId]);
 
   return { data, loading, error };
 };

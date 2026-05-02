@@ -119,6 +119,7 @@ const CollectionDetailsModal = ({
     providerId: collectionProviderId,
     enabled: isOpen && Boolean(collectionProviderId),
     details: true,
+    optional: true,
   });
   const logoSrc = String(
     firstItem?.logo ||

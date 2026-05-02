@@ -147,3 +147,32 @@ test('optional collection endpoint returns empty details for missing collection'
   assert.deepEqual(res.output.body.data.parts, []);
   assert.equal(res.output.body.meta.found, false);
 });
+
+test('optional hydrated collection endpoint returns empty details for missing collection', async () => {
+  process.env.MEDIA_PROVIDER_API_KEY = 'test-key';
+  global.fetch = async () => ({
+    ok: false,
+    status: 404,
+    json: async () => ({ status_message: 'Not found' }),
+  });
+
+  const req = createMockReq({
+    query: {
+      provider: 'tmdb',
+      id: '1680034',
+      optional: 'true',
+      details: 'true',
+    },
+  });
+  const res = createMockRes();
+
+  await collectionHandler(req, res);
+
+  assert.equal(res.output.statusCode, 200);
+  assert.equal(res.output.body.ok, true);
+  assert.equal(res.output.body.data.providerId, '1680034');
+  assert.deepEqual(res.output.body.data.parts, []);
+  assert.deepEqual(res.output.body.data.subCollections, []);
+  assert.equal(res.output.body.meta.optional, true);
+  assert.equal(res.output.body.meta.found, false);
+});

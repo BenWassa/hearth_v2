@@ -12,8 +12,11 @@ import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
 import { buildCollectionRollups } from '../domain/media/collections.js';
+import useCollectionPartCounts from '../hooks/useCollectionPartCounts.js';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
+
+const MIN_COLLECTION_SIZE = 3;
 
 const getModifiedAt = (item) =>
   toMillis(
@@ -149,12 +152,26 @@ const TonightView = ({
     [items],
   );
 
-  const collections = useMemo(
+  const rawCollections = useMemo(
     () =>
       buildCollectionRollups(items).filter(
         (entry) => entry?.type === 'collection',
       ),
     [items],
+  );
+  const collectionPartCounts = useCollectionPartCounts(rawCollections, {
+    minCollectionSize: MIN_COLLECTION_SIZE,
+  });
+  const collections = useMemo(
+    () =>
+      rawCollections.filter((collection) => {
+        if (Number(collection?.totalCount || 0) >= MIN_COLLECTION_SIZE) {
+          return true;
+        }
+        const providerCount = collectionPartCounts.get(collection.id);
+        return Number(providerCount || 0) >= MIN_COLLECTION_SIZE;
+      }),
+    [collectionPartCounts, rawCollections],
   );
 
   // 1. Low friction, easy viewing

@@ -3,7 +3,7 @@ import { getUpcomingReleases } from './upcomingReleases.js';
 const now = new Date(2026, 4, 1);
 
 describe('getUpcomingReleases', () => {
-  it('ignores movies and watched shows', () => {
+  it('ignores movies', () => {
     const releases = getUpcomingReleases(
       [
         {
@@ -12,18 +12,40 @@ describe('getUpcomingReleases', () => {
           title: 'Future Movie',
           seasons: [{ episodes: [{ airDate: '2026-05-02' }] }],
         },
-        {
-          id: 'show-1',
-          type: 'show',
-          status: 'watched',
-          title: 'Finished Show',
-          seasons: [{ episodes: [{ airDate: '2026-05-02' }] }],
-        },
       ],
       { now },
     );
 
     expect(releases).toEqual([]);
+  });
+
+  it('includes watched shows when a future season has upcoming episodes', () => {
+    const releases = getUpcomingReleases(
+      [
+        {
+          id: 'show-1',
+          type: 'show',
+          status: 'watched',
+          title: 'Finished Show',
+          seasons: [
+            {
+              seasonNumber: 3,
+              name: 'Season 3',
+              episodes: [{ episodeNumber: 1, airDate: '2026-06-01' }],
+            },
+          ],
+        },
+      ],
+      { now },
+    );
+
+    expect(releases).toHaveLength(1);
+    expect(releases[0]).toMatchObject({
+      showTitle: 'Finished Show',
+      seasonNumber: 3,
+      episodeNumber: 1,
+      airDate: '2026-06-01',
+    });
   });
 
   it('groups upcoming episodes by show season and keeps the nearest episode', () => {

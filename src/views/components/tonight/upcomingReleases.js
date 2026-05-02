@@ -26,7 +26,7 @@ export const getUpcomingReleases = (items = [], { now = new Date() } = {}) => {
   const releasesBySeason = new Map();
 
   items.forEach((item) => {
-    if (!item || item.type !== 'show' || item.status === 'watched') return;
+    if (!item || item.type !== 'show') return;
     const seasons = Array.isArray(item.seasons) ? item.seasons : [];
     seasons.forEach((season, seasonIndex) => {
       const seasonNumber = getSeasonNumber(season, seasonIndex + 1);

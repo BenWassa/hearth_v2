@@ -8,10 +8,16 @@ const getCacheKey = ({ provider = 'tmdb', providerId }) =>
 
 const getCollectionSize = async ({ provider, providerId, locale }) => {
   const cacheKey = getCacheKey({ provider, providerId });
-  if (collectionSizeCache.has(cacheKey)) return collectionSizeCache.get(cacheKey);
+  if (collectionSizeCache.has(cacheKey))
+    return collectionSizeCache.get(cacheKey);
 
-  const promise = getCollectionDetails({ provider, providerId, locale }).then(
-    (details) => (Array.isArray(details?.parts) ? details.parts.length : 0),
+  const promise = getCollectionDetails({
+    provider,
+    providerId,
+    locale,
+    optional: true,
+  }).then((details) =>
+    Array.isArray(details?.parts) ? details.parts.length : 0,
   );
   collectionSizeCache.set(cacheKey, promise);
 
@@ -74,7 +80,9 @@ const useCollectionSizes = (collections = [], { locale = 'en-US' } = {}) => {
     const nextSizes = new Map();
 
     requests.forEach(({ collectionKey, provider, providerId }) => {
-      const cached = collectionSizeCache.get(getCacheKey({ provider, providerId }));
+      const cached = collectionSizeCache.get(
+        getCacheKey({ provider, providerId }),
+      );
       if (typeof cached === 'number') {
         nextSizes.set(collectionKey, cached);
       }

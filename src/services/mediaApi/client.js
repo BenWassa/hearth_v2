@@ -180,9 +180,11 @@ export const getCollectionDetails = async ({
   provider = 'tmdb',
   providerId,
   locale = 'en-US',
+  optional = false,
 }) => {
   const params = new URLSearchParams();
   if (locale) params.set('locale', locale);
+  if (optional) params.set('optional', 'true');
   const suffix = params.toString() ? `?${params.toString()}` : '';
   return getJson(`/api/media/${provider}/collection/${providerId}${suffix}`);
 };

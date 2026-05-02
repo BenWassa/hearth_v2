@@ -95,6 +95,7 @@ describe('useCollectionSizes', () => {
       provider: 'tmdb',
       providerId: '2002',
       locale: 'en-US',
+      optional: true,
     });
     expect(latestHookValue.get('collection:tmdb:2002')).toBe(2);
 

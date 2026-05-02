@@ -11,6 +11,8 @@ const getParam = (value) => {
   return value.trim();
 };
 
+const isTruthyParam = (value) => ['1', 'true', 'yes'].includes(getParam(value));
+
 module.exports = async (req, res) => {
   const requestId = getRequestId(req);
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=7200');
@@ -34,6 +36,7 @@ module.exports = async (req, res) => {
   const provider = getParam(req?.query?.provider);
   const id = getParam(req?.query?.id);
   const locale = getParam(req?.query?.locale) || 'en-US';
+  const optional = isTruthyParam(req?.query?.optional);
 
   if (provider !== 'tmdb' || !id) {
     return fail(req, res, 400, 'BAD_REQUEST', 'Provider and id are required.');
@@ -43,6 +46,34 @@ module.exports = async (req, res) => {
 
   const result = await getCollection({ id, locale });
   if (!result.ok) {
+    if (optional && result.status === 404) {
+      logInfo('collection.details.optional_not_found', {
+        requestId,
+        provider,
+        id,
+      });
+      return ok(
+        req,
+        res,
+        {
+          provider,
+          providerId: id,
+          name: '',
+          overview: '',
+          poster: '',
+          backdrop: '',
+          parts: [],
+          subCollections: [],
+        },
+        {
+          provider,
+          cached: false,
+          optional: true,
+          found: false,
+        },
+      );
+    }
+
     logError('collection.details.error', {
       requestId,
       provider,

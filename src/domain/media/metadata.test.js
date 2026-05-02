@@ -229,6 +229,28 @@ describe('metadata helpers', () => {
           ],
         },
       }),
+    ).toBe(true);
+
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 5,
+                  name: 'Beware the Jabberwock, My Son',
+                  description: 'A real episode summary.',
+                },
+              ],
+            },
+          ],
+        },
+      }),
     ).toBe(false);
   });
 

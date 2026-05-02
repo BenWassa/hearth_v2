@@ -73,15 +73,16 @@ const hasRichEpisodeMetadata = (episode = {}) => {
   );
 };
 
+const isGenericEpisodeTitle = ({ title, episodeNumber }) =>
+  episodeNumber !== null && title.toLowerCase() === `episode ${episodeNumber}`;
+
 export const isEpisodeMetadataIncomplete = (episode = {}) => {
   const title = getEpisodeTitle(episode);
   if (!title) return true;
 
   const episodeNumber = getEpisodeNumber(episode);
-  const genericTitle =
-    episodeNumber !== null &&
-    title.toLowerCase() === `episode ${episodeNumber}`;
-  return genericTitle && !hasRichEpisodeMetadata(episode);
+  if (isGenericEpisodeTitle({ title, episodeNumber })) return true;
+  return !hasRichEpisodeMetadata(episode);
 };
 
 export const hasSeasonEpisodeMetadataGaps = (season = {}) => {

@@ -1,6 +1,6 @@
 // Rewritten by scripts/versioning.js on each build.
-const BUILD_VERSION = '3.15.2';
-const BUILD_ID = '3.15.2-20260502004835-43837ec';
+const BUILD_VERSION = '3.15.3';
+const BUILD_ID = '3.15.3-20260502005649-1fddbd9';
 const CACHE_NAME = `hearth-static-${BUILD_ID.replace(/[^a-zA-Z0-9-]/g, '-')}`;
 const OFFLINE_SHELL = '/index.html';
 

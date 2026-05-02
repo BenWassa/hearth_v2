@@ -57,8 +57,8 @@ const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
 const VIEW_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const AUTO_SHOW_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
-const AUTO_SHOW_REFRESH_MAX_ITEMS = 12;
-const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh:v2';
+const AUTO_SHOW_REFRESH_MAX_ITEMS = 24;
+const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh:v3';
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>

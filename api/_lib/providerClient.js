@@ -390,21 +390,77 @@ const buildSubCollections = async ({ parentId, parts, locale }) => {
   });
 };
 
-const getCollection = async ({ id, locale = 'en-US' }) => {
+const hydrateCollectionPartDetails = async ({ parts, locale }) => {
+  const detailResults = await Promise.all(
+    parts.map(async (part) => {
+      const providerId = String(part?.providerId || '').trim();
+      if (!providerId) return part;
+
+      const result = await getMediaDetails({
+        id: providerId,
+        type: 'movie',
+        locale,
+      });
+      if (!result.ok) return part;
+
+      return {
+        ...part,
+        ...result.data,
+        provider: part.provider || result.data.provider,
+        providerId,
+        type: 'movie',
+        collection: part.collection || result.data.collection,
+      };
+    }),
+  );
+
+  return detailResults;
+};
+
+const mergeHydratedSubCollections = ({ subCollections, hydratedParts }) => {
+  const hydratedByProviderId = new Map(
+    hydratedParts
+      .map((part) => [String(part?.providerId || '').trim(), part])
+      .filter(([providerId]) => providerId),
+  );
+
+  return subCollections.map((subCollection) => ({
+    ...subCollection,
+    parts: subCollection.parts.map((part) => {
+      const providerId = String(part?.providerId || '').trim();
+      return hydratedByProviderId.get(providerId) || part;
+    }),
+  }));
+};
+
+const getCollection = async ({
+  id,
+  locale = 'en-US',
+  includePartDetails = false,
+}) => {
   const response = await tmdbGet(`/collection/${id}`, {
     language: locale,
   });
   if (!response.ok) return response;
 
   const parts = Array.isArray(response.data.parts) ? response.data.parts : [];
-  const mappedParts = sortCollectionParts(
+  const baseParts = sortCollectionParts(
     parts.map((part) => mapMovieDetails(part)),
   );
-  const subCollections = await buildSubCollections({
+  const baseSubCollections = await buildSubCollections({
     parentId: response.data.id || id,
     parts,
     locale,
   });
+  const mappedParts = includePartDetails
+    ? await hydrateCollectionPartDetails({ parts: baseParts, locale })
+    : baseParts;
+  const subCollections = includePartDetails
+    ? mergeHydratedSubCollections({
+        subCollections: baseSubCollections,
+        hydratedParts: mappedParts,
+      })
+    : baseSubCollections;
 
   return {
     ok: true,

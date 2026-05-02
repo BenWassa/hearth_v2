@@ -37,6 +37,7 @@ module.exports = async (req, res) => {
   const id = getParam(req?.query?.id);
   const locale = getParam(req?.query?.locale) || 'en-US';
   const optional = isTruthyParam(req?.query?.optional);
+  const includePartDetails = isTruthyParam(req?.query?.details);
 
   if (provider !== 'tmdb' || !id) {
     return fail(req, res, 400, 'BAD_REQUEST', 'Provider and id are required.');
@@ -44,7 +45,7 @@ module.exports = async (req, res) => {
 
   logInfo('collection.details.request', { requestId, provider, id });
 
-  const result = await getCollection({ id, locale });
+  const result = await getCollection({ id, locale, includePartDetails });
   if (!result.ok) {
     if (optional && result.status === 404) {
       logInfo('collection.details.optional_not_found', {

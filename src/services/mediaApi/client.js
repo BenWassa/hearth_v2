@@ -181,10 +181,12 @@ export const getCollectionDetails = async ({
   providerId,
   locale = 'en-US',
   optional = false,
+  details = false,
 }) => {
   const params = new URLSearchParams();
   if (locale) params.set('locale', locale);
   if (optional) params.set('optional', 'true');
+  if (details) params.set('details', 'true');
   const suffix = params.toString() ? `?${params.toString()}` : '';
   return getJson(`/api/media/${provider}/collection/${providerId}${suffix}`);
 };

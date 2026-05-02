@@ -112,6 +112,9 @@ const ItemDetailsModal = ({
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
   const [isAddingItem, setIsAddingItem] = useState(false);
+  const [pendingAddItem, setPendingAddItem] = useState(null);
+  const [addVibe, setAddVibe] = useState('');
+  const [addEnergy, setAddEnergy] = useState('');
   const persistedHydrationRef = useRef(new Set());
   const initializedShowRef = useRef(null);
   const seasonScrollRef = useRef(null);
@@ -193,7 +196,10 @@ const ItemDetailsModal = ({
       }
     : null;
 
-  const handleAddItem = async (itemToAdd) => {
+  const addItemWithPreferences = async (
+    itemToAdd,
+    { vibe = itemToAdd?.vibe || '', energy = itemToAdd?.energy || '' } = {},
+  ) => {
     if (!itemToAdd || isAddingItem) return;
     const provider = String(
       itemToAdd?.source?.provider || itemToAdd?.provider || 'tmdb',
@@ -247,8 +253,8 @@ const ItemDetailsModal = ({
         },
         userState: {
           status: 'unwatched',
-          vibe: itemToAdd.vibe || '',
-          energy: itemToAdd.energy || '',
+          vibe,
+          energy,
           note: itemToAdd.note || '',
           episodeProgress: {},
         },
@@ -258,6 +264,49 @@ const ItemDetailsModal = ({
       setIsAddingItem(false);
     }
   };
+
+  const handleAddItem = async (itemToAdd) => {
+    if (!itemToAdd || isAddingItem) return;
+    const existingVibe = String(itemToAdd.vibe || '').trim();
+    const existingEnergy = String(itemToAdd.energy || '').trim();
+
+    if (!existingVibe || !existingEnergy) {
+      setPendingAddItem(itemToAdd);
+      setAddVibe(existingVibe);
+      setAddEnergy(existingEnergy);
+      return;
+    }
+
+    await addItemWithPreferences(itemToAdd, {
+      vibe: existingVibe,
+      energy: existingEnergy,
+    });
+  };
+
+  const handleConfirmAddPreferences = async () => {
+    if (!pendingAddItem || !addVibe || !addEnergy) return;
+    await addItemWithPreferences(pendingAddItem, {
+      vibe: addVibe,
+      energy: addEnergy,
+    });
+    setPendingAddItem(null);
+    setAddVibe('');
+    setAddEnergy('');
+  };
+
+  const handleCancelAddPreferences = () => {
+    if (isAddingItem) return;
+    setPendingAddItem(null);
+    setAddVibe('');
+    setAddEnergy('');
+  };
+
+  useEffect(() => {
+    if (isOpen) return;
+    setPendingAddItem(null);
+    setAddVibe('');
+    setAddEnergy('');
+  }, [isOpen]);
 
   useEffect(() => {
     setExpandedEpisodeId(null);
@@ -975,6 +1024,102 @@ const ItemDetailsModal = ({
           />
         </div>
       </div>
+
+      {pendingAddItem && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/65 px-4 pb-4 pt-16 backdrop-blur-sm sm:items-center sm:p-6"
+          onClick={handleCancelAddPreferences}
+        >
+          <div
+            className="w-full max-w-lg overflow-hidden rounded-2xl border border-stone-800 bg-stone-950 shadow-2xl shadow-black/60"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="border-b border-stone-900 px-5 py-4">
+              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-400">
+                Add to shelf
+              </div>
+              <h3 className="mt-1 font-serif text-2xl leading-tight text-stone-100">
+                {pendingAddItem.title || 'Untitled movie'}
+              </h3>
+            </div>
+
+            <div className="space-y-5 px-5 py-5">
+              <div>
+                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
+                  Vibe
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {VIBES.map((vibe) => {
+                    const VibeIcon = vibe.icon;
+                    const selected = addVibe === vibe.id;
+                    return (
+                      <button
+                        key={vibe.id}
+                        type="button"
+                        onClick={() => setAddVibe(vibe.id)}
+                        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                          selected
+                            ? 'border-amber-400 bg-amber-500 text-amber-950'
+                            : 'border-stone-800 bg-stone-900/70 text-stone-300 hover:border-stone-600 hover:bg-stone-900'
+                        }`}
+                      >
+                        <VibeIcon className="h-4 w-4" />
+                        {vibe.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
+                  Energy
+                </div>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  {ENERGIES.map((energy) => {
+                    const EnergyIcon = energy.icon;
+                    const selected = addEnergy === energy.id;
+                    return (
+                      <button
+                        key={energy.id}
+                        type="button"
+                        onClick={() => setAddEnergy(energy.id)}
+                        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
+                          selected
+                            ? 'border-sky-400 bg-sky-500 text-sky-950'
+                            : 'border-stone-800 bg-stone-900/70 text-stone-300 hover:border-stone-600 hover:bg-stone-900'
+                        }`}
+                      >
+                        <EnergyIcon className="h-4 w-4" />
+                        {energy.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 border-t border-stone-900 p-4">
+              <button
+                type="button"
+                onClick={handleCancelAddPreferences}
+                disabled={isAddingItem}
+                className="h-12 rounded-xl border border-stone-800 bg-stone-900 text-sm font-bold uppercase tracking-wider text-stone-300 transition-colors hover:bg-stone-800 disabled:cursor-wait disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmAddPreferences}
+                disabled={!addVibe || !addEnergy || isAddingItem}
+                className="h-12 rounded-xl bg-amber-600 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-amber-900/20 transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isAddingItem ? 'Adding...' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

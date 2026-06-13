@@ -111,6 +111,16 @@ const mapShowDetails = (data = {}) => ({
     ? data.number_of_episodes
     : null,
   seasonSummaries: mapSeasonSummaries(data.seasons),
+  showStatus: typeof data.status === 'string' ? data.status : '',
+  inProduction: Boolean(data.in_production),
+  nextEpisodeAirDate:
+    data.next_episode_to_air && typeof data.next_episode_to_air.air_date === 'string'
+      ? data.next_episode_to_air.air_date
+      : null,
+  lastEpisodeAirDate:
+    data.last_episode_to_air && typeof data.last_episode_to_air.air_date === 'string'
+      ? data.last_episode_to_air.air_date
+      : null,
   providerUpdatedAt: new Date().toISOString(),
 });
 

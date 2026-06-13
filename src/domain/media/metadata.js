@@ -120,6 +120,42 @@ export const shouldRefreshShowEpisodeMetadata = (item = {}) => {
   return provider === 'tmdb' && Boolean(providerId);
 };
 
+const ACTIVE_SHOW_STATUSES = new Set([
+  'returning series',
+  'in production',
+  'pilot',
+]);
+
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+export const isActivelyAiringShow = (item = {}) => {
+  if (item?.type !== 'show') return false;
+  const showStatus = String(item?.media?.showStatus || item?.showStatus || '')
+    .trim()
+    .toLowerCase();
+  if (ACTIVE_SHOW_STATUSES.has(showStatus)) return true;
+  if (item?.media?.inProduction === true || item?.inProduction === true) return true;
+  const nextAirDate =
+    item?.media?.nextEpisodeAirDate ?? item?.nextEpisodeAirDate ?? null;
+  if (nextAirDate) {
+    const airMs = Date.parse(String(nextAirDate));
+    if (Number.isFinite(airMs) && airMs > Date.now() - THIRTY_DAYS_MS) return true;
+  }
+  return false;
+};
+
+export const shouldRefreshAiringShowMetadata = (item = {}) => {
+  if (!isActivelyAiringShow(item)) return false;
+  const provider = String(item?.source?.provider || '')
+    .trim()
+    .toLowerCase();
+  const providerId = String(item?.source?.providerId || '').trim();
+  if (provider !== 'tmdb' || !providerId) return false;
+  const staleAfter = Number(item?.source?.staleAfter || 0);
+  if (!staleAfter) return false;
+  return Date.now() > staleAfter;
+};
+
 export const pickPrimaryPerson = (values) => {
   if (!Array.isArray(values)) return '';
   return String(values[0] || '').trim();

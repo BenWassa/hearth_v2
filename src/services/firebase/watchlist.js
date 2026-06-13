@@ -137,6 +137,12 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
           : null,
       providerUpdatedAt: asString(media.providerUpdatedAt),
       collection: normalizeCollection(media.collection),
+      showStatus: asString(media.showStatus),
+      inProduction: typeof media.inProduction === 'boolean' ? media.inProduction : null,
+      nextEpisodeAirDate:
+        media.nextEpisodeAirDate != null ? asString(media.nextEpisodeAirDate) : null,
+      lastEpisodeAirDate:
+        media.lastEpisodeAirDate != null ? asString(media.lastEpisodeAirDate) : null,
     },
     showData: {
       seasonCount,

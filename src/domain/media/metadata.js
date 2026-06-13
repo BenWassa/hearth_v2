@@ -59,18 +59,12 @@ const hasMeaningfulEpisodeText = (value) => {
 };
 
 const hasRichEpisodeMetadata = (episode = {}) => {
-  const runtime = Number(
-    episode?.runtimeMinutes ?? episode?.runtime_minutes ?? episode?.runtime,
-  );
-  return (
+  const hasDescription =
     hasMeaningfulEpisodeText(episode?.description) ||
-    hasMeaningfulEpisodeText(episode?.overview) ||
-    hasValue(episode?.still) ||
-    hasValue(episode?.stillUrl) ||
-    hasValue(episode?.airDate) ||
-    hasValue(episode?.air_date) ||
-    (Number.isFinite(runtime) && runtime > 0)
-  );
+    hasMeaningfulEpisodeText(episode?.overview);
+  const hasVisual =
+    hasValue(episode?.still) || hasValue(episode?.stillUrl);
+  return hasDescription || hasVisual;
 };
 
 const isGenericEpisodeTitle = ({ title, episodeNumber }) =>

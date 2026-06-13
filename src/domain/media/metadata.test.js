@@ -254,6 +254,53 @@ describe('metadata helpers', () => {
         },
       }),
     ).toBe(false);
+
+    // airDate alone should not satisfy rich metadata — description is still missing
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  airDate: '2024-01-15',
+                  runtimeMinutes: 45,
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+
+    // still image satisfies rich metadata even without description
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  still: '/path/to/still.jpg',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(false);
   });
 
   it('limits auto episode refresh candidates to TMDB-backed shows', () => {

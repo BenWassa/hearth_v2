@@ -5,7 +5,9 @@ import {
   hasListValues,
   hasValue,
   hasShowEpisodeMetadataGaps,
+  isActivelyAiringShow,
   pickPrimaryPerson,
+  shouldRefreshAiringShowMetadata,
   shouldRefreshShowEpisodeMetadata,
 } from './metadata.js';
 
@@ -310,5 +312,98 @@ describe('metadata helpers', () => {
         gaps: ['logo'],
       },
     ]);
+  });
+
+  it('identifies actively airing shows by status, inProduction, or upcoming air date', () => {
+    const NOW = new Date('2026-04-24T12:00:00Z').getTime();
+
+    expect(isActivelyAiringShow(completeMovie)).toBe(false);
+    expect(isActivelyAiringShow(completeShow)).toBe(false);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: { ...completeShow.media, showStatus: 'Returning Series' },
+      }),
+    ).toBe(true);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: { ...completeShow.media, showStatus: 'In Production' },
+      }),
+    ).toBe(true);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: { ...completeShow.media, showStatus: 'Ended' },
+      }),
+    ).toBe(false);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: { ...completeShow.media, inProduction: true },
+      }),
+    ).toBe(true);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: {
+          ...completeShow.media,
+          nextEpisodeAirDate: new Date(NOW + 7 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .slice(0, 10),
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      isActivelyAiringShow({
+        ...completeShow,
+        media: {
+          ...completeShow.media,
+          nextEpisodeAirDate: new Date(NOW - 60 * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .slice(0, 10),
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it('gates airing show refresh on staleAfter and TMDB source', () => {
+    const NOW = new Date('2026-04-24T12:00:00Z').getTime();
+    const airingShow = {
+      ...completeShow,
+      source: { provider: 'tmdb', providerId: '456', staleAfter: NOW - 1 },
+      media: { ...completeShow.media, showStatus: 'Returning Series' },
+    };
+
+    expect(shouldRefreshAiringShowMetadata(airingShow)).toBe(true);
+
+    expect(
+      shouldRefreshAiringShowMetadata({
+        ...airingShow,
+        source: { ...airingShow.source, staleAfter: NOW + 3600000 },
+      }),
+    ).toBe(false);
+
+    expect(
+      shouldRefreshAiringShowMetadata({
+        ...airingShow,
+        source: { provider: 'other', providerId: '456', staleAfter: NOW - 1 },
+      }),
+    ).toBe(false);
+
+    expect(
+      shouldRefreshAiringShowMetadata({
+        ...airingShow,
+        media: { ...airingShow.media, showStatus: 'Ended' },
+      }),
+    ).toBe(false);
+
+    expect(shouldRefreshAiringShowMetadata(completeMovie)).toBe(false);
   });
 });

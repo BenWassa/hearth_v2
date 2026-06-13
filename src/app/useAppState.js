@@ -12,6 +12,7 @@ import {
   getMetadataGaps,
   hasListValues,
   hasValue,
+  shouldRefreshAiringShowMetadata,
   shouldRefreshShowEpisodeMetadata,
 } from '../domain/media/metadata.js';
 import { buildWatchlistPayload } from '../domain/media/schema.js';
@@ -59,10 +60,16 @@ const VIEW_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const AUTO_SHOW_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 1 day
 const AUTO_SHOW_REFRESH_MAX_ITEMS = 24;
 const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh:v3';
+const AUTO_AIRING_SHOW_REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour (staleAfter controls actual rate)
+const AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS = 8;
+const AUTO_AIRING_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:airing-show-refresh:v1';
+const STALE_24H_MS = 24 * 60 * 60 * 1000;
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
   console.info('[auto-show-refresh]', ...args);
+const logAiringShowRefresh = (...args) =>
+  console.info('[airing-show-refresh]', ...args);
 
 const areShowDataEqual = (left = {}, right = {}) =>
   JSON.stringify(left || {}) === JSON.stringify(right || {});
@@ -391,6 +398,7 @@ export const useAppState = () => {
   const [importProgress, setImportProgress] = useState(null);
   const [userSpaces, setUserSpaces] = useState([]);
   const autoShowRefreshInFlightRef = useRef(false);
+  const airingShowRefreshInFlightRef = useRef(false);
   const forcedDemoRedirectRef = useRef(false);
   const isBootstrapping =
     Boolean(user) && Boolean(spaceId || joinSpaceId) && loading;
@@ -1841,6 +1849,141 @@ export const useAppState = () => {
     };
 
     runAutoRefresh();
+  }, [db, items, loading, spaceId, user]);
+
+  useEffect(() => {
+    if (!db || !spaceId || !user || loading) return;
+    if (typeof localStorage === 'undefined') return;
+    if (airingShowRefreshInFlightRef.current) {
+      logAiringShowRefresh('Skipped: refresh already in flight.');
+      return;
+    }
+
+    const storageKey = `${AUTO_AIRING_SHOW_REFRESH_STORAGE_PREFIX}:${spaceId}`;
+    let lastRunAt = 0;
+    let cursor = 0;
+
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      lastRunAt = Number(parsed?.lastRunAt || 0);
+      cursor = Number(parsed?.cursor || 0);
+    } catch (err) {
+      console.warn('Failed to parse airing show refresh state:', err);
+    }
+
+    const candidates = items
+      .filter((item) => shouldRefreshAiringShowMetadata(item))
+      .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+
+    if (!candidates.length) {
+      logAiringShowRefresh('No airing shows with stale metadata to refresh.');
+      return;
+    }
+
+    if (Date.now() - lastRunAt < AUTO_AIRING_SHOW_REFRESH_INTERVAL_MS) {
+      logAiringShowRefresh(
+        `Skipped: last run at ${new Date(lastRunAt).toISOString()} (interval not reached).`,
+      );
+      return;
+    }
+
+    const safeCursor = Math.max(0, cursor) % candidates.length;
+    const batchSize = Math.min(AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS, candidates.length);
+    const batch = Array.from({ length: batchSize }, (_, index) => {
+      const candidateIndex = (safeCursor + index) % candidates.length;
+      return candidates[candidateIndex];
+    });
+    const nextCursor = (safeCursor + batchSize) % candidates.length;
+
+    airingShowRefreshInFlightRef.current = true;
+    logAiringShowRefresh(
+      `Starting refresh for ${batch.length} airing show(s). Cursor ${safeCursor} -> ${nextCursor}.`,
+    );
+
+    const runAiringRefresh = async () => {
+      let refreshedCount = 0;
+      try {
+        for (const item of batch) {
+          try {
+            const refreshedShowData = await refreshShowDataForMissingEpisodes({
+              provider: item.source.provider,
+              providerId: item.source.providerId,
+              currentShowData: {
+                ...(item.showData || {}),
+                seasons: Array.isArray(item.showData?.seasons)
+                  ? item.showData.seasons
+                  : item.seasons,
+              },
+            });
+            const currentShowData = item.showData || {
+              seasonCount: item.totalSeasons || null,
+              episodeCount: item.totalEpisodes || null,
+              seasons: item.seasons || [],
+            };
+
+            const episodeSetChanged = hasEpisodeSetChanged(
+              currentShowData,
+              refreshedShowData,
+            );
+            const nextItem = {
+              ...item,
+              showData: refreshedShowData,
+              seasons: refreshedShowData.seasons,
+              totalSeasons: refreshedShowData.seasonCount || item.totalSeasons || null,
+              totalEpisodes: refreshedShowData.episodeCount || item.totalEpisodes || null,
+            };
+            const fullyWatched = isShowFullyWatched(nextItem);
+            const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
+              Boolean,
+            );
+            const updates = {
+              showData: refreshedShowData,
+              totalSeasons: refreshedShowData.seasonCount || null,
+              totalEpisodes: refreshedShowData.episodeCount || null,
+              seasons: refreshedShowData.seasons,
+              'source.fetchedAt': Date.now(),
+              'source.staleAfter': Date.now() + STALE_24H_MS,
+            };
+            if (episodeSetChanged) {
+              updates.status = fullyWatched
+                ? 'watched'
+                : watchedAny
+                ? 'watching'
+                : 'unwatched';
+            }
+
+            await updateWatchlistItem({
+              db,
+              appId,
+              spaceId,
+              itemId: item.id,
+              updates: mapWatchlistUpdatesForWrite(item, updates),
+            });
+            refreshedCount += 1;
+            logAiringShowRefresh(
+              `Refreshed: ${item?.title || item?.id}${episodeSetChanged ? ' (new episodes)' : ''}`,
+            );
+          } catch (error) {
+            console.warn(
+              'Airing show metadata refresh failed for item:',
+              item?.title,
+              error,
+            );
+          }
+        }
+      } finally {
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({ lastRunAt: Date.now(), cursor: nextCursor }),
+        );
+        logAiringShowRefresh(
+          `Completed. Refreshed ${refreshedCount}/${batch.length} airing show(s).`,
+        );
+        airingShowRefreshInFlightRef.current = false;
+      }
+    };
+
+    runAiringRefresh();
   }, [db, items, loading, spaceId, user]);
 
   const handleBulkDelete = async (ids, options = {}) => {

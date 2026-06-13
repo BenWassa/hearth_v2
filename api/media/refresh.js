@@ -106,6 +106,14 @@ module.exports = async (req, res) => {
     };
   }
 
+  const STALE_24H = 1000 * 60 * 60 * 24;
+  const STALE_30D = 1000 * 60 * 60 * 24 * 30;
+  const ACTIVE_SHOW_STATUSES = new Set(['returning series', 'in production', 'pilot']);
+  const isAiringShow =
+    details.type === 'show' &&
+    (ACTIVE_SHOW_STATUSES.has(String(details.data.showStatus || '').toLowerCase()) ||
+      Boolean(details.data.inProduction));
+
   return ok(
     req,
     res,
@@ -114,7 +122,7 @@ module.exports = async (req, res) => {
         provider,
         providerId,
         fetchedAt: Date.now(),
-        staleAfter: Date.now() + 1000 * 60 * 60 * 24 * 30,
+        staleAfter: Date.now() + (isAiringShow ? STALE_24H : STALE_30D),
         locale,
       },
       media: details.data,

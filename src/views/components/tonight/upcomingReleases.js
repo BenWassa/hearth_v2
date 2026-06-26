@@ -18,7 +18,9 @@ const getEpisodeId = ({ episode, seasonNumber, episodeNumber }) =>
       episode.episodeId ||
       episode.tmdb_id ||
       episode.tmdbId ||
-      (seasonNumber && episodeNumber ? `s${seasonNumber}e${episodeNumber}` : ''),
+      (seasonNumber && episodeNumber
+        ? `s${seasonNumber}e${episodeNumber}`
+        : ''),
   );
 
 export const getUpcomingReleases = (items = [], { now = new Date() } = {}) => {
@@ -47,7 +49,9 @@ export const getUpcomingReleases = (items = [], { now = new Date() } = {}) => {
           showTitle: item.title || '',
           seasonNumber,
           seasonName:
-            season.name || season.title || `Season ${seasonNumber || ''}`.trim(),
+            season.name ||
+            season.title ||
+            `Season ${seasonNumber || ''}`.trim(),
           seasonPoster: season.poster || season.posterUrl || '',
           poster: season.poster || season.posterUrl || item.poster || '',
           episodeId: getEpisodeId({ episode, seasonNumber, episodeNumber }),

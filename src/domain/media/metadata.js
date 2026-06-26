@@ -153,12 +153,14 @@ export const isActivelyAiringShow = (item = {}) => {
     .trim()
     .toLowerCase();
   if (ACTIVE_SHOW_STATUSES.has(showStatus)) return true;
-  if (item?.media?.inProduction === true || item?.inProduction === true) return true;
+  if (item?.media?.inProduction === true || item?.inProduction === true)
+    return true;
   const nextAirDate =
     item?.media?.nextEpisodeAirDate ?? item?.nextEpisodeAirDate ?? null;
   if (nextAirDate) {
     const airMs = Date.parse(String(nextAirDate));
-    if (Number.isFinite(airMs) && airMs > Date.now() - THIRTY_DAYS_MS) return true;
+    if (Number.isFinite(airMs) && airMs > Date.now() - THIRTY_DAYS_MS)
+      return true;
   }
   return false;
 };

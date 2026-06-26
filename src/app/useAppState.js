@@ -23,7 +23,10 @@ import {
 import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
-import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import {
+  getShowWatchStatus,
+  isShowFullyWatched,
+} from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
@@ -1320,15 +1323,7 @@ export const useAppState = () => {
       Object.prototype.hasOwnProperty.call(updates, 'episodeProgress')
     ) {
       const nextItem = { ...item, ...updates };
-      const fullyWatched = isShowFullyWatched(nextItem);
-      const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
-        Boolean,
-      );
-      const nextStatus = fullyWatched
-        ? 'watched'
-        : watchedAny
-        ? 'watching'
-        : 'unwatched';
+      const nextStatus = getShowWatchStatus(nextItem);
       if (nextUpdates.status !== nextStatus) {
         nextUpdates.status = nextStatus;
       }
@@ -1442,15 +1437,7 @@ export const useAppState = () => {
         type: 'show',
         seasons: refreshed.showData.seasons,
       };
-      const fullyWatched = isShowFullyWatched(nextItem);
-      const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
-        Boolean,
-      );
-      updates.status = fullyWatched
-        ? 'watched'
-        : watchedAny
-        ? 'watching'
-        : 'unwatched';
+      updates.status = getShowWatchStatus(nextItem);
     }
 
     return updates;
@@ -1788,15 +1775,6 @@ export const useAppState = () => {
               seasons: item.seasons || [],
             };
 
-            if (areShowDataEqual(currentShowData, refreshedShowData)) {
-              logAutoShowRefresh(`No changes: ${item?.title || item?.id}`);
-              continue;
-            }
-
-            const episodeSetChanged = hasEpisodeSetChanged(
-              currentShowData,
-              refreshedShowData,
-            );
             const nextItem = {
               ...item,
               showData: refreshedShowData,
@@ -1806,22 +1784,41 @@ export const useAppState = () => {
               totalEpisodes:
                 refreshedShowData.episodeCount || item.totalEpisodes || null,
             };
-            const fullyWatched = isShowFullyWatched(nextItem);
-            const watchedAny = Object.values(
-              nextItem.episodeProgress || {},
-            ).some(Boolean);
+            const nextStatus = getShowWatchStatus(nextItem);
+
+            if (areShowDataEqual(currentShowData, refreshedShowData)) {
+              if (item.status !== nextStatus) {
+                await updateWatchlistItem({
+                  db,
+                  appId,
+                  spaceId,
+                  itemId: item.id,
+                  updates: mapWatchlistUpdatesForWrite(item, {
+                    status: nextStatus,
+                  }),
+                });
+                refreshedCount += 1;
+                logAutoShowRefresh(
+                  `Updated status: ${item?.title || item?.id}`,
+                );
+              } else {
+                logAutoShowRefresh(`No changes: ${item?.title || item?.id}`);
+              }
+              continue;
+            }
+
+            const episodeSetChanged = hasEpisodeSetChanged(
+              currentShowData,
+              refreshedShowData,
+            );
             const updates = {
               showData: refreshedShowData,
               totalSeasons: refreshedShowData.seasonCount || null,
               totalEpisodes: refreshedShowData.episodeCount || null,
               seasons: refreshedShowData.seasons,
             };
-            if (episodeSetChanged) {
-              updates.status = fullyWatched
-                ? 'watched'
-                : watchedAny
-                ? 'watching'
-                : 'unwatched';
+            if (episodeSetChanged || item.status !== nextStatus) {
+              updates.status = nextStatus;
             }
 
             await updateWatchlistItem({
@@ -1878,7 +1875,9 @@ export const useAppState = () => {
 
     const candidates = items
       .filter((item) => shouldRefreshAiringShowMetadata(item))
-      .sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+      .sort((a, b) =>
+        String(a.title || '').localeCompare(String(b.title || '')),
+      );
 
     if (!candidates.length) {
       logAiringShowRefresh('No airing shows with stale metadata to refresh.');
@@ -1887,13 +1886,18 @@ export const useAppState = () => {
 
     if (Date.now() - lastRunAt < AUTO_AIRING_SHOW_REFRESH_INTERVAL_MS) {
       logAiringShowRefresh(
-        `Skipped: last run at ${new Date(lastRunAt).toISOString()} (interval not reached).`,
+        `Skipped: last run at ${new Date(
+          lastRunAt,
+        ).toISOString()} (interval not reached).`,
       );
       return;
     }
 
     const safeCursor = Math.max(0, cursor) % candidates.length;
-    const batchSize = Math.min(AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS, candidates.length);
+    const batchSize = Math.min(
+      AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS,
+      candidates.length,
+    );
     const batch = Array.from({ length: batchSize }, (_, index) => {
       const candidateIndex = (safeCursor + index) % candidates.length;
       return candidates[candidateIndex];
@@ -1934,13 +1938,12 @@ export const useAppState = () => {
               ...item,
               showData: refreshedShowData,
               seasons: refreshedShowData.seasons,
-              totalSeasons: refreshedShowData.seasonCount || item.totalSeasons || null,
-              totalEpisodes: refreshedShowData.episodeCount || item.totalEpisodes || null,
+              totalSeasons:
+                refreshedShowData.seasonCount || item.totalSeasons || null,
+              totalEpisodes:
+                refreshedShowData.episodeCount || item.totalEpisodes || null,
             };
-            const fullyWatched = isShowFullyWatched(nextItem);
-            const watchedAny = Object.values(nextItem.episodeProgress || {}).some(
-              Boolean,
-            );
+            const nextStatus = getShowWatchStatus(nextItem);
             const updates = {
               showData: refreshedShowData,
               totalSeasons: refreshedShowData.seasonCount || null,
@@ -1949,12 +1952,8 @@ export const useAppState = () => {
               'source.fetchedAt': Date.now(),
               'source.staleAfter': Date.now() + STALE_24H_MS,
             };
-            if (episodeSetChanged) {
-              updates.status = fullyWatched
-                ? 'watched'
-                : watchedAny
-                ? 'watching'
-                : 'unwatched';
+            if (episodeSetChanged || item.status !== nextStatus) {
+              updates.status = nextStatus;
             }
 
             await updateWatchlistItem({
@@ -1966,7 +1965,9 @@ export const useAppState = () => {
             });
             refreshedCount += 1;
             logAiringShowRefresh(
-              `Refreshed: ${item?.title || item?.id}${episodeSetChanged ? ' (new episodes)' : ''}`,
+              `Refreshed: ${item?.title || item?.id}${
+                episodeSetChanged ? ' (new episodes)' : ''
+              }`,
             );
           } catch (error) {
             console.warn(

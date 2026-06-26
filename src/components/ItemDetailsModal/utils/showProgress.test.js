@@ -1,4 +1,8 @@
-import { getShowEntryTarget, isShowFullyWatched } from './showProgress';
+import {
+  getShowEntryTarget,
+  getShowWatchStatus,
+  isShowFullyWatched,
+} from './showProgress';
 
 describe('getShowEntryTarget', () => {
   it('targets next unwatched episode in chronological order', () => {
@@ -157,6 +161,26 @@ describe('getShowEntryTarget', () => {
       episodeId: 's1e2',
     });
   });
+
+  it('supports refreshed seasons that only expose seasonNumber', () => {
+    const seasons = [
+      {
+        seasonNumber: 1,
+        episodes: [
+          { episodeId: 'tmdb-1', episodeNumber: 1 },
+          { episodeId: 'tmdb-2', episodeNumber: 2 },
+        ],
+      },
+    ];
+    const episodeProgress = {
+      s1e1: true,
+    };
+
+    expect(getShowEntryTarget({ seasons, episodeProgress })).toEqual({
+      seasonNumber: 1,
+      episodeId: 'tmdb-2',
+    });
+  });
 });
 
 describe('isShowFullyWatched', () => {
@@ -199,5 +223,62 @@ describe('isShowFullyWatched', () => {
     };
 
     expect(isShowFullyWatched(item)).toBe(false);
+  });
+
+  it('ignores unreleased episodes when deciding whether prior seasons are fully watched', () => {
+    const item = {
+      type: 'show',
+      seasons: [
+        {
+          seasonNumber: 1,
+          episodes: [
+            { episodeId: 's1e1', episodeNumber: 1, airDate: '2026-05-01' },
+            { episodeId: 's1e2', episodeNumber: 2, airDate: '2026-05-08' },
+          ],
+        },
+        {
+          seasonNumber: 2,
+          episodes: [
+            { episodeId: 's2e1', episodeNumber: 1, airDate: '2026-07-01' },
+          ],
+        },
+      ],
+      episodeProgress: {
+        s1e1: true,
+        s1e2: true,
+      },
+    };
+
+    const options = { now: new Date('2026-06-26T12:00:00') };
+    expect(isShowFullyWatched(item, options)).toBe(true);
+    expect(getShowWatchStatus(item, options)).toBe('watched');
+  });
+
+  it('marks a memories show as watching once an unwatched future episode is released', () => {
+    const item = {
+      type: 'show',
+      status: 'watched',
+      seasons: [
+        {
+          seasonNumber: 1,
+          episodes: [
+            { episodeId: 's1e1', episodeNumber: 1, airDate: '2026-05-01' },
+          ],
+        },
+        {
+          seasonNumber: 2,
+          episodes: [
+            { episodeId: 's2e1', episodeNumber: 1, airDate: '2026-07-01' },
+          ],
+        },
+      ],
+      episodeProgress: {
+        s1e1: true,
+      },
+    };
+
+    const options = { now: new Date('2026-07-02T12:00:00') };
+    expect(isShowFullyWatched(item, options)).toBe(false);
+    expect(getShowWatchStatus(item, options)).toBe('watching');
   });
 });

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { isEpisodeWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import {
   buildTemplateSeedItems,
   TEMPLATE_SPACE_ID,
@@ -116,27 +116,6 @@ const normalizeSeasons = (value) =>
       episodes,
     };
   });
-
-const isShowFullyWatched = (item) => {
-  if (!item || item.type !== 'show') return true;
-  const seasons = Array.isArray(item.seasons) ? item.seasons : [];
-  const seasonsWithEpisodes = seasons.filter(
-    (season) => Array.isArray(season?.episodes) && season.episodes.length > 0,
-  );
-  if (!seasonsWithEpisodes.length) return false;
-  const progress = item.episodeProgress || {};
-  return seasonsWithEpisodes.every((season) =>
-    season.episodes.every((episode) =>
-      isEpisodeWatched(progress, {
-        ...episode,
-        seasonNumber:
-          episode?.seasonNumber ?? episode?.season_number ?? season?.number,
-        number:
-          episode?.number ?? episode?.episodeNumber ?? episode?.episode_number,
-      }),
-    ),
-  );
-};
 
 const setValueByPath = (target, path, value) => {
   const segments = String(path || '')

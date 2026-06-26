@@ -64,12 +64,16 @@ const AUTO_AIRING_SHOW_REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour (staleAft
 const AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS = 8;
 const AUTO_AIRING_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:airing-show-refresh:v1';
 const STALE_24H_MS = 24 * 60 * 60 * 1000;
+const BACKGROUND_AUDIT_INTERVAL_MS = 12 * 60 * 60 * 1000; // twice a day
+const BACKGROUND_AUDIT_STORAGE_PREFIX = 'hearth:metadata-audit:v1';
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
   console.info('[auto-show-refresh]', ...args);
 const logAiringShowRefresh = (...args) =>
   console.info('[airing-show-refresh]', ...args);
+const logBackgroundAudit = (...args) =>
+  console.info('[metadata-audit]', ...args);
 
 const areShowDataEqual = (left = {}, right = {}) =>
   JSON.stringify(left || {}) === JSON.stringify(right || {});
@@ -397,6 +401,7 @@ export const useAppState = () => {
   const [isSpaceSetupRunning, setIsSpaceSetupRunning] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
   const [userSpaces, setUserSpaces] = useState([]);
+  const [backgroundAuditReport, setBackgroundAuditReport] = useState(null);
   const autoShowRefreshInFlightRef = useRef(false);
   const airingShowRefreshInFlightRef = useRef(false);
   const forcedDemoRedirectRef = useRef(false);
@@ -1986,6 +1991,40 @@ export const useAppState = () => {
     runAiringRefresh();
   }, [db, items, loading, spaceId, user]);
 
+  // Silent, periodic metadata audit. Runs in the background (no toasts) so gaps
+  // are surfaced in logs and made available to the audit modal without anyone
+  // having to open it manually. The on-demand `handleMetadataAudit` still works.
+  useEffect(() => {
+    if (!spaceId || loading) return;
+    if (typeof localStorage === 'undefined') return;
+    if (!Array.isArray(items) || !items.length) return;
+
+    const storageKey = `${BACKGROUND_AUDIT_STORAGE_PREFIX}:${spaceId}`;
+    let lastRunAt = 0;
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      lastRunAt = Number(parsed?.lastRunAt || 0);
+    } catch (err) {
+      console.warn('Failed to parse metadata audit state:', err);
+    }
+
+    if (Date.now() - lastRunAt < BACKGROUND_AUDIT_INTERVAL_MS) return;
+
+    try {
+      const report = buildMetadataAuditReport(items);
+      setBackgroundAuditReport(report);
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ lastRunAt: Date.now() }),
+      );
+      logBackgroundAudit(
+        `Audited ${report.totalItems} title(s): ${report.itemsWithGaps} with gaps, ${report.completeItems} complete.`,
+      );
+    } catch (err) {
+      console.warn('Background metadata audit failed:', err);
+    }
+  }, [items, loading, spaceId]);
+
   const handleBulkDelete = async (ids, options = {}) => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
@@ -2101,6 +2140,7 @@ export const useAppState = () => {
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRepairMissing,
+    backgroundAuditReport,
     handleRefreshMetadata,
     handleReloadNow,
     handleLoadUserSpaces,

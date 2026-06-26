@@ -110,6 +110,7 @@ const TonightView = ({
   showDevMetadataTools = false,
   onMetadataAudit,
   onMetadataRepairMissing,
+  backgroundAuditReport = null,
   isMetadataRepairing = false,
   goToShelf,
   importProgress,
@@ -270,6 +271,10 @@ const TonightView = ({
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [auditReport, setAuditReport] = useState(null);
+
+  // Seed the modal with the latest silent background audit so gaps are visible
+  // instantly; the open handler still kicks off a fresh on-demand audit.
+  const openAuditModalReport = auditReport || backgroundAuditReport;
 
   const spaceLabel =
     spaceName && spaceName.trim() ? spaceName.trim() : 'Tonight';
@@ -598,7 +603,7 @@ const TonightView = ({
         isOpen={isAuditModalOpen}
         onClose={() => setIsAuditModalOpen(false)}
         isAuditLoading={isAuditLoading}
-        auditReport={auditReport}
+        auditReport={openAuditModalReport}
         onMetadataRepairMissing={onMetadataRepairMissing}
         isMetadataRepairing={isMetadataRepairing}
       />

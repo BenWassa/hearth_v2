@@ -58,17 +58,41 @@ const hasMeaningfulEpisodeText = (value) => {
   return Boolean(normalized) && !PLACEHOLDER_EPISODE_TEXT.has(normalized);
 };
 
+const hasMeaningfulEpisodeDescription = (episode = {}) =>
+  hasMeaningfulEpisodeText(episode?.description) ||
+  hasMeaningfulEpisodeText(episode?.overview);
+
 const hasRichEpisodeMetadata = (episode = {}) => {
-  const hasDescription =
-    hasMeaningfulEpisodeText(episode?.description) ||
-    hasMeaningfulEpisodeText(episode?.overview);
-  const hasVisual =
-    hasValue(episode?.still) || hasValue(episode?.stillUrl);
-  return hasDescription || hasVisual;
+  const hasVisual = hasValue(episode?.still) || hasValue(episode?.stillUrl);
+  return hasMeaningfulEpisodeDescription(episode) || hasVisual;
 };
 
 const isGenericEpisodeTitle = ({ title, episodeNumber }) =>
   episodeNumber !== null && title.toLowerCase() === `episode ${episodeNumber}`;
+
+// Providers (TMDB) frequently publish an upcoming episode with only a title and
+// still image, then backfill the synopsis on or shortly after the air date.
+// Stills alone therefore should NOT mark a just-released episode as complete —
+// otherwise the description that lands later is never pulled in. We only enforce
+// this for a bounded window after air so episodes the provider never describes
+// don't trigger refreshes forever.
+const RECENTLY_AIRED_DESCRIPTION_WINDOW_MS = 90 * 24 * 60 * 60 * 1000;
+
+const getEpisodeAirMs = (episode = {}) => {
+  const raw = String(episode?.airDate ?? episode?.air_date ?? '').trim();
+  if (!raw) return null;
+  const ms = Date.parse(raw);
+  return Number.isFinite(ms) ? ms : null;
+};
+
+const needsAiredDescriptionBackfill = (episode = {}) => {
+  const airMs = getEpisodeAirMs(episode);
+  if (airMs === null) return false;
+  const now = Date.now();
+  if (airMs > now) return false; // not aired yet — leniency is expected
+  if (now - airMs > RECENTLY_AIRED_DESCRIPTION_WINDOW_MS) return false;
+  return !hasMeaningfulEpisodeDescription(episode);
+};
 
 export const isEpisodeMetadataIncomplete = (episode = {}) => {
   const title = getEpisodeTitle(episode);
@@ -76,6 +100,7 @@ export const isEpisodeMetadataIncomplete = (episode = {}) => {
 
   const episodeNumber = getEpisodeNumber(episode);
   if (isGenericEpisodeTitle({ title, episodeNumber })) return true;
+  if (needsAiredDescriptionBackfill(episode)) return true;
   return !hasRichEpisodeMetadata(episode);
 };
 
@@ -146,7 +171,12 @@ export const shouldRefreshAiringShowMetadata = (item = {}) => {
   const providerId = String(item?.source?.providerId || '').trim();
   if (provider !== 'tmdb' || !providerId) return false;
   const staleAfter = Number(item?.source?.staleAfter || 0);
-  if (!staleAfter) return false;
+  // Items added via search or import never went through the refresh endpoint,
+  // so they carry no staleAfter. Previously these airing shows were never
+  // auto-refreshed and silently missed new episodes/seasons. Treat a missing
+  // staleAfter as "due now" so the first background pass pulls fresh data and
+  // stamps a real staleAfter for subsequent runs.
+  if (!staleAfter) return true;
   return Date.now() > staleAfter;
 };
 

@@ -33,6 +33,7 @@ export default function HearthApp() {
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRepairMissing,
+    backgroundAuditReport,
     handleReloadNow,
     handleSignIn,
     handleSignOut,
@@ -197,6 +198,7 @@ export default function HearthApp() {
             showDevMetadataTools={showDevMetadataTools}
             onMetadataAudit={handleMetadataAudit}
             onMetadataRepairMissing={handleMetadataRepairMissing}
+            backgroundAuditReport={backgroundAuditReport}
             isMetadataRepairing={isMetadataRepairing}
             goToShelf={() => setView('shelf')}
             importProgress={importProgress}

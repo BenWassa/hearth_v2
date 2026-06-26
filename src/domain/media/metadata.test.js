@@ -279,7 +279,7 @@ describe('metadata helpers', () => {
       }),
     ).toBe(true);
 
-    // still image satisfies rich metadata even without description
+    // still image satisfies rich metadata even without description (no air date)
     expect(
       hasShowEpisodeMetadataGaps({
         ...completeShow,
@@ -293,6 +293,106 @@ describe('metadata helpers', () => {
                 {
                   episodeNumber: 1,
                   name: 'Pilot',
+                  still: '/path/to/still.jpg',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(false);
+
+    // a RECENTLY aired episode with a still but no description is still a gap —
+    // providers backfill the synopsis on/after air, so we must keep refreshing
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  airDate: '2026-04-20', // 4 days before mocked "now"
+                  still: '/path/to/still.jpg',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+
+    // a recently aired episode WITH a real description is complete
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  airDate: '2026-04-20',
+                  description: 'A real, freshly published synopsis.',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(false);
+
+    // an episode aired long ago (beyond the backfill window) with a still but
+    // no description is NOT flagged — avoids refreshing forever for episodes the
+    // provider will never describe
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  airDate: '2020-01-01',
+                  still: '/path/to/still.jpg',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    ).toBe(false);
+
+    // an upcoming (not-yet-aired) episode with only a title/still is fine —
+    // the synopsis legitimately may not exist yet
+    expect(
+      hasShowEpisodeMetadataGaps({
+        ...completeShow,
+        showData: {
+          seasonCount: 1,
+          seasons: [
+            {
+              seasonNumber: 1,
+              episodeCount: 1,
+              episodes: [
+                {
+                  episodeNumber: 1,
+                  name: 'Pilot',
+                  airDate: '2026-12-01',
                   still: '/path/to/still.jpg',
                 },
               ],
@@ -436,6 +536,15 @@ describe('metadata helpers', () => {
         source: { ...airingShow.source, staleAfter: NOW + 3600000 },
       }),
     ).toBe(false);
+
+    // missing staleAfter (e.g. added via search/import) should be treated as due
+    // so airing shows are not silently skipped forever
+    expect(
+      shouldRefreshAiringShowMetadata({
+        ...airingShow,
+        source: { provider: 'tmdb', providerId: '456' },
+      }),
+    ).toBe(true);
 
     expect(
       shouldRefreshAiringShowMetadata({

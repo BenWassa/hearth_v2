@@ -92,6 +92,11 @@ export const hydrateShowData = async ({ provider, providerId }) => {
   return {
     seasonCount: seasonResponse?.seasonCount || seasonData.length,
     episodeCount: seasonResponse?.episodeCount || 0,
+    showStatus: seasonResponse?.showStatus || '',
+    inProduction: seasonResponse?.inProduction === true,
+    nextEpisodeAirDate: seasonResponse?.nextEpisodeAirDate || null,
+    lastEpisodeAirDate: seasonResponse?.lastEpisodeAirDate || null,
+    providerUpdatedAt: seasonResponse?.providerUpdatedAt || null,
     seasons: seasonData,
   };
 };
@@ -211,6 +216,23 @@ export const refreshShowDataForMissingEpisodes = async ({
     seasonCount: seasonResponse?.seasonCount || mergedSeasons.length,
     episodeCount:
       seasonResponse?.episodeCount || currentShowData?.episodeCount || 0,
+    showStatus: seasonResponse?.showStatus || currentShowData?.showStatus || '',
+    inProduction:
+      seasonResponse?.inProduction === true ||
+      (seasonResponse?.inProduction == null &&
+        currentShowData?.inProduction === true),
+    nextEpisodeAirDate:
+      seasonResponse?.nextEpisodeAirDate ??
+      currentShowData?.nextEpisodeAirDate ??
+      null,
+    lastEpisodeAirDate:
+      seasonResponse?.lastEpisodeAirDate ??
+      currentShowData?.lastEpisodeAirDate ??
+      null,
+    providerUpdatedAt:
+      seasonResponse?.providerUpdatedAt ||
+      currentShowData?.providerUpdatedAt ||
+      null,
     seasons: mergedSeasons,
   };
 };

@@ -307,6 +307,20 @@ const getShowSeasons = async ({ id }) => {
       episodeCount: Number.isFinite(response.data.number_of_episodes)
         ? response.data.number_of_episodes
         : null,
+      showStatus:
+        typeof response.data.status === 'string' ? response.data.status : '',
+      inProduction: response.data.in_production === true,
+      nextEpisodeAirDate:
+        response.data.next_episode_to_air &&
+        typeof response.data.next_episode_to_air.air_date === 'string'
+          ? response.data.next_episode_to_air.air_date
+          : null,
+      lastEpisodeAirDate:
+        response.data.last_episode_to_air &&
+        typeof response.data.last_episode_to_air.air_date === 'string'
+          ? response.data.last_episode_to_air.air_date
+          : null,
+      providerUpdatedAt: new Date().toISOString(),
       seasons: seasons
         .map(mapSeason)
         .filter(

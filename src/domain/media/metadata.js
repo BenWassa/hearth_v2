@@ -146,17 +146,30 @@ const ACTIVE_SHOW_STATUSES = new Set([
 ]);
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export const isActivelyAiringShow = (item = {}) => {
   if (item?.type !== 'show') return false;
-  const showStatus = String(item?.media?.showStatus || item?.showStatus || '')
+  const showStatus = String(
+    item?.showData?.showStatus ||
+      item?.media?.showStatus ||
+      item?.showStatus ||
+      '',
+  )
     .trim()
     .toLowerCase();
   if (ACTIVE_SHOW_STATUSES.has(showStatus)) return true;
-  if (item?.media?.inProduction === true || item?.inProduction === true)
+  if (
+    item?.showData?.inProduction === true ||
+    item?.media?.inProduction === true ||
+    item?.inProduction === true
+  )
     return true;
   const nextAirDate =
-    item?.media?.nextEpisodeAirDate ?? item?.nextEpisodeAirDate ?? null;
+    item?.showData?.nextEpisodeAirDate ??
+    item?.media?.nextEpisodeAirDate ??
+    item?.nextEpisodeAirDate ??
+    null;
   if (nextAirDate) {
     const airMs = Date.parse(String(nextAirDate));
     if (Number.isFinite(airMs) && airMs > Date.now() - THIRTY_DAYS_MS)
@@ -166,21 +179,22 @@ export const isActivelyAiringShow = (item = {}) => {
 };
 
 export const shouldRefreshAiringShowMetadata = (item = {}) => {
-  if (!isActivelyAiringShow(item)) return false;
+  if (item?.type !== 'show') return false;
   const provider = String(item?.source?.provider || '')
     .trim()
     .toLowerCase();
   const providerId = String(item?.source?.providerId || '').trim();
   if (provider !== 'tmdb' || !providerId) return false;
   const staleAfter = Number(item?.source?.staleAfter || 0);
-  // Items added via search or import never went through the refresh endpoint,
-  // so they carry no staleAfter. Previously these airing shows were never
-  // auto-refreshed and silently missed new episodes/seasons. Treat a missing
-  // staleAfter as "due now" so the first background pass pulls fresh data and
-  // stamps a real staleAfter for subsequent runs.
+  // Completeness and freshness are independent. A complete local episode set
+  // can become stale when a provider adds a season, including after a revival.
+  // Legacy/imported items without a deadline are deliberately due immediately.
   if (!staleAfter) return true;
   return Date.now() > staleAfter;
 };
+
+export const getShowMetadataRefreshTtlMs = (item = {}) =>
+  isActivelyAiringShow(item) ? ONE_DAY_MS : THIRTY_DAYS_MS;
 
 export const pickPrimaryPerson = (values) => {
   if (!Array.isArray(values)) return '';

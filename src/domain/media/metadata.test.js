@@ -2,6 +2,7 @@ import {
   buildMetadataAuditReport,
   getMetadataGaps,
   getPrimaryCredit,
+  getShowMetadataRefreshTtlMs,
   hasListValues,
   hasValue,
   hasShowEpisodeMetadataGaps,
@@ -520,7 +521,7 @@ describe('metadata helpers', () => {
     ).toBe(false);
   });
 
-  it('gates airing show refresh on staleAfter and TMDB source', () => {
+  it('refreshes every stale provider-backed show, including ended and legacy records', () => {
     const NOW = new Date('2026-04-24T12:00:00Z').getTime();
     const airingShow = {
       ...completeShow,
@@ -558,8 +559,15 @@ describe('metadata helpers', () => {
         ...airingShow,
         media: { ...airingShow.media, showStatus: 'Ended' },
       }),
-    ).toBe(false);
+    ).toBe(true);
 
     expect(shouldRefreshAiringShowMetadata(completeMovie)).toBe(false);
+    expect(getShowMetadataRefreshTtlMs(airingShow)).toBe(24 * 60 * 60 * 1000);
+    expect(
+      getShowMetadataRefreshTtlMs({
+        ...airingShow,
+        media: { ...airingShow.media, showStatus: 'Ended' },
+      }),
+    ).toBe(30 * 24 * 60 * 60 * 1000);
   });
 });

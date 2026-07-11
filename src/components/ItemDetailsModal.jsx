@@ -10,7 +10,7 @@ import { ENERGIES, VIBES } from '../config/constants.js';
 import { getBackdropSrc } from '../utils/poster.js';
 import { getMediaDetailsByTitle } from '../utils/media-details.js';
 import { getEpisodeSeasons } from '../utils/episode-map.js';
-import { hydrateShowData } from '../services/mediaApi/showData.js';
+import { refreshShowDataForMissingEpisodes } from '../services/mediaApi/showData.js';
 import {
   formatRuntime,
   formatFinishTime,
@@ -68,17 +68,40 @@ const normalizeHydratedShowData = (showData = {}) => {
         ? showData.seasonCount
         : seasons.length || null,
     episodeCount: showData?.episodeCount || null,
+    showStatus: showData?.showStatus || '',
+    inProduction: showData?.inProduction === true,
+    nextEpisodeAirDate: showData?.nextEpisodeAirDate || null,
+    lastEpisodeAirDate: showData?.lastEpisodeAirDate || null,
+    providerUpdatedAt: showData?.providerUpdatedAt || null,
     seasons,
   };
 };
 
-const fetchHydratedShowDataSingleFlight = async ({ provider, providerId }) => {
+const HYDRATED_SHOW_CACHE_TTL_MS = 15 * 60 * 1000;
+
+const fetchHydratedShowDataSingleFlight = async ({
+  provider,
+  providerId,
+  forceRefresh = false,
+  currentShowData = {},
+}) => {
   const key = `${provider}:${providerId}`;
-  if (hydratedShowCache.has(key)) return hydratedShowCache.get(key);
+  const cached = hydratedShowCache.get(key);
+  if (
+    !forceRefresh &&
+    cached &&
+    Date.now() - cached.cachedAt < HYDRATED_SHOW_CACHE_TTL_MS
+  ) {
+    return cached.data;
+  }
   if (!hydratedShowPromises.has(key)) {
-    const pending = hydrateShowData({ provider, providerId }).then((data) => {
+    const pending = refreshShowDataForMissingEpisodes({
+      provider,
+      providerId,
+      currentShowData,
+    }).then((data) => {
       const normalized = normalizeHydratedShowData(data);
-      hydratedShowCache.set(key, normalized);
+      hydratedShowCache.set(key, { data: normalized, cachedAt: Date.now() });
       return normalized;
     });
     hydratedShowPromises.set(
@@ -362,6 +385,9 @@ const ItemDetailsModal = ({
     seasons.length > 0
       ? seasons.length
       : item?.totalSeasons ?? item?.seasonCount ?? null;
+  const showMetadataIsStale =
+    !Number(item?.source?.staleAfter) ||
+    Date.now() > Number(item?.source?.staleAfter);
 
   useEffect(() => {
     let isActive = true;
@@ -371,7 +397,7 @@ const ItemDetailsModal = ({
       return undefined;
     }
 
-    if (hasInlineEpisodes) {
+    if (hasInlineEpisodes && !showMetadataIsStale) {
       setEpisodeMapSeasons(null);
       setEpisodeMapStatus('ready');
       return undefined;
@@ -404,6 +430,13 @@ const ItemDetailsModal = ({
           const hydrated = await fetchHydratedShowDataSingleFlight({
             provider: provider || 'tmdb',
             providerId,
+            forceRefresh: showMetadataIsStale,
+            currentShowData: {
+              ...(item?.showData || {}),
+              seasons: Array.isArray(item?.showData?.seasons)
+                ? item.showData.seasons
+                : item?.seasons || [],
+            },
           });
           if (!isActive) return;
           if (Array.isArray(hydrated?.seasons) && hydrated.seasons.length) {
@@ -421,6 +454,15 @@ const ItemDetailsModal = ({
                 totalSeasons: hydrated.seasonCount || null,
                 totalEpisodes: hydrated.episodeCount || null,
                 seasons: hydrated.seasons,
+                'source.fetchedAt': Date.now(),
+                'source.staleAfter':
+                  Date.now() +
+                  (hydrated.inProduction ||
+                  ['returning series', 'in production', 'pilot'].includes(
+                    String(hydrated.showStatus || '').toLowerCase(),
+                  )
+                    ? 24 * 60 * 60 * 1000
+                    : 30 * 24 * 60 * 60 * 1000),
               });
             }
             return;
@@ -466,6 +508,7 @@ const ItemDetailsModal = ({
     item?.media?.provider,
     item?.media?.providerId,
     hasInlineEpisodes,
+    showMetadataIsStale,
     item?.id,
     onUpdate,
     episodeFetchSeed,

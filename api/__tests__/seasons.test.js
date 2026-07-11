@@ -18,6 +18,9 @@ test('seasons endpoint returns normalized seasons list', async () => {
     ok: true,
     json: async () => ({
       number_of_seasons: 2,
+      status: 'Returning Series',
+      in_production: true,
+      next_episode_to_air: { air_date: '2026-07-17' },
       seasons: [
         {
           season_number: 1,
@@ -40,5 +43,8 @@ test('seasons endpoint returns normalized seasons list', async () => {
   assert.equal(res.output.statusCode, 200);
   assert.equal(res.output.body.ok, true);
   assert.equal(res.output.body.data.seasonCount, 2);
+  assert.equal(res.output.body.data.showStatus, 'Returning Series');
+  assert.equal(res.output.body.data.inProduction, true);
+  assert.equal(res.output.body.data.nextEpisodeAirDate, '2026-07-17');
   assert.equal(res.output.body.data.seasons[0].seasonNumber, 1);
 });

@@ -140,6 +140,9 @@ describe('refreshShowDataForMissingEpisodes', () => {
     getShowSeasons.mockResolvedValue({
       seasonCount: 3,
       episodeCount: 6,
+      showStatus: 'Returning Series',
+      inProduction: true,
+      nextEpisodeAirDate: '2026-07-17',
       seasons: [
         { seasonNumber: 1, name: 'Season 1', episodeCount: 2 },
         { seasonNumber: 2, name: 'Season 2', episodeCount: 2 },
@@ -213,6 +216,11 @@ describe('refreshShowDataForMissingEpisodes', () => {
     expect(data.seasons[0].episodes[0].name).toBe('Pilot');
     expect(data.seasons[1].episodes).toHaveLength(2);
     expect(data.seasons[2].episodes).toHaveLength(2);
+    expect(data).toMatchObject({
+      showStatus: 'Returning Series',
+      inProduction: true,
+      nextEpisodeAirDate: '2026-07-17',
+    });
   });
 
   it('preserves existing local season data when a targeted episode fetch fails', async () => {

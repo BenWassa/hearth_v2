@@ -10,6 +10,7 @@ import {
 import {
   buildMetadataAuditReport,
   getMetadataGaps,
+  getShowMetadataRefreshTtlMs,
   hasListValues,
   hasValue,
   shouldRefreshAiringShowMetadata,
@@ -66,7 +67,6 @@ const AUTO_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:auto-show-refresh:v3';
 const AUTO_AIRING_SHOW_REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour (staleAfter controls actual rate)
 const AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS = 8;
 const AUTO_AIRING_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:airing-show-refresh:v1';
-const STALE_24H_MS = 24 * 60 * 60 * 1000;
 const BACKGROUND_AUDIT_INTERVAL_MS = 12 * 60 * 60 * 1000; // twice a day
 const BACKGROUND_AUDIT_STORAGE_PREFIX = 'hearth:metadata-audit:v1';
 const ACCESS_BLOCKED_MESSAGE =
@@ -1950,7 +1950,8 @@ export const useAppState = () => {
               totalEpisodes: refreshedShowData.episodeCount || null,
               seasons: refreshedShowData.seasons,
               'source.fetchedAt': Date.now(),
-              'source.staleAfter': Date.now() + STALE_24H_MS,
+              'source.staleAfter':
+                Date.now() + getShowMetadataRefreshTtlMs(nextItem),
             };
             if (episodeSetChanged || item.status !== nextStatus) {
               updates.status = nextStatus;

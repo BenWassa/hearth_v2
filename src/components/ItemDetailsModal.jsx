@@ -944,18 +944,15 @@ const ItemDetailsModal = ({
   const finishContext = startedAtLabel
     ? `Started ${startedAtLabel}`
     : 'If started now';
-  const mobileBackdropStyle =
-    backdropSrc && !backdropMissing
-      ? {
-          backgroundImage: `linear-gradient(to top, rgba(12, 10, 9, 1), rgba(12, 10, 9, 0)), url(${backdropSrc})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'top',
-          backgroundRepeat: 'no-repeat',
-        }
-      : {
-          backgroundImage:
-            'linear-gradient(to top, rgba(12, 10, 9, 1), rgba(12, 10, 9, 0))',
-        };
+  // Blend only. This layer used to repaint the backdrop as a cover background
+  // on top of the <img> beneath it, which meant the visible art was a second,
+  // differently cropped copy. It only needs to fade the bottom edge into the
+  // content sheet, and the fade stops short of the halfway mark so the art
+  // stays readable instead of washing out from the middle down.
+  const mobileBackdropStyle = {
+    backgroundImage:
+      'linear-gradient(to top, rgba(12, 10, 9, 1) 0%, rgba(12, 10, 9, 0) 55%)',
+  };
 
   // Mobile-first design updates
   return (

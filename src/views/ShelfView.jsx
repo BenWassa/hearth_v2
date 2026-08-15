@@ -227,7 +227,7 @@ const ShelfView = ({
       {/* ── Sticky header block: tabs-as-title + filter bar ── */}
       <div className="sticky top-0 z-20">
         {/* Tabs row — doubles as the page header */}
-        <header className="px-4 sm:px-5 pt-4 bg-stone-950 border-b border-stone-800/60 flex items-end justify-between">
+        <header className="px-4 sm:px-5 pt-[calc(1rem+var(--safe-top))] bg-shell border-b border-stone-800/60 flex items-end justify-between">
           <div className="flex gap-6">
             <button
               onClick={() => setViewTab('library')}
@@ -572,7 +572,7 @@ const ShelfView = ({
             onClick={() => setIsBulkDeleteConfirmOpen(false)}
             aria-label="Close confirmation"
           />
-          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 pt-[max(1rem,var(--safe-top))] pb-[max(1rem,var(--safe-bottom))]">
             <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-red-800/60 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -618,10 +618,7 @@ const ShelfView = ({
       )}
 
       {viewTab === 'library' && selectionMode && (
-        <div
-          className="fixed left-1/2 -translate-x-1/2 bottom-[7.7rem] z-50 max-w-md w-[calc(100%-3rem)]"
-          style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-        >
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-[calc(7.7rem+var(--safe-bottom))] z-50 max-w-md w-[calc(100%-3rem)]">
           <div className="mx-auto w-fit bg-stone-900/75 backdrop-blur-xl border border-stone-700/60 rounded-2xl px-4 py-2.5 shadow-xl shadow-black/40">
             <div className="flex items-center gap-4">
               <button
@@ -657,12 +654,7 @@ const ShelfView = ({
       )}
 
       {/* Bottom Nav - Tonight, Add & Library */}
-      <nav
-        className="fixed left-1/2 -translate-x-1/2 bottom-6 z-40 max-w-md w-[calc(100%-3rem)]"
-        style={{
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
+      <nav className="fixed left-1/2 -translate-x-1/2 bottom-[calc(1.5rem+var(--safe-bottom))] z-40 max-w-md w-[calc(100%-3rem)]">
         <div className="bg-stone-900/40 backdrop-blur-2xl border border-stone-700/50 rounded-3xl shadow-2xl shadow-black/40 p-2">
           <div className="flex items-center justify-around gap-2">
             {/* Add Button */}

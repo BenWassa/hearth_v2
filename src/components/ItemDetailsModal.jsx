@@ -986,7 +986,7 @@ const ItemDetailsModal = ({
             ref={contentScrollRef}
             className="relative flex-1 overflow-y-auto no-scrollbar"
           >
-            <div className="p-5 sm:p-8 space-y-6">
+            <div className="p-5 sm:p-8 pb-[calc(1.25rem+var(--safe-bottom))] sm:pb-[calc(2rem+var(--safe-bottom))] space-y-6">
               {/* Header: Vibe/Energy & Close (Desktop) */}
               <ModalContentHeader
                 vibeDef={vibeDef}
@@ -1070,7 +1070,7 @@ const ItemDetailsModal = ({
 
       {pendingAddItem && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/65 px-4 pb-4 pt-16 backdrop-blur-sm sm:items-center sm:p-6"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/65 px-4 pb-[calc(1rem+var(--safe-bottom))] pt-[max(4rem,var(--safe-top))] backdrop-blur-sm sm:items-center sm:p-6"
           onClick={handleCancelAddPreferences}
         >
           <div

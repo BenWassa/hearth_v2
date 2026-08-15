@@ -284,7 +284,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
   return (
     <div className="flex-1 flex flex-col bg-stone-950 animate-in slide-in-from-bottom duration-300 w-full">
-      <div className="px-5 py-4 sm:px-6 flex items-center justify-between border-b border-stone-900/80 bg-stone-950/95">
+      <div className="px-5 pt-[calc(1rem+var(--safe-top))] pb-4 sm:px-6 flex items-center justify-between border-b border-stone-900/80 bg-stone-950/95">
         <button
           onClick={onBack}
           className="rounded-lg px-2 py-1.5 text-sm font-medium text-stone-400 transition-colors hover:bg-stone-900 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
@@ -576,7 +576,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
         </div>
       </div>
 
-      <div className="border-t border-stone-900/80 bg-stone-950/95 px-5 py-4 sm:px-6 backdrop-blur">
+      <div className="border-t border-stone-900/80 bg-stone-950/95 px-5 pt-4 pb-[calc(1rem+var(--safe-bottom))] sm:px-6 backdrop-blur">
         <Button
           onClick={handleSubmit}
           disabled={

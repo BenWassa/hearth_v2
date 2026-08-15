@@ -22,7 +22,7 @@ const SpaceSwitcherModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-stone-950 px-6 py-12">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-shell pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] pt-[max(3rem,var(--safe-top))] pb-[max(3rem,var(--safe-bottom))]">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-900/10 blur-[120px] rounded-full" />

@@ -396,7 +396,7 @@ Titles:
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">
+    <div className="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center pl-[calc(1rem+var(--safe-left))] pr-[calc(1rem+var(--safe-right))] sm:pl-[calc(1.5rem+var(--safe-left))] sm:pr-[calc(1.5rem+var(--safe-right))] pt-[max(1.5rem,var(--safe-top))] pb-[max(1.5rem,var(--safe-bottom))] sm:pt-[max(2rem,var(--safe-top))] sm:pb-[max(2rem,var(--safe-bottom))]">
       <div className="w-full sm:max-w-4xl bg-stone-950 border border-stone-800 rounded-none sm:rounded-2xl shadow-2xl flex flex-col h-full sm:h-auto sm:max-h-[92vh]">
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-5 border-b border-stone-900">
@@ -759,10 +759,7 @@ Titles:
         </div>
 
         {/* Footer */}
-        <div
-          className="mt-auto sticky bottom-0 z-40 px-6 py-5 border-t border-stone-900 space-y-3 bg-stone-950/50"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        >
+        <div className="mt-auto sticky bottom-0 z-40 px-6 pt-5 pb-[calc(1.25rem+var(--safe-bottom))] border-t border-stone-900 space-y-3 bg-stone-950/50">
           {actionError && (
             <div className="text-xs text-amber-500 bg-amber-900/10 border border-amber-900/30 rounded-lg px-3 py-2">
               ⚠️ {actionError}

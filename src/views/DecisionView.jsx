@@ -39,20 +39,11 @@ const DecisionView = ({
   })();
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-950 flex flex-col items-center justify-center p-6 sm:p-8 animate-in fade-in duration-300">
-      {/* Safe Area Inset Fill */}
-      <div
-        className="absolute inset-x-0 top-0 z-40 bg-stone-950 sm:hidden"
-        style={{ height: 'env(safe-area-inset-top)' }}
-      />
-
+    <div className="fixed inset-0 z-50 bg-shell flex flex-col items-center justify-center py-6 sm:py-8 pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] sm:pl-[calc(2rem+var(--safe-left))] sm:pr-[calc(2rem+var(--safe-right))] animate-in fade-in duration-300">
       {!isDeciding && (
         <button
           onClick={onClose}
-          className="absolute left-4 text-stone-400 hover:text-stone-200 transition-colors"
-          style={{
-            top: 'calc(max(1rem, env(safe-area-inset-top)) + env(safe-area-inset-top))',
-          }}
+          className="absolute left-[calc(1rem+var(--safe-left))] top-[max(1rem,calc(var(--safe-top)+0.5rem))] text-stone-400 hover:text-stone-200 transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>

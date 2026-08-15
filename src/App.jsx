@@ -100,7 +100,7 @@ export default function HearthApp() {
 
   if (!authResolved || isBootstrapping) {
     return (
-      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-shell flex items-center justify-center">
         <div className="animate-pulse text-amber-700">
           <Heart className="w-8 h-8 opacity-50" />
         </div>
@@ -110,7 +110,7 @@ export default function HearthApp() {
 
   if (loading && !items.length && view !== 'onboarding' && view !== 'tonight') {
     return (
-      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-shell flex items-center justify-center">
         <div className="animate-pulse text-amber-700">
           <Heart className="w-8 h-8 opacity-50" />
         </div>
@@ -119,10 +119,10 @@ export default function HearthApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-300 font-sans selection:bg-amber-900/50 selection:text-amber-200">
+    <div className="min-h-dvh bg-shell text-stone-300 font-sans selection:bg-amber-900/50 selection:text-amber-200 pl-safe-l pr-safe-r">
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(66,40,20,0.2),rgba(12,10,9,1))]"></div>
 
-      <div className="relative w-full lg:max-w-md lg:mx-auto min-h-screen flex flex-col">
+      <div className="relative w-full lg:max-w-md lg:mx-auto min-h-dvh flex flex-col">
         {errorMessage && (
           <div className="px-6 pt-4 text-xs text-stone-300">{errorMessage}</div>
         )}
@@ -272,6 +272,15 @@ export default function HearthApp() {
           isLoading={false}
         />
       )}
+
+      {/* Camera cutout / status bar strip. Sits above every view and modal
+          (highest z in the app is 80) so the inset always reads as solid
+          shell black, never a translucent header or a poster bleeding up.
+          Collapses to 0px on hardware without a cutout. */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-[100] h-safe-t bg-shell pointer-events-none"
+      />
     </div>
   );
 }

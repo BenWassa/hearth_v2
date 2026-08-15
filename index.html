@@ -6,8 +6,17 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
     />
-    <meta name="theme-color" content="#FDF6F0" />
+    <meta name="theme-color" content="#0c0a09" />
+    <meta name="color-scheme" content="dark" />
     <meta name="description" content="Hearth - A calm, shared watchlist" />
+    <!-- Painted before the stylesheet resolves so the notch and status bar
+         never flash white on first load. -->
+    <style>
+      html,
+      body {
+        background-color: #0c0a09;
+      }
+    </style>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"

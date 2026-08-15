@@ -36,19 +36,10 @@ const ModalHeader = ({
         )}
       </div>
 
-      {/* Safe Area Inset Fill */}
-      <div
-        className="absolute inset-x-0 top-0 z-40 bg-stone-950 sm:hidden"
-        style={{ height: 'env(safe-area-inset-top)' }}
-      />
-
       {/* Mobile Close Button (Floating) */}
       <button
         onClick={onClose}
-        className="absolute right-4 z-50 p-2 bg-black/50 backdrop-blur-md rounded-full text-white/90 sm:hidden active:scale-95 transition-transform"
-        style={{
-          top: 'calc(max(1rem, env(safe-area-inset-top)) + env(safe-area-inset-top))',
-        }}
+        className="absolute right-[calc(1rem+var(--safe-right))] top-[max(1rem,calc(var(--safe-top)+0.5rem))] z-50 p-2 bg-black/50 backdrop-blur-md rounded-full text-white/90 sm:hidden active:scale-95 transition-transform"
         aria-label="Close details"
       >
         <X className="w-5 h-5" />

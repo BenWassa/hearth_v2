@@ -95,14 +95,7 @@ const TonightHeaderMenu = ({
 
   return (
     <>
-      <div
-        className="fixed top-0 inset-x-0 z-40 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md bg-stone-950"
-        style={{ height: 'env(safe-area-inset-top)' }}
-      />
-      <header
-        className="fixed inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md px-3 sm:px-4 py-2.5 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/82 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]"
-        style={{ top: 'env(safe-area-inset-top)' }}
-      >
+      <header className="fixed top-safe-t inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md pl-[calc(0.75rem+var(--safe-left))] pr-[calc(0.75rem+var(--safe-right))] sm:pl-[calc(1rem+var(--safe-left))] sm:pr-[calc(1rem+var(--safe-right))] py-2.5 flex items-center justify-between z-40 border-b border-stone-800/70 bg-gradient-to-b from-stone-950/95 to-stone-950/82 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
         <div ref={utilityRef} className="relative z-10 w-11 flex justify-start">
           {showUtilityMenu ? (
             <>

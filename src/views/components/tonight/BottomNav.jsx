@@ -3,12 +3,7 @@ import { Library, Moon, Plus } from 'lucide-react';
 
 const BottomNav = ({ onAdd, goToShelf }) => {
   return (
-    <nav
-      className="fixed left-1/2 -translate-x-1/2 bottom-6 z-40 max-w-md w-[calc(100%-3rem)]"
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}
-    >
+    <nav className="fixed left-1/2 -translate-x-1/2 bottom-[calc(1.5rem+var(--safe-bottom))] z-40 max-w-md w-[calc(100%-3rem)]">
       <div className="bg-stone-900/40 backdrop-blur-2xl border border-stone-700/50 rounded-3xl shadow-2xl shadow-black/40 p-2">
         <div className="flex items-center justify-around gap-2">
           <button

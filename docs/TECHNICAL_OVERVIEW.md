@@ -86,6 +86,17 @@ Repair flow:
 5. Retry rate-limited and transient refresh failures with bounded backoff, then
    report transport failures separately from metadata the provider still lacks.
 
+Rate-limit safeguards:
+
+- Browser requests are paced at least 750 ms apart during a full refresh.
+- Known provider IDs are refreshed directly; alternate-title searches are only
+  attempted when provider identity had to be recovered.
+- TMDB 429 responses are retried server-side using `Retry-After` when available.
+- TV season requests run with concurrency 2, and a failed season aborts the
+  refresh instead of overwriting stored episode metadata with a partial result.
+- Manual and background audits emit a structured `[metadata-audit] Summary`
+  plus gap tables in the browser console.
+
 Repeatable full-library refresh:
 
 1. Run the app in a development context and open **Dev tools → Audit metadata**.

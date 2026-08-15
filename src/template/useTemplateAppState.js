@@ -6,8 +6,10 @@ import {
   TEMPLATE_SPACE_NAME,
 } from './seedLibrary.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
+import { createRequestPacer } from '../services/mediaApi/requestPacer.js';
 import { buildMetadataAuditReport as buildSharedMetadataAuditReport } from '../domain/media/metadata.js';
 import { initializeFirebase } from '../services/firebase/client.js';
+import { logMetadataAuditSummary } from '../app/metadataAuditConsole.js';
 import {
   signInAnonymousUser,
   signOutUser,
@@ -16,6 +18,7 @@ import {
 
 const TEMPLATE_SESSION_MESSAGE = 'Template mode: all changes reset on refresh.';
 const TEMPLATE_METADATA_OPTIONS = { includeLogoGap: true };
+const TEMPLATE_METADATA_REFRESH_MIN_INTERVAL_MS = 750;
 
 const asString = (value) => String(value || '').trim();
 
@@ -277,11 +280,14 @@ const hydrateTemplateItem = async (item, state = {}) => {
       return item;
     }
 
-    const details = await getMediaDetails({
-      provider,
-      providerId,
-      type: baseType,
-    });
+    const requestProvider = state.requestProvider || ((request) => request());
+    const details = await requestProvider(() =>
+      getMediaDetails({
+        provider,
+        providerId,
+        type: baseType,
+      }),
+    );
 
     const year = asString(details?.year || item?.year);
     const runtimeMinutes = toNumericOrNull(
@@ -563,6 +569,7 @@ export const useTemplateAppState = () => {
 
   const handleMetadataAudit = () => {
     const report = buildMetadataAuditReport(items);
+    logMetadataAuditSummary(report, { source: 'manual-template' });
     if (!report.totalItems) {
       notifyUpdate('Metadata audit: no titles to check.');
       return report;
@@ -588,7 +595,13 @@ export const useTemplateAppState = () => {
     }
 
     setIsMetadataRepairing(true);
-    const hydrationState = { rateLimited: false };
+    const refreshStartedAt = Date.now();
+    const hydrationState = {
+      rateLimited: false,
+      requestProvider: createRequestPacer({
+        minIntervalMs: TEMPLATE_METADATA_REFRESH_MIN_INTERVAL_MS,
+      }),
+    };
     let refreshedCount = 0;
     let failed = 0;
 
@@ -620,6 +633,15 @@ export const useTemplateAppState = () => {
     } finally {
       setIsMetadataRepairing(false);
     }
+
+    console.info('[metadata-refresh] Summary', {
+      source: 'template',
+      totalTitles: candidates.length,
+      refreshedTitles: refreshedCount,
+      failedTitles: failed,
+      durationMs: Date.now() - refreshStartedAt,
+      minimumRequestIntervalMs: TEMPLATE_METADATA_REFRESH_MIN_INTERVAL_MS,
+    });
 
     if (refreshedCount > 0) {
       notifyUpdate(

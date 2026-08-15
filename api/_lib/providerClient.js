@@ -5,6 +5,43 @@ const { mapEpisode } = require('./mappers/episodeMapper');
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const DEFAULT_TIMEOUT_MS = 7000;
+const DEFAULT_PROVIDER_MAX_RETRIES = 2;
+const DEFAULT_PROVIDER_RETRY_BASE_MS = 500;
+const MAX_PROVIDER_RETRY_DELAY_MS = 5000;
+
+const delay = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+const parseRetryAfterMs = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  const seconds = Number.parseFloat(raw);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const dateMs = Date.parse(raw);
+  return Number.isFinite(dateMs) ? Math.max(0, dateMs - Date.now()) : null;
+};
+
+const getProviderMaxRetries = () => {
+  const parsed = Number.parseInt(
+    process.env.MEDIA_PROVIDER_MAX_RETRIES || '',
+    10,
+  );
+  return Number.isFinite(parsed) && parsed >= 0
+    ? parsed
+    : DEFAULT_PROVIDER_MAX_RETRIES;
+};
+
+const getProviderRetryDelayMs = ({ attempt, retryAfterMs }) => {
+  if (Number.isFinite(retryAfterMs)) {
+    return Math.min(Math.max(0, retryAfterMs), MAX_PROVIDER_RETRY_DELAY_MS);
+  }
+  return Math.min(
+    DEFAULT_PROVIDER_RETRY_BASE_MS * 2 ** attempt,
+    MAX_PROVIDER_RETRY_DELAY_MS,
+  );
+};
 
 const getAuth = () => {
   const token =
@@ -87,6 +124,7 @@ const fetchJson = async (url, options = {}) => {
         ...mapStatusToError(response.status),
         upstreamStatus: response.status,
         upstreamBody: json,
+        retryAfterMs: parseRetryAfterMs(response.headers?.get?.('Retry-After')),
       };
     }
     return { ok: true, data: json };
@@ -137,7 +175,37 @@ const tmdbGet = async (path, params = {}) => {
       }
     : {};
 
-  return fetchJson(url.toString(), { headers });
+  const maxRetries = getProviderMaxRetries();
+  let attempt = 0;
+  let totalRetryDelayMs = 0;
+
+  while (attempt <= maxRetries) {
+    const response = await fetchJson(url.toString(), { headers });
+    if (response.ok) {
+      return {
+        ...response,
+        attempts: attempt + 1,
+        totalRetryDelayMs,
+      };
+    }
+
+    const canRetry = response.status === 429 && attempt < maxRetries;
+    if (!canRetry) {
+      return {
+        ...response,
+        attempts: attempt + 1,
+        totalRetryDelayMs,
+      };
+    }
+
+    const retryDelayMs = getProviderRetryDelayMs({
+      attempt,
+      retryAfterMs: response.retryAfterMs,
+    });
+    await delay(retryDelayMs);
+    totalRetryDelayMs += retryDelayMs;
+    attempt += 1;
+  }
 };
 
 const tryFetchDetails = async ({ id, type, locale = 'en-US' }) => {

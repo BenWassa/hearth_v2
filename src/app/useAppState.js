@@ -29,6 +29,7 @@ import {
   isShowFullyWatched,
 } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
+import { logMetadataAuditSummary } from './metadataAuditConsole.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
   isAnonymousAuthUser,
@@ -57,6 +58,7 @@ import {
   searchMedia,
 } from '../services/mediaApi/client.js';
 import { refreshShowDataForMissingEpisodes } from '../services/mediaApi/showData.js';
+import { createRequestPacer } from '../services/mediaApi/requestPacer.js';
 
 const appId = getAppId();
 const VIEW_STORAGE_KEY = 'hearth:last_view';
@@ -69,6 +71,7 @@ const AUTO_AIRING_SHOW_REFRESH_MAX_ITEMS = 8;
 const AUTO_AIRING_SHOW_REFRESH_STORAGE_PREFIX = 'hearth:airing-show-refresh:v1';
 const BACKGROUND_AUDIT_INTERVAL_MS = 12 * 60 * 60 * 1000; // twice a day
 const BACKGROUND_AUDIT_STORAGE_PREFIX = 'hearth:metadata-audit:v1';
+const MANUAL_METADATA_REFRESH_MIN_INTERVAL_MS = 750;
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
@@ -1478,6 +1481,7 @@ export const useAppState = () => {
 
   const handleMetadataAudit = () => {
     const report = buildMetadataAuditReport(items);
+    logMetadataAuditSummary(report, { source: 'manual' });
     if (!report.totalItems) {
       notifyUpdate('Metadata audit: no titles to check.');
       return report;
@@ -1508,6 +1512,10 @@ export const useAppState = () => {
     }
 
     setIsMetadataRepairing(true);
+    const refreshStartedAt = Date.now();
+    const requestProvider = createRequestPacer({
+      minIntervalMs: MANUAL_METADATA_REFRESH_MIN_INTERVAL_MS,
+    });
     let refreshedCount = 0;
     let failedCount = 0;
     const stillMissing = [];
@@ -1516,15 +1524,18 @@ export const useAppState = () => {
         try {
           let provider = String(item?.source?.provider || '').trim();
           let providerId = String(item?.source?.providerId || '').trim();
+          const hadProviderIdentity = Boolean(provider && providerId);
           const itemType = item?.type === 'show' ? 'show' : 'movie';
           let searchResults = null;
 
           if (!provider || !providerId) {
-            const searchData = await searchMedia({
-              q: item.title,
-              type: itemType,
-              page: 1,
-            });
+            const searchData = await requestProvider(() =>
+              searchMedia({
+                q: item.title,
+                type: itemType,
+                page: 1,
+              }),
+            );
             searchResults = Array.isArray(searchData?.results)
               ? searchData.results
               : [];
@@ -1543,11 +1554,13 @@ export const useAppState = () => {
             continue;
           }
 
-          const refreshed = await refreshMediaMetadata({
-            provider,
-            providerId,
-            type: item?.type || 'auto',
-          });
+          const refreshed = await requestProvider(() =>
+            refreshMediaMetadata({
+              provider,
+              providerId,
+              type: item?.type || 'auto',
+            }),
+          );
 
           const initialUpdates = buildUpdatesFromRefreshed(item, refreshed, {
             recomputeShowStatus: false,
@@ -1573,14 +1586,17 @@ export const useAppState = () => {
 
           if (
             countBlockingMetadataGaps(bestAttempt.remainingGaps) > 0 &&
-            item?.title
+            item?.title &&
+            !hadProviderIdentity
           ) {
             if (!searchResults) {
-              const searchData = await searchMedia({
-                q: item.title,
-                type: itemType,
-                page: 1,
-              });
+              const searchData = await requestProvider(() =>
+                searchMedia({
+                  q: item.title,
+                  type: itemType,
+                  page: 1,
+                }),
+              );
               searchResults = Array.isArray(searchData?.results)
                 ? searchData.results
                 : [];
@@ -1603,11 +1619,13 @@ export const useAppState = () => {
               }
 
               try {
-                const candidateRefreshed = await refreshMediaMetadata({
-                  provider: candidateProvider,
-                  providerId: candidateProviderId,
-                  type: item?.type || 'auto',
-                });
+                const candidateRefreshed = await requestProvider(() =>
+                  refreshMediaMetadata({
+                    provider: candidateProvider,
+                    providerId: candidateProviderId,
+                    type: item?.type || 'auto',
+                  }),
+                );
                 const candidateUpdates = buildUpdatesFromRefreshed(
                   item,
                   candidateRefreshed,
@@ -1681,6 +1699,15 @@ export const useAppState = () => {
     } finally {
       setIsMetadataRepairing(false);
     }
+
+    console.info('[metadata-refresh] Summary', {
+      totalTitles: candidates.length,
+      refreshedTitles: refreshedCount,
+      failedTitles: failedCount,
+      titlesWithProviderGaps: stillMissing.length,
+      durationMs: Date.now() - refreshStartedAt,
+      minimumRequestIntervalMs: MANUAL_METADATA_REFRESH_MIN_INTERVAL_MS,
+    });
 
     if (refreshedCount > 0) {
       notifyUpdate(
@@ -2020,6 +2047,7 @@ export const useAppState = () => {
     try {
       const report = buildMetadataAuditReport(items);
       setBackgroundAuditReport(report);
+      logMetadataAuditSummary(report, { source: 'background' });
       localStorage.setItem(
         storageKey,
         JSON.stringify({ lastRunAt: Date.now() }),

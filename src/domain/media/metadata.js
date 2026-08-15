@@ -6,6 +6,8 @@ export const METADATA_GAP_KEYS = Object.freeze([
   'runtimeMinutes',
   'year',
   'overview',
+  'showDescription',
+  'episodeDescriptions',
   'genres',
   'actors',
   'director',
@@ -38,8 +40,21 @@ const toPositiveInteger = (value) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 };
 
+const toNonNegativeInteger = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+    return value;
+  }
+  const parsed = Number.parseInt(String(value ?? '').trim(), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+};
+
 const getSeasonNumber = (season = {}) =>
   toPositiveInteger(
+    season?.seasonNumber ?? season?.number ?? season?.season_number,
+  );
+
+const getDescriptionSeasonNumber = (season = {}) =>
+  toNonNegativeInteger(
     season?.seasonNumber ?? season?.number ?? season?.season_number,
   );
 
@@ -85,6 +100,11 @@ const getEpisodeAirMs = (episode = {}) => {
   return Number.isFinite(ms) ? ms : null;
 };
 
+const isEpisodeAiredOrUndated = (episode = {}) => {
+  const airMs = getEpisodeAirMs(episode);
+  return airMs === null || airMs <= Date.now();
+};
+
 const needsAiredDescriptionBackfill = (episode = {}) => {
   const airMs = getEpisodeAirMs(episode);
   if (airMs === null) return false;
@@ -121,6 +141,29 @@ export const getShowSeasonsForMetadata = (item = {}) => {
   if (Array.isArray(item?.showData?.seasons)) return item.showData.seasons;
   if (Array.isArray(item?.seasons)) return item.seasons;
   return [];
+};
+
+export const getMissingEpisodeDescriptions = (item = {}) => {
+  if (item?.type !== 'show') return [];
+
+  return getShowSeasonsForMetadata(item).flatMap((season) => {
+    const seasonNumber = getDescriptionSeasonNumber(season);
+    if (seasonNumber === null) return [];
+
+    const episodes = Array.isArray(season?.episodes) ? season.episodes : [];
+    return episodes
+      .filter(
+        (episode) =>
+          isEpisodeAiredOrUndated(episode) &&
+          !hasMeaningfulEpisodeDescription(episode),
+      )
+      .map((episode) => ({
+        seasonNumber,
+        episodeNumber: getEpisodeNumber(episode),
+        title: getEpisodeTitle(episode),
+        airDate: String(episode?.airDate ?? episode?.air_date ?? '').trim(),
+      }));
+  });
 };
 
 export const hasShowEpisodeMetadataGaps = (item = {}) => {
@@ -265,7 +308,7 @@ export const getMetadataGaps = (item = {}, { includeLogoGap = false } = {}) => {
     gaps.push('runtimeMinutes');
   }
   if (!year) gaps.push('year');
-  if (!overview) gaps.push('overview');
+  if (!overview) gaps.push(isShow ? 'showDescription' : 'overview');
   if (!genres.length) gaps.push('genres');
   if (!actors.length) gaps.push('actors');
   if (!director) gaps.push('director');
@@ -273,6 +316,9 @@ export const getMetadataGaps = (item = {}, { includeLogoGap = false } = {}) => {
     if (!Number.isFinite(seasonCount) || seasonCount < 1)
       gaps.push('seasonCount');
     if (!seasons.length) gaps.push('seasons');
+    if (getMissingEpisodeDescriptions(item).length) {
+      gaps.push('episodeDescriptions');
+    }
   }
 
   return gaps;
@@ -284,11 +330,15 @@ export const buildMetadataAuditReport = (
 ) => {
   const rows = items.map((item) => {
     const gaps = getMetadataGaps(item, { includeLogoGap });
+    const missingEpisodeDescriptions = getMissingEpisodeDescriptions(item);
     return {
       id: item.id,
       title: item.title || '[untitled]',
       type: item.type || 'unknown',
       gaps,
+      ...(missingEpisodeDescriptions.length
+        ? { missingEpisodeDescriptions }
+        : {}),
     };
   });
 
@@ -315,6 +365,10 @@ export const buildMetadataAuditReport = (
     completeItems: rows.length - itemsWithGaps.length,
     itemsWithGaps: itemsWithGaps.length,
     gapCounts,
+    missingEpisodeDescriptions: rows.reduce(
+      (total, row) => total + (row.missingEpisodeDescriptions?.length || 0),
+      0,
+    ),
     byType: {
       movie: {
         total: movieRows.length,

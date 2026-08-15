@@ -1,5 +1,6 @@
 import {
   buildMetadataAuditReport,
+  getMissingEpisodeDescriptions,
   getMetadataGaps,
   getPrimaryCredit,
   getShowMetadataRefreshTtlMs,
@@ -127,6 +128,85 @@ describe('metadata helpers', () => {
         showData: { seasonCount: 0, seasons: [] },
       }),
     ).toEqual(['director', 'seasonCount', 'seasons']);
+  });
+
+  it('audits missing show and aired episode descriptions', () => {
+    const show = {
+      ...completeShow,
+      media: { ...completeShow.media, overview: '' },
+      showData: {
+        seasonCount: 1,
+        seasons: [
+          {
+            seasonNumber: 0,
+            episodeCount: 1,
+            episodes: [
+              {
+                episodeNumber: 1,
+                name: 'Special',
+              },
+            ],
+          },
+          {
+            seasonNumber: 1,
+            episodeCount: 4,
+            episodes: [
+              {
+                episodeNumber: 1,
+                name: 'Old episode',
+                airDate: '2020-01-01',
+                still: '/old.jpg',
+              },
+              {
+                episodeNumber: 2,
+                name: 'Placeholder',
+                airDate: '2026-04-20',
+                description: 'No description yet.',
+              },
+              {
+                episodeNumber: 3,
+                name: 'Upcoming',
+                airDate: '2026-12-01',
+              },
+              {
+                episodeNumber: 4,
+                name: 'Described',
+                overview: 'A real summary.',
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    expect(getMissingEpisodeDescriptions(show)).toEqual([
+      {
+        seasonNumber: 0,
+        episodeNumber: 1,
+        title: 'Special',
+        airDate: '',
+      },
+      {
+        seasonNumber: 1,
+        episodeNumber: 1,
+        title: 'Old episode',
+        airDate: '2020-01-01',
+      },
+      {
+        seasonNumber: 1,
+        episodeNumber: 2,
+        title: 'Placeholder',
+        airDate: '2026-04-20',
+      },
+    ]);
+    expect(getMetadataGaps(show)).toContain('showDescription');
+    expect(getMetadataGaps(show)).toContain('episodeDescriptions');
+
+    const report = buildMetadataAuditReport([show]);
+    expect(report.gapCounts.showDescription).toBe(1);
+    expect(report.gapCounts.episodeDescriptions).toBe(1);
+    expect(report.missingEpisodeDescriptions).toBe(3);
+    expect(report.missingRows[0].missingEpisodeDescriptions).toHaveLength(3);
   });
 
   it('detects targeted TV episode metadata gaps', () => {

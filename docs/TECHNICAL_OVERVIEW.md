@@ -72,6 +72,8 @@ Audit (`useAppState` + `MetadataAuditModal`) reports gaps for:
 - backdrop
 - logo
 - runtime/year/genres/actors/director
+- movie and show descriptions
+- descriptions for aired or undated episodes (future episodes are excluded)
 - show season metadata
 
 Repair flow:

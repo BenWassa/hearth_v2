@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 import { BarChart3, Wrench, X } from 'lucide-react';
 
+const GAP_LABELS = {
+  overview: 'movie description',
+  showDescription: 'show description',
+  episodeDescriptions: 'episode descriptions',
+};
+
 const MetadataAuditModal = ({
   isOpen,
   onClose,
@@ -98,7 +104,17 @@ const MetadataAuditModal = ({
                 <div>Logo: {auditReport.gapCounts.logo || 0}</div>
                 <div>Runtime: {auditReport.gapCounts.runtimeMinutes || 0}</div>
                 <div>Year: {auditReport.gapCounts.year || 0}</div>
-                <div>Overview: {auditReport.gapCounts.overview || 0}</div>
+                <div>
+                  Movie descriptions: {auditReport.gapCounts.overview || 0}
+                </div>
+                <div>
+                  Show descriptions:{' '}
+                  {auditReport.gapCounts.showDescription || 0}
+                </div>
+                <div>
+                  Episode descriptions:{' '}
+                  {auditReport.missingEpisodeDescriptions || 0}
+                </div>
                 <div>Genres: {auditReport.gapCounts.genres || 0}</div>
                 <div>Actors: {auditReport.gapCounts.actors || 0}</div>
                 <div>Director: {auditReport.gapCounts.director || 0}</div>
@@ -130,8 +146,33 @@ const MetadataAuditModal = ({
                           {row.type}
                         </div>
                         <div className="text-xs text-amber-300 mt-1">
-                          Missing: {row.gaps.join(', ')}
+                          Missing:{' '}
+                          {row.gaps
+                            .map((gap) => GAP_LABELS[gap] || gap)
+                            .join(', ')}
                         </div>
+                        {row.missingEpisodeDescriptions?.length > 0 && (
+                          <div className="mt-1 text-xs text-stone-400">
+                            {row.missingEpisodeDescriptions
+                              .slice(0, 5)
+                              .map((episode) => {
+                                const episodeLabel = episode.episodeNumber
+                                  ? `E${episode.episodeNumber}`
+                                  : ' episode';
+                                return `S${
+                                  episode.seasonNumber
+                                }${episodeLabel}${
+                                  episode.title ? ` ${episode.title}` : ''
+                                }`;
+                              })
+                              .join(', ')}
+                            {row.missingEpisodeDescriptions.length > 5
+                              ? ` +${
+                                  row.missingEpisodeDescriptions.length - 5
+                                } more`
+                              : ''}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

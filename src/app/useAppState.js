@@ -157,7 +157,7 @@ const scoreSearchResult = ({ result, title, type, year }) => {
 };
 
 const MIN_AUTO_MATCH_SCORE = 50;
-const NON_BLOCKING_METADATA_GAPS = new Set(['logo']);
+const NON_BLOCKING_METADATA_GAPS = new Set(['logo', 'episodeDescriptions']);
 const MAX_REPAIR_SEARCH_CANDIDATES = 5;
 
 const pickBestSearchResult = ({ results, title, type, year }) => {

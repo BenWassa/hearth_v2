@@ -6,10 +6,7 @@ import {
   TEMPLATE_SPACE_NAME,
 } from './seedLibrary.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
-import {
-  buildMetadataAuditReport as buildSharedMetadataAuditReport,
-  getMetadataGaps as getSharedMetadataGaps,
-} from '../domain/media/metadata.js';
+import { buildMetadataAuditReport as buildSharedMetadataAuditReport } from '../domain/media/metadata.js';
 import { initializeFirebase } from '../services/firebase/client.js';
 import {
   signInAnonymousUser,
@@ -68,9 +65,6 @@ const isRateLimitedError = (error) => {
     message.includes('too many requests')
   );
 };
-
-const getMetadataGaps = (item = {}) =>
-  getSharedMetadataGaps(item, TEMPLATE_METADATA_OPTIONS);
 
 const buildMetadataAuditReport = (items = []) =>
   buildSharedMetadataAuditReport(items, TEMPLATE_METADATA_OPTIONS);
@@ -585,28 +579,26 @@ export const useTemplateAppState = () => {
     return report;
   };
 
-  const handleMetadataRepairMissing = async () => {
+  const handleMetadataRefreshAll = async () => {
     if (isMetadataRepairing) return;
-    const candidates = items.filter((item) => getMetadataGaps(item).length > 0);
+    const candidates = items;
     if (!candidates.length) {
-      notifyUpdate('No missing metadata found to repair.');
+      notifyUpdate('No titles found to refresh.');
       return;
     }
 
     setIsMetadataRepairing(true);
     const hydrationState = { rateLimited: false };
-    let repaired = 0;
+    let refreshedCount = 0;
     let failed = 0;
 
     try {
       const updatesById = new Map();
       for (const item of candidates) {
-        const beforeGaps = getMetadataGaps(item).length;
         const next = await hydrateTemplateItem(item, hydrationState);
-        const afterGaps = getMetadataGaps(next).length;
-        if (afterGaps < beforeGaps) {
+        if (next !== item) {
           updatesById.set(item.id, next);
-          repaired += 1;
+          refreshedCount += 1;
         } else {
           failed += 1;
         }
@@ -629,11 +621,13 @@ export const useTemplateAppState = () => {
       setIsMetadataRepairing(false);
     }
 
-    if (repaired > 0) {
-      notifyUpdate(`Metadata repair completed for ${repaired} title(s).`);
+    if (refreshedCount > 0) {
+      notifyUpdate(
+        `Metadata refresh completed for ${refreshedCount} title(s).`,
+      );
     }
     if (failed > 0) {
-      notifyError(`${failed} title(s) still missing metadata after repair.`);
+      notifyError(`${failed} title(s) could not be refreshed.`);
     }
   };
 
@@ -771,7 +765,7 @@ export const useTemplateAppState = () => {
     handleImportItems,
     handleMarkWatched,
     handleMetadataAudit,
-    handleMetadataRepairMissing,
+    handleMetadataRefreshAll,
     handleRefreshMetadata: async () => {},
     handleReloadNow,
     handleLoadUserSpaces: async () => {},

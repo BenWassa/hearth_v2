@@ -1494,22 +1494,22 @@ export const useAppState = () => {
     return report;
   };
 
-  const handleMetadataRepairMissing = async () => {
+  const handleMetadataRefreshAll = async () => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
       return;
     }
     if (isMetadataRepairing) return;
 
-    const candidates = items.filter((item) => getMetadataGaps(item).length > 0);
+    const candidates = items;
     if (!candidates.length) {
-      notifyUpdate('No missing metadata found to repair.');
+      notifyUpdate('No titles found to refresh.');
       return;
     }
 
     setIsMetadataRepairing(true);
-    let repaired = 0;
-    let failed = 0;
+    let refreshedCount = 0;
+    let failedCount = 0;
     const stillMissing = [];
     try {
       for (const item of candidates) {
@@ -1539,7 +1539,7 @@ export const useAppState = () => {
           }
 
           if (!provider || !providerId) {
-            failed += 1;
+            failedCount += 1;
             continue;
           }
 
@@ -1660,11 +1660,9 @@ export const useAppState = () => {
             itemId: item.id,
             updates: bestAttempt.updates,
           });
+          refreshedCount += 1;
 
-          if (countBlockingMetadataGaps(bestAttempt.remainingGaps) === 0) {
-            repaired += 1;
-          } else {
-            failed += 1;
+          if (countBlockingMetadataGaps(bestAttempt.remainingGaps) > 0) {
             stillMissing.push({
               title: item?.title || '[untitled]',
               gaps: bestAttempt.remainingGaps,
@@ -1677,26 +1675,33 @@ export const useAppState = () => {
           }
         } catch (error) {
           console.warn('Metadata repair failed for item:', item?.title, error);
-          failed += 1;
+          failedCount += 1;
         }
       }
     } finally {
       setIsMetadataRepairing(false);
     }
 
-    if (repaired > 0) {
-      notifyUpdate(`Metadata repair completed for ${repaired} title(s).`);
+    if (refreshedCount > 0) {
+      notifyUpdate(
+        `Metadata refresh completed for ${refreshedCount} title(s).`,
+      );
     }
-    if (failed > 0) {
+    if (stillMissing.length > 0) {
       const detail = stillMissing
         .slice(0, 3)
         .map((entry) => `${entry.title} (${entry.gaps.join(', ')})`)
         .join('; ');
       notifyError(
-        `${failed} title(s) still missing metadata after repair.${
+        `${
+          stillMissing.length
+        } refreshed title(s) still have provider metadata gaps.${
           detail ? ` ${detail}` : ''
         }`,
       );
+    }
+    if (failedCount > 0) {
+      notifyError(`${failedCount} title(s) could not be refreshed.`);
     }
   };
 
@@ -2141,7 +2146,7 @@ export const useAppState = () => {
     handleImportItems,
     handleMarkWatched,
     handleMetadataAudit,
-    handleMetadataRepairMissing,
+    handleMetadataRefreshAll,
     backgroundAuditReport,
     handleRefreshMetadata,
     handleReloadNow,

@@ -6,7 +6,7 @@ const MetadataAuditModal = ({
   onClose,
   isAuditLoading,
   auditReport,
-  onMetadataRepairMissing,
+  onMetadataRefreshAll,
   isMetadataRepairing = false,
 }) => {
   useEffect(() => {
@@ -141,14 +141,14 @@ const MetadataAuditModal = ({
               <div className="flex justify-end pt-2 border-t border-stone-800">
                 <button
                   type="button"
-                  onClick={() => onMetadataRepairMissing?.()}
+                  onClick={() => onMetadataRefreshAll?.()}
                   disabled={isMetadataRepairing || isAuditLoading}
                   className="inline-flex items-center gap-2 rounded-lg border border-amber-700/60 bg-amber-950/30 px-3 py-2 text-sm text-amber-300 transition-colors hover:bg-amber-950/50 hover:text-amber-200 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Wrench className="w-4 h-4 shrink-0" />
                   {isMetadataRepairing
-                    ? 'Repairing...'
-                    : 'Repair missing metadata'}
+                    ? 'Refreshing...'
+                    : 'Refresh all metadata'}
                 </button>
               </div>
             </>

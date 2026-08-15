@@ -76,10 +76,22 @@ Audit (`useAppState` + `MetadataAuditModal`) reports gaps for:
 
 Repair flow:
 
-1. Determine candidates from audit gaps.
-2. Resolve provider identity if missing via search.
-3. Refresh metadata from `/api/media/refresh`.
+1. Select every title in the library, not only titles with known audit gaps.
+2. Resolve provider identity via search when it is missing.
+3. Refresh each title from `/api/media/refresh`, including titles that
+   currently pass the gap audit, so newly available provider metadata is captured.
 4. Persist normalized updates without mutating user episode progress intent.
+5. Retry rate-limited and transient refresh failures with bounded backoff, then
+   report transport failures separately from metadata the provider still lacks.
+
+Repeatable full-library refresh:
+
+1. Run the app in a development context and open **Dev tools → Audit metadata**.
+2. Select **Refresh all metadata**. The operation is safe to repeat: it refreshes
+   provider-owned catalog fields while preserving status, notes, vibe, energy,
+   and episode progress.
+3. Reopen the audit after completion to review any fields TMDB still does not
+   provide. Transport failures can be retried by running the action again.
 
 ## 8. Logo/Clearlogo Pipeline
 

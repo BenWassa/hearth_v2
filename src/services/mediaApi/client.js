@@ -16,7 +16,7 @@ const buildInvalidJsonError = ({ url, contentType, raw }) => {
   );
 };
 
-const MAX_GET_RETRIES = 2;
+const MAX_REQUEST_RETRIES = 2;
 const BACKOFF_BASE_MS = 350;
 const MAX_BACKOFF_MS = 5000;
 
@@ -103,7 +103,7 @@ const toError = async (response, url) => {
 const getJson = async (url) => {
   let attempt = 0;
   let totalRetryDelayMs = 0;
-  while (attempt <= MAX_GET_RETRIES) {
+  while (attempt <= MAX_REQUEST_RETRIES) {
     const response = await fetch(url);
 
     if (response.ok) {
@@ -122,7 +122,7 @@ const getJson = async (url) => {
       return payload.data;
     }
 
-    const canRetry = response.status === 429 && attempt < MAX_GET_RETRIES;
+    const canRetry = response.status === 429 && attempt < MAX_REQUEST_RETRIES;
     if (!canRetry) {
       throw withRequestMeta(await toError(response, url), {
         attempts: attempt + 1,
@@ -197,22 +197,57 @@ export const refreshMediaMetadata = async ({
   type,
   locale = 'en-US',
 }) => {
-  const response = await fetch('/api/media/refresh', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      provider,
-      providerId,
-      type,
-      locale,
-    }),
-  });
-  if (!response.ok) throw await toError(response, '/api/media/refresh');
-  const payload = await parseJsonResponse(response, '/api/media/refresh');
-  if (!payload?.ok) {
-    throw new Error(payload?.error?.message || 'Refresh failed');
+  const url = '/api/media/refresh';
+  let attempt = 0;
+  let totalRetryDelayMs = 0;
+
+  while (attempt <= MAX_REQUEST_RETRIES) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        provider,
+        providerId,
+        type,
+        locale,
+      }),
+    });
+
+    if (response.ok) {
+      const payload = await parseJsonResponse(response, url);
+      if (!payload?.ok) {
+        throw withRequestMeta(
+          new Error(payload?.error?.message || 'Refresh failed'),
+          {
+            attempts: attempt + 1,
+            totalRetryDelayMs,
+            status: response.status,
+            url,
+          },
+        );
+      }
+      return payload.data;
+    }
+
+    const isTransient = response.status === 429 || response.status >= 500;
+    const canRetry = isTransient && attempt < MAX_REQUEST_RETRIES;
+    if (!canRetry) {
+      throw withRequestMeta(await toError(response, url), {
+        attempts: attempt + 1,
+        totalRetryDelayMs,
+        status: response.status,
+        url,
+      });
+    }
+
+    const retryDelayMs = getRetryDelayMs({
+      attempt,
+      retryAfterHeader: response.headers.get('Retry-After'),
+    });
+    await delay(retryDelayMs);
+    totalRetryDelayMs += retryDelayMs;
+    attempt += 1;
   }
-  return payload.data;
 };

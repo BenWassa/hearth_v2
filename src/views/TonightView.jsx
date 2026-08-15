@@ -109,7 +109,7 @@ const TonightView = ({
   onAddItem,
   showDevMetadataTools = false,
   onMetadataAudit,
-  onMetadataRepairMissing,
+  onMetadataRefreshAll,
   backgroundAuditReport = null,
   isMetadataRepairing = false,
   goToShelf,
@@ -604,7 +604,7 @@ const TonightView = ({
         onClose={() => setIsAuditModalOpen(false)}
         isAuditLoading={isAuditLoading}
         auditReport={openAuditModalReport}
-        onMetadataRepairMissing={onMetadataRepairMissing}
+        onMetadataRefreshAll={onMetadataRefreshAll}
         isMetadataRepairing={isMetadataRepairing}
       />
 

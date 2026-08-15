@@ -32,7 +32,7 @@ export default function HearthApp() {
     handleLoadUserSpaces,
     handleMarkWatched,
     handleMetadataAudit,
-    handleMetadataRepairMissing,
+    handleMetadataRefreshAll,
     backgroundAuditReport,
     handleReloadNow,
     handleSignIn,
@@ -197,7 +197,7 @@ export default function HearthApp() {
             onAddItem={handleAddItem}
             showDevMetadataTools={showDevMetadataTools}
             onMetadataAudit={handleMetadataAudit}
-            onMetadataRepairMissing={handleMetadataRepairMissing}
+            onMetadataRefreshAll={handleMetadataRefreshAll}
             backgroundAuditReport={backgroundAuditReport}
             isMetadataRepairing={isMetadataRepairing}
             goToShelf={() => setView('shelf')}

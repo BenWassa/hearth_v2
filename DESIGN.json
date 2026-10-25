@@ -1,0 +1,414 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-25T17:49:40.520Z",
+  "title": "Design System: Hearth",
+  "extensions": {
+    "colorMeta": {
+      "ember-amber": {
+        "role": "primary",
+        "displayName": "Ember Amber",
+        "canonical": "#d97706",
+        "tonalRamp": [
+          "oklch(15% 0.056 70)",
+          "oklch(25% 0.080 70)",
+          "oklch(35% 0.104 70)",
+          "oklch(50% 0.140 70)",
+          "oklch(62% 0.111 70)",
+          "oklch(74% 0.082 70)",
+          "oklch(85% 0.056 70)",
+          "oklch(95% 0.032 70)"
+        ]
+      },
+      "ember-amber-bright": {
+        "role": "primary",
+        "displayName": "Bright Ember",
+        "canonical": "#f59e0b",
+        "tonalRamp": [
+          "oklch(15% 0.056 75)",
+          "oklch(25% 0.080 75)",
+          "oklch(35% 0.104 75)",
+          "oklch(50% 0.140 75)",
+          "oklch(62% 0.111 75)",
+          "oklch(74% 0.082 75)",
+          "oklch(85% 0.056 75)",
+          "oklch(95% 0.032 75)"
+        ]
+      },
+      "glow-amber": {
+        "role": "primary",
+        "displayName": "Glow Amber",
+        "canonical": "#fbbf24",
+        "tonalRamp": [
+          "oklch(15% 0.056 80)",
+          "oklch(25% 0.080 80)",
+          "oklch(35% 0.104 80)",
+          "oklch(50% 0.140 80)",
+          "oklch(62% 0.111 80)",
+          "oklch(74% 0.082 80)",
+          "oklch(85% 0.056 80)",
+          "oklch(95% 0.032 80)"
+        ]
+      },
+      "hearth-ash": {
+        "role": "primary",
+        "displayName": "Hearth Ash",
+        "canonical": "#fde68a",
+        "tonalRamp": [
+          "oklch(15% 0.056 95)",
+          "oklch(25% 0.080 95)",
+          "oklch(35% 0.104 95)",
+          "oklch(50% 0.140 95)",
+          "oklch(62% 0.111 95)",
+          "oklch(74% 0.082 95)",
+          "oklch(85% 0.056 95)",
+          "oklch(95% 0.032 95)"
+        ]
+      },
+      "shell-black": {
+        "role": "neutral",
+        "displayName": "Shell Black",
+        "canonical": "#0c0a09",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "soot": {
+        "role": "neutral",
+        "displayName": "Soot",
+        "canonical": "#1c1917",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "canonical": "#292524",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "cinder": {
+        "role": "neutral",
+        "displayName": "Cinder",
+        "canonical": "#44403c",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "ash-grey": {
+        "role": "neutral",
+        "displayName": "Ash Grey",
+        "canonical": "#78716c",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "smoke": {
+        "role": "neutral",
+        "displayName": "Smoke",
+        "canonical": "#a8a29e",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "parchment": {
+        "role": "neutral",
+        "displayName": "Parchment",
+        "canonical": "#d6d3d1",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "bone": {
+        "role": "neutral",
+        "displayName": "Bone",
+        "canonical": "#f5f5f4",
+        "tonalRamp": [
+          "oklch(15% 0.008 50)",
+          "oklch(25% 0.008 50)",
+          "oklch(35% 0.008 50)",
+          "oklch(50% 0.008 50)",
+          "oklch(62% 0.008 50)",
+          "oklch(74% 0.008 50)",
+          "oklch(85% 0.008 50)",
+          "oklch(95% 0.008 50)"
+        ]
+      },
+      "energy-light": {
+        "role": "secondary",
+        "displayName": "Light Sky",
+        "canonical": "#38bdf8",
+        "tonalRamp": [
+          "oklch(15% 0.056 230)",
+          "oklch(25% 0.080 230)",
+          "oklch(35% 0.104 230)",
+          "oklch(50% 0.140 230)",
+          "oklch(62% 0.111 230)",
+          "oklch(74% 0.082 230)",
+          "oklch(85% 0.056 230)",
+          "oklch(95% 0.032 230)"
+        ]
+      },
+      "energy-focused": {
+        "role": "secondary",
+        "displayName": "Focused Red",
+        "canonical": "#f87171",
+        "tonalRamp": [
+          "oklch(15% 0.056 25)",
+          "oklch(25% 0.080 25)",
+          "oklch(35% 0.104 25)",
+          "oklch(50% 0.140 25)",
+          "oklch(62% 0.111 25)",
+          "oklch(74% 0.082 25)",
+          "oklch(85% 0.056 25)",
+          "oklch(95% 0.032 25)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Title block of a details modal over its backdrop."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Collection and modal headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, list rows and the search input."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions and supporting copy, 65ch to 75ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase tracked metadata and section eyebrows."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lamp-glow",
+        "value": "0 10px 15px -3px rgba(120,53,15,0.2)",
+        "purpose": "Warm lift under the primary button."
+      },
+      {
+        "name": "card-lift",
+        "value": "0 10px 15px -3px rgba(0,0,0,0.3)",
+        "purpose": "Poster cards and rails."
+      },
+      {
+        "name": "modal-depth",
+        "value": "0 25px 50px -12px rgba(0,0,0,0.4)",
+        "purpose": "Details modals, the dock and the space switcher."
+      },
+      {
+        "name": "title-scrim",
+        "value": "drop-shadow(0 2px 10px rgba(0,0,0,0.6))",
+        "purpose": "Serif titles set directly over backdrop art."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-enter",
+        "value": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "purpose": "Card entrance, 420ms, 8px rise and fade."
+      },
+      {
+        "name": "ease-state",
+        "value": "cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Color, opacity and transform transitions at 200ms to 300ms."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.95)",
+        "purpose": "Active press feedback on buttons and dock items."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single main action on a surface.",
+      "html": "<button class=\"ds-btn-primary\">Pick for tonight</button>",
+      "css": ".ds-btn-primary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:#d97706;color:#1c1917;border:none;box-shadow:0 10px 15px -3px rgba(120,53,15,0.2)}.ds-btn-primary:hover{background:#f59e0b}.ds-btn-primary:active{transform:scale(.95)}.ds-btn-primary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Supporting actions beside the primary.",
+      "html": "<button class=\"ds-btn-secondary\">Not tonight</button>",
+      "css": ".ds-btn-secondary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:#292524;color:#d6d3d1;border:1px solid #44403c}.ds-btn-secondary:hover{background:#44403c}.ds-btn-secondary:active{transform:scale(.95)}.ds-btn-secondary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis actions on dark surfaces.",
+      "html": "<button class=\"ds-btn-ghost\">Skip</button>",
+      "css": ".ds-btn-ghost{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:transparent;color:#d6d3d1;border:none}.ds-btn-ghost:hover{color:#fbbf24}.ds-btn-ghost:active{transform:scale(.95)}.ds-btn-ghost:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Serif text field with a warm amber focus ring.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search for a title\">",
+      "css": ".ds-input{width:100%;box-sizing:border-box;background:rgba(41,37,36,.5);border:1px solid #44403c;color:#f5f5f4;padding:16px;border-radius:12px;font-family:ui-serif,Georgia,Cambria,\"Times New Roman\",serif;font-size:18px;outline:none;transition:all .3s}.ds-input::placeholder{color:#a8a29e}.ds-input:focus{border-color:rgba(180,83,9,.5);box-shadow:0 0 0 2px rgba(120,53,15,.5)}"
+    },
+    {
+      "name": "Energy Chip",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Light, balanced or focused indicator; always labeled.",
+      "html": "<span class=\"ds-chip\">Balanced</span>",
+      "css": ".ds-chip{display:inline-block;background:#fbbf24;color:#451a03;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:9999px}"
+    },
+    {
+      "name": "Dock Item (current)",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Floating bottom dock; the current page is an inert amber wash.",
+      "html": "<nav class=\"ds-dock\"><button class=\"ds-dock-item\">Tonight</button><button class=\"ds-dock-item ds-current\" disabled>Library</button></nav>",
+      "css": ".ds-dock{display:flex;gap:8px;padding:8px;background:rgba(28,25,23,.4);backdrop-filter:blur(40px);border:1px solid rgba(68,64,60,.5);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.4)}.ds-dock-item{flex:1;padding:12px 16px;background:transparent;border:1px solid transparent;border-radius:16px;color:#a8a29e;font-size:12px;font-weight:700;letter-spacing:.025em;cursor:pointer;transition:all .3s}.ds-dock-item:hover{background:rgba(255,255,255,.05);color:#e7e5e4}.ds-dock-item:active{transform:scale(.95)}.ds-current{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#fcd34d;cursor:default}"
+    },
+    {
+      "name": "Poster Card",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Poster with a 4px energy band and a progress bar for shows in progress.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-band\"></div><div class=\"ds-poster\"><div class=\"ds-track\"><div class=\"ds-fill\"></div></div></div><div class=\"ds-card-title\">Severance</div></div>",
+      "css": ".ds-card{width:140px;font-family:ui-serif,Georgia,serif}.ds-band{height:4px;background:#fbbf24}.ds-poster{position:relative;aspect-ratio:2/3;background:#1c1917;border:1px solid #292524;box-shadow:0 10px 15px -3px rgba(0,0,0,.3);overflow:hidden}.ds-track{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(12,10,9,.9);border-top:1px solid #292524}.ds-fill{width:60%;height:100%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6)}.ds-card-title{margin-top:8px;color:#f5f5f4;font-size:16px;line-height:1.35}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lamp-Lit Living Room",
+    "overview": "Hearth is a dark, warm room with one source of light. The shell is a near-black with a trace of brown, and everything else is lit from within: poster and backdrop artwork supplies the drama, and a single amber accent plays the role of the lamp. The interface chrome stays low and quiet so two people on a couch can look at titles, not at controls.",
+    "keyCharacteristics": [
+      "Near-black warm shell; amber as the only brand accent.",
+      "Serif titles over a system sans body; tiny uppercase tracked labels for metadata.",
+      "Soft, large radii (12px controls, 16px to 24px containers, full pills for chips).",
+      "Artwork-first: posters and backdrops are the saturated element, chrome recedes.",
+      "Tonal depth first, shadow second; blur only where text must sit on artwork.",
+      "Dim-room comfort: no pure black, no pure white, no glare."
+    ],
+    "rules": [
+      {
+        "name": "The One Lamp Rule",
+        "body": "Amber is the only brand hue. On any screen it marks the primary action and the current state, nothing else.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm Neutral Rule",
+        "body": "Every grey is a stone (warm-tinted). Pure #000 and #fff are forbidden.",
+        "section": "colors"
+      },
+      {
+        "name": "The Energy Code Rule",
+        "body": "Sky, amber and red appear together only as the light / balanced / focused energy indicator, always with a text label.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serif Names Things Rule",
+        "body": "Serif is for things with names. Sans is for things that describe or act.",
+        "section": "typography"
+      },
+      {
+        "name": "The Small Caps Eyebrow Rule",
+        "body": "Eyebrows are 10px to 11px, bold, uppercase, widely tracked, and never carry primary information.",
+        "section": "typography"
+      },
+      {
+        "name": "The Dim Room Rule",
+        "body": "Surfaces are flat at rest; lift and glow answer state or float above artwork.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Functional Blur Rule",
+        "body": "Backdrop blur is a legibility device over imagery, never decoration.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do let poster and backdrop artwork be the saturated element; keep chrome in stone neutrals.",
+      "Do use Ember Amber (#d97706) for exactly one primary action per surface, with Soot (#1c1917) text.",
+      "Do tint every neutral warm (the stone ramp); end at Bone (#f5f5f4) and Shell Black (#0c0a09).",
+      "Do pair every color-coded state (energy, watched, in progress) with a label or icon.",
+      "Do paint the shell Shell Black behind notches and overscroll, and add --safe-* insets to fixed bars.",
+      "Do honor prefers-reduced-motion on any new animation, and animate transform and opacity only."
+    ],
+    "donts": [
+      "Don't build a gamified or social app: no streaks, badges, feeds, leaderboards or notification nags.",
+      "Don't drift into a generic dark SaaS dashboard: no cold blue-grey panels, glass cards, gradient accents or gradient text.",
+      "Don't show algorithmic recommender patterns: no match percentages, no \"because you watched\", no ranked or explained suggestions.",
+      "Don't use blur or translucency on plain backgrounds; it is only for legibility over artwork.",
+      "Don't use #000 or #fff, or introduce a second brand hue beside amber.",
+      "Don't add border-left or border-right wider than 1px as a colored accent.",
+      "Don't create endless rows, autoplay or infinite scroll; the shelf is finite on purpose."
+    ]
+  }
+}

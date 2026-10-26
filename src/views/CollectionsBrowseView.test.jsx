@@ -307,7 +307,7 @@ it('keeps standalone films, shorts and TV in separate World sections without fak
   expect(openItem).toHaveBeenCalledWith(items[0]);
 });
 
-it('moves direct World navigation to the full overview with restored focus and a reset scroll', async () => {
+it('offers only Back on a World page opened from Tonight, with no All collections shortcut', async () => {
   await mount(
     <CollectionsBrowseView
       initialWorldId="marvel"
@@ -316,16 +316,8 @@ it('moves direct World navigation to the full overview with restored focus and a
       onOpenCollection={vi.fn()}
     />,
   );
-  const scroller = host.querySelector('.overflow-y-auto');
-  scroller.scrollTop = 130;
-  await click(button('All collections'));
-  await act(
-    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
-  );
-  expect(scroller.scrollTop).toBe(0);
-  expect(document.activeElement).toBe(
-    host.querySelector('#collections-heading'),
-  );
+  expect(button('Back to Tonight')).toBeDefined();
+  expect(button('All collections')).toBeUndefined();
 });
 
 it('renders natural-ratio artwork and already-accessible saga on the first World page', async () => {

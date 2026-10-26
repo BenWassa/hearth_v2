@@ -141,22 +141,6 @@ const CollectionsBrowseView = ({
           >
             <span aria-hidden="true">←</span>
           </IconButton>
-          {worldReturn === 'tonight' && (
-            <button
-              type="button"
-              className="min-h-11 rounded-full border border-stone-700 bg-stone-950/90 px-4 text-sm text-stone-100 hover:bg-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-              onClick={() => {
-                setWorldId(null);
-                setWorldReturn('overview');
-                if (scroller.current) scroller.current.scrollTop = 0;
-                requestAnimationFrame(() =>
-                  heading.current?.focus({ preventScroll: true }),
-                );
-              }}
-            >
-              All collections
-            </button>
-          )}
         </header>
       ) : (
         <header className="px-4 pt-3 pb-2 border-b border-stone-800">

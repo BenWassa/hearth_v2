@@ -20,7 +20,6 @@ const WorldCover = ({ world, onOpen }) => {
     <button
       type="button"
       data-world-id={world.id}
-      aria-label={`Open ${world.name} World`}
       onClick={(event) => {
         event.currentTarget.focus({ preventScroll: true });
         onOpen(event);

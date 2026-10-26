@@ -44,7 +44,7 @@ try {
       reducedMotion: 'reduce',
     });
     const page = await context.newPage();
-    await page.goto(origin + '/?demo=1', { waitUntil: 'domcontentloaded' });
+    await page.goto(origin + '/?demo=1&collectionsFixture=25', { waitUntil: 'domcontentloaded' });
     await page.locator('[data-world-id]').first().waitFor({ timeout: 20000 });
     await page.locator('[data-world-id] img').first().evaluate(async (img) => {
       await img.decode().catch(() => undefined);

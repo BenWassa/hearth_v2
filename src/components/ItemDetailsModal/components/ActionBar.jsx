@@ -9,6 +9,7 @@ const ActionBar = ({ item, onToggleStatus, onAddItem, isAdding = false }) => {
   return (
     <div className="p-4 bg-stone-950 border-t border-stone-900 grid gap-3">
       <button
+        type="button"
         onClick={() => {
           if (isSaved) {
             onToggleStatus?.(item.id, item.status);
@@ -17,12 +18,12 @@ const ActionBar = ({ item, onToggleStatus, onAddItem, isAdding = false }) => {
           }
         }}
         disabled={!isSaved && isAdding}
-        className={`w-full h-14 flex items-center justify-center gap-2 rounded-xl text-sm font-bold uppercase tracking-wider transition-all active:scale-[0.98] ${
+        className={`w-full h-14 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-[opacity,transform] motion-safe:active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
           !isSaved
-            ? 'bg-amber-600 text-white hover:bg-amber-500 disabled:cursor-wait disabled:opacity-70 shadow-lg shadow-amber-900/20'
+            ? 'bg-amber-600 text-stone-950 hover:bg-amber-500 disabled:cursor-wait disabled:opacity-70'
             : item.status === 'watched'
             ? 'bg-stone-800 text-stone-400 hover:bg-stone-700'
-            : 'bg-amber-600 text-white hover:bg-amber-500 shadow-lg shadow-amber-900/20'
+            : 'bg-amber-600 text-stone-950 hover:bg-amber-500'
         }`}
       >
         {!isSaved ? (
@@ -32,15 +33,15 @@ const ActionBar = ({ item, onToggleStatus, onAddItem, isAdding = false }) => {
             ) : (
               <Plus className="w-5 h-5" />
             )}
-            Add to Watchlist
+            Add to shelf
           </>
         ) : item.status === 'watched' ? (
           <>
-            <Plus className="w-5 h-5" /> Back to Shelf
+            <Plus className="w-5 h-5" /> Back to shelf
           </>
         ) : (
           <>
-            <Check className="w-5 h-5" /> Mark Watched
+            <Check className="w-5 h-5" /> Mark watched
           </>
         )}
       </button>

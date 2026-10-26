@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import Dialog from './ui/Dialog.jsx';
 import { Calendar, Film } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { getBackdropSrc } from '../utils/poster.js';
@@ -34,9 +33,18 @@ import TitleBlock from './ItemDetailsModal/components/TitleBlock.jsx';
 import ModalHeader from './ItemDetailsModal/components/ModalHeader.jsx';
 import ModalContentHeader from './ItemDetailsModal/components/ModalContentHeader.jsx';
 import ShowSeasonsSection from './ItemDetailsModal/components/ShowSeasonsSection.jsx';
+import Dialog from './ui/Dialog.jsx';
+import Button from './ui/Button.jsx';
+import SelectChip from './ui/SelectChip.jsx';
+import { getEnergyStyle } from '../config/energyStyles.js';
 
 const hydratedShowCache = new Map();
 const hydratedShowPromises = new Map();
+
+const getScrollBehavior = () =>
+  window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    ? 'auto'
+    : 'smooth';
 
 const normalizeHydratedShowData = (showData = {}) => {
   const seasons = Array.isArray(showData?.seasons)
@@ -187,11 +195,11 @@ const ItemDetailsModal = ({
     ? {
         ...mediaDetails,
         ...rawItem,
-        title: rawItem.title?.trim() || '[add title]',
+        title: rawItem.title?.trim() || '',
         year:
           rawItem.year?.toString().trim() ||
           mediaDetails?.year?.toString().trim() ||
-          '[add year]',
+          '',
         director:
           rawItem.director?.toString().trim() ||
           rawItem.media?.directors?.[0]?.toString().trim() ||
@@ -199,7 +207,7 @@ const ItemDetailsModal = ({
             ? rawItem.media?.creators?.[0]?.toString().trim() || ''
             : '') ||
           mediaDetails?.director?.toString().trim() ||
-          '[add director]',
+          '',
         note: rawItem.note?.toString().trim() || '',
         overview:
           rawItem.overview?.toString().trim() ||
@@ -685,7 +693,7 @@ const ItemDetailsModal = ({
       `[data-season-number="${seasonNumber}"]`,
     );
     targetButton?.scrollIntoView({
-      behavior: 'smooth',
+      behavior: getScrollBehavior(),
       inline: 'center',
       block: 'nearest',
     });
@@ -721,7 +729,7 @@ const ItemDetailsModal = ({
       );
       if (!target) return;
       target.scrollIntoView({
-        behavior: 'smooth',
+        behavior: getScrollBehavior(),
         block: 'center',
         inline: 'nearest',
       });
@@ -925,22 +933,16 @@ const ItemDetailsModal = ({
     if (!nextSeason) return;
     setActiveSeasonNum(nextSeason.number);
     scrollToSeason(nextSeason.number);
+    seasonScrollRef.current
+      ?.querySelector(`[data-season-number="${nextSeason.number}"]`)
+      ?.focus({ preventScroll: true });
   };
 
+  // Missing metadata is hidden rather than shown as a bracketed placeholder.
   const metadataChips = [
-    {
-      label: 'Year',
-      value: item.year,
-      isPlaceholder: item.year === '[add year]',
-      icon: Calendar,
-    },
-    {
-      label: 'Director',
-      value: item.director,
-      isPlaceholder: item.director === '[add director]',
-      icon: Film,
-    },
-  ];
+    { label: 'Year', value: item.year, icon: Calendar },
+    { label: 'Director', value: item.director, icon: Film },
+  ].filter((chip) => chip.value);
 
   const finishContext = startedAtLabel
     ? `Started ${startedAtLabel}`
@@ -957,20 +959,18 @@ const ItemDetailsModal = ({
 
   // Mobile-first design updates
   return (
-    <Dialog
-      onClose={onClose}
-      aria-label={item.title || 'Film details'}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 animate-in fade-in duration-200"
-    >
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-stone-950/85"
         onClick={onClose}
-        aria-label="Close details"
+        aria-hidden="true"
+        tabIndex={-1}
       />
 
-      <div
+      <Dialog
+        onClose={onClose}
+        aria-labelledby="item-details-title"
         className="relative w-full max-w-3xl bg-stone-950 sm:border border-stone-800 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row h-[100dvh] sm:h-auto sm:max-h-[85vh]"
-        onClick={(event) => event.stopPropagation()}
       >
         <ModalHeader
           backdropSrc={backdropSrc}
@@ -1001,6 +1001,7 @@ const ItemDetailsModal = ({
                 item={item}
                 metadataChips={metadataChips}
                 genres={genres}
+                titleId="item-details-title"
               />
 
               {/* Timing Card (Movies) */}
@@ -1046,7 +1047,7 @@ const ItemDetailsModal = ({
               {/* Notes */}
               {item.note ? (
                 <div className="space-y-2">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-stone-500">
+                  <div className="text-label font-bold uppercase tracking-widest text-stone-400">
                     Notes
                   </div>
                   <p className="text-base text-stone-300 italic leading-relaxed">
@@ -1068,29 +1069,36 @@ const ItemDetailsModal = ({
             isAdding={isAddingItem}
           />
         </div>
-      </div>
+      </Dialog>
 
       {pendingAddItem && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/65 px-4 pb-[calc(1rem+var(--safe-bottom))] pt-[max(4rem,var(--safe-top))] backdrop-blur-sm sm:items-center sm:p-6"
-          onClick={handleCancelAddPreferences}
-        >
+        <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-[calc(1rem+var(--safe-bottom))] pt-[max(4rem,var(--safe-top))] sm:items-center sm:p-6">
           <div
-            className="w-full max-w-lg overflow-hidden rounded-2xl border border-stone-800 bg-stone-950 shadow-2xl shadow-black/60"
-            onClick={(event) => event.stopPropagation()}
+            className="absolute inset-0 bg-stone-950/85"
+            onClick={handleCancelAddPreferences}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <Dialog
+            onClose={handleCancelAddPreferences}
+            aria-labelledby="add-picker-title"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-stone-800 bg-stone-950 shadow-2xl shadow-black/60"
           >
             <div className="border-b border-stone-900 px-5 py-4">
-              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-400">
+              <div className="text-label font-bold uppercase tracking-[0.22em] text-amber-400">
                 Add to shelf
               </div>
-              <h3 className="mt-1 font-serif text-2xl leading-tight text-stone-100">
+              <h3
+                id="add-picker-title"
+                className="mt-1 font-serif text-2xl leading-tight text-stone-100"
+              >
                 {pendingAddItem.title || 'Untitled movie'}
               </h3>
             </div>
 
             <div className="space-y-5 px-5 py-5">
               <div>
-                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
+                <div className="mb-2 text-label font-bold uppercase tracking-[0.2em] text-stone-400">
                   Vibe
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -1098,46 +1106,40 @@ const ItemDetailsModal = ({
                     const VibeIcon = vibe.icon;
                     const selected = addVibe === vibe.id;
                     return (
-                      <button
+                      <SelectChip
                         key={vibe.id}
-                        type="button"
+                        selected={selected}
+                        icon={VibeIcon}
                         onClick={() => setAddVibe(vibe.id)}
-                        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
-                          selected
-                            ? 'border-amber-400 bg-amber-500 text-amber-950'
-                            : 'border-stone-800 bg-stone-900/70 text-stone-300 hover:border-stone-600 hover:bg-stone-900'
-                        }`}
+                        className="w-full justify-center"
                       >
-                        <VibeIcon className="h-4 w-4" />
                         {vibe.label}
-                      </button>
+                      </SelectChip>
                     );
                   })}
                 </div>
               </div>
 
               <div>
-                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
+                <div className="mb-2 text-label font-bold uppercase tracking-[0.2em] text-stone-400">
                   Energy
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {ENERGIES.map((energy) => {
                     const EnergyIcon = energy.icon;
                     const selected = addEnergy === energy.id;
+                    const energyStyle = getEnergyStyle(energy.id);
                     return (
-                      <button
+                      <SelectChip
                         key={energy.id}
-                        type="button"
+                        selected={selected}
+                        icon={EnergyIcon}
+                        selectedClassName={energyStyle.selected}
                         onClick={() => setAddEnergy(energy.id)}
-                        className={`flex h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                          selected
-                            ? 'border-sky-400 bg-sky-500 text-sky-950'
-                            : 'border-stone-800 bg-stone-900/70 text-stone-300 hover:border-stone-600 hover:bg-stone-900'
-                        }`}
+                        className="w-full justify-center"
                       >
-                        <EnergyIcon className="h-4 w-4" />
                         {energy.label}
-                      </button>
+                      </SelectChip>
                     );
                   })}
                 </div>
@@ -1145,27 +1147,28 @@ const ItemDetailsModal = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3 border-t border-stone-900 p-4">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
                 onClick={handleCancelAddPreferences}
                 disabled={isAddingItem}
-                className="h-12 rounded-xl border border-stone-800 bg-stone-900 text-sm font-bold uppercase tracking-wider text-stone-300 transition-colors hover:bg-stone-800 disabled:cursor-wait disabled:opacity-60"
+                className="h-12 py-0 text-sm font-bold"
               >
                 Cancel
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={handleConfirmAddPreferences}
                 disabled={!addVibe || !addEnergy || isAddingItem}
-                className="h-12 rounded-xl bg-amber-600 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-amber-900/20 transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-12 rounded-xl bg-amber-600 text-sm font-bold text-stone-950 transition-opacity hover:bg-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isAddingItem ? 'Adding...' : 'Add'}
               </button>
             </div>
-          </div>
+          </Dialog>
         </div>
       )}
-    </Dialog>
+    </div>
   );
 };
 

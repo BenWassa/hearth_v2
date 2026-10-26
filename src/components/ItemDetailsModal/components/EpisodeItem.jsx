@@ -29,44 +29,48 @@ const EpisodeItem = ({
     !isWatched && !isNextUp && Boolean(episode.description);
   const isSpoilerHidden = canToggleSpoiler && !isSpoilerRevealed;
 
+  const descriptionId = `episode-desc-${episode.id}`;
+
   return (
     <div
       data-episode-id={episode.id}
       className={`
-        relative group rounded-xl border transition-all duration-200 overflow-hidden mb-2
+        relative group rounded-xl border transition-opacity duration-200 overflow-hidden mb-2
         ${
           isNextUp
-            ? 'bg-stone-800/60 border-amber-900/40 ring-1 ring-amber-500/20 shadow-lg shadow-black/20'
+            ? 'bg-stone-800/60 border-amber-900/40 ring-1 ring-amber-500/20'
             : 'bg-transparent border-transparent active:bg-stone-900/40'
         }
       `}
     >
-      <div
-        className="flex items-center gap-4 p-4 cursor-pointer select-none"
-        onClick={onToggleExpand}
-      >
+      <div className="flex items-center gap-2 p-4 pr-2 select-none">
         <div className="flex-shrink-0 relative z-10">
           <button
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggleWatched();
-            }}
+            type="button"
+            onClick={onToggleWatched}
             className={`
-              w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
+              w-11 h-11 rounded-full flex items-center justify-center transition-[opacity,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400
               ${
                 isWatched
-                  ? 'bg-stone-800 text-stone-500 border border-stone-700 active:text-amber-500 active:border-amber-500/50'
+                  ? 'bg-stone-800 text-stone-400 border border-stone-700 active:text-amber-400 active:border-amber-500/50'
                   : isNextUp
-                  ? 'bg-amber-600 text-white shadow-lg shadow-amber-900/40 active:scale-95'
-                  : 'bg-stone-900/50 text-stone-600 border border-stone-800 active:border-stone-500 active:text-stone-400'
+                  ? 'bg-amber-600 text-stone-950 motion-safe:active:scale-95'
+                  : 'bg-stone-900/50 text-stone-400 border border-stone-700 active:border-stone-500 active:text-stone-300'
               }
             `}
-            aria-label={isWatched ? 'Mark unwatched' : 'Mark watched'}
+            aria-label={
+              isWatched
+                ? `Mark ${episode.title} unwatched`
+                : `Mark ${episode.title} watched`
+            }
           >
             {isWatched ? (
-              <Check className="w-5 h-5" />
+              <Check className="w-5 h-5" aria-hidden="true" />
             ) : isNextUp ? (
-              <Play className="w-4 h-4 ml-0.5 fill-current" />
+              <Play
+                className="w-4 h-4 ml-0.5 fill-current"
+                aria-hidden="true"
+              />
             ) : (
               <span className="text-xs font-bold font-mono">
                 {episode.number}
@@ -75,101 +79,89 @@ const EpisodeItem = ({
           </button>
         </div>
 
-        <div
-          className={`flex-1 min-w-0 transition-opacity ${
-            isWatched ? 'opacity-40' : 'opacity-100'
-          }`}
+        <button
+          type="button"
+          onClick={onToggleExpand}
+          aria-expanded={isExpanded}
+          aria-controls={descriptionId}
+          className="flex-1 min-w-0 min-h-11 flex items-center gap-4 pl-2 text-left rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
         >
-          <div className="flex items-center gap-2 mb-1">
-            {isNextUp && (
-              <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-500 px-1.5 py-0.5 rounded border border-amber-500/20">
-                Next
+          <span className="flex-1 min-w-0 block">
+            <span className="flex items-center gap-2 mb-1">
+              {isNextUp && (
+                <span className="text-label font-bold uppercase tracking-widest bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/20">
+                  Next
+                </span>
+              )}
+              <span
+                className={`font-medium text-base leading-tight truncate ${
+                  isWatched ? 'text-stone-300' : 'text-stone-200'
+                }`}
+              >
+                {episode.title}
               </span>
+            </span>
+
+            <span className="flex items-center gap-2 text-xs text-stone-400">
+              {airYear ? <span>{airYear}</span> : null}
+              {runtimeLabel ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>{runtimeLabel}</span>
+                </>
+              ) : null}
+            </span>
+          </span>
+
+          <span className="text-stone-400 px-1" aria-hidden="true">
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
             )}
-            <h3
-              className={`font-medium text-base leading-tight truncate ${
-                isWatched ? 'decoration-stone-700' : 'text-stone-200'
-              }`}
-            >
-              {episode.title}
-            </h3>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-stone-500">
-            {airYear ? <span>{airYear}</span> : null}
-            {runtimeLabel ? (
-              <>
-                <span className="text-stone-600">·</span>
-                <span>{runtimeLabel}</span>
-              </>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="text-stone-600 px-1">
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5" />
-          ) : (
-            <ChevronDown className="w-5 h-5" />
-          )}
-        </div>
+          </span>
+        </button>
       </div>
 
       <div
-        className={`
-          overflow-hidden transition-all duration-300 ease-in-out bg-stone-950/40
-          ${isExpanded ? 'max-h-48 border-t border-stone-800/30' : 'max-h-0'}
-        `}
+        id={descriptionId}
+        hidden={!isExpanded}
+        className={`bg-stone-950/40 ${
+          isExpanded ? 'border-t border-stone-800/30' : ''
+        }`}
       >
-        <div
-          className={`p-4 pl-4 pr-4 ${
-            canToggleSpoiler ? 'cursor-pointer' : ''
-          }`}
-          onClick={() => {
-            if (!canToggleSpoiler) return;
-            onToggleSpoiler?.();
-          }}
-          role={canToggleSpoiler ? 'button' : undefined}
-          tabIndex={canToggleSpoiler ? 0 : undefined}
-          onKeyDown={(event) => {
-            if (!canToggleSpoiler) return;
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              onToggleSpoiler?.();
-            }
-          }}
-          aria-label={
-            canToggleSpoiler
-              ? isSpoilerHidden
-                ? 'Reveal description'
-                : 'Hide description'
-              : undefined
-          }
-          aria-pressed={canToggleSpoiler ? !isSpoilerHidden : undefined}
-        >
+        <div className="p-4">
           <p
-            className={`text-sm leading-relaxed transition-[filter,opacity] duration-300 ${
+            aria-hidden={isSpoilerHidden || undefined}
+            className={`text-sm leading-relaxed transition-opacity duration-300 ${
               isSpoilerHidden
-                ? 'blur-[3px] text-stone-500 select-none'
+                ? 'blur-[3px] text-stone-400 select-none'
                 : 'text-stone-400'
             }`}
           >
             {descriptionText}
           </p>
           {canToggleSpoiler ? (
-            <div className="mt-3 text-[10px] uppercase tracking-wider text-stone-600 flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => onToggleSpoiler?.()}
+              aria-label={
+                isSpoilerHidden ? 'Reveal description' : 'Hide description'
+              }
+              className="mt-1 min-h-11 text-label uppercase tracking-wider text-stone-400 flex items-center gap-1.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            >
               {isSpoilerHidden ? (
                 <>
-                  <EyeOff className="w-3.5 h-3.5" />
-                  Spoiler Protected
+                  <EyeOff className="w-3.5 h-3.5" aria-hidden="true" />
+                  Spoiler protected
                 </>
               ) : (
                 <>
-                  <Eye className="w-3.5 h-3.5" />
-                  Spoiler Revealed
+                  <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                  Spoiler revealed
                 </>
               )}
-            </div>
+            </button>
           ) : null}
         </div>
       </div>

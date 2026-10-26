@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   AlertTriangle,
   BookOpen,
@@ -15,7 +21,90 @@ import {
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { normalizeSearchText } from '../utils/text.js';
 import PosterCard from '../components/cards/PosterCard.jsx';
-import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
+import {
+  lazyWithPrefetch,
+  prefetchOnIdle,
+  useHasBeenTrue,
+} from '../app/lazyWithPrefetch.js';
+import Button from '../components/ui/Button.jsx';
+import IconButton from '../components/ui/IconButton.jsx';
+import Dialog from '../components/ui/Dialog.jsx';
+
+const ItemDetailsModal = lazyWithPrefetch(() =>
+  import('../components/ItemDetailsModal.jsx'),
+);
+
+const BulkDeleteDialog = ({ count, isDeleting, onCancel, onConfirm }) => {
+  return (
+    <Dialog
+      onClose={onCancel}
+      aria-labelledby="bulk-delete-title"
+      className="fixed inset-0 z-[80] flex items-center justify-center px-4 pt-[max(1rem,var(--safe-top))] pb-[max(1rem,var(--safe-bottom))] outline-none"
+    >
+      <div
+        aria-hidden="true"
+        tabIndex={-1}
+        onClick={onCancel}
+        className="absolute inset-0 bg-stone-950/85"
+      />
+      <div className="relative bg-stone-900 border border-red-800/60 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-300" />
+            <h3
+              id="bulk-delete-title"
+              className="text-lg font-serif text-stone-100"
+            >
+              Delete Selected Titles?
+            </h3>
+          </div>
+          <IconButton
+            label="Close confirmation"
+            onClick={onCancel}
+            className="-mr-2 text-stone-400"
+          >
+            <X className="w-5 h-5" />
+          </IconButton>
+        </div>
+        <p className="text-sm text-stone-300">
+          This will remove{' '}
+          <span className="font-medium">
+            {count} selected title{count === 1 ? '' : 's'}
+          </span>{' '}
+          from your shelf.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+          <Button
+            variant="secondary"
+            onClick={onCancel}
+            disabled={isDeleting}
+            className="min-h-11"
+            type="button"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={onConfirm}
+            disabled={isDeleting}
+            type="button"
+            className="min-h-11"
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Selected'}
+          </Button>
+        </div>
+      </div>
+    </Dialog>
+  );
+};
+
+const FILTER_BUTTON_BASE =
+  'min-h-11 px-3 inline-flex items-center justify-center gap-1.5 rounded-lg text-xs font-semibold tracking-wide transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60';
+const SORT_BUTTON_BASE =
+  'min-h-11 px-3.5 rounded-lg text-xs font-semibold tracking-wide transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60';
+const SORT_ACTIVE = 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30';
+const SORT_INACTIVE =
+  'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50';
 
 const ShelfView = ({
   items,
@@ -62,7 +151,7 @@ const ShelfView = ({
     });
   };
 
-  const toggleSelected = (id) => {
+  const toggleSelected = useCallback((id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -72,12 +161,12 @@ const ShelfView = ({
       }
       return next;
     });
-  };
+  }, []);
 
-  const openDetails = (item) => {
+  const openDetails = useCallback((item) => {
     setDetailItem(item);
     setIsDetailOpen(true);
-  };
+  }, []);
 
   const closeDetails = () => {
     setIsDetailOpen(false);
@@ -196,6 +285,22 @@ const ShelfView = ({
     return groups;
   };
 
+  // Keep per-item handlers stable across search, selection and dialog updates.
+  const cardActions = useMemo(
+    () =>
+      new Map(
+        items.map((item) => [
+          item.id,
+          {
+            toggle: () => onToggleStatus(item.id, item.status),
+            delete: () => onDelete(item.id),
+            select: () => toggleSelected(item.id),
+          },
+        ]),
+      ),
+    [items, onToggleStatus, onDelete, toggleSelected],
+  );
+
   const renderShelfItem = (
     item,
     { canDelete = true, canSelect = true } = {},
@@ -204,11 +309,11 @@ const ShelfView = ({
       <PosterCard
         key={item.id}
         item={item}
-        onToggle={() => onToggleStatus(item.id, item.status)}
-        onDelete={canDelete ? () => onDelete(item.id) : null}
+        onToggle={cardActions.get(item.id)?.toggle}
+        onDelete={canDelete ? cardActions.get(item.id)?.delete : null}
         selectionMode={canSelect ? selectionMode : false}
         isSelected={canSelect ? selectedIds.has(item.id) : false}
-        onSelect={canSelect ? () => toggleSelected(item.id) : null}
+        onSelect={canSelect ? cardActions.get(item.id)?.select : null}
         onOpenDetails={openDetails}
       />
     );
@@ -222,8 +327,46 @@ const ShelfView = ({
     return buildGroupedItems(watchedFiltered);
   }, [watchedFiltered, sortBy]);
 
+  const getGroupHeader = (groupId) => {
+    if (sortBy === 'alphabetical') return { header: null, HeaderIcon: null };
+    const definitions = sortBy === 'energy' ? ENERGIES : VIBES;
+    const definition = definitions.find((d) => d.id === groupId);
+    if (definition) {
+      return { header: definition.label, HeaderIcon: definition.icon };
+    }
+    return { header: 'Unsorted', HeaderIcon: null };
+  };
+
+  const renderGroups = (groups, itemOptions) =>
+    Object.entries(groups).map(([groupId, groupItems]) => {
+      if (groupItems.length === 0) return null;
+      const { header, HeaderIcon } = getGroupHeader(groupId);
+
+      return (
+        <div key={groupId} className={sectionGapClassName}>
+          {header && (
+            <div className="flex items-center gap-1.5 pl-0.5 pt-1">
+              {HeaderIcon && (
+                <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
+              )}
+              <h3 className="text-label font-bold uppercase tracking-[0.14em] text-stone-400">
+                {header}
+              </h3>
+            </div>
+          )}
+          <div className={cardGridClassName}>
+            {groupItems.map((item) => renderShelfItem(item, itemOptions))}
+          </div>
+        </div>
+      );
+    });
+
+  const hasOpenedDetails = useHasBeenTrue(isDetailOpen);
+
+  useEffect(() => prefetchOnIdle([ItemDetailsModal]), []);
+
   return (
-    <div className="flex-1 flex flex-col animate-in slide-in-from-right duration-300">
+    <div className="flex-1 flex flex-col">
       {/* ── Sticky header block: tabs-as-title + filter bar ── */}
       <div className="sticky top-0 z-20">
         {/* Tabs row — doubles as the page header */}
@@ -231,26 +374,28 @@ const ShelfView = ({
           <div className="flex gap-6">
             <button
               onClick={() => setViewTab('library')}
-              className={`pb-3 text-base font-serif tracking-wide transition-colors border-b-2 -mb-px ${
+              aria-pressed={viewTab === 'library'}
+              className={`min-h-11 pb-3 text-base font-serif tracking-wide transition-opacity border-b-2 -mb-px focus:outline-none focus-visible:text-amber-300 ${
                 viewTab === 'library'
                   ? 'text-stone-100 border-amber-500'
-                  : 'text-stone-500 border-transparent hover:text-stone-300'
+                  : 'text-stone-400 border-transparent hover:text-stone-200'
               }`}
             >
               Library
             </button>
             <button
               onClick={() => setViewTab('memories')}
-              className={`pb-3 text-base font-serif tracking-wide transition-colors border-b-2 -mb-px ${
+              aria-pressed={viewTab === 'memories'}
+              className={`min-h-11 pb-3 text-base font-serif tracking-wide transition-opacity border-b-2 -mb-px focus:outline-none focus-visible:text-amber-300 ${
                 viewTab === 'memories'
                   ? 'text-stone-100 border-amber-500'
-                  : 'text-stone-500 border-transparent hover:text-stone-300'
+                  : 'text-stone-400 border-transparent hover:text-stone-200'
               }`}
             >
               Memories
             </button>
           </div>
-          <div className="flex items-center gap-2 pb-2.5">
+          <div className="flex items-center gap-1 pb-1">
             <button
               onClick={() => {
                 setIsSearchOpen((prev) => {
@@ -259,22 +404,26 @@ const ShelfView = ({
                   return next;
                 });
               }}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`min-h-11 min-w-11 flex items-center justify-center rounded-lg transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 ${
                 isSearchOpen
                   ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
-                  : 'text-stone-500 hover:text-stone-200 hover:bg-stone-800/60'
+                  : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'
               }`}
-              title="Search"
+              aria-label="Search library"
+              aria-pressed={isSearchOpen}
+              type="button"
             >
               <Search className="w-4 h-4" />
             </button>
             <button
               onClick={toggleSelectionMode}
-              className={`text-xs font-semibold uppercase tracking-widest transition-colors px-2 py-1 rounded-md ${
+              className={`min-h-11 min-w-11 text-xs font-semibold uppercase tracking-widest transition-opacity px-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 ${
                 selectionMode
                   ? 'text-amber-400 bg-amber-500/10'
-                  : 'text-stone-500 hover:text-stone-300'
+                  : 'text-stone-400 hover:text-stone-200'
               }`}
+              aria-pressed={selectionMode}
+              type="button"
             >
               {selectionMode ? 'Done' : 'Select'}
             </button>
@@ -284,21 +433,23 @@ const ShelfView = ({
         {/* Search input — expands below header when open */}
         {isSearchOpen && (
           <div className="px-4 sm:px-5 py-2.5 bg-stone-950 border-b border-stone-800/60">
-            <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
-              <Search className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+            <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 focus-within:border-amber-500/40 transition-opacity">
+              <Search className="w-3.5 h-3.5 text-stone-400 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search your library…"
+                aria-label="Search your library"
                 autoFocus
-                className="flex-1 bg-transparent text-stone-200 placeholder-stone-500 text-sm focus:outline-none"
+                className="flex-1 min-h-11 bg-transparent text-stone-200 placeholder-stone-400 text-sm focus:outline-none"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="p-0.5 text-stone-500 hover:text-stone-200 transition-colors"
-                  title="Clear search"
+                  className="min-h-11 min-w-11 -mr-3 flex items-center justify-center text-stone-400 hover:text-stone-200 transition-opacity rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                  aria-label="Clear search"
+                  type="button"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -308,46 +459,41 @@ const ShelfView = ({
         )}
 
         {/* Sort + Type Filter Bar */}
-        <div className="px-4 sm:px-5 py-2.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
+        <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
           {/* Sort pill group */}
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={() => setSortBy('vibe')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
-                sortBy === 'vibe'
-                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
-                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
-              }`}
-            >
-              Vibe
-            </button>
-            <button
-              onClick={() => setSortBy('energy')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
-                sortBy === 'energy'
-                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
-                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
-              }`}
-            >
-              Energy
-            </button>
-            <button
-              onClick={() => setSortBy('alphabetical')}
-              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
-                sortBy === 'alphabetical'
-                  ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
-                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
-              }`}
-            >
-              A–Z
-            </button>
+          <div
+            className="flex gap-2 shrink-0"
+            role="group"
+            aria-label="Sort by"
+          >
+            {[
+              ['vibe', 'Vibe'],
+              ['energy', 'Energy'],
+              ['alphabetical', 'A–Z'],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => setSortBy(id)}
+                className={`${SORT_BUTTON_BASE} ${
+                  sortBy === id ? SORT_ACTIVE : SORT_INACTIVE
+                }`}
+                aria-pressed={sortBy === id}
+                type="button"
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* Divider */}
           <div className="w-px h-5 bg-stone-800 shrink-0" />
 
           {/* Type Filter Buttons */}
-          <div className="flex gap-2 shrink-0">
+          <div
+            className="flex gap-2 shrink-0"
+            role="group"
+            aria-label="Filter by type"
+          >
             <button
               onClick={() => {
                 // If clicking movies: if movies are only one shown, reset to both. If both shown, show only movies
@@ -361,14 +507,16 @@ const ShelfView = ({
                   setShowShows(false);
                 }
               }}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`${FILTER_BUTTON_BASE} ${
                 showMovies && !showShows
                   ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
-                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
+                  : SORT_INACTIVE
               }`}
-              title="Filter by Movies"
+              aria-pressed={showMovies && !showShows}
+              type="button"
             >
               <Film className="w-4 h-4" />
+              Movies
             </button>
             <button
               onClick={() => {
@@ -383,14 +531,16 @@ const ShelfView = ({
                   setShowShows(true);
                 }
               }}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`${FILTER_BUTTON_BASE} ${
                 showShows && !showMovies
                   ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
-                  : 'text-stone-500 hover:text-stone-300 hover:bg-stone-800/50'
+                  : SORT_INACTIVE
               }`}
-              title="Filter by Shows"
+              aria-pressed={showShows && !showMovies}
+              type="button"
             >
               <Tv className="w-4 h-4" />
+              Shows
             </button>
           </div>
         </div>
@@ -418,51 +568,22 @@ const ShelfView = ({
               </div>
             ) : (
               <>
-                {/* Categories/Sort Groups */}
-                {Object.entries(itemsByVibe).map(([groupId, groupItems]) => {
-                  if (groupItems.length === 0) return null;
-
-                  // Determine header based on sort mode
-                  let header = null;
-                  let HeaderIcon = null;
-
-                  if (sortBy === 'alphabetical') {
-                    header = 'All Items';
-                  } else if (sortBy === 'energy') {
-                    const energyDef = ENERGIES.find((e) => e.id === groupId);
-                    if (energyDef) {
-                      header = energyDef.label;
-                      HeaderIcon = energyDef.icon;
-                    } else {
-                      header = 'Unsorted';
-                    }
-                  } else {
-                    // vibe mode
-                    const vibeDef = VIBES.find((v) => v.id === groupId);
-                    if (vibeDef) {
-                      header = vibeDef.label;
-                      HeaderIcon = vibeDef.icon;
-                    } else {
-                      header = 'Unsorted';
-                    }
-                  }
-
-                  return (
-                    <div key={groupId} className={sectionGapClassName}>
-                      <div className="flex items-center gap-1.5 pl-0.5 pt-1">
-                        {HeaderIcon && (
-                          <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
-                        )}
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
-                          {header}
-                        </h3>
-                      </div>
-                      <div className={cardGridClassName}>
-                        {groupItems.map((item) => renderShelfItem(item))}
-                      </div>
-                    </div>
-                  );
-                })}
+                {items.length === 0 ? (
+                  <div className="text-center py-16 px-6">
+                    <p className="text-stone-300 font-serif text-lg">
+                      Your shelf is empty
+                    </p>
+                    <p className="text-stone-400 text-sm mt-2">
+                      Use the Add tab below to put the first title on it.
+                    </p>
+                  </div>
+                ) : libraryItems.length === 0 ? (
+                  <div className="text-sm text-stone-400 text-center py-12">
+                    Nothing is waiting on the shelf right now.
+                  </div>
+                ) : (
+                  renderGroups(itemsByVibe)
+                )}
               </>
             )}
           </>
@@ -485,14 +606,14 @@ const ShelfView = ({
                 </div>
               )
             ) : watched.length === 0 ? (
-              <div className="text-center py-12 opacity-60">
+              <div className="text-center py-12">
                 <div className="w-16 h-16 bg-stone-900 rounded-full flex items-center justify-center mx-auto mb-4 text-stone-700">
                   <Heart className="w-8 h-8" />
                 </div>
                 <p className="text-stone-400 font-serif text-lg">
                   No memories yet
                 </p>
-                <p className="text-stone-400 text-xs mt-2">
+                <p className="text-stone-400 text-sm mt-2">
                   When you finish watching something, it'll appear here
                 </p>
               </div>
@@ -502,136 +623,53 @@ const ShelfView = ({
               </div>
             ) : (
               <>
-                {Object.entries(memoriesByGroup).map(
-                  ([groupId, groupItems]) => {
-                    if (groupItems.length === 0) return null;
-
-                    let header = null;
-                    let HeaderIcon = null;
-
-                    if (sortBy === 'alphabetical') {
-                      header = 'All Items';
-                    } else if (sortBy === 'energy') {
-                      const energyDef = ENERGIES.find((e) => e.id === groupId);
-                      if (energyDef) {
-                        header = energyDef.label;
-                        HeaderIcon = energyDef.icon;
-                      } else {
-                        header = 'Unsorted';
-                      }
-                    } else {
-                      const vibeDef = VIBES.find((v) => v.id === groupId);
-                      if (vibeDef) {
-                        header = vibeDef.label;
-                        HeaderIcon = vibeDef.icon;
-                      } else {
-                        header = 'Unsorted';
-                      }
-                    }
-
-                    return (
-                      <div key={groupId} className={sectionGapClassName}>
-                        <div className="flex items-center gap-1.5 pl-0.5 pt-1">
-                          {HeaderIcon && (
-                            <HeaderIcon className="w-3.5 h-3.5 text-amber-500/60 shrink-0" />
-                          )}
-                          <h3 className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">
-                            {header}
-                          </h3>
-                        </div>
-                        <div className={cardGridClassName}>
-                          {groupItems.map((item) =>
-                            renderShelfItem(item, {
-                              canDelete: false,
-                              canSelect: false,
-                            }),
-                          )}
-                        </div>
-                      </div>
-                    );
-                  },
-                )}
+                {renderGroups(memoriesByGroup, {
+                  canDelete: false,
+                  canSelect: false,
+                })}
               </>
             )}
           </div>
         )}
       </div>
 
-      <ItemDetailsModal
-        isOpen={isDetailOpen}
-        item={detailItem}
-        onClose={closeDetails}
-        onToggleStatus={onToggleStatus}
-        onUpdate={onUpdate}
-      />
+      {hasOpenedDetails && (
+        <Suspense fallback={null}>
+          <ItemDetailsModal
+            isOpen={isDetailOpen}
+            item={detailItem}
+            onClose={closeDetails}
+            onToggleStatus={onToggleStatus}
+            onUpdate={onUpdate}
+          />
+        </Suspense>
+      )}
 
       {isBulkDeleteConfirmOpen && (
-        <>
-          <button
-            className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm cursor-default"
-            onClick={() => setIsBulkDeleteConfirmOpen(false)}
-            aria-label="Close confirmation"
-          />
-          <div className="fixed inset-0 z-[80] flex items-center justify-center px-4 pt-[max(1rem,var(--safe-top))] pb-[max(1rem,var(--safe-bottom))]">
-            <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-red-800/60 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-300" />
-                  <h3 className="text-lg font-serif text-red-100">
-                    Delete Selected Titles?
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setIsBulkDeleteConfirmOpen(false)}
-                  className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-                  aria-label="Close confirmation"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-sm text-stone-300">
-                This will remove{' '}
-                <span className="font-medium">
-                  {selectedCount} selected title{selectedCount === 1 ? '' : 's'}
-                </span>{' '}
-                from your shelf.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
-                <button
-                  onClick={() => setIsBulkDeleteConfirmOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-stone-800 text-stone-300 hover:bg-stone-700 transition-colors"
-                  disabled={isBulkDeleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-red-700 text-white hover:bg-red-600 transition-colors disabled:opacity-60"
-                  disabled={isBulkDeleting}
-                >
-                  {isBulkDeleting ? 'Deleting...' : 'Delete Selected'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
+        <BulkDeleteDialog
+          count={selectedCount}
+          isDeleting={isBulkDeleting}
+          onCancel={() => setIsBulkDeleteConfirmOpen(false)}
+          onConfirm={handleBulkDelete}
+        />
       )}
 
       {viewTab === 'library' && selectionMode && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-[calc(7.7rem+var(--safe-bottom))] z-50 max-w-md w-[calc(100%-3rem)]">
-          <div className="mx-auto w-fit bg-stone-900/75 backdrop-blur-xl border border-stone-700/60 rounded-2xl px-4 py-2.5 shadow-xl shadow-black/40">
-            <div className="flex items-center gap-4">
+          <div className="mx-auto w-fit bg-stone-900 border border-stone-700 rounded-2xl px-2 py-1.5 shadow-xl shadow-black/40">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleBulkMarkWatched}
                 disabled={selectedCount === 0 || isSelectionBusy}
-                className="flex flex-col items-center gap-1 text-stone-200 hover:text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="min-h-11 min-w-11 px-3 flex flex-col items-center justify-center gap-1 rounded-xl text-stone-200 hover:text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                type="button"
               >
                 <Eye className="w-4 h-4" />
-                <span className="text-[10px] uppercase tracking-widest">
+                <span className="text-label uppercase tracking-widest">
                   Seen
                 </span>
               </button>
-              <span className="text-[11px] text-stone-400 min-w-16 text-center">
+              <span className="text-label text-stone-400 min-w-16 text-center">
                 {isBulkMarking
                   ? 'Saving...'
                   : isBulkDeleting
@@ -641,10 +679,11 @@ const ShelfView = ({
               <button
                 onClick={requestBulkDelete}
                 disabled={selectedCount === 0 || isSelectionBusy}
-                className="flex flex-col items-center gap-1 text-red-300 hover:text-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="min-h-11 min-w-11 px-3 flex flex-col items-center justify-center gap-1 rounded-xl text-red-300 hover:text-red-200 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                type="button"
               >
                 <Trash2 className="w-4 h-4" />
-                <span className="text-[10px] uppercase tracking-widest">
+                <span className="text-label uppercase tracking-widest">
                   Delete
                 </span>
               </button>
@@ -660,11 +699,11 @@ const ShelfView = ({
             {/* Add Button */}
             <button
               onClick={onAdd}
-              className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
+              className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-stone-100/5 transition-[opacity,transform] duration-300 motion-safe:active:scale-95"
               title="Add new item"
             >
-              <Plus className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-colors" />
-              <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
+              <Plus className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-opacity" />
+              <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-opacity">
                 Add
               </span>
             </button>
@@ -672,11 +711,11 @@ const ShelfView = ({
             {/* Tonight Button */}
             <button
               onClick={onBack}
-              className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
+              className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-stone-100/5 transition-[opacity,transform] duration-300 motion-safe:active:scale-95"
               title="Back to Tonight"
             >
-              <Moon className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-colors" />
-              <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
+              <Moon className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-opacity" />
+              <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-opacity">
                 Tonight
               </span>
             </button>

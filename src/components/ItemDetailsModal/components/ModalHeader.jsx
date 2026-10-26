@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import PosterPlaceholder from '../../cards/PosterPlaceholder.jsx';
 import LazyMediaImage from '../../media/LazyMediaImage.jsx';
+import IconButton from '../../ui/IconButton.jsx';
 
 const ModalHeader = ({
   backdropSrc,
@@ -10,8 +11,6 @@ const ModalHeader = ({
   item,
   mobileBackdropStyle,
   onClose,
-  vibeDef,
-  energyDef,
 }) => {
   return (
     <>
@@ -37,13 +36,14 @@ const ModalHeader = ({
       </div>
 
       {/* Mobile Close Button (Floating) */}
-      <button
+      <IconButton
+        label="Close details"
+        variant="overlay"
         onClick={onClose}
-        className="absolute right-[calc(1rem+var(--safe-right))] top-[max(1rem,calc(var(--safe-top)+0.5rem))] z-50 p-2 bg-black/50 backdrop-blur-md rounded-full text-white/90 sm:hidden active:scale-95 transition-transform"
-        aria-label="Close details"
+        className="absolute right-[calc(1rem+var(--safe-right))] top-[max(1rem,calc(var(--safe-top)+0.5rem))] z-50 sm:hidden"
       >
-        <X className="w-5 h-5" />
-      </button>
+        <X className="w-5 h-5" aria-hidden="true" />
+      </IconButton>
 
       {/* Poster Section */}
       <div className="sm:w-72 bg-stone-950 sm:bg-stone-900 flex-shrink-0 sm:border-r border-stone-800 relative z-10">
@@ -80,23 +80,7 @@ const ModalHeader = ({
             />
 
             {/* Bottom gradient for blending with content */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-black/5 to-black/20 pointer-events-none" />
-
-            {/* Vibe & Energy Badges */}
-            <div className="absolute bottom-5 left-5 right-5 flex flex-wrap gap-3 z-20">
-              {vibeDef && (
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black/90 text-sm font-bold text-white uppercase tracking-wider border-2 border-white/20 shadow-2xl backdrop-blur-xl">
-                  <vibeDef.icon className="w-4 h-4 text-amber-400 drop-shadow-lg" />
-                  <span className="drop-shadow-lg">{vibeDef.label}</span>
-                </span>
-              )}
-              {energyDef && (
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black/90 text-sm font-bold text-white uppercase tracking-wider border-2 border-white/20 shadow-2xl backdrop-blur-xl">
-                  <energyDef.icon className="w-4 h-4 text-sky-400 drop-shadow-lg" />
-                  <span className="drop-shadow-lg">{energyDef.label}</span>
-                </span>
-              )}
-            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-stone-950/5 to-stone-950/20 pointer-events-none" />
           </div>
         </div>
       </div>

@@ -41,7 +41,7 @@ const LazyMediaImage = ({
     <div className={`relative h-full w-full ${containerClassName}`.trim()}>
       {isLoading && (
         <div
-          className={`absolute inset-0 animate-pulse bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 ${skeletonClassName}`.trim()}
+          className={`absolute inset-0 animate-pulse bg-stone-800 ${skeletonClassName}`.trim()}
           aria-hidden="true"
         />
       )}

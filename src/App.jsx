@@ -1,19 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { ENERGIES, VIBES } from './config/constants.js';
-import {
-  isTemplateMode,
-  useConfiguredAppState,
-} from './app/useConfiguredAppState.js';
+import { isTemplateMode } from './app/useConfiguredAppState.js';
+import { useAppState } from './app/useAppState.js';
+import { lazyWithPrefetch, prefetchOnIdle } from './app/lazyWithPrefetch.js';
 import OnboardingView from './views/OnboardingView.jsx';
 import TonightView from './views/TonightView.jsx';
-import ShelfView from './views/ShelfView.jsx';
-import AddView from './views/AddView.jsx';
-import ImportModal from './views/ImportModal.jsx';
-import DecisionView from './views/DecisionView.jsx';
-import SpaceSwitcherModal from './views/components/SpaceSwitcherModal.jsx';
 
+// Non-first-paint views and modals ship as separate chunks. Tonight and the
+// shell stay eager. Chunks are prefetched on idle after first render so a tap
+// rarely waits on the network.
+const ShelfView = lazyWithPrefetch(() => import('./views/ShelfView.jsx'));
+const AddView = lazyWithPrefetch(() => import('./views/AddView.jsx'));
+const DecisionView = lazyWithPrefetch(() => import('./views/DecisionView.jsx'));
+const ImportModal = lazyWithPrefetch(() => import('./views/ImportModal.jsx'));
+const SpaceSwitcherModal = lazyWithPrefetch(() =>
+  import('./views/components/SpaceSwitcherModal.jsx'),
+);
+
+export function AppLoadingScreen() {
+  return (
+    <div className="min-h-dvh bg-shell flex items-center justify-center">
+      <div className="animate-pulse text-amber-700">
+        <Heart className="w-8 h-8 opacity-50" />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Real (Firebase-backed) app. Template mode renders HearthAppView from
+ * src/template/TemplateApp.jsx with its own state hook, which is lazy-loaded
+ * from src/index.jsx so the template code and seed data stay out of this chunk.
+ */
 export default function HearthApp() {
+  return <HearthAppView appState={useAppState()} />;
+}
+
+export function HearthAppView({ appState }) {
   const {
     autoReloadCountdown,
     authResolved,
@@ -61,7 +85,7 @@ export default function HearthApp() {
     user,
     userSpaces,
     view,
-  } = useConfiguredAppState();
+  } = appState;
 
   const [isSpaceSwitcherOpen, setIsSpaceSwitcherOpen] = useState(false);
 
@@ -73,6 +97,18 @@ export default function HearthApp() {
       setIsSpaceSwitcherOpen(true);
     }
   }, [authResolved, user, spaceId, isBootstrapping, userSpaces]);
+
+  useEffect(
+    () =>
+      prefetchOnIdle([
+        ShelfView,
+        AddView,
+        DecisionView,
+        SpaceSwitcherModal,
+        ...(isTemplateMode ? [] : [ImportModal]),
+      ]),
+    [],
+  );
 
   const handleOpenSpaceSwitcher = () => {
     handleLoadUserSpaces();
@@ -99,40 +135,25 @@ export default function HearthApp() {
     (!isTemplateMode && isDevToolsContext) || allowTemplateDevMenu;
 
   if (!authResolved || isBootstrapping) {
-    return (
-      <div className="min-h-dvh bg-shell flex items-center justify-center">
-        <div className="animate-pulse text-amber-700">
-          <Heart className="w-8 h-8 opacity-50" />
-        </div>
-      </div>
-    );
+    return <AppLoadingScreen />;
   }
 
   if (loading && !items.length && view !== 'onboarding' && view !== 'tonight') {
-    return (
-      <div className="min-h-dvh bg-shell flex items-center justify-center">
-        <div className="animate-pulse text-amber-700">
-          <Heart className="w-8 h-8 opacity-50" />
-        </div>
-      </div>
-    );
+    return <AppLoadingScreen />;
   }
 
   return (
     <div className="min-h-dvh bg-shell text-stone-300 font-sans selection:bg-amber-900/50 selection:text-amber-200 pl-safe-l pr-safe-r">
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(66,40,20,0.2),rgba(12,10,9,1))]"></div>
-
       <div className="relative w-full lg:max-w-md lg:mx-auto min-h-dvh flex flex-col">
         {errorMessage && (
-          <div className="px-6 pt-4 text-xs text-stone-300">{errorMessage}</div>
+          <div role="alert" className="px-6 pt-4 text-sm text-stone-300">
+            {errorMessage}
+          </div>
         )}
         {newVersionAvailable ? (
           <div className="mx-4 mt-4 mb-2">
-            <div className="bg-gradient-to-r from-amber-600/20 to-amber-700/20 border border-amber-500/40 rounded-lg p-4 shadow-lg">
+            <div className="bg-stone-900 border border-stone-700 rounded-lg p-4 shadow-lg">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-amber-200 mb-1">
                     Update Available
@@ -147,13 +168,13 @@ export default function HearthApp() {
                   </p>
                   <div className="flex gap-2">
                     <button
-                      className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-md transition-colors active:scale-95"
+                      className="min-h-11 min-w-11 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-stone-950 text-sm font-medium rounded-md transition-opacity motion-safe:active:scale-95"
                       onClick={handleReloadNow}
                     >
                       Reload Now
                     </button>
                     <button
-                      className="px-4 py-2 bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600 text-stone-300 text-sm font-medium rounded-md transition-colors"
+                      className="min-h-11 min-w-11 px-4 py-2 bg-stone-800/60 hover:bg-stone-700/60 border border-stone-600 text-stone-300 text-sm font-medium rounded-md transition-opacity"
                       onClick={dismissUpdate}
                     >
                       Dismiss
@@ -215,62 +236,69 @@ export default function HearthApp() {
           />
         )}
 
-        {view === 'shelf' && (
-          <ShelfView
-            items={items}
-            onAdd={() => setView('add')}
-            onToggleStatus={handleMarkWatched}
-            onUpdate={handleUpdateItem}
-            onDelete={handleDelete}
-            onBulkDelete={handleBulkDelete}
-            isBulkDeleting={isBulkDeleting}
-            onBack={() => setView('tonight')}
-          />
-        )}
+        <Suspense fallback={null}>
+          {view === 'shelf' && (
+            <ShelfView
+              items={items}
+              onAdd={() => setView('add')}
+              onToggleStatus={handleMarkWatched}
+              onUpdate={handleUpdateItem}
+              onDelete={handleDelete}
+              onBulkDelete={handleBulkDelete}
+              isBulkDeleting={isBulkDeleting}
+              onBack={() => setView('tonight')}
+            />
+          )}
 
-        {view === 'add' && (
-          <AddView
-            onBack={() => setView('tonight')}
-            onSubmit={handleAddItem}
-            allowManualEntry={isTemplateMode}
-          />
-        )}
+          {view === 'add' && (
+            <AddView
+              onBack={() => setView('tonight')}
+              onSubmit={handleAddItem}
+              allowManualEntry={isTemplateMode}
+            />
+          )}
 
-        {view === 'decision' && (
-          <DecisionView
-            isDeciding={isDeciding}
-            result={decisionResult}
-            onClose={() => setView('tonight')}
-            onReroll={() =>
-              startDecision(
-                contextItems.filter((item) => item.id !== decisionResult?.id),
-                decisionContext,
-              )
-            }
-            decisionContext={decisionContext}
-          />
-        )}
+          {view === 'decision' && (
+            <DecisionView
+              isDeciding={isDeciding}
+              result={decisionResult}
+              onClose={() => setView('tonight')}
+              onReroll={() =>
+                startDecision(
+                  contextItems.filter((item) => item.id !== decisionResult?.id),
+                  decisionContext,
+                )
+              }
+              decisionContext={decisionContext}
+            />
+          )}
+        </Suspense>
 
         {isImportOpen && !isTemplateMode && (
-          <ImportModal
-            onClose={() => setIsImportOpen(false)}
-            onImport={handleImportItems}
-            importProgress={importProgress}
-            validVibes={VIBES.map((v) => v.id)}
-            validEnergies={ENERGIES.map((e) => e.id)}
-            existingItems={items}
-          />
+          <Suspense fallback={null}>
+            <ImportModal
+              onClose={() => setIsImportOpen(false)}
+              onImport={handleImportItems}
+              importProgress={importProgress}
+              validVibes={VIBES.map((v) => v.id)}
+              validEnergies={ENERGIES.map((e) => e.id)}
+              existingItems={items}
+            />
+          </Suspense>
         )}
       </div>
 
       {isSpaceSwitcherOpen && (
-        <SpaceSwitcherModal
-          spaces={userSpaces}
-          currentSpaceId={spaceId}
-          onSelect={handleSpaceSwitcherSelect}
-          onCreateNew={handleSpaceSwitcherCreate}
-          isLoading={false}
-        />
+        <Suspense fallback={null}>
+          <SpaceSwitcherModal
+            spaces={userSpaces}
+            currentSpaceId={spaceId}
+            onSelect={handleSpaceSwitcherSelect}
+            onCreateNew={handleSpaceSwitcherCreate}
+            onClose={() => setIsSpaceSwitcherOpen(false)}
+            isLoading={false}
+          />
+        </Suspense>
       )}
 
       {/* Camera cutout / status bar strip. Sits above every view and modal

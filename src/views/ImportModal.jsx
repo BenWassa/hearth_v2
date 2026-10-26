@@ -10,11 +10,14 @@ import {
 } from '../domain/import/importer.js';
 import { copyToClipboard } from '../utils/clipboard.js';
 import Button from '../components/ui/Button.jsx';
+import IconButton from '../components/ui/IconButton.jsx';
+import ProgressBar from '../components/ui/ProgressBar.jsx';
+import SelectChip from '../components/ui/SelectChip.jsx';
 import TextArea from '../components/ui/TextArea.jsx';
+import Dialog from '../components/ui/Dialog.jsx';
 
-const UX_PROGRESS_FAST_MS = 2500;
-const UX_PROGRESS_SETTLE_MS = 2500;
-const UX_PROGRESS_TOTAL_MS = UX_PROGRESS_FAST_MS + UX_PROGRESS_SETTLE_MS;
+const FIELD_FOCUS =
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60';
 
 const ImportModal = ({
   onClose,
@@ -36,14 +39,33 @@ const ImportModal = ({
   const [lastEditedId, setLastEditedId] = useState(null);
   const [highlightId, setHighlightId] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
-  const [uiProgressPercent, setUiProgressPercent] = useState(0);
+  const [importError, setImportError] = useState('');
   const [showSlowLoadSkeletons, setShowSlowLoadSkeletons] = useState(false);
-  const importStartRef = useRef(0);
   const isMountedRef = useRef(true);
   const scrollContainerRef = useRef(null);
+  const stepFocusRef = useRef(null);
   const issueRefs = useRef(new Map());
   const vibeOptions = VIBES.filter((v) => validVibes?.includes(v.id));
   const energyOptions = ENERGIES.filter((e) => validEnergies?.includes(e.id));
+
+  useEffect(() => {
+    stepFocusRef.current?.focus({ preventScroll: true });
+  }, [step]);
+
+  const focusIssue = (node) => {
+    const field = node?.querySelector('[aria-invalid="true"]');
+    (field || node || stepFocusRef.current)?.focus({ preventScroll: true });
+  };
+
+  const scrollIssueIntoView = (node) => {
+    const prefersReducedMotion = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    node.scrollIntoView?.({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  };
 
   const smoothScrollTo = (container, target) => {
     if (!container) return;
@@ -181,6 +203,7 @@ Titles:
         row.id === id ? { ...row, include: !row.include } : row,
       ),
     );
+    setLastEditedId(id);
   };
 
   const fillDefaults = () => {
@@ -255,7 +278,11 @@ Titles:
   const progressProcessed = Number(importProgress?.processed || 0);
   const hydrationTotal = Number(importProgress?.hydrationTotal || 0);
   const hydrationCompleted = Number(importProgress?.hydrationCompleted || 0);
-  const progressPercent = Math.round(uiProgressPercent);
+  const progressRatio =
+    progressTotal > 0
+      ? Math.min(Math.max(progressProcessed / progressTotal, 0), 1)
+      : 0;
+  const progressPercent = Math.round(progressRatio * 100);
   const previewCards = Array.isArray(importProgress?.previewCards)
     ? importProgress.previewCards
     : [];
@@ -264,17 +291,16 @@ Titles:
 
   const importPhaseMessage = (() => {
     if (!isImporting) return '';
-    if (progressPercent < 80) {
-      return 'Preparing your Tonight tray...';
+    if (importProgress?.isRateLimitedBackoff) {
+      return 'The catalog is busy. Pausing for a moment...';
     }
-    if (progressPercent < 90) {
-      return 'Pulling artwork and metadata...';
-    }
-    return 'Opening Tonight...';
+    if (progressTotal === 0) return 'Getting started...';
+    return 'Adding titles to your shelf...';
   })();
 
   const handleImport = async () => {
     setActionError('');
+    setImportError('');
     if (selectedRows.length === 0) {
       setActionError('Select at least one row to import.');
       return;
@@ -292,19 +318,21 @@ Titles:
 
     const selectedPayload = selectedRows.map((row) => row.data);
     setIsImporting(true);
-    importStartRef.current = Date.now();
-    setUiProgressPercent(0);
 
-    const importTask = Promise.resolve(onImport(selectedPayload));
-    void importTask.catch(() => {
+    try {
+      const result = await onImport(selectedPayload);
       if (!isMountedRef.current) return;
-      setActionError('Import failed. Please try again.');
-    });
-
-    setTimeout(() => {
-      if (!isMountedRef.current) return;
+      if (result === false || result?.ok === false) {
+        throw new Error('Import did not finish');
+      }
       onClose();
-    }, UX_PROGRESS_TOTAL_MS);
+    } catch (err) {
+      if (!isMountedRef.current) return;
+      setIsImporting(false);
+      setImportError(
+        'The import did not finish. Try again; titles already added are skipped.',
+      );
+    }
   };
 
   const jumpToFirstIssue = () => {
@@ -321,8 +349,9 @@ Titles:
       const target = currentScroll + (nodeRect.top - containerRect.top) - 24;
       smoothScrollTo(container, Math.max(target, 0));
     } else if (node && node.scrollIntoView) {
-      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollIssueIntoView(node);
     }
+    focusIssue(node);
     setHighlightId(firstIssue.id);
     setTimeout(() => setHighlightId(null), 1200);
   };
@@ -337,9 +366,10 @@ Titles:
     if (currentHasIssues) return;
 
     const currentIndex = rows.findIndex((row) => row.id === lastEditedId);
-    const nextIssue = rows.slice(currentIndex + 1).find((row) => {
-      return row.include && (row.errors.length > 0 || row.missing.length > 0);
-    });
+    const isIssue = (row) =>
+      row.include && (row.errors.length > 0 || row.missing.length > 0);
+    const nextIssue =
+      rows.slice(currentIndex + 1).find(isIssue) || rows.find(isIssue);
 
     if (nextIssue) {
       const node = issueRefs.current.get(nextIssue.id);
@@ -351,10 +381,13 @@ Titles:
         const target = currentScroll + (nodeRect.top - containerRect.top) - 24;
         smoothScrollTo(container, Math.max(target, 0));
       } else if (node && node.scrollIntoView) {
-        node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIssueIntoView(node);
       }
+      focusIssue(node);
       setHighlightId(nextIssue.id);
       setTimeout(() => setHighlightId(null), 1200);
+    } else {
+      stepFocusRef.current?.focus({ preventScroll: true });
     }
     setLastEditedId(null);
   }, [lastEditedId, rows, step]);
@@ -362,59 +395,51 @@ Titles:
   useEffect(() => {
     if (!isImporting) {
       setShowSlowLoadSkeletons(false);
-      setUiProgressPercent(0);
       return undefined;
     }
-    const tick = () => {
-      const elapsed = Date.now() - importStartRef.current;
-      let nextProgress = 0;
-      if (elapsed <= UX_PROGRESS_FAST_MS) {
-        nextProgress = (elapsed / UX_PROGRESS_FAST_MS) * 80;
-      } else if (elapsed <= UX_PROGRESS_TOTAL_MS) {
-        nextProgress =
-          80 + ((elapsed - UX_PROGRESS_FAST_MS) / UX_PROGRESS_SETTLE_MS) * 10;
-      } else {
-        nextProgress = 90;
-      }
-      setUiProgressPercent(Math.max(0, Math.min(nextProgress, 90)));
-    };
-    tick();
-    const progressTimer = setInterval(tick, 60);
     const timer = setTimeout(() => {
       setShowSlowLoadSkeletons(true);
     }, 1200);
-    return () => {
-      clearInterval(progressTimer);
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, [isImporting]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-950/95 backdrop-blur-md flex items-center justify-center pl-[calc(1rem+var(--safe-left))] pr-[calc(1rem+var(--safe-right))] sm:pl-[calc(1.5rem+var(--safe-left))] sm:pr-[calc(1.5rem+var(--safe-right))] pt-[max(1.5rem,var(--safe-top))] pb-[max(1.5rem,var(--safe-bottom))] sm:pt-[max(2rem,var(--safe-top))] sm:pb-[max(2rem,var(--safe-bottom))]">
-      <div className="w-full sm:max-w-4xl bg-stone-950 border border-stone-800 rounded-none sm:rounded-2xl shadow-2xl flex flex-col h-full sm:h-auto sm:max-h-[92vh]">
+    <Dialog
+      onClose={onClose}
+      aria-labelledby="import-title"
+      className="fixed inset-0 z-50 flex items-center justify-center outline-none pl-[calc(1rem+var(--safe-left))] pr-[calc(1rem+var(--safe-right))] sm:pl-[calc(1.5rem+var(--safe-left))] sm:pr-[calc(1.5rem+var(--safe-right))] pt-[max(1.5rem,var(--safe-top))] pb-[max(1.5rem,var(--safe-bottom))] sm:pt-[max(2rem,var(--safe-top))] sm:pb-[max(2rem,var(--safe-bottom))]"
+    >
+      <div
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute inset-0 bg-stone-950/85"
+      />
+      <div className="relative w-full sm:max-w-4xl bg-stone-950 border border-stone-800 rounded-none sm:rounded-2xl shadow-2xl flex flex-col h-full sm:h-auto sm:max-h-[92vh]">
         {/* Header */}
         <div className="flex items-start justify-between px-6 py-5 border-b border-stone-900">
           <div className="space-y-2 flex-1">
-            <h3 className="text-xl font-serif text-stone-100">
+            <h3 id="import-title" className="text-xl font-serif text-stone-100">
               Import Watchlist
             </h3>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Paste JSON (preferred) or CSV below, preview changes, then commit
+              Paste JSON (preferred) or CSV below, preview changes, then import
               to your shelf.
             </p>
           </div>
-          <button
+          <IconButton
+            label="Close import"
             onClick={onClose}
-            className="p-2 -mr-2 -mt-2 rounded-full text-stone-400 hover:text-stone-300 hover:bg-stone-900/30 transition-colors"
+            className="-mr-2 -mt-2 text-stone-400"
           >
             <X className="w-5 h-5" />
-          </button>
+          </IconButton>
         </div>
 
         {/* Main Content */}
@@ -425,7 +450,10 @@ Titles:
           {step === 'prompt' && (
             <>
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-stone-400">
+                <label
+                  htmlFor="import-llm-prompt"
+                  className="block text-xs font-bold uppercase tracking-widest text-stone-400"
+                >
                   Step 1 of 3: Generate JSON with an LLM
                 </label>
                 <p className="text-xs text-stone-400 leading-relaxed">
@@ -433,23 +461,25 @@ Titles:
                   ask an LLM to return JSON that matches Hearth&#39;s schema.
                 </p>
                 <textarea
+                  id="import-llm-prompt"
+                  ref={stepFocusRef}
                   value={llmPrompt}
                   readOnly
                   rows={10}
-                  className="w-full bg-stone-900/40 border border-stone-800 text-stone-300 placeholder-stone-600 px-4 py-3 rounded-xl focus:outline-none font-mono text-xs resize-none"
+                  className={`w-full bg-stone-900/40 border border-stone-800 text-stone-300 px-4 py-3 rounded-xl font-mono text-xs resize-none ${FIELD_FOCUS}`}
                 />
                 <div className="flex items-center gap-2">
                   <Button
                     variant="secondary"
                     onClick={copyPrompt}
-                    className="px-4 py-2 text-sm"
+                    className="px-4 py-2 text-sm min-h-11"
                   >
                     {promptCopied ? 'Prompt Copied' : 'Copy Prompt'}
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={loadSampleData}
-                    className="px-4 py-2 text-sm"
+                    className="px-4 py-2 text-sm min-h-11"
                   >
                     Load sample data
                   </Button>
@@ -461,7 +491,10 @@ Titles:
           {step === 'paste' && (
             <>
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-stone-400">
+                <label
+                  htmlFor="import-raw-text"
+                  className="block text-xs font-bold uppercase tracking-widest text-stone-400"
+                >
                   Step 2 of 3: Paste JSON or CSV
                 </label>
                 <p className="text-xs text-stone-400 leading-relaxed">
@@ -469,15 +502,20 @@ Titles:
                   import.
                 </p>
                 <textarea
+                  id="import-raw-text"
+                  ref={stepFocusRef}
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder='[{"title":"Spirited Away","type":"movie","vibe":"visual","energy":"balanced"}]'
                   rows={8}
-                  className="w-full bg-stone-900/60 border border-stone-800 text-stone-200 placeholder-stone-600 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-900/50 focus:border-amber-700/50 transition-all font-mono text-xs resize-none"
+                  className={`w-full bg-stone-900/60 border border-stone-800 text-stone-200 placeholder-stone-400 px-4 py-3 rounded-xl focus-visible:border-amber-600/60 transition-opacity font-mono text-xs resize-none ${FIELD_FOCUS}`}
                 />
                 {parseError && (
-                  <div className="text-xs text-red-400 bg-red-900/10 border border-red-900/30 rounded-lg px-3 py-2">
-                    ⚠️ {parseError}
+                  <div
+                    role="alert"
+                    className="text-xs text-red-400 bg-red-900/10 border border-red-900/30 rounded-lg px-3 py-2"
+                  >
+                    {parseError}
                   </div>
                 )}
               </div>
@@ -487,9 +525,13 @@ Titles:
           {step === 'review' && (
             <>
               <div className="space-y-5">
-                <label className="text-xs font-bold uppercase tracking-widest text-stone-400">
+                <h4
+                  ref={stepFocusRef}
+                  tabIndex={-1}
+                  className="text-xs font-bold uppercase tracking-widest text-stone-400 focus:outline-none"
+                >
                   Step 3 of 3: Fix missing details
-                </label>
+                </h4>
                 <p className="text-xs text-stone-400 leading-relaxed">
                   Only items that need attention are shown. Everything else is
                   ready to import.
@@ -498,7 +540,7 @@ Titles:
                   <Button
                     variant="secondary"
                     onClick={fillDefaults}
-                    className="px-4 py-2 text-sm"
+                    className="px-4 py-2 text-sm min-h-11"
                   >
                     Auto-fill Defaults
                   </Button>
@@ -507,11 +549,11 @@ Titles:
                     onClick={() => {
                       jumpToFirstIssue();
                     }}
-                    className="px-4 py-2 text-sm"
+                    className="px-4 py-2 text-sm min-h-11"
                   >
                     Assign Manually
                   </Button>
-                  <div className="flex items-center gap-3 text-xs text-stone-500 sm:ml-auto">
+                  <div className="flex items-center gap-3 text-xs text-stone-400 sm:ml-auto">
                     <span>{selectedRows.length} selected</span>
                     <span className="w-px h-4 bg-stone-800" />
                     <span>Issues: {issueRows.length}</span>
@@ -519,29 +561,39 @@ Titles:
                 </div>
                 <button
                   onClick={() => setShowAllRows((prev) => !prev)}
-                  className="text-xs text-stone-400 hover:text-stone-200"
+                  type="button"
+                  className={`min-h-11 -ml-2 px-2 rounded-lg text-xs text-stone-400 hover:text-stone-200 ${FIELD_FOCUS}`}
                 >
                   {showAllRows ? 'Show issues only' : 'Show all rows'}
                 </button>
               </div>
 
               {displayRows.length === 0 && (
-                <div className="text-xs text-stone-500 bg-stone-900/30 rounded-lg px-3 py-3">
+                <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-3">
                   No issues found. You&#39;re ready to import.
                 </div>
               )}
 
               {displayRows.length > 0 && (
-                <div className="space-y-3">
+                <div className="divide-y divide-stone-800">
                   {displayRows.map((row, index) => {
-                    const hasIssues =
-                      row.errors.length > 0 || row.missing.length > 0;
                     const errorFields = row.errors.map((e) => e.field);
                     const missingVibe = row.missing.includes('vibe');
                     const missingEnergy = row.missing.includes('energy');
                     const hasTypeError = errorFields.includes('type');
                     const hasVibeError = errorFields.includes('vibe');
                     const hasEnergyError = errorFields.includes('energy');
+                    const fieldError = (field) =>
+                      row.errors.find((error) => error.field === field)
+                        ?.message;
+                    const titleError = fieldError('title');
+                    const typeError = fieldError('type');
+                    const vibeError =
+                      fieldError('vibe') ||
+                      (missingVibe ? 'Choose a vibe.' : '');
+                    const energyError =
+                      fieldError('energy') ||
+                      (missingEnergy ? 'Choose an energy.' : '');
 
                     return (
                       <div
@@ -553,28 +605,23 @@ Titles:
                             issueRefs.current.set(row.id, node);
                           }
                         }}
-                        className={`border rounded-2xl p-5 space-y-5 transition-all scroll-mt-24 ${
-                          hasIssues
-                            ? 'border-amber-900/50 bg-amber-900/10'
-                            : 'border-stone-800 bg-stone-900/30'
-                        } ${!row.include ? 'opacity-50' : ''} ${
-                          highlightId === row.id
-                            ? 'ring-2 ring-amber-600/40 shadow-lg shadow-amber-900/20'
-                            : ''
-                        }`}
+                        className={`-mx-3 px-3 py-5 space-y-5 rounded-xl transition-opacity scroll-mt-24 ${
+                          !row.include ? 'opacity-50' : ''
+                        } ${highlightId === row.id ? 'bg-amber-500/10' : ''}`}
+                        tabIndex={-1}
                       >
-                        <div className="space-y-2">
-                          <span className="text-xs uppercase tracking-widest text-stone-400 font-bold whitespace-normal break-words">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs uppercase tracking-widest text-stone-400 font-bold whitespace-normal break-words min-w-0">
                             {row.data.title || `Row ${index + 1}`}
                           </span>
-                          <label className="flex items-center gap-3 cursor-pointer group sm:self-end">
+                          <label className="flex min-h-11 shrink-0 items-center gap-3 cursor-pointer group">
                             <input
                               type="checkbox"
                               checked={row.include}
                               onChange={() => toggleRowById(row.id)}
-                              className="w-4 h-4 rounded border-stone-700 bg-stone-900 text-amber-600 focus:ring-amber-900/50 accent-amber-600 cursor-pointer"
+                              className={`w-5 h-5 rounded border-stone-700 bg-stone-900 text-amber-600 accent-amber-600 cursor-pointer ${FIELD_FOCUS}`}
                             />
-                            <span className="text-xs text-stone-500 group-hover:text-stone-400">
+                            <span className="text-xs text-stone-400 group-hover:text-stone-200">
                               Import this
                             </span>
                           </label>
@@ -585,17 +632,44 @@ Titles:
                           onChange={(e) =>
                             updateRowById(row.id, 'title', e.target.value)
                           }
+                          aria-label="Title"
+                          aria-invalid={Boolean(titleError)}
+                          aria-describedby={
+                            titleError
+                              ? `import-title-error-${row.id}`
+                              : undefined
+                          }
                           placeholder="Title (required)"
-                          className={`w-full bg-stone-900/50 border rounded-lg px-3 py-2 text-sm transition-all ${
+                          className={`w-full min-h-11 bg-stone-900/50 border rounded-lg px-3 py-2 text-sm transition-opacity ${
                             errorFields.includes('title')
                               ? 'border-red-900/50 text-red-200'
                               : 'border-stone-800 text-stone-200'
-                          } placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-900/50`}
+                          } placeholder-stone-400 ${FIELD_FOCUS}`}
                         />
+                        {titleError && (
+                          <p
+                            id={`import-title-error-${row.id}`}
+                            className="text-sm text-red-300"
+                          >
+                            {titleError}
+                          </p>
+                        )}
 
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
+                        <div
+                          role="group"
+                          aria-labelledby={`import-type-label-${row.id}`}
+                          aria-invalid={Boolean(typeError)}
+                          aria-describedby={
+                            typeError
+                              ? `import-type-error-${row.id}`
+                              : undefined
+                          }
+                          tabIndex={-1}
+                          className={`space-y-2 rounded-lg ${FIELD_FOCUS}`}
+                        >
+                          <div className="flex items-center gap-2 text-label uppercase tracking-widest">
                             <span
+                              id={`import-type-label-${row.id}`}
                               className={
                                 hasTypeError ? 'text-red-200' : 'text-stone-400'
                               }
@@ -606,32 +680,46 @@ Titles:
                           <div className="flex gap-2">
                             {['movie', 'show'].map((type) => {
                               const isSelected = row.data.type === type;
-                              const TypeIcon = type === 'movie' ? Film : Tv;
                               return (
-                                <button
+                                <SelectChip
                                   key={type}
                                   onClick={() =>
                                     updateRowById(row.id, 'type', type)
                                   }
-                                  className={`flex-1 py-2 rounded-lg border text-xs uppercase tracking-widest transition-all ${
-                                    isSelected
-                                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                                      : 'border-stone-800 text-stone-400 hover:bg-stone-900'
-                                  }`}
+                                  selected={isSelected}
+                                  icon={type === 'movie' ? Film : Tv}
+                                  className="flex-1 justify-center"
                                 >
-                                  <span className="inline-flex items-center justify-center gap-2">
-                                    <TypeIcon className="w-3.5 h-3.5" />
-                                    {type}
-                                  </span>
-                                </button>
+                                  {type}
+                                </SelectChip>
                               );
                             })}
                           </div>
+                          {typeError && (
+                            <p
+                              id={`import-type-error-${row.id}`}
+                              className="text-sm text-red-300"
+                            >
+                              {typeError}
+                            </p>
+                          )}
                         </div>
 
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
+                        <div
+                          role="group"
+                          aria-labelledby={`import-vibe-label-${row.id}`}
+                          aria-invalid={Boolean(vibeError)}
+                          aria-describedby={
+                            vibeError
+                              ? `import-vibe-error-${row.id}`
+                              : undefined
+                          }
+                          tabIndex={-1}
+                          className={`space-y-2 rounded-lg ${FIELD_FOCUS}`}
+                        >
+                          <div className="flex items-center gap-2 text-label uppercase tracking-widest">
                             <span
+                              id={`import-vibe-label-${row.id}`}
                               className={
                                 hasVibeError
                                   ? 'text-red-200'
@@ -646,32 +734,45 @@ Titles:
                           <div className="flex flex-wrap gap-2">
                             {vibeOptions.map((vibe) => {
                               const isSelected = row.data.vibe === vibe.id;
-                              const VibeIcon = vibe.icon;
                               return (
-                                <button
+                                <SelectChip
                                   key={vibe.id}
                                   onClick={() =>
                                     updateRowById(row.id, 'vibe', vibe.id)
                                   }
-                                  className={`px-3 py-1.5 rounded-full border text-xs uppercase tracking-widest transition-all ${
-                                    isSelected
-                                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                                      : 'border-stone-800 text-stone-500 hover:bg-stone-900'
-                                  }`}
+                                  selected={isSelected}
+                                  icon={vibe.icon}
                                 >
-                                  <span className="inline-flex items-center gap-1.5">
-                                    <VibeIcon className="w-3.5 h-3.5" />
-                                    {vibe.label}
-                                  </span>
-                                </button>
+                                  {vibe.label}
+                                </SelectChip>
                               );
                             })}
                           </div>
+                          {vibeError && (
+                            <p
+                              id={`import-vibe-error-${row.id}`}
+                              className="text-sm text-red-300"
+                            >
+                              {vibeError}
+                            </p>
+                          )}
                         </div>
 
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
+                        <div
+                          role="group"
+                          aria-labelledby={`import-energy-label-${row.id}`}
+                          aria-invalid={Boolean(energyError)}
+                          aria-describedby={
+                            energyError
+                              ? `import-energy-error-${row.id}`
+                              : undefined
+                          }
+                          tabIndex={-1}
+                          className={`space-y-2 rounded-lg ${FIELD_FOCUS}`}
+                        >
+                          <div className="flex items-center gap-2 text-label uppercase tracking-widest">
                             <span
+                              id={`import-energy-label-${row.id}`}
                               className={
                                 hasEnergyError
                                   ? 'text-red-200'
@@ -683,40 +784,45 @@ Titles:
                               Energy
                             </span>
                           </div>
+                          {energyError && (
+                            <p
+                              id={`import-energy-error-${row.id}`}
+                              className="text-sm text-red-300"
+                            >
+                              {energyError}
+                            </p>
+                          )}
                           <div className="flex flex-wrap gap-2">
                             {energyOptions.map((energy) => {
                               const isSelected = row.data.energy === energy.id;
-                              const EnergyIcon = energy.icon;
                               return (
-                                <button
+                                <SelectChip
                                   key={energy.id}
                                   onClick={() =>
                                     updateRowById(row.id, 'energy', energy.id)
                                   }
-                                  className={`px-3 py-1.5 rounded-full border text-xs uppercase tracking-widest transition-all ${
-                                    isSelected
-                                      ? 'bg-stone-800 border-stone-700 text-stone-200'
-                                      : 'border-stone-800 text-stone-500 hover:bg-stone-900'
-                                  }`}
+                                  selected={isSelected}
+                                  icon={energy.icon}
                                 >
-                                  <span className="inline-flex items-center gap-1.5">
-                                    <EnergyIcon className="w-3.5 h-3.5" />
-                                    {energy.label}
-                                  </span>
-                                </button>
+                                  {energy.label}
+                                </SelectChip>
                               );
                             })}
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-stone-400">
+                          <label
+                            htmlFor={`import-runtime-${row.id}`}
+                            className="flex items-center gap-2 text-label uppercase tracking-widest text-stone-400"
+                          >
                             Runtime (minutes)
-                            <span className="text-stone-600 normal-case">
+                            <span className="text-stone-400 normal-case">
                               Optional
                             </span>
-                          </div>
+                          </label>
                           <input
+                            id={`import-runtime-${row.id}`}
                             value={row.data.runtimeMinutes ?? ''}
                             onChange={(e) =>
                               updateRowById(
@@ -729,19 +835,23 @@ Titles:
                             min="1"
                             inputMode="numeric"
                             placeholder="e.g. 97"
-                            className="w-full bg-stone-900/50 border border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-900/50"
+                            className={`w-full min-h-11 bg-stone-900/50 border border-stone-800 rounded-lg px-3 py-2 text-sm text-stone-200 placeholder-stone-400 ${FIELD_FOCUS}`}
                           />
                         </div>
 
                         <div className="space-y-3">
-                          <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400">
+                          <label
+                            htmlFor={`import-note-${row.id}`}
+                            className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-400"
+                          >
                             <MessageSquare className="w-3 h-3" />
                             Why this?{' '}
-                            <span className="text-stone-700 font-normal normal-case">
+                            <span className="text-stone-400 font-normal normal-case">
                               (Optional)
                             </span>
                           </label>
                           <TextArea
+                            id={`import-note-${row.id}`}
                             value={row.data.note || ''}
                             onChange={(e) =>
                               updateRowById(row.id, 'note', e.target.value)
@@ -759,32 +869,51 @@ Titles:
         </div>
 
         {/* Footer */}
-        <div className="mt-auto sticky bottom-0 z-40 px-6 pt-5 pb-[calc(1.25rem+var(--safe-bottom))] border-t border-stone-900 space-y-3 bg-stone-950/50">
+        <div className="mt-auto sticky bottom-0 z-40 px-6 pt-5 pb-[calc(1.25rem+var(--safe-bottom))] border-t border-stone-900 space-y-3 bg-stone-950">
           {actionError && (
-            <div className="text-xs text-amber-500 bg-amber-900/10 border border-amber-900/30 rounded-lg px-3 py-2">
-              ⚠️ {actionError}
+            <div
+              role="alert"
+              className="text-xs text-amber-500 bg-amber-900/10 border border-amber-900/30 rounded-lg px-3 py-2"
+            >
+              {actionError}
+            </div>
+          )}
+          {importError && (
+            <div
+              role="alert"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-red-300 bg-red-900/10 border border-red-900/30 rounded-lg px-3 py-2"
+            >
+              <span className="flex-1">{importError}</span>
+              <Button
+                variant="secondary"
+                onClick={handleImport}
+                className="px-4 py-2 text-sm min-h-11"
+              >
+                Try again
+              </Button>
             </div>
           )}
           {needsAttention && hasPreview && (
             <div className="text-xs text-stone-400 bg-stone-900/30 rounded-lg px-3 py-2">
-              Resolve fields marked in red or orange before importing.
+              Resolve missing or invalid fields before importing.
             </div>
           )}
           {isImporting && (
-            <div className="rounded-xl border border-amber-800/40 bg-gradient-to-br from-amber-950/50 via-stone-900/70 to-stone-950/70 px-3 py-3 space-y-2">
+            <div className="rounded-xl border border-stone-800 bg-stone-900 px-3 py-3 space-y-2">
               <div className="flex items-center justify-between gap-3 text-xs">
-                <span className="text-amber-300">{importPhaseMessage}</span>
+                <span className="text-amber-300" aria-live="polite">
+                  {importPhaseMessage}
+                </span>
                 <span className="tabular-nums font-semibold text-amber-200">
                   {progressPercent}%
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-stone-900/90 border border-stone-800 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-700 via-amber-500 to-rose-500 transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <div className="flex items-center justify-between text-[11px] text-stone-400">
+              <ProgressBar
+                label="Import progress"
+                value={progressPercent}
+                heightClassName="h-2"
+              />
+              <div className="flex items-center justify-between text-label text-stone-400">
                 <span className="tabular-nums">
                   {progressProcessed}/{progressTotal || selectedImportableCount}{' '}
                   titles
@@ -798,8 +927,8 @@ Titles:
             </div>
           )}
           {shouldShowCoverStrip && (
-            <div className="rounded-xl border border-stone-800 bg-stone-900/40 px-3 py-3 space-y-2">
-              <div className="text-[11px] uppercase tracking-widest text-stone-500">
+            <div className="space-y-2">
+              <div className="text-label uppercase tracking-widest text-stone-400">
                 Covers Incoming
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -814,7 +943,7 @@ Titles:
                 ).map((card) => (
                   <div
                     key={card.id}
-                    className="relative overflow-hidden rounded-lg border border-stone-800/70 bg-stone-950/70"
+                    className="relative overflow-hidden rounded-lg bg-stone-900"
                   >
                     <div className="aspect-[2/3] w-full">
                       {card.poster ? (
@@ -826,7 +955,7 @@ Titles:
                           decoding="async"
                         />
                       ) : (
-                        <div className="h-full w-full animate-pulse bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 flex items-center justify-center text-stone-500">
+                        <div className="h-full w-full animate-pulse bg-stone-800 flex items-center justify-center text-stone-400">
                           {card.type === 'show' ? (
                             <Tv className="w-4 h-4" />
                           ) : (
@@ -858,14 +987,14 @@ Titles:
             <Button
               variant="ghost"
               onClick={onClose}
-              className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
+              className="px-4 py-2 text-sm min-h-11 whitespace-nowrap flex-shrink-0"
             >
               Cancel
             </Button>
             {step === 'prompt' && (
               <Button
                 onClick={() => setStep('paste')}
-                className="px-4 py-2 text-sm"
+                className="px-4 py-2 text-sm min-h-11"
               >
                 Next
               </Button>
@@ -875,7 +1004,7 @@ Titles:
                 <Button
                   variant="ghost"
                   onClick={() => setStep('prompt')}
-                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
+                  className="px-4 py-2 text-sm min-h-11 whitespace-nowrap flex-shrink-0"
                 >
                   Back
                 </Button>
@@ -883,7 +1012,7 @@ Titles:
                   variant="secondary"
                   onClick={handlePreview}
                   disabled={!rawText.trim()}
-                  className="px-4 py-2 text-sm"
+                  className="px-4 py-2 text-sm min-h-11"
                 >
                   Preview
                 </Button>
@@ -894,7 +1023,7 @@ Titles:
                 <Button
                   variant="ghost"
                   onClick={() => setStep('paste')}
-                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
+                  className="px-4 py-2 text-sm min-h-11 whitespace-nowrap flex-shrink-0"
                 >
                   Back
                 </Button>
@@ -906,7 +1035,7 @@ Titles:
                     selectedImportableCount === 0 ||
                     isImporting
                   }
-                  className="px-4 py-2 text-sm whitespace-nowrap flex-shrink-0"
+                  className="px-4 py-2 text-sm min-h-11 whitespace-nowrap flex-shrink-0"
                 >
                   {isImporting ? (
                     'Importing...'
@@ -929,7 +1058,7 @@ Titles:
           </div>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

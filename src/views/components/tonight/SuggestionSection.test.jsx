@@ -93,8 +93,9 @@ describe('SuggestionSection rewind', () => {
 
     await act(async () => {
       rail.dispatchEvent(new Event('scroll', { bubbles: true }));
-      animationCallbacks.shift()?.();
-      animationCallbacks.shift()?.();
+      // Scroll measuring is batched per frame and schedules a follow-up frame
+      // to restore snapping, so flush until the queue is empty.
+      while (animationCallbacks.length) animationCallbacks.shift()();
     });
 
     expect(rail.scrollLeft).toBe(0);

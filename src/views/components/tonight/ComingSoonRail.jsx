@@ -24,8 +24,8 @@ const ComingSoonRail = ({ releases, onOpenDetails }) => {
   return (
     <section className="space-y-2 shrink-0" aria-label="Coming Soon">
       <div className="flex items-center gap-1.5 px-1">
-        <CalendarDays className="w-4 h-4 text-stone-500" />
-        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
+        <CalendarDays className="w-4 h-4 text-stone-400" />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400">
           Coming Soon
         </h3>
       </div>
@@ -49,7 +49,7 @@ const ComingSoonRail = ({ releases, onOpenDetails }) => {
                 <button
                   type="button"
                   key={`${release.showId}-${release.seasonNumber}`}
-                  className="group relative w-[clamp(17rem,42vw,24rem)] shrink-0 overflow-hidden rounded-xl border border-stone-800/70 bg-stone-900/70 text-left shadow-lg shadow-black/20 transition-colors duration-200 hover:border-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  className="group relative w-[clamp(17rem,42vw,24rem)] shrink-0 overflow-hidden rounded-xl border border-stone-800/70 bg-stone-900/70 text-left shadow-lg shadow-black/20 transition-opacity duration-200 hover:border-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                   style={{ scrollSnapAlign: 'start' }}
                   onClick={() => onOpenDetails?.(release.item)}
                   aria-label={`View details for ${release.showTitle}`}
@@ -82,7 +82,7 @@ const ComingSoonRail = ({ releases, onOpenDetails }) => {
 
                     <div className="min-w-0 p-3 flex flex-col justify-between gap-3">
                       <div className="space-y-1.5 min-w-0">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                        <div className="flex items-center gap-1.5 text-label font-bold uppercase tracking-widest text-amber-400">
                           <span>{formatReleaseDate(release.airDate)}</span>
                         </div>
                         <div className="min-w-0">
@@ -97,14 +97,14 @@ const ComingSoonRail = ({ releases, onOpenDetails }) => {
 
                       <div className="flex items-end justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="text-[10px] uppercase tracking-wider text-stone-500">
+                          <div className="text-label uppercase tracking-wider text-stone-400">
                             Next episode
                           </div>
                           <div className="mt-0.5 text-xs font-medium leading-snug text-stone-300 line-clamp-2">
                             {release.episodeTitle}
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 shrink-0 text-stone-600 transition-colors group-hover:text-stone-400" />
+                        <ChevronRight className="w-4 h-4 shrink-0 text-stone-400 transition-opacity group-hover:text-stone-400" />
                       </div>
                     </div>
                   </div>
@@ -123,4 +123,4 @@ const ComingSoonRail = ({ releases, onOpenDetails }) => {
   );
 };
 
-export default ComingSoonRail;
+export default React.memo(ComingSoonRail);

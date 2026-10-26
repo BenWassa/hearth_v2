@@ -232,4 +232,45 @@ describe('AddView integration', () => {
 
     await cleanupDom(mounted);
   });
+
+  it('labels the search input and marks only the first result as top match', async () => {
+    useMediaSearch.mockReturnValue(
+      makeSearchState({
+        results: [makeSearchResult('1'), makeSearchResult('2')],
+        hasQuery: true,
+      }),
+    );
+
+    const mounted = await renderIntoDom(
+      <AddView onBack={() => {}} onSubmit={() => {}} />,
+    );
+
+    const input = mounted.container.querySelector(
+      '[data-testid="live-search-input"]',
+    );
+    expect(
+      mounted.container.querySelector(`label[for="${input.id}"]`),
+    ).not.toBeNull();
+    const matches = mounted.container.textContent.match(/Top match/g) || [];
+    expect(matches).toHaveLength(1);
+
+    await cleanupDom(mounted);
+  });
+
+  it('explains why Put on Shelf is disabled', async () => {
+    const mounted = await renderIntoDom(
+      <AddView onBack={() => {}} onSubmit={() => {}} />,
+    );
+
+    const submit = Array.from(
+      mounted.container.querySelectorAll('button'),
+    ).find((button) => button.textContent.includes('Put on Shelf'));
+    expect(submit.disabled).toBe(true);
+    const hint = mounted.container.querySelector(
+      `#${submit.getAttribute('aria-describedby')}`,
+    );
+    expect(hint.textContent).toContain('Pick a title');
+
+    await cleanupDom(mounted);
+  });
 });

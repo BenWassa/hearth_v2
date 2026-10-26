@@ -11,17 +11,24 @@ import {
 import { ENERGIES, VIBES } from '../config/constants.js';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
+import SelectChip from '../components/ui/SelectChip.jsx';
 import TextArea from '../components/ui/TextArea.jsx';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
 
-const SectionLabel = ({ children, icon: Icon }) => (
-  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">
-    {Icon ? <Icon className="h-3 w-3 text-amber-500/70" /> : null}
-    {children}
-  </div>
-);
+const SectionLabel = ({ children, icon: Icon, htmlFor }) => {
+  const Tag = htmlFor ? 'label' : 'div';
+  return (
+    <Tag
+      htmlFor={htmlFor}
+      className="flex items-center gap-2 text-label font-semibold uppercase tracking-[0.16em] text-stone-400"
+    >
+      {Icon ? <Icon className="h-3 w-3 text-amber-500/70" /> : null}
+      {children}
+    </Tag>
+  );
+};
 
 const getMediaTypeMeta = (mediaType) => {
   if (mediaType === 'show') {
@@ -40,7 +47,7 @@ const MediaTypeBadge = ({ type: mediaType, selected = false }) => {
   const { icon: Icon, label } = getMediaTypeMeta(mediaType);
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-1 text-label font-semibold uppercase tracking-[0.12em] ${
         selected
           ? 'border-amber-500/30 bg-amber-400/10 text-amber-200'
           : 'border-stone-700/80 bg-stone-950/50 text-stone-400'
@@ -205,7 +212,9 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
   const handleSubmit = () => {
     if (!selectedResult) {
-      setSubmitError('Select a movie or show from Live Search before saving.');
+      setSubmitError(
+        'Pick a movie or show from the search results before saving.',
+      );
       return;
     }
     if (isEnriching) {
@@ -283,29 +292,31 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-stone-950 animate-in slide-in-from-bottom duration-300 w-full">
+    <div className="flex-1 flex flex-col bg-stone-950 w-full">
       <div className="px-5 pt-[calc(1rem+var(--safe-top))] pb-4 sm:px-6 flex items-center justify-between border-b border-stone-900/80 bg-stone-950/95">
         <button
           onClick={onBack}
-          className="rounded-lg px-2 py-1.5 text-sm font-medium text-stone-400 transition-colors hover:bg-stone-900 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
+          className="min-h-11 rounded-lg px-3 text-sm font-medium text-stone-400 transition-opacity hover:bg-stone-900 hover:text-stone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
           type="button"
         >
           Cancel
         </button>
         <div className="text-center">
           <h1 className="font-serif text-base text-stone-100">Save for Us</h1>
-          <p className="mt-0.5 text-[11px] text-stone-500">
+          <p className="mt-0.5 text-label text-stone-400">
             Add a title to the shared shelf
           </p>
         </div>
-        <div className="w-[4.25rem]" aria-hidden="true" />
+        <div className="w-[4.5rem]" aria-hidden="true" />
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
-        {/* Live Search */}
+        {/* Title search */}
         <div className="space-y-7">
           <section className="space-y-3">
-            <SectionLabel icon={Search}>Title</SectionLabel>
+            <SectionLabel icon={Search} htmlFor="add-title-search">
+              Title
+            </SectionLabel>
             <div className="relative">
               <Input
                 value={searchQuery}
@@ -313,10 +324,11 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                   setSearchQuery(e.target.value);
                   if (selectedResult) clearSelectedResult();
                 }}
+                id="add-title-search"
                 placeholder="Search movie or show title"
                 data-testid="live-search-input"
                 autoComplete="off"
-                className="pr-11"
+                className="pr-14"
               />
               {searchQuery ? (
                 <button
@@ -324,8 +336,8 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                     setSearchQuery('');
                     clearSelectedResult();
                   }}
-                  className="absolute right-3 top-1/2 rounded-full p-1 text-stone-500 transition-colors -translate-y-1/2 hover:bg-stone-700/70 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
-                  title="Clear search"
+                  className="absolute right-1 top-1/2 flex min-h-11 min-w-11 items-center justify-center rounded-full text-stone-400 transition-opacity -translate-y-1/2 hover:bg-stone-700/70 hover:text-stone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                  aria-label="Clear search"
                   type="button"
                 >
                   <X className="h-4 w-4" />
@@ -347,16 +359,16 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                       <SearchResultSkeleton />
                     ) : (
                       <>
-                        {results.map((result) => (
+                        {results.map((result, index) => (
                           <button
                             key={`${result.provider}-${result.providerId}`}
                             onClick={() => handleSelectResult(result)}
-                            className="w-full px-3 py-3 text-left transition-colors hover:bg-stone-800/70 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-700/40"
+                            className="w-full min-h-11 px-3 py-3 text-left transition-opacity hover:bg-stone-800/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500/60"
                             type="button"
                           >
                             <div className="flex items-center gap-4">
                               <div className="relative h-[4.5rem] w-12 shrink-0 overflow-hidden rounded-md border border-stone-700 bg-stone-800">
-                                <div className="absolute inset-0 flex items-center justify-center text-stone-500">
+                                <div className="absolute inset-0 flex items-center justify-center text-stone-400">
                                   {result.type === 'show' ? (
                                     <Tv className="h-4 w-4" />
                                   ) : (
@@ -378,15 +390,21 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-start gap-2">
-                                  <div className="min-w-0 flex-1 truncate text-[15px] font-medium text-stone-100">
+                                  <div className="min-w-0 flex-1 truncate text-base font-medium text-stone-100">
                                     {result.title}
                                   </div>
                                   <MediaTypeBadge type={result.type} />
                                 </div>
-                                <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-                                  Top match{' '}
-                                  {result.year ? `• ${result.year}` : ''}
-                                </div>
+                                {index === 0 || result.year ? (
+                                  <div className="mt-1 text-label font-semibold uppercase tracking-[0.14em] text-stone-400">
+                                    {[
+                                      index === 0 ? 'Top match' : '',
+                                      result.year,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(' • ')}
+                                  </div>
+                                ) : null}
                               </div>
                             </div>
                           </button>
@@ -403,7 +421,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                         {hasMore ? (
                           <div className="px-3 py-3">
                             <button
-                              className="w-full rounded-lg border border-stone-800 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-400 transition-colors hover:bg-stone-800/70 hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-700/40 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="w-full min-h-11 rounded-lg border border-stone-800 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-400 transition-opacity hover:bg-stone-800/70 hover:text-stone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 disabled:cursor-not-allowed disabled:opacity-50"
                               disabled={loadingMore}
                               onClick={loadMore}
                               type="button"
@@ -426,7 +444,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                 <p className="text-sm text-stone-300">
                   No catalog matches yet.
                 </p>
-                <p className="mt-1 text-xs text-stone-500">
+                <p className="mt-1 text-xs text-stone-400">
                   Try the exact title or a related keyword.
                 </p>
               </div>
@@ -455,7 +473,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                     ) : null}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-300">
+                    <div className="flex items-center gap-1.5 text-label font-semibold uppercase tracking-[0.14em] text-amber-300">
                       {isEnriching ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                       ) : (
@@ -469,14 +487,14 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <MediaTypeBadge type={type} selected />
                       {selectedYear ? (
-                        <span className="text-xs text-stone-500">
+                        <span className="text-xs text-stone-400">
                           {selectedYear}
                         </span>
                       ) : null}
                     </div>
                   </div>
                   <button
-                    className="rounded-lg px-2 py-1 text-xs font-semibold text-amber-300 transition-colors hover:bg-amber-500/10 hover:text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-700/40"
+                    className="min-h-11 min-w-11 rounded-lg px-3 text-xs font-semibold text-amber-300 transition-opacity hover:bg-amber-500/10 hover:text-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
                     onClick={clearSelectedResult}
                     type="button"
                   >
@@ -496,7 +514,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
               </div>
             )}
             {allowManualEntry && (
-              <div className="text-xs text-stone-500">
+              <div className="text-xs text-stone-400">
                 Choose the official title from search before saving.
               </div>
             )}
@@ -508,23 +526,15 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
             <div className="flex flex-wrap gap-2">
               {VIBES.map((v) => {
                 const isSelected = vibe === v.id;
-                const VibeIcon = v.icon;
                 return (
-                  <button
+                  <SelectChip
                     key={v.id}
                     onClick={() => setVibe(v.id)}
-                    className={`rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
-                      isSelected
-                        ? 'bg-amber-500/15 border-amber-500/35 text-amber-200'
-                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
-                    }`}
-                    type="button"
+                    selected={isSelected}
+                    icon={v.icon}
                   >
-                    <span className="inline-flex items-center gap-1.5">
-                      <VibeIcon className="w-3.5 h-3.5" />
-                      {v.label}
-                    </span>
-                  </button>
+                    {v.label}
+                  </SelectChip>
                 );
               })}
             </div>
@@ -536,23 +546,15 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
             <div className="flex flex-wrap gap-2">
               {ENERGIES.map((e) => {
                 const isSelected = energy === e.id;
-                const EnergyIcon = e.icon;
                 return (
-                  <button
+                  <SelectChip
                     key={e.id}
                     onClick={() => setEnergy(e.id)}
-                    className={`rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-all focus:outline-none focus:ring-2 focus:ring-amber-700/40 ${
-                      isSelected
-                        ? 'bg-amber-500/15 border-amber-500/35 text-amber-200'
-                        : 'border-stone-800 text-stone-500 hover:bg-stone-900 hover:text-stone-300'
-                    }`}
-                    type="button"
+                    selected={isSelected}
+                    icon={e.icon}
                   >
-                    <span className="inline-flex items-center gap-1.5">
-                      <EnergyIcon className="w-3.5 h-3.5" />
-                      {e.label}
-                    </span>
-                  </button>
+                    {e.label}
+                  </SelectChip>
                 );
               })}
             </div>
@@ -560,14 +562,18 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
 
           {/* Note */}
           <section className="space-y-3">
-            <label className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-500">
+            <label
+              htmlFor="add-note"
+              className="flex items-center gap-2 text-label font-semibold uppercase tracking-[0.16em] text-stone-400"
+            >
               <MessageSquare className="w-3 h-3 text-amber-500/70" />
               Why this?{' '}
-              <span className="text-stone-600 font-normal normal-case tracking-normal">
+              <span className="text-stone-400 font-normal normal-case tracking-normal">
                 (Optional)
               </span>
             </label>
             <TextArea
+              id="add-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Heard it is funny, good for a rainy day..."
@@ -576,7 +582,15 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
         </div>
       </div>
 
-      <div className="border-t border-stone-900/80 bg-stone-950/95 px-5 pt-4 pb-[calc(1rem+var(--safe-bottom))] sm:px-6 backdrop-blur">
+      <div className="border-t border-stone-900/80 bg-stone-950 px-5 pt-4 pb-[calc(1rem+var(--safe-bottom))] sm:px-6">
+        {!selectedResult && (
+          <p
+            id="add-submit-hint"
+            className="mb-3 text-center text-xs text-stone-400"
+          >
+            Pick a title from the search results to put it on the shelf.
+          </p>
+        )}
         <Button
           onClick={handleSubmit}
           disabled={
@@ -586,6 +600,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
             !enrichedPayload?.source?.providerId
           }
           className="w-full"
+          aria-describedby={!selectedResult ? 'add-submit-hint' : undefined}
         >
           {isEnriching ? 'Loading Metadata...' : 'Put on Shelf'}
         </Button>

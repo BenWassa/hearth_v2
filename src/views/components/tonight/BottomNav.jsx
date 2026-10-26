@@ -8,17 +8,17 @@ const BottomNav = ({ onAdd, goToShelf }) => {
         <div className="flex items-center justify-around gap-2">
           <button
             onClick={onAdd}
-            className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
+            className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-stone-100/5 transition-[opacity,transform] duration-300 motion-safe:active:scale-95"
             title="Add new item"
           >
-            <Plus className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-colors" />
-            <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
+            <Plus className="w-6 h-6 text-stone-300 group-hover:text-amber-300 transition-opacity" />
+            <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-opacity">
               Add
             </span>
           </button>
 
           <button
-            disabled
+            aria-current="page"
             className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 cursor-default"
             title="Tonight"
           >
@@ -30,11 +30,11 @@ const BottomNav = ({ onAdd, goToShelf }) => {
 
           <button
             onClick={goToShelf}
-            className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-white/5 transition-all duration-300 active:scale-95"
+            className="group flex-1 py-3 px-4 flex flex-col items-center gap-1.5 rounded-2xl hover:bg-stone-100/5 transition-[opacity,transform] duration-300 motion-safe:active:scale-95"
             title="Go to Library"
           >
-            <Library className="w-6 h-6 text-stone-300 group-hover:text-stone-100 transition-colors" />
-            <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-colors">
+            <Library className="w-6 h-6 text-stone-300 group-hover:text-stone-100 transition-opacity" />
+            <span className="text-xs font-bold tracking-wide text-stone-400 group-hover:text-stone-200 transition-opacity">
               Library
             </span>
           </button>

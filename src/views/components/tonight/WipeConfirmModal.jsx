@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { AlertTriangle, Trash2 } from 'lucide-react';
+import Button from '../../../components/ui/Button.jsx';
+import Dialog from '../../../components/ui/Dialog.jsx';
 
 const WipeConfirmModal = ({
   isOpen,
@@ -24,59 +26,76 @@ const WipeConfirmModal = ({
 
   if (!isOpen) return null;
 
+  // Closing is blocked while the delete is in flight.
+  const handleClose = isDeletingAll ? undefined : onClose;
+
   return (
     <>
-      <button
-        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm cursor-default"
-        onClick={onClose}
-        aria-label="Close delete confirmation"
+      <div
+        className="fixed inset-0 z-40 bg-stone-950/85"
+        onClick={handleClose}
+        aria-hidden="true"
+        tabIndex={-1}
       />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-rose-500/40 rounded-2xl p-6 max-w-md w-full space-y-6 shadow-2xl">
+      <Dialog
+        onClose={handleClose}
+        aria-labelledby="wipe-confirm-title"
+        className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
+        <div className="pointer-events-auto w-full max-w-md space-y-6 rounded-2xl border border-red-900/30 bg-stone-900 p-6 shadow-2xl">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 w-10 h-10 rounded-full bg-rose-900/40 border border-rose-500/30 flex items-center justify-center text-rose-300">
-              <AlertTriangle className="w-5 h-5" />
+            <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-red-900/30 bg-red-900/20 text-red-400">
+              <AlertTriangle className="h-5 w-5" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-serif text-rose-200">
+              <h3
+                id="wipe-confirm-title"
+                className="font-serif text-lg text-stone-100"
+              >
                 Delete all titles?
               </h3>
               <p className="text-sm text-stone-300">
                 This permanently clears every title in this space for everyone.
               </p>
-              <p className="text-xs text-rose-300/90 uppercase tracking-wider font-semibold">
+              <label
+                htmlFor="wipe-confirm-input"
+                className="block text-xs font-semibold uppercase tracking-wider text-red-400"
+              >
                 Type WIPE to confirm
-              </p>
+              </label>
             </div>
           </div>
 
           <input
+            id="wipe-confirm-input"
             value={wipeConfirmText}
             onChange={(event) => setWipeConfirmText(event.target.value)}
             placeholder="WIPE"
             autoComplete="off"
-            className="w-full px-4 py-3 bg-stone-950/80 border border-stone-700 rounded-xl text-sm tracking-wider uppercase text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-rose-500/70 focus:ring-2 focus:ring-rose-500/20"
+            className="min-h-[44px] w-full rounded-xl border border-stone-700 bg-stone-800/50 px-4 py-3 text-sm uppercase tracking-wider text-stone-100 placeholder:text-stone-400 focus:border-red-700/50 focus:outline-none focus:ring-2 focus:ring-red-900/50"
           />
 
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              variant="secondary"
               onClick={onClose}
               disabled={Boolean(isDeletingAll)}
-              className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-stone-900 border border-stone-700 text-stone-300 hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-[44px] flex-1 px-4 text-sm font-semibold"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="danger"
               onClick={onConfirm}
               disabled={!canConfirmWipe}
-              className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-rose-600/90 text-white hover:bg-rose-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="min-h-[44px] flex-1 px-4 text-sm font-semibold"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
               {isDeletingAll ? 'Deleting...' : 'Delete all'}
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Dialog>
     </>
   );
 };

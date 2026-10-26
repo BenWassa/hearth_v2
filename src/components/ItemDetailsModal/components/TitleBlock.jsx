@@ -1,10 +1,13 @@
 import React from 'react';
 
-const TitleBlock = ({ item, metadataChips, genres }) => {
+const TitleBlock = ({ item, metadataChips, genres, titleId }) => {
   return (
     <div className="space-y-3">
-      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-100 leading-tight tracking-tight">
-        {item.title}
+      <h2
+        id={titleId}
+        className="text-3xl sm:text-4xl lg:text-5xl font-serif text-stone-100 leading-tight tracking-tight"
+      >
+        {item.title || 'Untitled'}
       </h2>
 
       {/* Metadata Row */}
@@ -16,9 +19,7 @@ const TitleBlock = ({ item, metadataChips, genres }) => {
             )}
             <div className="flex items-center gap-1.5" title={chip.label}>
               <chip.icon className="w-3.5 h-3.5 opacity-60" />
-              <span className={chip.isPlaceholder ? 'opacity-50 italic' : ''}>
-                {chip.value}
-              </span>
+              <span>{chip.value}</span>
             </div>
           </React.Fragment>
         ))}
@@ -31,11 +32,9 @@ const TitleBlock = ({ item, metadataChips, genres }) => {
       </div>
 
       {item.overview ? (
-        <div className="pl-3.5 border-l-2 border-stone-700/60 mt-4">
-          <p className="text-base sm:text-[1.05rem] leading-[1.7] text-stone-300/85 font-light tracking-[0.01em] max-w-prose italic">
-            {item.overview}
-          </p>
-        </div>
+        <p className="mt-4 max-w-prose text-base leading-[1.7] text-stone-300">
+          {item.overview}
+        </p>
       ) : null}
     </div>
   );

@@ -14,7 +14,7 @@ const MovieTimingCard = ({
           <Clock className="w-5 h-5" />
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold">
+          <div className="text-label uppercase tracking-widest text-stone-400 font-bold">
             Runtime
           </div>
           <div className="text-stone-200 font-medium">
@@ -25,10 +25,10 @@ const MovieTimingCard = ({
 
       {hasRuntime && (
         <div className="text-right border-l border-stone-800 pl-4">
-          <div className="text-[10px] uppercase tracking-widest text-stone-500 font-bold">
+          <div className="text-label uppercase tracking-widest text-stone-400 font-bold">
             {finishContext}
           </div>
-          <div className="text-amber-500 font-bold text-lg font-mono">
+          <div className="text-amber-400 font-bold text-lg font-mono">
             {finishLabel}
           </div>
         </div>

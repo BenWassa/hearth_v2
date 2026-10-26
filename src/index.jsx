@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App, { AppLoadingScreen } from './App';
+import { isTemplateMode } from './app/useConfiguredAppState.js';
+
+// Template mode (and its seed library JSON) is a separate chunk, only fetched
+// when the demo/template flag is set.
+const TemplateApp = isTemplateMode
+  ? lazy(() => import('./template/TemplateApp.jsx'))
+  : null;
 
 if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
   window.__vite_import_meta_env__ = import.meta.env || {};
@@ -9,7 +16,13 @@ if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    {TemplateApp ? (
+      <Suspense fallback={<AppLoadingScreen />}>
+        <TemplateApp />
+      </Suspense>
+    ) : (
+      <App />
+    )}
   </React.StrictMode>,
 );
 

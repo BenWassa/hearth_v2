@@ -48,7 +48,7 @@ describe('ActionBar', () => {
 
     const button = mounted.container.querySelector('button');
     expect(button).not.toBeNull();
-    expect(button.textContent).toContain('Mark Watched');
+    expect(button.textContent).toContain('Mark watched');
 
     await act(async () => {
       button.dispatchEvent(new MouseEvent('click', { bubbles: true }));

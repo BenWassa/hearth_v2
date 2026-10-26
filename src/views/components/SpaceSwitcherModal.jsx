@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, Loader2, Plus } from 'lucide-react';
-import hearthVector from '../../assets/hearth_vector_up.png';
+import { ArrowRight, Check, Loader2, Plus, X } from 'lucide-react';
+import Button from '../../components/ui/Button.jsx';
+import Dialog from '../../components/ui/Dialog.jsx';
+import IconButton from '../../components/ui/IconButton.jsx';
+import hearthVector from '../../assets/hearth_vector_up.webp';
 
 const SpaceSwitcherModal = ({
   spaces = [],
   currentSpaceId,
   onSelect,
   onCreateNew,
+  onClose,
   isLoading = false,
 }) => {
   const [creating, setCreating] = useState(false);
   const [newSpaceName, setNewSpaceName] = useState('');
   const trimmedName = newSpaceName.trim();
+  // First run (no current space) has nowhere to go back to, so it cannot be dismissed.
+  const canDismiss = Boolean(currentSpaceId) && typeof onClose === 'function';
 
   const getInitials = (name = '') =>
     (name.replace(/[^a-z]/gi, '').slice(0, 2) || '?').toUpperCase();
@@ -22,24 +28,40 @@ const SpaceSwitcherModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-shell pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] pt-[max(3rem,var(--safe-top))] pb-[max(3rem,var(--safe-bottom))]">
-      {/* Background glow */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-900/10 blur-[120px] rounded-full" />
-      </div>
+    <Dialog
+      onClose={canDismiss ? onClose : undefined}
+      aria-labelledby="space-switcher-title"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-shell pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] pt-[max(3rem,var(--safe-top))] pb-[max(3rem,var(--safe-bottom))]"
+    >
+      {canDismiss && (
+        <IconButton
+          label="Close space switcher"
+          onClick={onClose}
+          className="absolute right-[calc(0.75rem+var(--safe-right))] top-[max(0.75rem,var(--safe-top))]"
+        >
+          <X className="h-5 w-5" />
+        </IconButton>
+      )}
 
-      <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-8">
+      <div className="flex w-full max-w-sm flex-col items-center gap-8">
         {/* Brand */}
         <div className="flex flex-col items-center gap-3">
           <img
             src={hearthVector}
-            alt="Hearth"
+            alt=""
+            width="48"
+            height="48"
+            loading="lazy"
+            decoding="async"
             className="w-12 h-12 object-contain"
           />
-          <h1 className="text-2xl font-serif tracking-wide text-stone-100">
+          <h1
+            id="space-switcher-title"
+            className="text-2xl font-serif tracking-wide text-stone-100"
+          >
             Choose a Space
           </h1>
-          <p className="text-xs text-stone-500 text-center">
+          <p className="text-xs text-stone-400 text-center">
             Select the space you want to open, or create a new one.
           </p>
         </div>
@@ -51,7 +73,7 @@ const SpaceSwitcherModal = ({
               <Loader2 className="w-6 h-6 animate-spin text-amber-600" />
             </div>
           ) : spaces.length === 0 ? (
-            <p className="text-center text-sm text-stone-500 py-4">
+            <p className="text-center text-sm text-stone-400 py-4">
               No spaces found. Create one below.
             </p>
           ) : (
@@ -60,15 +82,17 @@ const SpaceSwitcherModal = ({
               return (
                 <button
                   key={space.id}
+                  type="button"
                   onClick={() => onSelect(space.id, space.name)}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-colors text-left ${
+                  aria-current={isCurrent ? 'true' : undefined}
+                  className={`w-full min-h-[44px] flex items-center gap-4 px-4 py-3.5 rounded-2xl border transition-opacity text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                     isCurrent
                       ? 'bg-amber-900/20 border-amber-700/40 text-amber-200'
                       : 'bg-stone-900/60 border-stone-800/60 text-stone-200 hover:bg-stone-800/60 hover:border-stone-700'
                   }`}
                 >
                   <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold uppercase shrink-0 ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-label font-bold uppercase shrink-0 ${
                       isCurrent
                         ? 'bg-amber-800/50 text-amber-200'
                         : 'bg-stone-800 text-stone-400'
@@ -91,50 +115,67 @@ const SpaceSwitcherModal = ({
         {/* Create new space */}
         <div className="w-full">
           {!creating ? (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setCreating(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-stone-800 text-stone-400 hover:text-stone-200 hover:border-stone-700 transition-colors text-sm"
+              className="w-full min-h-[44px] px-4 text-sm"
             >
               <Plus className="w-4 h-4" />
               Create new space
-            </button>
+            </Button>
           ) : (
             <div className="flex flex-col gap-2">
+              <label
+                htmlFor="space-switcher-name"
+                className="ml-1 text-xs font-semibold text-stone-300"
+              >
+                Space name
+              </label>
               <input
+                id="space-switcher-name"
                 autoFocus
                 value={newSpaceName}
                 onChange={(e) => setNewSpaceName(e.target.value)}
                 onKeyDown={(e) =>
                   e.key === 'Enter' && trimmedName && handleCreate()
                 }
-                placeholder="Space name..."
+                placeholder="The Living Room..."
                 maxLength={100}
-                className="w-full bg-stone-900/50 border border-stone-800/80 text-stone-100 placeholder:text-stone-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all"
+                aria-describedby="space-switcher-name-hint"
+                className="w-full min-h-[44px] bg-stone-800/50 border border-stone-700 text-stone-100 placeholder:text-stone-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700/50 focus:ring-2 focus:ring-amber-900/50 transition-opacity"
               />
+              <p
+                id="space-switcher-name-hint"
+                className="ml-1 text-xs text-stone-400"
+              >
+                Enter the name of an existing space to join it. A new name
+                creates a new space.
+              </p>
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() => {
                     setCreating(false);
                     setNewSpaceName('');
                   }}
-                  className="flex-1 py-2.5 rounded-xl border border-stone-800 text-stone-500 hover:text-stone-300 text-sm transition-colors"
+                  className="flex-1 min-h-[44px] px-4 text-sm"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleCreate}
                   disabled={!trimmedName}
-                  className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-stone-950 font-bold text-sm flex items-center justify-center gap-1.5 transition-colors"
+                  className="flex-1 min-h-[44px] px-4 text-sm font-bold"
                 >
                   Create
                   <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                </Button>
               </div>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

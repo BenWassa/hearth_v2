@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Moon } from 'lucide-react';
 import ItemCard from '../../../components/cards/ItemCard.jsx';
 
@@ -22,6 +22,8 @@ const SuggestionSection = ({
 }) => {
   const isRail = layout === 'rail';
   const railRef = useRef(null);
+  const scrollFrameRef = useRef(null);
+  const restoreSnapFrameRef = useRef(null);
   const teleportFrameRef = useRef(null);
   const isPointerDownRef = useRef(false);
   const [atStart, setAtStart] = useState(true);
@@ -50,6 +52,16 @@ const SuggestionSection = ({
   }, []);
 
   const itemsWithPickCard = suggestions;
+  const toggleActions = useMemo(
+    () =>
+      new Map(
+        suggestions.map((item) => [
+          item.id,
+          () => onToggleStatus(item.id, item.status),
+        ]),
+      ),
+    [suggestions, onToggleStatus],
+  );
 
   // For looping rails we clone the first N cards at the end.
   // When the user scrolls into the clone zone we silently jump back
@@ -64,7 +76,7 @@ const SuggestionSection = ({
     setAtStart(rail.scrollLeft <= 2);
   };
 
-  const handleScroll = () => {
+  const measureScroll = () => {
     updateEdgeState();
     if (!loopEnabled) return;
     if (isPointerDownRef.current) return; // wait until finger lifts
@@ -89,11 +101,19 @@ const SuggestionSection = ({
         rail.style.scrollSnapType = 'none';
         rail.scrollLeft = overshoot;
         // Re-enable on next frame
-        requestAnimationFrame(() => {
+        restoreSnapFrameRef.current = requestAnimationFrame(() => {
           rail.style.scrollSnapType = '';
         });
       });
     }
+  };
+
+  const handleScroll = () => {
+    if (scrollFrameRef.current !== null) return;
+    scrollFrameRef.current = requestAnimationFrame(() => {
+      scrollFrameRef.current = null;
+      measureScroll();
+    });
   };
 
   const handlePointerUp = () => {
@@ -108,6 +128,8 @@ const SuggestionSection = ({
 
   useEffect(() => {
     return () => {
+      cancelAnimationFrame(scrollFrameRef.current);
+      cancelAnimationFrame(restoreSnapFrameRef.current);
       if (teleportFrameRef.current)
         cancelAnimationFrame(teleportFrameRef.current);
     };
@@ -116,8 +138,8 @@ const SuggestionSection = ({
   return (
     <div className={`space-y-2 ${isRail ? 'flex flex-col' : ''} ${className}`}>
       <div className="flex items-center gap-1.5 px-1">
-        {Icon && <Icon className="w-4 h-4 text-stone-500" />}
-        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
+        {Icon && <Icon className="w-4 h-4 text-stone-400" />}
+        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400">
           {title}
         </h3>
       </div>
@@ -152,7 +174,7 @@ const SuggestionSection = ({
                   >
                     <ItemCard
                       item={item}
-                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      onToggle={toggleActions.get(item.id)}
                       minimal={false}
                       onOpenDetails={onOpenDetails}
                     />
@@ -163,12 +185,13 @@ const SuggestionSection = ({
                   <div
                     key={`clone-${item.id}-${i}`}
                     aria-hidden="true"
+                    inert=""
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
                     <ItemCard
                       item={item}
-                      onToggle={() => onToggleStatus(item.id, item.status)}
+                      onToggle={toggleActions.get(item.id)}
                       minimal={false}
                       onOpenDetails={onOpenDetails}
                     />
@@ -193,7 +216,7 @@ const SuggestionSection = ({
               <ItemCard
                 key={item.id}
                 item={item}
-                onToggle={() => onToggleStatus(item.id, item.status)}
+                onToggle={toggleActions.get(item.id)}
                 minimal={false}
                 onOpenDetails={onOpenDetails}
               />
@@ -216,4 +239,4 @@ const SuggestionSection = ({
   );
 };
 
-export default SuggestionSection;
+export default React.memo(SuggestionSection);

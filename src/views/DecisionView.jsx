@@ -3,6 +3,7 @@ import { Battery, ChevronLeft, Film, Sparkles, Tv } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { getPosterSrc } from '../utils/poster.js';
 import Button from '../components/ui/Button.jsx';
+import IconButton from '../components/ui/IconButton.jsx';
 import PosterPlaceholder from '../components/cards/PosterPlaceholder.jsx';
 import LazyMediaImage from '../components/media/LazyMediaImage.jsx';
 
@@ -39,32 +40,33 @@ const DecisionView = ({
   })();
 
   return (
-    <div className="fixed inset-0 z-50 bg-shell flex flex-col items-center justify-center py-6 sm:py-8 pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] sm:pl-[calc(2rem+var(--safe-left))] sm:pr-[calc(2rem+var(--safe-right))] animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 bg-shell flex flex-col items-center justify-center py-6 sm:py-8 pl-[calc(1.5rem+var(--safe-left))] pr-[calc(1.5rem+var(--safe-right))] sm:pl-[calc(2rem+var(--safe-left))] sm:pr-[calc(2rem+var(--safe-right))]">
       {!isDeciding && (
-        <button
+        <IconButton
+          label="Back to Tonight"
           onClick={onClose}
-          className="absolute left-[calc(1rem+var(--safe-left))] top-[max(1rem,calc(var(--safe-top)+0.5rem))] text-stone-400 hover:text-stone-200 transition-colors"
+          className="absolute left-[calc(1rem+var(--safe-left))] top-[max(1rem,calc(var(--safe-top)+0.5rem))]"
         >
           <ChevronLeft className="w-5 h-5" />
-        </button>
+        </IconButton>
       )}
       {isDeciding ? (
         <div className="text-center space-y-8">
           <div className="relative w-32 h-32 mx-auto">
-            <div className="absolute inset-0 bg-amber-600/20 rounded-full animate-ping duration-[3000ms]"></div>
+            <div className="absolute inset-0 bg-amber-600/20 rounded-full motion-safe:animate-ping"></div>
             <div className="absolute inset-4 bg-stone-900 rounded-full flex items-center justify-center border border-stone-800">
-              <Sparkles className="w-8 h-8 text-amber-600/50 animate-spin-slow" />
+              <Sparkles className="w-8 h-8 text-amber-600/50" />
             </div>
           </div>
-          <p className="text-stone-500 font-serif text-lg animate-pulse">
+          <p className="text-stone-400 font-serif text-lg motion-safe:animate-pulse">
             Checking the mood...
           </p>
         </div>
       ) : (
-        <div className="w-full max-w-md space-y-6 animate-in zoom-in-95 duration-500">
+        <div className="w-full max-w-md space-y-6">
           {decisionTag && (
             <div className="flex justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-700/40 bg-amber-900/20 text-amber-300 text-[11px] uppercase tracking-wider font-semibold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-700/40 bg-amber-900/20 text-amber-300 text-label uppercase tracking-wider font-semibold">
                 <Sparkles className="w-3 h-3" />
                 {decisionTag}
               </div>
@@ -72,7 +74,7 @@ const DecisionView = ({
           )}
           {/* Large Poster Image */}
           {result && (
-            <div className="mx-auto w-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+            <div className="mx-auto w-64 rounded-2xl overflow-hidden shadow-2xl shadow-stone-950/50">
               <div className="aspect-[2/3] w-full bg-stone-900/50 overflow-hidden">
                 {posterSrc && !posterMissing ? (
                   <LazyMediaImage
@@ -97,41 +99,43 @@ const DecisionView = ({
             </div>
           )}
 
-          <div className="space-y-4 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-amber-600/80 text-xs uppercase tracking-widest font-bold">
-              <Sparkles className="w-3 h-3" />
-              It's Time For
-            </div>
-
-            <h1 className="text-4xl font-serif text-stone-100 leading-tight py-2">
-              {result.title}
-            </h1>
-
-            <div className="flex items-center justify-center gap-4 text-stone-500">
-              {result.type === 'movie' ? (
-                <Film className="w-4 h-4" />
-              ) : (
-                <Tv className="w-4 h-4" />
-              )}
-              <span className="w-1 h-1 bg-stone-800 rounded-full" />
-              <span className="">{vibeDef?.label}</span>
-              {energyDef && (
-                <>
-                  <span className="w-1 h-1 bg-stone-800 rounded-full" />
-                  <div className="flex items-center gap-1">
-                    <EnergyIcon className="w-3 h-3" />
-                    <span>{energyDef.label}</span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {result.note && (
-              <div className="bg-stone-900/50 p-4 rounded-xl text-stone-400 italic text-sm mt-6">
-                "{result.note}"
+          {result && (
+            <div className="space-y-4 text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-amber-600/80 text-xs uppercase tracking-widest font-bold">
+                <Sparkles className="w-3 h-3" />
+                It's Time For
               </div>
-            )}
-          </div>
+
+              <h1 className="text-4xl font-serif text-stone-100 leading-tight py-2">
+                {result.title}
+              </h1>
+
+              <div className="flex items-center justify-center gap-4 text-stone-400">
+                {result.type === 'movie' ? (
+                  <Film className="w-4 h-4" />
+                ) : (
+                  <Tv className="w-4 h-4" />
+                )}
+                <span className="w-1 h-1 bg-stone-800 rounded-full" />
+                <span className="">{vibeDef?.label}</span>
+                {energyDef && (
+                  <>
+                    <span className="w-1 h-1 bg-stone-800 rounded-full" />
+                    <div className="flex items-center gap-1">
+                      <EnergyIcon className="w-3 h-3" />
+                      <span>{energyDef.label}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {result.note && (
+                <div className="bg-stone-900/50 p-4 rounded-xl text-stone-400 italic text-sm mt-6">
+                  "{result.note}"
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 pt-4">
             <Button onClick={onClose} className="w-full">

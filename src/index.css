@@ -36,11 +36,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(120, 113, 108, 0.6) rgba(24, 24, 27, 0.4);
@@ -99,8 +94,18 @@ code {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .collection-card-enter {
+  .collection-card-enter,
+  .animate-pulse,
+  .animate-ping {
     animation: none;
+  }
+
+  /* Spinners stay: they report loading state, not decoration. */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

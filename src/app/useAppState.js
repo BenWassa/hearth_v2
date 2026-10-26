@@ -832,7 +832,7 @@ export const useAppState = () => {
   const handleImportItems = async (itemsToImport) => {
     if (!user || !spaceId || !db) {
       notifyError('Database not available. Please check your connection.');
-      return;
+      return false;
     }
     try {
       const existingKeys = new Set(
@@ -1198,6 +1198,7 @@ export const useAppState = () => {
       console.error('Error importing items:', err);
       setImportProgress(null);
       notifyError("Something didn't save. Try again.");
+      return false;
     }
   };
 

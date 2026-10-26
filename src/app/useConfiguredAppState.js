@@ -1,5 +1,6 @@
-import { useAppState } from './useAppState.js';
-import { useTemplateAppState } from '../template/useTemplateAppState.js';
+// Mode resolution only. Template-mode code (and its 1.7 MB seed JSON) is NOT
+// imported here: src/index.jsx lazy-loads src/template/TemplateApp.jsx when
+// `isTemplateMode` is true, so real users never download it.
 
 const envMode = String(
   import.meta?.env?.VITE_HEARTH_MODE || import.meta?.env?.VITE_APP_MODE || '',
@@ -30,7 +31,3 @@ const getQueryMode = () => {
 const resolvedMode = envMode === 'template' ? 'template' : getQueryMode();
 
 export const isTemplateMode = resolvedMode === 'template';
-
-export const useConfiguredAppState = isTemplateMode
-  ? useTemplateAppState
-  : useAppState;

@@ -1,5 +1,10 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import IconButton from '../../ui/IconButton.jsx';
+import { getEnergyStyle } from '../../../config/energyStyles.js';
+
+const chipClass =
+  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-900 text-label font-bold text-stone-300 uppercase tracking-wider border border-stone-700';
 
 const ModalContentHeader = ({ vibeDef, energyDef, onClose }) => {
   return (
@@ -7,27 +12,33 @@ const ModalContentHeader = ({ vibeDef, energyDef, onClose }) => {
       {/* Vibe & Energy Tags */}
       <div className="flex flex-wrap gap-2">
         {vibeDef && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-br from-stone-800/90 to-stone-900/90 text-[11px] font-bold text-stone-300 uppercase tracking-wider border border-stone-700/50 shadow-sm">
-            <vibeDef.icon className="w-3.5 h-3.5 text-amber-500/90" />
+          <span className={chipClass}>
+            <vibeDef.icon
+              className="w-3.5 h-3.5 text-amber-400"
+              aria-hidden="true"
+            />
             {vibeDef.label}
           </span>
         )}
         {energyDef && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-br from-stone-800/90 to-stone-900/90 text-[11px] font-bold text-stone-300 uppercase tracking-wider border border-stone-700/50 shadow-sm">
-            <energyDef.icon className="w-3.5 h-3.5 text-sky-500/90" />
+          <span className={chipClass}>
+            <energyDef.icon
+              className={`w-3.5 h-3.5 ${getEnergyStyle(energyDef.id).icon}`}
+              aria-hidden="true"
+            />
             {energyDef.label}
           </span>
         )}
       </div>
 
       {/* Right: Close Button */}
-      <button
+      <IconButton
+        label="Close details"
         onClick={onClose}
-        className="hidden sm:flex flex-shrink-0 items-center justify-center w-8 h-8 text-stone-500 hover:text-stone-200 hover:bg-stone-800/60 rounded-lg transition-all"
-        aria-label="Close details"
+        className="hidden sm:flex flex-shrink-0 -mt-2 -mr-2"
       >
-        <X className="w-5 h-5" />
-      </button>
+        <X className="w-5 h-5" aria-hidden="true" />
+      </IconButton>
     </div>
   );
 };

@@ -33,5 +33,6 @@ npm run dev
 
 ## Notes for repo split
 
-- `src/app/useConfiguredAppState.js` switches between normal/Firebase mode and template mode.
+- `src/app/useConfiguredAppState.js` only resolves the mode (`isTemplateMode`). It does not import template code.
+- `src/index.jsx` renders `src/template/TemplateApp.jsx` through `React.lazy` when `isTemplateMode` is true, otherwise the normal `App`. `TemplateApp` calls `useTemplateAppState` and renders the shared `HearthAppView`. Template code and `seed-media-map.json` (~1.7 MB) therefore live in their own chunk that real users never download.
 - For a dedicated template repo, keep `src/template/` + `src/app/useConfiguredAppState.js` and remove Firebase onboarding/services as desired.

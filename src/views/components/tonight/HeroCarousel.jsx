@@ -23,6 +23,23 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     [items],
   );
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Retain revealed sources so outgoing slides keep their art during transitions.
+  const [revealedBackdrops, setRevealedBackdrops] = useState(() => new Set());
+  useEffect(() => {
+    setRevealedBackdrops((previous) => {
+      const sources = safeItems
+        .filter((_, index) => Math.abs(index - currentIndex) <= 1)
+        .map((item) => getBackdropSrc(item) || getPosterSrc(item))
+        .filter(Boolean);
+      if (sources.every((src) => previous.has(src))) return previous;
+      return new Set([...previous, ...sources]);
+    });
+  }, [safeItems, currentIndex]);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () =>
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+  );
+  const userInteractedRef = useRef(false);
   const [logoFailed, setLogoFailed] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -46,13 +63,32 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     return () => ro.disconnect();
   }, []);
 
+  const stopAutoAdvance = useCallback(() => {
+    userInteractedRef.current = true;
+    window.clearInterval(autoAdvanceRef.current);
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!media) return;
+    const sync = () => setPrefersReducedMotion(media.matches);
+    sync();
+    media.addEventListener?.('change', sync);
+    return () => media.removeEventListener?.('change', sync);
+  }, []);
+
   const resetAutoAdvance = useCallback(() => {
     if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
-    if (safeItems.length <= 1) return;
+    if (
+      safeItems.length <= 1 ||
+      userInteractedRef.current ||
+      prefersReducedMotion
+    )
+      return;
     autoAdvanceRef.current = window.setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % safeItems.length);
     }, 6000);
-  }, [safeItems.length]);
+  }, [safeItems.length, prefersReducedMotion]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -67,14 +103,17 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     return () => window.clearInterval(autoAdvanceRef.current);
   }, [resetAutoAdvance]);
 
-  const handleTouchStart = useCallback((e) => {
-    const touch = e.targetTouches[0];
-    touchStartXRef.current = touch.clientX;
-    touchStartYRef.current = touch.clientY;
-    gestureAxisRef.current = null;
-    setDragOffset(0);
-    if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
-  }, []);
+  const handleTouchStart = useCallback(
+    (e) => {
+      const touch = e.targetTouches[0];
+      touchStartXRef.current = touch.clientX;
+      touchStartYRef.current = touch.clientY;
+      gestureAxisRef.current = null;
+      setDragOffset(0);
+      stopAutoAdvance();
+    },
+    [stopAutoAdvance],
+  );
 
   const handleTouchMove = useCallback(
     (e) => {
@@ -135,9 +174,8 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           setCurrentIndex((prev) => prev - 1);
         }
       }
-      resetAutoAdvance();
     },
-    [currentIndex, safeItems.length, resetAutoAdvance],
+    [currentIndex, safeItems.length],
   );
 
   const handleTouchCancel = useCallback(() => {
@@ -146,8 +184,7 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     gestureAxisRef.current = null;
     setIsDragging(false);
     setDragOffset(0);
-    resetAutoAdvance();
-  }, [resetAutoAdvance]);
+  }, []);
 
   const handleClick = useCallback(() => {
     if (suppressNextClickRef.current) {
@@ -176,18 +213,16 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       ref={containerRef}
       className="relative w-full aspect-video bg-stone-900 overflow-hidden rounded-2xl select-none"
       style={{ touchAction: 'pan-y' }}
-      onClick={handleClick}
+      onPointerDownCapture={stopAutoAdvance}
+      onClickCapture={stopAutoAdvance}
+      onFocusCapture={stopAutoAdvance}
+      onKeyDownCapture={stopAutoAdvance}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
-      role="button"
-      tabIndex={0}
+      role="group"
       onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onOpenDetails?.(currentItem);
-        }
         if (event.key === 'ArrowLeft') {
           setCurrentIndex((prev) => Math.max(prev - 1, 0));
         }
@@ -195,7 +230,7 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
           setCurrentIndex((prev) => Math.min(prev + 1, safeItems.length - 1));
         }
       }}
-      aria-label={`Open details for ${currentItem?.title || 'featured title'}`}
+      aria-label="Featured titles"
     >
       {/* Slides — each absolutely fills the container, translated by index */}
       {safeItems.map((item, index) => {
@@ -213,19 +248,23 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
             className="absolute inset-0 overflow-hidden"
             style={{
               transform: `translateX(${translateX})`,
-              transition: isDragging
-                ? 'none'
-                : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
+              transition:
+                isDragging || prefersReducedMotion
+                  ? 'none'
+                  : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
               willChange: 'transform',
             }}
           >
-            {backdrop ? (
+            {backdrop &&
+            (Math.abs(offset) <= 1 || revealedBackdrops.has(backdrop)) ? (
               <img
                 src={backdrop}
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover object-center"
                 draggable={false}
                 loading="eager"
+                decoding="async"
+                {...{ fetchpriority: index === 0 ? 'high' : 'auto' }}
               />
             ) : (
               <div className="absolute inset-0 bg-stone-800" />
@@ -249,7 +288,7 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
             loading="eager"
           />
         ) : null}
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-stone-300/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+        <div className="flex items-center gap-2 text-label font-semibold uppercase tracking-widest text-stone-300/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
           {currentItem?.type === 'movie' ? 'Film' : 'Series'}
           {currentItem?.year && (
             <>
@@ -260,20 +299,36 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
         </div>
       </div>
 
-      <div className="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
+      <button
+        type="button"
+        className="absolute inset-0 min-h-11 min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500/60"
+        onClick={handleClick}
+        aria-label={`Open details for ${
+          currentItem?.title || 'featured title'
+        }`}
+      />
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center z-20 pointer-events-none">
         {safeItems.map((item, index) => (
-          <div
+          <button
+            type="button"
             key={`${getItemKey(item, index)}-dot`}
-            className={`h-1 rounded-full transition-all duration-300 ${
-              index === currentIndex
-                ? 'w-4 bg-amber-500'
-                : 'w-1.5 bg-stone-500/50'
-            }`}
-          />
+            aria-label={`Show slide ${index + 1} of ${safeItems.length}`}
+            aria-current={index === currentIndex ? 'true' : undefined}
+            className="min-h-11 min-w-11 flex items-center justify-center pointer-events-auto rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+            onClick={() => setCurrentIndex(index)}
+          >
+            <span
+              className={`h-1 rounded-full ${
+                index === currentIndex
+                  ? 'w-4 bg-amber-500'
+                  : 'w-1.5 bg-stone-400/50'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>
   );
 };
 
-export default HeroCarousel;
+export default React.memo(HeroCarousel);

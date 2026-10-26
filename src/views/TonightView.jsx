@@ -1,23 +1,43 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Armchair, Coffee, Eye, Smile, Clock, Tv, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
-import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
-import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
-import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
 import { balanceRows } from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
-import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
+import {
+  lazyWithPrefetch,
+  prefetchOnIdle,
+  useHasBeenTrue,
+} from '../app/lazyWithPrefetch.js';
 import { getUpcomingReleases } from './components/tonight/upcomingReleases.js';
 import { buildCollectionRollups } from '../domain/media/collections.js';
 import useCollectionPartCounts from '../hooks/useCollectionPartCounts.js';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
+
+const ItemDetailsModal = lazyWithPrefetch(() =>
+  import('../components/ItemDetailsModal.jsx'),
+);
+const CollectionDetailsModal = lazyWithPrefetch(() =>
+  import('../components/CollectionDetailsModal.jsx'),
+);
+const MetadataAuditModal = lazyWithPrefetch(() =>
+  import('./components/tonight/MetadataAuditModal.jsx'),
+);
+const WipeConfirmModal = lazyWithPrefetch(() =>
+  import('./components/tonight/WipeConfirmModal.jsx'),
+);
 
 const MIN_COLLECTION_SIZE = 3;
 
@@ -286,15 +306,15 @@ const TonightView = ({
     return 'Good Evening';
   }, []);
 
-  const openDetails = (item) => {
+  const openDetails = useCallback((item) => {
     setDetailItem(item);
     setIsDetailOpen(true);
-  };
+  }, []);
 
-  const openCollection = (collection) => {
+  const openCollection = useCallback((collection) => {
     setCollectionDetail(collection);
     setIsCollectionOpen(true);
-  };
+  }, []);
 
   const closeDetails = () => {
     setIsDetailOpen(false);
@@ -356,8 +376,18 @@ const TonightView = ({
     }
   };
 
+  const hasOpenedDetails = useHasBeenTrue(isDetailOpen);
+  const hasOpenedCollection = useHasBeenTrue(isCollectionOpen);
+  const hasOpenedAudit = useHasBeenTrue(isAuditModalOpen);
+  const hasOpenedWipe = useHasBeenTrue(isWipeConfirmOpen);
+
+  useEffect(
+    () => prefetchOnIdle([ItemDetailsModal, CollectionDetailsModal]),
+    [],
+  );
+
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <div
         aria-hidden={isCollectionsBrowseOpen || undefined}
         inert={isCollectionsBrowseOpen ? '' : undefined}
@@ -403,7 +433,7 @@ const TonightView = ({
             {showSkeleton ? (
               <>
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-stone-800/60 bg-stone-900/80 animate-pulse">
-                  <div className="absolute inset-0 bg-gradient-to-br from-stone-800/80 to-stone-900/90" />
+                  <div className="absolute inset-0 bg-stone-900" />
                   <div className="absolute bottom-5 right-5 h-10 w-28 rounded bg-stone-700/80" />
                   <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
                     {Array.from({ length: 5 }).map((_, index) => (
@@ -579,34 +609,46 @@ const TonightView = ({
         <BottomNav onAdd={onAdd} goToShelf={goToShelf} />
       </div>
 
-      <ItemDetailsModal
-        isOpen={isDetailOpen}
-        item={detailItem}
-        onClose={closeDetails}
-        onToggleStatus={onToggleStatus}
-        onDelete={onDelete}
-        onAddItem={onAddItem}
-        onUpdate={onUpdate}
-      />
+      {hasOpenedDetails && (
+        <Suspense fallback={null}>
+          <ItemDetailsModal
+            isOpen={isDetailOpen}
+            item={detailItem}
+            onClose={closeDetails}
+            onToggleStatus={onToggleStatus}
+            onDelete={onDelete}
+            onAddItem={onAddItem}
+            onUpdate={onUpdate}
+          />
+        </Suspense>
+      )}
 
-      <CollectionDetailsModal
-        isOpen={isCollectionOpen}
-        collection={
-          collections.find((entry) => entry.id === collectionDetail?.id) ||
-          collectionDetail
-        }
-        onClose={closeCollection}
-        onOpenItem={openDetails}
-      />
+      {hasOpenedCollection && (
+        <Suspense fallback={null}>
+          <CollectionDetailsModal
+            isOpen={isCollectionOpen}
+            collection={
+              collections.find((entry) => entry.id === collectionDetail?.id) ||
+              collectionDetail
+            }
+            onClose={closeCollection}
+            onOpenItem={openDetails}
+          />
+        </Suspense>
+      )}
 
-      <MetadataAuditModal
-        isOpen={isAuditModalOpen}
-        onClose={() => setIsAuditModalOpen(false)}
-        isAuditLoading={isAuditLoading}
-        auditReport={openAuditModalReport}
-        onMetadataRefreshAll={onMetadataRefreshAll}
-        isMetadataRepairing={isMetadataRepairing}
-      />
+      {hasOpenedAudit && (
+        <Suspense fallback={null}>
+          <MetadataAuditModal
+            isOpen={isAuditModalOpen}
+            onClose={() => setIsAuditModalOpen(false)}
+            isAuditLoading={isAuditLoading}
+            auditReport={openAuditModalReport}
+            onMetadataRefreshAll={onMetadataRefreshAll}
+            isMetadataRepairing={isMetadataRepairing}
+          />
+        </Suspense>
+      )}
 
       {isCollectionsBrowseOpen && (
         <CollectionsBrowseView
@@ -616,15 +658,20 @@ const TonightView = ({
           onOpenCollection={openCollection}
         />
       )}
-      <WipeConfirmModal
-        isOpen={isWipeConfirmOpen}
-        isDeletingAll={isDeletingAll}
-        wipeConfirmText={wipeConfirmText}
-        setWipeConfirmText={setWipeConfirmText}
-        canConfirmWipe={canConfirmWipe}
-        onClose={closeWipeModal}
-        onConfirm={confirmDeleteAll}
-      />
+
+      {hasOpenedWipe && (
+        <Suspense fallback={null}>
+          <WipeConfirmModal
+            isOpen={isWipeConfirmOpen}
+            isDeletingAll={isDeletingAll}
+            wipeConfirmText={wipeConfirmText}
+            setWipeConfirmText={setWipeConfirmText}
+            canConfirmWipe={canConfirmWipe}
+            onClose={closeWipeModal}
+            onConfirm={confirmDeleteAll}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

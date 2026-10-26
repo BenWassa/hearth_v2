@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { BarChart3, Wrench, X } from 'lucide-react';
+import Button from '../../../components/ui/Button.jsx';
+import Dialog from '../../../components/ui/Dialog.jsx';
+import IconButton from '../../../components/ui/IconButton.jsx';
 
 const GAP_LABELS = {
   overview: 'movie description',
@@ -31,27 +34,31 @@ const MetadataAuditModal = ({
 
   return (
     <>
-      <button
-        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm cursor-default"
+      <div
+        className="fixed inset-0 z-40 bg-stone-950/85"
         onClick={onClose}
-        aria-label="Close metadata audit"
+        aria-hidden="true"
+        tabIndex={-1}
       />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-b from-stone-900 to-stone-950 border border-stone-700 rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-4 shadow-2xl">
+      <Dialog
+        onClose={onClose}
+        aria-labelledby="metadata-audit-title"
+        className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
+        <div className="pointer-events-auto max-h-[85vh] w-full max-w-2xl space-y-4 overflow-y-auto rounded-2xl border border-stone-800 bg-stone-900 p-6 shadow-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-amber-400" />
-              <h3 className="text-lg font-serif text-stone-100">
+              <BarChart3 className="h-5 w-5 text-amber-400" />
+              <h3
+                id="metadata-audit-title"
+                className="font-serif text-lg text-stone-100"
+              >
                 Metadata Audit
               </h3>
             </div>
-            <button
-              onClick={onClose}
-              className="text-stone-400 hover:text-stone-200 transition-colors p-1 hover:bg-stone-800 rounded"
-              aria-label="Close metadata audit"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <IconButton label="Close metadata audit" onClick={onClose}>
+              <X className="h-5 w-5" />
+            </IconButton>
           </div>
 
           {isAuditLoading ? (
@@ -62,42 +69,42 @@ const MetadataAuditModal = ({
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-y border-stone-800 py-3 sm:grid-cols-4">
+                <div>
+                  <dt className="text-label uppercase tracking-widest text-stone-400">
                     Total
-                  </div>
-                  <div className="text-lg font-semibold text-stone-100">
+                  </dt>
+                  <dd className="text-lg font-semibold text-stone-100">
                     {auditReport.totalItems}
-                  </div>
+                  </dd>
                 </div>
-                <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                <div>
+                  <dt className="text-label uppercase tracking-widest text-stone-400">
                     Complete
-                  </div>
-                  <div className="text-lg font-semibold text-emerald-300">
+                  </dt>
+                  <dd className="text-lg font-semibold text-stone-100">
                     {auditReport.completeItems}
-                  </div>
+                  </dd>
                 </div>
-                <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                <div>
+                  <dt className="text-label uppercase tracking-widest text-stone-400">
                     Missing
-                  </div>
-                  <div className="text-lg font-semibold text-amber-300">
+                  </dt>
+                  <dd className="text-lg font-semibold text-amber-300">
                     {auditReport.itemsWithGaps}
-                  </div>
+                  </dd>
                 </div>
-                <div className="rounded-lg bg-stone-900/40 border border-stone-800 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                <div>
+                  <dt className="text-label uppercase tracking-widest text-stone-400">
                     Shows Missing
-                  </div>
-                  <div className="text-lg font-semibold text-amber-300">
+                  </dt>
+                  <dd className="text-lg font-semibold text-amber-300">
                     {auditReport.byType.show.withGaps}
-                  </div>
+                  </dd>
                 </div>
-              </div>
+              </dl>
 
-              <div className="rounded-lg bg-stone-900/30 border border-stone-800 px-3 py-3 text-xs text-stone-300 grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2 text-xs text-stone-300 sm:grid-cols-3">
                 <div>Source: {auditReport.gapCounts.source || 0}</div>
                 <div>Poster: {auditReport.gapCounts.poster || 0}</div>
                 <div>Backdrop: {auditReport.gapCounts.backdrop || 0}</div>
@@ -125,7 +132,7 @@ const MetadataAuditModal = ({
               </div>
 
               <div className="space-y-2">
-                <div className="text-[10px] uppercase tracking-widest text-stone-500">
+                <div className="text-label uppercase tracking-widest text-stone-400">
                   Missing Items ({auditReport.missingRows.length})
                 </div>
                 {auditReport.missingRows.length === 0 ? (
@@ -137,12 +144,12 @@ const MetadataAuditModal = ({
                     {auditReport.missingRows.slice(0, 100).map((row) => (
                       <div
                         key={row.id}
-                        className="rounded-lg border border-stone-800 bg-stone-900/30 px-3 py-2"
+                        className="border-b border-stone-800 px-1 py-2"
                       >
                         <div className="text-sm text-stone-200">
                           {row.title}
                         </div>
-                        <div className="text-[11px] text-stone-500 uppercase tracking-wider">
+                        <div className="text-label text-stone-400 uppercase tracking-wider">
                           {row.type}
                         </div>
                         <div className="text-xs text-amber-300 mt-1">
@@ -180,22 +187,22 @@ const MetadataAuditModal = ({
               </div>
 
               <div className="flex justify-end pt-2 border-t border-stone-800">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   onClick={() => onMetadataRefreshAll?.()}
                   disabled={isMetadataRepairing || isAuditLoading}
-                  className="inline-flex items-center gap-2 rounded-lg border border-amber-700/60 bg-amber-950/30 px-3 py-2 text-sm text-amber-300 transition-colors hover:bg-amber-950/50 hover:text-amber-200 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="min-h-[44px] px-4 text-sm"
                 >
-                  <Wrench className="w-4 h-4 shrink-0" />
+                  <Wrench className="h-4 w-4 shrink-0" />
                   {isMetadataRepairing
                     ? 'Refreshing...'
                     : 'Refresh all metadata'}
-                </button>
+                </Button>
               </div>
             </>
           )}
         </div>
-      </div>
+      </Dialog>
     </>
   );
 };

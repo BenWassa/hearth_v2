@@ -143,3 +143,9 @@ Target: Firebase App Hosting
 - For metadata changes, validate both:
   - API normalization tests
   - UI regressions in Tonight and ItemDetails modal
+
+## Activity-aware Collections
+
+`TonightView` derives canonical movie saga rollups. `collectionActivity.js` aggregates only explicit manual additions and current movie watch transitions with an injected clock; `CollectionsRail` retains at most two entry-time IDs. `CollectionsBrowseView` retains visit order and navigation state while reusing `CollectionDetailsModal`. `collectionWorlds.js` is a versioned provider-ID taxonomy, with no duplicated progress. Optional provider counts share a three-request queue and locale-aware cache and do not gate local eligibility.
+
+Watchlist records add optional `additionOrigin` and `userState.markedWatchedAt`. Status writes transact against the current shared record to avoid refreshing dates for repeated/concurrent same-status writes. Undo clears the event; imports and historical records do not receive invented watch history. No schema backfill is needed. See [Collections](../COLLECTIONS_REDESIGN.md) for ranking windows, navigation, fixtures and limitations.

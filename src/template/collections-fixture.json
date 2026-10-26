@@ -1,0 +1,706 @@
+[
+  {
+    "providerId": "86311",
+    "name": "The Avengers Collection",
+    "backdrop": "/2UNUv4NJdC36E5myDHACBJ99EwL.jpg",
+    "poster": "/yFSIUVTCvgYrpalUktulvk3Gi5Y.jpg",
+    "parts": [
+      {
+        "providerId": "24428",
+        "title": "The Avengers",
+        "year": "2012",
+        "poster": "/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
+        "backdrop": "/86IbFy98QjRIqg6WanKYb9tXNbJ.jpg"
+      },
+      {
+        "providerId": "99861",
+        "title": "Avengers: Age of Ultron",
+        "year": "2015",
+        "poster": "/4ssDuvEDkSArWEdyBl2X5EHvYKU.jpg",
+        "backdrop": "/kIBK5SKwgqIIuRKhhWrJn3XkbPq.jpg"
+      },
+      {
+        "providerId": "299536",
+        "title": "Avengers: Infinity War",
+        "year": "2018",
+        "poster": "/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
+        "backdrop": "/mDfJG3LC3Dqb67AZ52x3Z0jU0uB.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "131292",
+    "name": "Iron Man Collection",
+    "backdrop": "/rI8zOWkRQJdlAyQ6WJOSlYK6JxZ.jpg",
+    "poster": "/fbeJ7f0aD4A112Bc1tnpzyn82xO.jpg",
+    "parts": [
+      {
+        "providerId": "10138",
+        "title": "Iron Man 2",
+        "year": "2010",
+        "poster": "/6WBeq4fCfn7AN0o21W9qNcRF2l9.jpg",
+        "backdrop": "/7lmBufEG7P7Y1HClYK3gCxYrkgS.jpg"
+      },
+      {
+        "providerId": "68721",
+        "title": "Iron Man 3",
+        "year": "2013",
+        "poster": "/qhPtAc1TKbMPqNvcdXSOn9Bn7hZ.jpg",
+        "backdrop": "/iVped1djsF0tvGkvnHbzsE3ZPTF.jpg"
+      },
+      {
+        "providerId": "1726",
+        "title": "Iron Man",
+        "year": "2008",
+        "poster": "/78lPtwv72eTNqFW9COBYI0dWDJa.jpg",
+        "backdrop": "/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "131295",
+    "name": "Captain America Collection",
+    "backdrop": "/7kVucUYqz8fZkOmFtA8opDwJFXM.jpg",
+    "poster": "/2tOgiY533JSFp7OrVlkeRJvsZpI.jpg",
+    "parts": [
+      {
+        "providerId": "100402",
+        "title": "Captain America: The Winter Soldier",
+        "year": "2014",
+        "poster": "/tVFRpFw3xTedgPGqxW0AOI8Qhh0.jpg",
+        "backdrop": "/1RWLMyC9KcFfcaoViMiJGSSZzzr.jpg"
+      },
+      {
+        "providerId": "271110",
+        "title": "Captain America: Civil War",
+        "year": "2016",
+        "poster": "/rAGiXaUfPzY7CDEyNKUofk3Kw2e.jpg",
+        "backdrop": "/7FWlcZq3r6525LWOcvO9kNWurN1.jpg"
+      },
+      {
+        "providerId": "1771",
+        "title": "Captain America: The First Avenger",
+        "year": "2011",
+        "poster": "/vSNxAJTlD0r02V9sPYpOjqDZXUK.jpg",
+        "backdrop": "/yFuKvT4Vm3sKHdFY4eG6I4ldAnn.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "131296",
+    "name": "Thor Collection",
+    "backdrop": "/3KL8UNKFWgIKXzLHjwY0uwgjzYl.jpg",
+    "poster": "/1fGblAmaE2wU6ts2A83eWBgkmHs.jpg",
+    "parts": [
+      {
+        "providerId": "10195",
+        "title": "Thor",
+        "year": "2011",
+        "poster": "/prSfAi1xGrhLQNxVSUFh61xQ4Qy.jpg",
+        "backdrop": "/cDJ61O1STtbWNBwefuqVrRe3d7l.jpg"
+      },
+      {
+        "providerId": "76338",
+        "title": "Thor: The Dark World",
+        "year": "2013",
+        "poster": "/wp6OxE4poJ4G7c0U2ZIXasTSMR7.jpg",
+        "backdrop": "/5o88bbqcV5STn56jqOeovaaWbAE.jpg"
+      },
+      {
+        "providerId": "284053",
+        "title": "Thor: Ragnarok",
+        "year": "2017",
+        "poster": "/rzRwTcFvttcN1ZpX2xv4j3tSdJu.jpg",
+        "backdrop": "/vLmHH8jAy8Jq8uBsLucd3592WGh.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "284433",
+    "name": "Guardians of the Galaxy Collection",
+    "backdrop": "/sxyF4lVkEvOLVzr8jOF5K5nrMh3.jpg",
+    "poster": "/kFWLxUwcSpiLzszZbxUIZT9g6WR.jpg",
+    "parts": [
+      {
+        "providerId": "118340",
+        "title": "Guardians of the Galaxy",
+        "year": "2014",
+        "poster": "/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg",
+        "backdrop": "/uLtVbjvS1O7gXL8lUOwsFOH4man.jpg"
+      },
+      {
+        "providerId": "283995",
+        "title": "Guardians of the Galaxy Vol. 2",
+        "year": "2017",
+        "poster": "/y4MBh0EjBlMuOzv9axM4qJlmhzz.jpg",
+        "backdrop": "/aJn9XeesqsrSLKcHfHP4u5985hn.jpg"
+      },
+      {
+        "providerId": "447365",
+        "title": "Guardians of the Galaxy Vol. 3",
+        "year": "2023",
+        "poster": "/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg",
+        "backdrop": "/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "448150",
+    "name": "Deadpool Collection",
+    "backdrop": "/dTq7mGyAR5eAydR532feWfjJjzm.jpg",
+    "poster": "/30c5jO7YEXuF8KiWXLg9m28GWDA.jpg",
+    "parts": [
+      {
+        "providerId": "293660",
+        "title": "Deadpool",
+        "year": "2016",
+        "poster": "/3E53WEZJqP6aM84D8CckXx4pIHw.jpg",
+        "backdrop": "/rFj9IKlL75B2pXhZA60jkNWvxeW.jpg"
+      },
+      {
+        "providerId": "383498",
+        "title": "Deadpool 2",
+        "year": "2018",
+        "poster": "/gyfPKfFYcVW54MoqhYlwwDDIfJR.jpg",
+        "backdrop": "/3P52oz9HPQWxcwHOwxtyrVV1LKi.jpg"
+      },
+      {
+        "providerId": "533535",
+        "title": "Deadpool & Wolverine",
+        "year": "2024",
+        "poster": "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+        "backdrop": "/by8z9Fe8y7p4jo2YlW2SZDnptyT.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "531241",
+    "name": "Spider-Man (MCU) Collection",
+    "backdrop": "/AvnqpRwlEaYNVL6wzC4RN94EdSd.jpg",
+    "poster": "/yeba3Y820OjApZO9aJevDsNeMEd.jpg",
+    "parts": [
+      {
+        "providerId": "315635",
+        "title": "Spider-Man: Homecoming",
+        "year": "2017",
+        "poster": "/c24sv2weTHPsmDa7jEMN0m2P3RT.jpg",
+        "backdrop": "/lAsr1ytUq0ATWdCbcjf59pupPFy.jpg"
+      },
+      {
+        "providerId": "429617",
+        "title": "Spider-Man: Far From Home",
+        "year": "2019",
+        "poster": "/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg",
+        "backdrop": "/wqBW5ltBJu0gs26yCc8shQQV82d.jpg"
+      },
+      {
+        "providerId": "634649",
+        "title": "Spider-Man: No Way Home",
+        "year": "2021",
+        "poster": "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+        "backdrop": "/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "573436",
+    "name": "Spider-Man: Spider-Verse Collection",
+    "backdrop": "/xLg6LRJ6VqwJX3ZiB6mRhLYAg3I.jpg",
+    "poster": "/eD4bGQNfmqExIAzKdvX5gDHhI2.jpg",
+    "parts": [
+      {
+        "providerId": "324857",
+        "title": "Spider-Man: Into the Spider-Verse",
+        "year": "2018",
+        "poster": "/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg",
+        "backdrop": "/1ntePsIqeklfmrQJqZPncCydsqY.jpg"
+      },
+      {
+        "providerId": "569094",
+        "title": "Spider-Man: Across the Spider-Verse",
+        "year": "2023",
+        "poster": "/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+        "backdrop": "/kVd3a9YeLGkoeR50jGEXM6EqseS.jpg"
+      },
+      {
+        "providerId": "911916",
+        "title": "Spider-Man: Beyond the Spider-Verse",
+        "year": "2027",
+        "poster": "/9KAe39xqyZnv9J4W3DRGdQqX82h.jpg",
+        "backdrop": "/fUcT8bcJD3SZsy84Z9QRP6kOS7v.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "10",
+    "name": "Star Wars Collection",
+    "backdrop": "/iY2ujEY2m68OTTlPFTiHub9joHS.jpg",
+    "poster": "/pWVLFh4OuejTpUaDQbB1C4zoS2p.jpg",
+    "parts": [
+      {
+        "providerId": "11",
+        "title": "Star Wars",
+        "year": "1977",
+        "poster": "/fai0rspsNeJCS69wHNjOdWxcI7P.jpg",
+        "backdrop": "/zqkmTXzjkAgXmEWLRsY4UpTWCeo.jpg"
+      },
+      {
+        "providerId": "1891",
+        "title": "The Empire Strikes Back",
+        "year": "1980",
+        "poster": "/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg",
+        "backdrop": "/k9pshruhCpJAdH9RaGJO6jaWQ4X.jpg"
+      },
+      {
+        "providerId": "1892",
+        "title": "Return of the Jedi",
+        "year": "1983",
+        "poster": "/jQYlydvHm3kUix1f8prMucrplhm.jpg",
+        "backdrop": "/ziECpBRIyclmBNaFSWlvCfsKbMD.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "10194",
+    "name": "Toy Story Collection",
+    "backdrop": "/hApclyB9NEZEQujAVajzi5iWE4a.jpg",
+    "poster": "/rki5qLuwb0xnnE9seehxO9TlLhW.jpg",
+    "parts": [
+      {
+        "providerId": "862",
+        "title": "Toy Story",
+        "year": "1995",
+        "poster": "/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+        "backdrop": "/3Rfvhy1Nl6sSGJwyjb0QiZzZYlB.jpg"
+      },
+      {
+        "providerId": "863",
+        "title": "Toy Story 2",
+        "year": "1999",
+        "poster": "/4rbcp3ng8n1MKHjpeqW0L7Fnpzz.jpg",
+        "backdrop": "/nsfVr4QbbunUrHINN9N7JdVAMTf.jpg"
+      },
+      {
+        "providerId": "10193",
+        "title": "Toy Story 3",
+        "year": "2010",
+        "poster": "/AbbXspMOwdvwWZgVN0nabZq03Ec.jpg",
+        "backdrop": "/wE5JGzujfvDPMIfFjJyrhXFjZLc.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "87118",
+    "name": "Cars Collection",
+    "backdrop": "/A8DqaTGwZ8iCEjWMNRsZumzfKLw.jpg",
+    "poster": "/uq3N2SFj1Y06zA6LzCQPkmBdaaE.jpg",
+    "parts": [
+      {
+        "providerId": "49013",
+        "title": "Cars 2",
+        "year": "2011",
+        "poster": "/okIz1HyxeVOMzYwwHUjH2pHi74I.jpg",
+        "backdrop": "/robYRZk9LxJTwD7GlZCginji5k.jpg"
+      },
+      {
+        "providerId": "920",
+        "title": "Cars",
+        "year": "2006",
+        "poster": "/2Touk3m5gzsqr1VsvxypdyHY5ci.jpg",
+        "backdrop": "/sd4xN5xi8tKRPrJOWwNiZEile7f.jpg"
+      },
+      {
+        "providerId": "260514",
+        "title": "Cars 3",
+        "year": "2017",
+        "poster": "/zg5RDxvIIAKsucjuU2EZJIHEIvz.jpg",
+        "backdrop": "/4mlS1MitcOqdPLhxEFyk9Qwf5rr.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "137697",
+    "name": "Finding Nemo Collection",
+    "backdrop": "/yzqaKAhglTrkeOfuIXYYArf0WnA.jpg",
+    "poster": "/cCovtlN16ykvyFYnzKyv3dFtceG.jpg",
+    "parts": [
+      {
+        "providerId": "12",
+        "title": "Finding Nemo",
+        "year": "2003",
+        "poster": "/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
+        "backdrop": "/eCynaAOgYYiw5yN5lBwz3IxqvaW.jpg"
+      },
+      {
+        "providerId": "127380",
+        "title": "Finding Dory",
+        "year": "2016",
+        "poster": "/3UVe8NL1E2ZdUZ9EDlKGJY5UzE.jpg",
+        "backdrop": "/wijltj1toRcicHlCn8Cpsp4yPXe.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "468222",
+    "name": "The Incredibles Collection",
+    "backdrop": "/6oi6V1O9MJRNnfV8E9JMntmFqBD.jpg",
+    "poster": "/l7GqbzkJwowYRIXAtUz2iCPi64a.jpg",
+    "parts": [
+      {
+        "providerId": "9806",
+        "title": "The Incredibles",
+        "year": "2004",
+        "poster": "/2LqaLgk4Z226KkgPJuiOQ58wvrm.jpg",
+        "backdrop": "/lxwzY9vNwjDgxWKt3zZ6zcU6rEJ.jpg"
+      },
+      {
+        "providerId": "260513",
+        "title": "Incredibles 2",
+        "year": "2018",
+        "poster": "/9lFKBtaVIhP7E2Pk0IY1CwTKTMZ.jpg",
+        "backdrop": "/mabuNsGJgRuCTuGqjFkWe1xdu19.jpg"
+      },
+      {
+        "providerId": "1327821",
+        "title": "Incredibles 3",
+        "year": "2028",
+        "poster": "/4pGPF8LuneSJKGnfgO70W3zHChF.jpg",
+        "backdrop": "/pZUWtObJ3wacsYlgIUUilIrDpZD.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "137696",
+    "name": "Monsters, Inc. Collection",
+    "backdrop": "/x4Mq7gDRhbqDjw4SkemLvd1yzF3.jpg",
+    "poster": "/4Cp0L58Rg1bSJSsT6uw7OuU4nYc.jpg",
+    "parts": [
+      {
+        "providerId": "585",
+        "title": "Monsters, Inc.",
+        "year": "2001",
+        "poster": "/wFSpyMsp7H0ttERbxY7Trlv8xry.jpg",
+        "backdrop": "/c7VbRPlev1bRfKvTxr98erw5T7B.jpg"
+      },
+      {
+        "providerId": "62211",
+        "title": "Monsters University",
+        "year": "2013",
+        "poster": "/y7thwJ7z5Bplv6vwl6RI0yteaDD.jpg",
+        "backdrop": "/mIpCxBWNz6SHCQBe2K2PFr5MB7f.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "386382",
+    "name": "Frozen Collection",
+    "backdrop": "/s3vdRkK7KZFUDC8HEJo2GRKyVhW.jpg",
+    "poster": "/2DdKGQYzE6D7pSvvHvM9FRzTh5r.jpg",
+    "parts": [
+      {
+        "providerId": "109445",
+        "title": "Frozen",
+        "year": "2013",
+        "poster": "/itAKcobTYGpYT8Phwjd8c9hleTo.jpg",
+        "backdrop": "/rj58WQ9ImI0mYDptXdM7euX1Wjt.jpg"
+      },
+      {
+        "providerId": "330457",
+        "title": "Frozen II",
+        "year": "2019",
+        "poster": "/mINJaa34MtknCYl5AjtNJzWj8cD.jpg",
+        "backdrop": "/AoSZyb37ljMAxw0RdeQEBHKtgcc.jpg"
+      },
+      {
+        "providerId": "1024604",
+        "title": "Frozen III",
+        "year": "2027",
+        "poster": "/qzVuYNqRX7rBBuUdobS2SWEni5R.jpg",
+        "backdrop": "/AsoITR3tq9PXk0j0VJyN7dkFkp9.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "404825",
+    "name": "Wreck-It Ralph Collection",
+    "backdrop": "/8eow0LLABdSYBPIge9TOQgINfT9.jpg",
+    "poster": "/bhfxa6U5Ud3Vk507YgY9nYes9c0.jpg",
+    "parts": [
+      {
+        "providerId": "82690",
+        "title": "Wreck-It Ralph",
+        "year": "2012",
+        "poster": "/zWoIgZ7mgmPkaZjG0102BSKFIqQ.jpg",
+        "backdrop": "/3IFRjBDwtk0DlIsDfJ2zEzLjUBi.jpg"
+      },
+      {
+        "providerId": "404368",
+        "title": "Ralph Breaks the Internet",
+        "year": "2018",
+        "poster": "/iVCrhBcpDaHGvv7CLYbK6PuXZo1.jpg",
+        "backdrop": "/qDQEQbgP3v7B9IYLAUcYexNrVYP.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "94032",
+    "name": "The Lion King Collection",
+    "backdrop": "/A9IEaj9cPAwEgFnTmteB70oxgJY.jpg",
+    "poster": "/oG1heUs503GV6xBnFhgyYTGWm05.jpg",
+    "parts": [
+      {
+        "providerId": "11430",
+        "title": "The Lion King 1½",
+        "year": "2004",
+        "poster": "/u2hN0WT7Dz46HfhQbr6uzSYfVW4.jpg",
+        "backdrop": "/3eQnD9CIUerbXbgtFE1zJNvEVVo.jpg"
+      },
+      {
+        "providerId": "9732",
+        "title": "The Lion King II: Simba's Pride",
+        "year": "1998",
+        "poster": "/sWR1x6UCMCGN9xEf8RGhPS934X0.jpg",
+        "backdrop": "/vyOFlV1afDHb9MMwJVyON4qXbvC.jpg"
+      },
+      {
+        "providerId": "8587",
+        "title": "The Lion King",
+        "year": "1994",
+        "poster": "/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+        "backdrop": "/wXsQvli6tWqja51pYxXNG1LFIGV.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "2150",
+    "name": "Shrek Collection",
+    "backdrop": "/lhsd1zCsq5UquvcNalmhuddV3tI.jpg",
+    "poster": "/g1Kcbi5zSelArzR5UYkxKvG6K2a.jpg",
+    "parts": [
+      {
+        "providerId": "808",
+        "title": "Shrek",
+        "year": "2001",
+        "poster": "/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg",
+        "backdrop": "/w0eKUOEog2ImtktCHAMUZws8qif.jpg"
+      },
+      {
+        "providerId": "809",
+        "title": "Shrek 2",
+        "year": "2004",
+        "poster": "/2yYP0PQjG8zVqturh1BAqu2Tixl.jpg",
+        "backdrop": "/8ohobj5lAIbl5XWw11FywS3IRrS.jpg"
+      },
+      {
+        "providerId": "810",
+        "title": "Shrek the Third",
+        "year": "2007",
+        "poster": "/n4SexGGQzI26E269tfpa80MZaGV.jpg",
+        "backdrop": "/wvXxKpFGXvQJRB0nvvfURhRD3C0.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "14740",
+    "name": "Madagascar Collection",
+    "backdrop": "/lzTIAbvMeGWB7PUrmBZXulGA28M.jpg",
+    "poster": "/UXIxsUbwMpv4v8xXRdT7LX58z9.jpg",
+    "parts": [
+      {
+        "providerId": "953",
+        "title": "Madagascar",
+        "year": "2005",
+        "poster": "/zMpJY5CJKUufG9OTw0In4eAFqPX.jpg",
+        "backdrop": "/tPaurpIUskVji5vwV0dhy9pq4Vs.jpg"
+      },
+      {
+        "providerId": "10527",
+        "title": "Madagascar: Escape 2 Africa",
+        "year": "2008",
+        "poster": "/agRbLOHgN46TQO4YdKR462iR7To.jpg",
+        "backdrop": "/3yXLkSTrVhG66MIAr3X6C4gjccw.jpg"
+      },
+      {
+        "providerId": "80321",
+        "title": "Madagascar 3: Europe's Most Wanted",
+        "year": "2012",
+        "poster": "/ekraj4ksvIKeuvQVEevEJkuybZd.jpg",
+        "backdrop": "/uDR9UjSuykTL8g3N3bh3siZ4n3C.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "77816",
+    "name": "Kung Fu Panda Collection",
+    "backdrop": "/2nbtv33hEk2CTnuMhTGZgsFdi3K.jpg",
+    "poster": "/xoYc0RYKSc3xC4S9OpPZxKocKtj.jpg",
+    "parts": [
+      {
+        "providerId": "9502",
+        "title": "Kung Fu Panda",
+        "year": "2008",
+        "poster": "/wWt4JYXTg5Wr3xBW2phBrMKgp3x.jpg",
+        "backdrop": "/qdthf9WrRDSaIkGVQGhhJ9pz1hn.jpg"
+      },
+      {
+        "providerId": "49444",
+        "title": "Kung Fu Panda 2",
+        "year": "2011",
+        "poster": "/mtqqD00vB4PGRt20gWtGqFhrkd0.jpg",
+        "backdrop": "/iBUIS2duNa9aDfLgRr8thsUPRs0.jpg"
+      },
+      {
+        "providerId": "140300",
+        "title": "Kung Fu Panda 3",
+        "year": "2016",
+        "poster": "/oajNi4Su39WAByHI6EONu8G8HYn.jpg",
+        "backdrop": "/s3FiHTdpQVpqIqdBxLLiy40wGut.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "89137",
+    "name": "How to Train Your Dragon Collection",
+    "backdrop": "/mvcfPkOvgDJG2lEAxTz0NKqoQLo.jpg",
+    "poster": "/jkC6nE9Wzqxt77oSxlYtgIAOzhu.jpg",
+    "parts": [
+      {
+        "providerId": "10191",
+        "title": "How to Train Your Dragon",
+        "year": "2010",
+        "poster": "/ygGmAO60t8GyqUo9xYeYxSZAR3b.jpg",
+        "backdrop": "/59vDC1BuEQvti24OMr0ZvtAK6R1.jpg"
+      },
+      {
+        "providerId": "82702",
+        "title": "How to Train Your Dragon 2",
+        "year": "2014",
+        "poster": "/d13Uj86LdbDLrfDoHR5aDOFYyJC.jpg",
+        "backdrop": "/8AAuJtCzaibYkbE0QVHc8EBsELB.jpg"
+      },
+      {
+        "providerId": "166428",
+        "title": "How to Train Your Dragon: The Hidden World",
+        "year": "2019",
+        "poster": "/xvx4Yhf0DVH8G4LzNISpMfFBDy2.jpg",
+        "backdrop": "/h3KN24PrOheHVYs9ypuOIdFBEpX.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "1241",
+    "name": "Harry Potter Collection",
+    "backdrop": "/4gV0rKUjB1nLUdZB4zIltLvNZZr.jpg",
+    "poster": "/eVPs2Y0LyvTLZn6AP5Z6O2rtiGB.jpg",
+    "parts": [
+      {
+        "providerId": "671",
+        "title": "Harry Potter and the Philosopher's Stone",
+        "year": "2001",
+        "poster": "/wuMc08IPKEatf9rnMNXvIDxqP4W.jpg",
+        "backdrop": "/bfh9Z3Ghz4FOJAfLOAhmc3ccnHU.jpg"
+      },
+      {
+        "providerId": "672",
+        "title": "Harry Potter and the Chamber of Secrets",
+        "year": "2002",
+        "poster": "/sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg",
+        "backdrop": "/zuYEvft5fuzBDOeq4ClYpiu9LlO.jpg"
+      },
+      {
+        "providerId": "674",
+        "title": "Harry Potter and the Goblet of Fire",
+        "year": "2005",
+        "poster": "/fECBtHlr0RB3foNHDiCBXeg9Bv9.jpg",
+        "backdrop": "/cClWTo3ftVXvV1sF8vlLuWfnlph.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "230",
+    "name": "The Godfather Collection",
+    "backdrop": "/28eqCQ51SuLfkbzhQE7jCmTfYfy.jpg",
+    "poster": "/kKjIYmvpBUIxcYJ0LL9YZwv4nrZ.jpg",
+    "parts": [
+      {
+        "providerId": "238",
+        "title": "The Godfather",
+        "year": "1972",
+        "poster": "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+        "backdrop": "/ejdD20cdHNFAYAN2DlqPToXKyzx.jpg"
+      },
+      {
+        "providerId": "240",
+        "title": "The Godfather Part II",
+        "year": "1974",
+        "poster": "/8a1lJs7mFyGhGhZZDT1azJUoQiZ.jpg",
+        "backdrop": "/pGzqRKrYeK4LogoysNro0vG8d8N.jpg"
+      },
+      {
+        "providerId": "242",
+        "title": "The Godfather Part III",
+        "year": "1990",
+        "poster": "/lm3pQ2QoQ16pextRsmnUbG2onES.jpg",
+        "backdrop": "/zNnjHLDtV8Ti3aworltaeaLMov4.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "263",
+    "name": "The Dark Knight Collection",
+    "backdrop": "/xyhrCEdB4XRkelfVsqXeUZ6rLHi.jpg",
+    "poster": "/ogyw5LTmL53dVxsppcy8Dlm30Fu.jpg",
+    "parts": [
+      {
+        "providerId": "155",
+        "title": "The Dark Knight",
+        "year": "2008",
+        "poster": "/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+        "backdrop": "/9FE5eD92WfVCiivM9Pq9GVSrlWk.jpg"
+      },
+      {
+        "providerId": "49026",
+        "title": "The Dark Knight Rises",
+        "year": "2012",
+        "poster": "/hr0L2aueqlP2BYUblTTjmtn0hw4.jpg",
+        "backdrop": "/c3OHQncTAnKFhdOTX7D3LTW6son.jpg"
+      },
+      {
+        "providerId": "272",
+        "title": "Batman Begins",
+        "year": "2005",
+        "poster": "/sPX89Td70IDDjVr85jdSBb4rWGr.jpg",
+        "backdrop": "/9IIBboV7MCT0bTxzXHmWK1Hq558.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "119",
+    "name": "The Lord of the Rings Collection",
+    "backdrop": "/bccR2CGTWVVSZAG0yqmy3DIvhTX.jpg",
+    "poster": "/oENY593nKRVL2PnxXsMtlh8izb4.jpg",
+    "parts": [
+      {
+        "providerId": "120",
+        "title": "The Lord of the Rings: The Fellowship of the Ring",
+        "year": "2001",
+        "poster": "/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg",
+        "backdrop": "/oiwc338EoBgS4sEI2ixAny4KQKg.jpg"
+      },
+      {
+        "providerId": "121",
+        "title": "The Lord of the Rings: The Two Towers",
+        "year": "2002",
+        "poster": "/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg",
+        "backdrop": "/6G73mNyooWAEQTpckPSnFxFoNmc.jpg"
+      },
+      {
+        "providerId": "122",
+        "title": "The Lord of the Rings: The Return of the King",
+        "year": "2003",
+        "poster": "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
+        "backdrop": "/ctiw6FZK4N36LmkjSklWEbuvlq9.jpg"
+      }
+    ]
+  }
+]

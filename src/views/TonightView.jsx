@@ -5,6 +5,7 @@ import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
 import ItemDetailsModal from '../components/ItemDetailsModal.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
+import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
 import MetadataAuditModal from './components/tonight/MetadataAuditModal.jsx';
@@ -170,17 +171,10 @@ const TonightView = ({
   const collectionPartCounts = useCollectionPartCounts(rawCollections, {
     minCollectionSize: MIN_COLLECTION_SIZE,
   });
-  const collections = useMemo(
-    () =>
-      rawCollections.filter((collection) => {
-        if (Number(collection?.totalCount || 0) >= MIN_COLLECTION_SIZE) {
-          return true;
-        }
-        const providerCount = collectionPartCounts.get(collection.id);
-        return Number(providerCount || 0) >= MIN_COLLECTION_SIZE;
-      }),
-    [collectionPartCounts, rawCollections],
-  );
+  // Eligibility is local and stable: include every recognized TMDB saga,
+  // including two-film sagas. Optional provider enrichment never gates browsing.
+  const collections = rawCollections;
+  const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
 
   // 1. Low friction, easy viewing
   const comfortWatches = useMemo(() => {
@@ -364,7 +358,11 @@ const TonightView = ({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden animate-in fade-in duration-500">
-      <div className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden">
+      <div
+        aria-hidden={isCollectionsBrowseOpen || undefined}
+        inert={isCollectionsBrowseOpen ? '' : undefined}
+        className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden"
+      >
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
           <TonightHeaderMenu
             greeting={greeting}
@@ -430,6 +428,8 @@ const TonightView = ({
 
                 <CollectionsRail
                   collections={collections}
+                  counts={collectionPartCounts}
+                  onBrowse={() => setIsCollectionsBrowseOpen(true)}
                   onOpenCollection={openCollection}
                 />
 
@@ -591,7 +591,10 @@ const TonightView = ({
 
       <CollectionDetailsModal
         isOpen={isCollectionOpen}
-        collection={collectionDetail}
+        collection={
+          collections.find((entry) => entry.id === collectionDetail?.id) ||
+          collectionDetail
+        }
         onClose={closeCollection}
         onOpenItem={openDetails}
       />
@@ -605,6 +608,14 @@ const TonightView = ({
         isMetadataRepairing={isMetadataRepairing}
       />
 
+      {isCollectionsBrowseOpen && (
+        <CollectionsBrowseView
+          collections={collections}
+          counts={collectionPartCounts}
+          onClose={() => setIsCollectionsBrowseOpen(false)}
+          onOpenCollection={openCollection}
+        />
+      )}
       <WipeConfirmModal
         isOpen={isWipeConfirmOpen}
         isDeletingAll={isDeletingAll}

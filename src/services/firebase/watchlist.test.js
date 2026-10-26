@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const runTransactionMock = vi.fn();
 const onSnapshotMock = vi.fn();
 const getDocMock = vi.fn();
 const writeBatchMock = vi.fn();
@@ -9,6 +10,7 @@ const docMock = vi.fn((...args) => ({ kind: 'doc', args }));
 const serverTimestampMock = vi.fn(() => 'server-ts');
 
 vi.mock('firebase/firestore', () => ({
+  runTransaction: runTransactionMock,
   collection: collectionMock,
   deleteDoc: vi.fn(),
   doc: docMock,
@@ -211,3 +213,103 @@ describe('addWatchlistItem', () => {
     });
   });
 });
+
+describe('meaningful shared movie activity', () => {
+  const update = vi.fn();
+  let record;
+  beforeEach(() => {
+    update.mockClear();
+    record = {
+      type: 'movie',
+      status: 'unwatched',
+      userState: { status: 'unwatched' },
+    };
+    runTransactionMock.mockImplementation(async (_db, operation) =>
+      operation({
+        get: async () => ({ data: () => record }),
+        update,
+        set: vi.fn(),
+      }),
+    );
+  });
+  it('timestamps a deliberate watch atomically and clears it on undo', async () => {
+    const { updateWatchlistStatus } = await loadModule();
+    const args = { db: 'db', appId: 'app', spaceId: 'shared', itemId: 'movie' };
+    await updateWatchlistStatus({ ...args, status: 'watched' });
+    expect(update.mock.calls[0][1]).toMatchObject({
+      'userState.markedWatchedAt': 'server-ts',
+      status: 'watched',
+    });
+    record = {
+      type: 'movie',
+      userState: { status: 'watched', markedWatchedAt: 'original' },
+    };
+    await updateWatchlistStatus({ ...args, status: 'unwatched' });
+    expect(update.mock.calls[1][1]['userState.markedWatchedAt']).toBeNull();
+  });
+  it('does not reset a date when another member repeats the same status', async () => {
+    const { updateWatchlistStatus } = await loadModule();
+    record = { type: 'movie', userState: { status: 'watched' } };
+    await updateWatchlistStatus({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'shared',
+      itemId: 'movie',
+      status: 'watched',
+    });
+    expect(update.mock.calls[0][1]).not.toHaveProperty(
+      'userState.markedWatchedAt',
+    );
+  });
+  it('supports status writes from details and excludes TV activity', async () => {
+    const { updateWatchlistItem } = await loadModule();
+    const args = {
+      db: 'db',
+      appId: 'app',
+      spaceId: 'shared',
+      itemId: 'movie',
+      updates: { 'userState.status': 'watched' },
+    };
+    await updateWatchlistItem(args);
+    expect(update.mock.calls[0][1]['userState.markedWatchedAt']).toBe(
+      'server-ts',
+    );
+    record = { type: 'show', status: 'unwatched' };
+    await updateWatchlistItem(args);
+    expect(update.mock.calls[1][1]).not.toHaveProperty(
+      'userState.markedWatchedAt',
+    );
+  });
+});
+
+it.each(['manual', 'import'])(
+  'persists %s origin without inventing watched history',
+  async (additionOrigin) => {
+    const set = vi.fn();
+    writeBatchMock.mockReturnValue({
+      set,
+      commit: vi.fn().mockResolvedValue(),
+    });
+    const { addWatchlistItem } = await loadModule();
+    await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'space',
+      payload: {
+        type: 'movie',
+        provider: 'tmdb',
+        providerId: '42',
+        status: 'watched',
+        additionOrigin,
+      },
+    });
+    expect(set.mock.calls[1][1]).toMatchObject({
+      additionOrigin,
+      createdAt: 'server-ts',
+      status: 'watched',
+    });
+    expect(set.mock.calls[1][1].userState).not.toHaveProperty(
+      'markedWatchedAt',
+    );
+  },
+);

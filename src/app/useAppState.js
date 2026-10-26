@@ -816,7 +816,12 @@ export const useAppState = () => {
         }
       }
 
-      await addWatchlistItem({ db, appId, spaceId, payload });
+      await addWatchlistItem({
+        db,
+        appId,
+        spaceId,
+        payload: { ...payload, additionOrigin: 'manual' },
+      });
       setView('tonight');
     } catch (err) {
       console.error('Error adding item:', err);
@@ -1118,7 +1123,12 @@ export const useAppState = () => {
           user.uid,
         );
 
-        await addWatchlistItem({ db, appId, spaceId, payload });
+        await addWatchlistItem({
+          db,
+          appId,
+          spaceId,
+          payload: { ...payload, additionOrigin: 'import' },
+        });
         importedCount += 1;
 
         const previewId = payload.mediaId || `${index}`;

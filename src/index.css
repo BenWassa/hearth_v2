@@ -103,3 +103,48 @@ code {
     animation: none;
   }
 }
+
+/* Original typographic World covers: no third-party promotional artwork. */
+.world-cover {
+  background-color: oklch(23% 0.014 65);
+}
+.world-cover::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  width: 150px;
+  height: 150px;
+  right: -55px;
+  top: -45px;
+  border: 1px solid oklch(65% 0.04 70 / 0.25);
+  border-radius: 50%;
+}
+.world-cover-orbit::before {
+  box-shadow: 0 0 0 16px oklch(65% 0.04 70 / 0.06),
+    0 0 0 35px oklch(65% 0.04 70 / 0.05);
+  transform: rotate(-30deg) scaleX(0.55);
+}
+.world-cover-stars {
+  background-image: radial-gradient(
+      circle at 80% 25%,
+      oklch(85% 0.02 70 / 0.5) 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 60% 65%,
+      oklch(85% 0.02 70 / 0.3) 1px,
+      transparent 2px
+    );
+}
+.world-cover-play::before {
+  border-radius: 24px;
+  transform: rotate(25deg);
+}
+.world-cover-story::before {
+  border-radius: 70% 10% 0 0;
+  transform: rotate(-20deg);
+}
+.world-cover-moon::before {
+  background: oklch(40% 0.025 70 / 0.2);
+  box-shadow: -18px 10px 0 oklch(60% 0.035 70 / 0.12);
+}

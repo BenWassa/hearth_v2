@@ -5,6 +5,7 @@ import {
   getDoc,
   onSnapshot,
   query,
+  runTransaction,
   serverTimestamp,
   updateDoc,
   writeBatch,
@@ -190,6 +191,7 @@ const buildWatchlistPayload = (
     schemaVersion: 2,
     mediaId,
     addedBy: asString(payload.addedBy),
+    additionOrigin: payload.additionOrigin === 'import' ? 'import' : 'manual',
     status,
     vibe,
     energy,
@@ -388,10 +390,12 @@ export const updateWatchlistStatus = async ({
   status,
 }) => {
   const normalizedStatus = normalizeWatchStatus(status);
-  return updateDoc(getWatchlistDocRef(db, appId, spaceId, itemId), {
-    status: normalizedStatus,
-    'userState.status': normalizedStatus,
-    updatedAt: serverTimestamp(),
+  return updateWatchlistItem({
+    db,
+    appId,
+    spaceId,
+    itemId,
+    updates: { status: normalizedStatus },
   });
 };
 
@@ -454,6 +458,28 @@ export const updateWatchlistItem = async ({
 
   if (Object.keys(catalogUpdates).length > 0) {
     catalogUpdates.updatedAt = serverTimestamp();
+  }
+
+  const requestedStatus = watchlistUpdates['userState.status'];
+  if (requestedStatus !== undefined) {
+    const watchRef = getWatchlistDocRef(db, appId, spaceId, itemId);
+    // Read the current shared record atomically: repeated writes by two members
+    // must not manufacture another watch event.
+    return runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(watchRef);
+      const current = snapshot.data() || {};
+      const previous = current.userState?.status || current.status;
+      if ((current.type || '') === 'movie' && previous !== requestedStatus) {
+        watchlistUpdates['userState.markedWatchedAt'] =
+          requestedStatus === 'watched' ? serverTimestamp() : null;
+      }
+      transaction.update(watchRef, watchlistUpdates);
+      if (Object.keys(catalogUpdates).length) {
+        transaction.set(getCatalogDocRef(db, appId, itemId), catalogUpdates, {
+          merge: true,
+        });
+      }
+    });
   }
 
   if (Object.keys(catalogUpdates).length === 0) {

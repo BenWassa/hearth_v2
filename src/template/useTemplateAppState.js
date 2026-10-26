@@ -1,3 +1,4 @@
+import { buildCollectionFixture } from './collectionFixtures.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import {
@@ -209,6 +210,9 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
 
   return {
     id: asString(item.id) || fallbackId,
+    additionOrigin: item.additionOrigin || 'seed',
+    collection: media.collection || item.collection || null,
+    markedWatchedAt: item.markedWatchedAt ?? userState.markedWatchedAt ?? null,
     title,
     type,
     year: asString(media.year || item.year),
@@ -416,6 +420,9 @@ const applyTemplateUpdates = (currentItem, updates) => {
     );
   }
 
+  if (currentItem.type === 'movie' && next.status !== currentItem.status) {
+    next.markedWatchedAt = next.status === 'watched' ? Date.now() : null;
+  }
   next.type = normalizeType(next.type);
   next.status = normalizeStatus(next.status);
   next.seasons = normalizeSeasons(next.seasons);
@@ -431,9 +438,19 @@ export const useTemplateAppState = () => {
   const [authResolved, setAuthResolved] = useState(false);
   const [authUser, setAuthUser] = useState(null);
   const [items, setItems] = useState(() =>
-    buildTemplateSeedItems().map((item) =>
-      normalizeTemplateItem(item, item.id, item.createdAt),
-    ),
+    (new URLSearchParams(window.location.search).has('collectionsFixture')
+      ? buildCollectionFixture({
+          count: Number(
+            new URLSearchParams(window.location.search).get(
+              'collectionsFixture',
+            ),
+          ),
+          dispersed: new URLSearchParams(window.location.search).has(
+            'dispersedWorlds',
+          ),
+        })
+      : buildTemplateSeedItems()
+    ).map((item) => normalizeTemplateItem(item, item.id, item.createdAt)),
   );
   const [view, setView] = useState('tonight');
   const [decisionResult, setDecisionResult] = useState(null);
@@ -534,7 +551,7 @@ export const useTemplateAppState = () => {
 
   const handleAddItem = async (itemData) => {
     const normalized = normalizeTemplateItem(
-      itemData,
+      { ...itemData, additionOrigin: 'manual', createdAt: Date.now() },
       createItemId(),
       Date.now(),
     );
@@ -670,6 +687,10 @@ export const useTemplateAppState = () => {
         return {
           ...item,
           status: nextStatus,
+          markedWatchedAt:
+            item.type === 'movie' && nextStatus === 'watched'
+              ? Date.now()
+              : null,
           updatedAt: Date.now(),
         };
       }),

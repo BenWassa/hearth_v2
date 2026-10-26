@@ -238,3 +238,7 @@ A rotating carousel of up to five cinematic backdrops fills the top of the Tonig
 - **Don't** create endless rows, autoplay or infinite scroll; the shelf is finite on purpose.
 - **Don't** nest cards inside cards, or wrap content in a container when spacing would do.
 - **Don't** use em dashes in interface copy.
+
+### Collections browser and Worlds
+
+Collections replace the exhaustive Tonight rail with up to two compact artwork rows and an always-visible browse action. The secondary full-height browser uses 96px landscape thumbnails, untruncated serif saga names, 14px shelf counts, and 44px controls. Search and sorting remain at the top of the scroll surface. Libraries above five sagas may show represented Worlds in two columns; singleton Worlds go straight to the saga. Original warm-toned geometric covers keep brand names legible without suggesting unowned films. Custom licensed covers are optional. Browsing order stays fixed until entry or explicit refresh; no new motion is introduced. “Watched recently” and addition labels are factual activity summaries, an explicit exception to the ban on algorithmic recommendation explanations.

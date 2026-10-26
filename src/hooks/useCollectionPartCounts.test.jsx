@@ -117,3 +117,45 @@ describe('useCollectionPartCounts', () => {
     await mounted.cleanup();
   });
 });
+
+it('bounds 50 provider requests to three concurrent calls and tolerates failure', async () => {
+  global.IS_REACT_ACT_ENVIRONMENT = true;
+  global.fetch = vi.fn().mockResolvedValue({ ok: true });
+  let active = 0;
+  let peak = 0;
+  const pending = [];
+  getCollectionDetails.mockImplementation(
+    () =>
+      new Promise((resolve, reject) => {
+        active++;
+        peak = Math.max(peak, active);
+        pending.push(() => {
+          active--;
+          if (pending.length % 5 === 0) reject(new Error('offline'));
+          else resolve({ parts: [{}, {}] });
+        });
+      }),
+  );
+  const mounted = await renderHookHarness({
+    collections: Array.from({ length: 50 }, (_, i) =>
+      makeCollection(`bounded-${i}`),
+    ),
+  });
+  await flushPromises();
+  expect(active).toBe(3);
+  while (pending.length) {
+    const batch = pending.splice(0);
+    await act(async () => {
+      batch.forEach((finish) => finish());
+    });
+    await flushPromises();
+  }
+  expect(
+    getCollectionDetails.mock.calls.filter(([args]) =>
+      args.providerId.startsWith('bounded-'),
+    ),
+  ).toHaveLength(50);
+  expect(peak).toBe(3);
+  await mounted.cleanup();
+  global.fetch = originalFetch;
+});

@@ -45,7 +45,7 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
   const watchedFragment =
     watchedCount > 0
       ? isComplete
-        ? 'All watched'
+        ? 'Shelf watched'
         : `${watchedCount} of ${totalCount} watched`
       : `${totalCount} ${totalCount === 1 ? 'film' : 'films'}`;
 
@@ -106,7 +106,7 @@ const CollectionCardLandscape = ({ collection, onOpenCollection }) => {
 
       {isComplete && (
         <div className="absolute right-3 top-3 inline-flex items-center rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-950 ring-1 ring-amber-300/40">
-          Complete
+          Shelf watched
         </div>
       )}
 

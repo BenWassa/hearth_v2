@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import Dialog from './ui/Dialog.jsx';
 import { Calendar, Film } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
 import { getBackdropSrc } from '../utils/poster.js';
@@ -956,7 +957,11 @@ const ItemDetailsModal = ({
 
   // Mobile-first design updates
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 animate-in fade-in duration-200">
+    <Dialog
+      onClose={onClose}
+      aria-label={item.title || 'Film details'}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 animate-in fade-in duration-200"
+    >
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
         onClick={onClose}
@@ -1160,7 +1165,7 @@ const ItemDetailsModal = ({
           </div>
         </div>
       )}
-    </div>
+    </Dialog>
   );
 };
 

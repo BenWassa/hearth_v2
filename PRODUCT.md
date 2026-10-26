@@ -35,3 +35,7 @@ Comparison point, not a model to copy: major streaming services share a cinemati
 ## Accessibility & Inclusion
 
 Target WCAG 2.1 AA for text contrast and focus visibility, with particular care for small muted text on dark surfaces. Honor `prefers-reduced-motion` (already done for card entrances). Touch targets at least 44px on mobile. Respect device safe areas. Do not rely on color alone for state (watched, in progress, selected).
+
+## Collections
+
+Collections offer up to two recent household saga shortcuts on Tonight, with a complete searchable browser one tap away. Optional Worlds help larger shelves without becoming mandatory navigation. Activity labels describe deliberate household actions; they never claim viewing telemetry or infer dates from imports. Shelf progress is distinct from franchise completion.

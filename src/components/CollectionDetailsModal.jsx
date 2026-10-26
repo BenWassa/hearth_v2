@@ -7,6 +7,7 @@ import {
   Plus,
   X,
 } from 'lucide-react';
+import Dialog from './ui/Dialog.jsx';
 import useCollectionDetails from '../hooks/useCollectionDetails.js';
 import { getBackdropSrc, getPosterSrc } from '../utils/poster.js';
 import LazyMediaImage from './media/LazyMediaImage.jsx';
@@ -279,13 +280,17 @@ const CollectionDetailsModal = ({
 
   return (
     <>
-      <button
+      <div
+        aria-hidden="true"
         className="fixed inset-0 z-[70] cursor-default bg-stone-950/80 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
-        aria-label="Close collection"
       />
-      <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center animate-in fade-in duration-200">
-        <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-2xl border border-stone-800/80 bg-stone-950 shadow-2xl shadow-black/60 sm:rounded-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+      <Dialog
+        onClose={onClose}
+        aria-labelledby="collection-details-title"
+        className="pointer-events-none fixed inset-0 z-[80] flex items-end justify-center sm:items-center animate-in fade-in duration-200"
+      >
+        <div className="pointer-events-auto max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-2xl border border-stone-800/80 bg-stone-950 shadow-2xl shadow-black/60 sm:rounded-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
           {/* Hero header */}
           <div className="relative h-56 overflow-hidden bg-stone-900 sm:h-64">
             {backdrop ? (
@@ -307,7 +312,7 @@ const CollectionDetailsModal = ({
 
             <button
               onClick={onClose}
-              className="absolute right-3 top-3 rounded-lg border border-stone-50/10 bg-stone-950/70 p-2 text-stone-200 backdrop-blur-sm transition-colors hover:border-stone-50/25 hover:bg-stone-950/85 hover:text-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="absolute right-3 top-3 min-h-[44px] min-w-[44px] grid place-items-center rounded-lg border border-stone-50/10 bg-stone-950/70 p-2 text-stone-200 backdrop-blur-sm transition-colors hover:border-stone-50/25 hover:bg-stone-950/85 hover:text-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               aria-label="Close collection"
             >
               <X className="h-4 w-4" />
@@ -321,7 +326,7 @@ const CollectionDetailsModal = ({
                 </span>
                 {isComplete && (
                   <span className="inline-flex items-center rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-950 ring-1 ring-amber-300/40">
-                    Complete
+                    Shelf watched
                   </span>
                 )}
               </div>
@@ -329,13 +334,17 @@ const CollectionDetailsModal = ({
               {logoSrc && !logoFailed ? (
                 <img
                   src={logoSrc}
+                  id="collection-details-title"
                   alt={displayTitle}
                   className="mt-3 max-h-16 max-w-[78%] object-contain object-left drop-shadow-[0_4px_18px_rgba(0,0,0,0.85)] sm:max-h-20 sm:max-w-[62%]"
                   onError={() => setLogoFailed(true)}
                   loading="eager"
                 />
               ) : (
-                <h2 className="mt-3 font-serif text-3xl leading-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] sm:text-4xl">
+                <h2
+                  id="collection-details-title"
+                  className="mt-3 font-serif text-3xl leading-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] sm:text-4xl"
+                >
                   {displayTitle}
                 </h2>
               )}
@@ -348,7 +357,7 @@ const CollectionDetailsModal = ({
                   />
                 </div>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-300">
-                  {watchedCount} / {ownedTotalCount} watched
+                  {watchedCount} / {ownedTotalCount} watched on your shelf
                   {collection.year ? ` · ${collection.year}` : ''}
                 </span>
               </div>
@@ -409,7 +418,8 @@ const CollectionDetailsModal = ({
                 The collection
               </div>
               <div className="text-[11px] font-medium text-stone-500">
-                {fullTotalCount} {fullTotalCount === 1 ? 'film' : 'films'}
+                {fullTotalCount} {fullTotalCount === 1 ? 'film' : 'films'}{' '}
+                {fullParts.length ? 'in the saga' : 'on your shelf'}
               </div>
             </div>
 
@@ -437,7 +447,7 @@ const CollectionDetailsModal = ({
             )}
           </div>
         </div>
-      </div>
+      </Dialog>
     </>
   );
 };

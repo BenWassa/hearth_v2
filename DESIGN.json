@@ -285,7 +285,17 @@
         "name": "lg",
         "value": "1024px"
       }
-    ]
+    ],
+    "collections": {
+      "previewLimit": 2,
+      "rowArtworkWidth": "96px",
+      "minimumTouchTarget": "44px",
+      "worldColumns": 2,
+      "worldThreshold": 5,
+      "worldArtwork": "Original warm tonal geometry with optional licensed cover",
+      "ordering": "Frozen during a visit; meaningful activity or A–Z",
+      "progress": "Explicitly scoped to household shelf"
+    }
   },
   "components": [
     {

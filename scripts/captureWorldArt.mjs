@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
-import { chromium } from 'playwright';
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
 const origin = 'http://127.0.0.1:4173';
 const out = resolve('world-art-browser-evidence');

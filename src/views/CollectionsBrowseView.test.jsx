@@ -428,8 +428,10 @@ it.each([
   ['dc', true],
   ['pixar', false],
   ['wizarding-world', false],
-])('uses a readable heading without stacking logos in %s artwork', async (id, visible) => {
-  await mount(
+])(
+  'uses a readable heading without stacking logos in %s artwork',
+  async (id, visible) => {
+    await mount(
     <CollectionsBrowseView
       initialWorldId={id}
       collections={[]}
@@ -446,9 +448,9 @@ it.each([
       onOpenCollection={vi.fn()}
     />,
   );
-  const hero = host.querySelector(`[data-world-hero="${id}"]`);
-  const heading = hero.querySelector('h1');
-  expect(heading.textContent).toBe(
+    const hero = host.querySelector(`[data-world-hero="${id}"]`);
+    const heading = hero.querySelector('h1');
+    expect(heading.textContent).toBe(
     id === 'marvel'
       ? 'Marvel'
       : id === 'dc'
@@ -457,11 +459,12 @@ it.each([
       ? 'Pixar'
       : 'Wizarding World',
   );
-  // The image has its own baked typography. Transparent wordmark PNGs/SVGs
-  // must not be painted on top of it.
-  expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
-  const image = hero.querySelector('img[src$="/hero.webp"]');
-  expect(image).not.toBeNull();
-  await act(async () => image.dispatchEvent(new Event('load')));
-  expect(heading.classList.contains('sr-only')).toBe(!visible);
-});
+    // The image has its own baked typography. Transparent wordmark PNGs/SVGs
+    // must not be painted on top of it.
+    expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
+    const image = hero.querySelector('img[src$="/hero.webp"]');
+    expect(image).not.toBeNull();
+    await act(async () => image.dispatchEvent(new Event('load')));
+    expect(heading.classList.contains('sr-only')).toBe(!visible);
+  },
+);

@@ -424,38 +424,36 @@ it('retains readable landscape World cover labels when an image is corrupt', asy
 });
 
 it.each([
-  ['marvel', 'Marvel', true],
-  ['dc', 'DC', true],
-  ['pixar', 'Pixar', false],
-  ['wizarding-world', 'Wizarding World', false],
-])(
-  'uses a readable heading without stacking logos in %s artwork',
-  async (id, name, visible) => {
-    await mount(
-      <CollectionsBrowseView
-        initialWorldId={id}
-        collections={[]}
-        items={[
-          {
-            id: 'only-film',
-            type: 'movie',
-            title: 'Standalone',
-            worldId: id,
-            runtimeMinutes: 90,
-          },
-        ]}
-        onClose={vi.fn()}
-        onOpenCollection={vi.fn()}
-      />,
-    );
-    const hero = host.querySelector(`[data-world-hero="${id}"]`);
-    const heading = hero.querySelector('h1');
-    expect(heading.textContent).toBe(name);
-    // The image already contains typography; don't overlay PNG/SVG wordmarks.
-    expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
-    const image = hero.querySelector('img[src$="/hero.webp"]');
-    expect(image).not.toBeNull();
-    await act(async () => image.dispatchEvent(new Event('load')));
-    expect(heading.classList.contains('sr-only')).toBe(!visible);
-  },
-);
+  ['marvel', 'Marvel'],
+  ['dc', 'DC'],
+  ['pixar', 'Pixar'],
+  ['wizarding-world', 'Wizarding World'],
+])('keeps a live visible heading in %s portrait crops', async (id, name) => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId={id}
+      collections={[]}
+      items={[
+        {
+          id: 'only-film',
+          type: 'movie',
+          title: 'Standalone',
+          worldId: id,
+          runtimeMinutes: 90,
+        },
+      ]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  const hero = host.querySelector(`[data-world-hero="${id}"]`);
+  const heading = hero.querySelector('h1');
+  expect(heading.textContent).toBe(name);
+  expect(heading.classList.contains('sr-only')).toBe(false);
+  // The source can already contain typography; do not stack a wordmark image.
+  expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
+  const image = hero.querySelector('img[src$="/hero.webp"]');
+  expect(image).not.toBeNull();
+  await act(async () => image.dispatchEvent(new Event('load')));
+  expect(heading.classList.contains('sr-only')).toBe(false);
+});

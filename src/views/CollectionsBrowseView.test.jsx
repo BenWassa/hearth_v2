@@ -422,3 +422,46 @@ it('retains readable landscape World cover labels when an image is corrupt', asy
   await click(cover);
   expect(openWorld).toHaveBeenCalledWith('marvel', cover);
 });
+
+it.each([
+  ['marvel', true],
+  ['dc', true],
+  ['pixar', false],
+  ['wizarding-world', false],
+])('uses a readable heading without stacking logos in %s artwork', async (id, visible) => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId={id}
+      collections={[]}
+      items={[
+        {
+          id: 'only-film',
+          type: 'movie',
+          title: 'Standalone',
+          worldId: id,
+          runtimeMinutes: 90,
+        },
+      ]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  const hero = host.querySelector(`[data-world-hero="${id}"]`);
+  const heading = hero.querySelector('h1');
+  expect(heading.textContent).toBe(
+    id === 'marvel'
+      ? 'Marvel'
+      : id === 'dc'
+      ? 'DC'
+      : id === 'pixar'
+      ? 'Pixar'
+      : 'Wizarding World',
+  );
+  // The image has its own baked typography. Transparent wordmark PNGs/SVGs
+  // must not be painted on top of it.
+  expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
+  const image = hero.querySelector('img[src$="/hero.webp"]');
+  expect(image).not.toBeNull();
+  await act(async () => image.dispatchEvent(new Event('load')));
+  expect(heading.classList.contains('sr-only')).toBe(!visible);
+});

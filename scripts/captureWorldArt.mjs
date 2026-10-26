@@ -8,10 +8,29 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const origin = 'http://127.0.0.1:4173';
 const out = resolve('world-art-browser-evidence');
 const viewports = [320, 390, 448];
-const ids = ['marvel', 'pixar', 'wizarding-world'];
+const ids = [
+  'marvel',
+  'dc',
+  'pixar',
+  'disney-animation',
+  'dreamworks',
+  'star-wars',
+  'wizarding-world',
+  'studio-ghibli',
+];
+// Launch Vite itself rather than `npm run preview`. Killing an npm wrapper
+// leaves the spawned Vite server holding inherited pipes open on Linux CI.
 const server = spawn(
-  process.platform === 'win32' ? 'npm.cmd' : 'npm',
-  ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4173', '--strictPort'],
+  process.execPath,
+  [
+    'node_modules/vite/bin/vite.js',
+    'preview',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '4173',
+    '--strictPort',
+  ],
   { stdio: 'pipe' },
 );
 let output = '';
@@ -104,4 +123,6 @@ try {
 } finally {
   await browser?.close();
   server.kill('SIGTERM');
+  server.stdout.destroy();
+  server.stderr.destroy();
 }

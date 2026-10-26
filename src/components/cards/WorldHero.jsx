@@ -25,24 +25,33 @@ const WorldHero = ({ world, headingRef }) => {
       )}
       <div className="world-hero-shade absolute inset-0" aria-hidden="true" />
       <div className="relative z-10">
-        {world.wordmark && !signatureFailed && (
-          <img
-            src={world.wordmark}
-            alt=""
-            decoding="async"
-            onLoad={() => setSignatureReady(true)}
-            onError={() => setSignatureFailed(true)}
-            className="mb-3 max-h-20 w-auto max-w-[80%] object-contain object-left"
-          />
-        )}
-        <h1
-          id="collections-heading"
-          ref={headingRef}
-          tabIndex={-1}
-          className={signatureReady ? 'sr-only' : 'font-serif text-3xl font-semibold leading-tight text-stone-50'}
-        >
-          {world.name}
-        </h1>
+        <div className="relative flex h-16 items-center">
+          {world.wordmark && !signatureFailed && (
+            <img
+              src={world.wordmark}
+              alt=""
+              decoding="async"
+              onLoad={() => setSignatureReady(true)}
+              onError={() => {
+                setSignatureFailed(true);
+                setSignatureReady(false);
+              }}
+              className="absolute inset-0 h-full w-[80%] object-contain object-left"
+            />
+          )}
+          <h1
+            id="collections-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className={
+              signatureReady
+                ? 'sr-only'
+                : 'font-serif text-3xl font-semibold leading-tight text-stone-50'
+            }
+          >
+            {world.name}
+          </h1>
+        </div>
         <p className="mt-2 text-sm leading-snug text-stone-200">
           {sagaCount} {sagaCount === 1 ? 'saga' : 'sagas'} · {filmCount}{' '}
           {filmCount === 1 ? 'feature film' : 'feature films'} on your shelf ·{' '}

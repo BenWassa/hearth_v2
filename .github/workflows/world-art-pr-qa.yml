@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: world-art-validation
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   verify:

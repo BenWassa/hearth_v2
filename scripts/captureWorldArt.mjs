@@ -103,6 +103,13 @@ try {
       });
       const valid = await image.evaluate((img) => img.naturalWidth > 0);
       if (!valid) throw new Error(`Hero failed to load: ${id}`);
+      const title = await hero.locator('h1').evaluate((node) => {
+        const bounds = node.getBoundingClientRect();
+        return { text: node.textContent.trim(), height: bounds.height };
+      });
+      if (title.height < 20) {
+        throw new Error(`World title not visibly readable: ${id} at ${width}px`);
+      }
       const contentVisible = (await page.locator('[aria-label="All sagas"] h3').count())
         + (await page.locator('[aria-label="Other films"] button').count())
         + (await page.locator('[aria-label="Shorts & specials"] button').count())

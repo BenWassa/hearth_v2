@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 
+// All shipped portrait assets contain baked-in studio/World typography.
+// The superhero crops can hide that typography, so retain a visible live
+// heading for those Worlds. Do not layer a second PNG/SVG wordmark over art.
+const NEEDS_VISIBLE_TITLE = new Set(['marvel', 'dc']);
+
 const WorldHero = ({ world, headingRef }) => {
   const [imageFailed, setImageFailed] = useState(false);
-  const [signatureFailed, setSignatureFailed] = useState(false);
-  const [signatureReady, setSignatureReady] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
   const sagaCount = world.sagas?.length || 0;
   const filmCount = world.ownedTotal || 0;
+  const visibleHeading =
+    imageFailed || !imageReady || NEEDS_VISIBLE_TITLE.has(world.id);
 
   return (
     <section
@@ -19,40 +25,26 @@ const WorldHero = ({ world, headingRef }) => {
           alt=""
           decoding="async"
           fetchPriority="high"
+          onLoad={() => setImageReady(true)}
           onError={() => setImageFailed(true)}
           className="absolute inset-0 h-full w-full object-cover"
         />
       )}
       <div className="world-hero-shade absolute inset-0" aria-hidden="true" />
       <div className="relative z-10">
-        <div className="relative flex h-16 items-center">
-          {world.wordmark && !signatureFailed && (
-            <img
-              src={world.wordmark}
-              alt=""
-              decoding="async"
-              onLoad={() => setSignatureReady(true)}
-              onError={() => {
-                setSignatureFailed(true);
-                setSignatureReady(false);
-              }}
-              className="absolute inset-0 h-full w-[80%] object-contain object-left"
-            />
-          )}
-          <h1
-            id="collections-heading"
-            ref={headingRef}
-            tabIndex={-1}
-            className={
-              signatureReady
-                ? 'sr-only'
-                : 'font-serif text-3xl font-semibold leading-tight text-stone-50'
-            }
-          >
-            {world.name}
-          </h1>
-        </div>
-        <p className="mt-2 text-sm leading-snug text-stone-200">
+        <h1
+          id="collections-heading"
+          ref={headingRef}
+          tabIndex={-1}
+          className={
+            visibleHeading
+              ? 'mb-2 font-serif text-3xl font-semibold leading-tight text-stone-50'
+              : 'sr-only'
+          }
+        >
+          {world.name}
+        </h1>
+        <p className="text-sm leading-snug text-stone-200">
           {sagaCount} {sagaCount === 1 ? 'saga' : 'sagas'} · {filmCount}{' '}
           {filmCount === 1 ? 'feature film' : 'feature films'} on your shelf ·{' '}
           {world.unwatched || 0} unwatched

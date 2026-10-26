@@ -24,11 +24,10 @@ const saga = (id, items = []) => ({
 });
 
 describe('approved World membership', () => {
-  it('uses stable local artwork for all eight Worlds', () => {
+  it('uses stable local cover artwork for all eight Worlds', () => {
     expect(COLLECTION_WORLDS).toHaveLength(8);
     for (const world of COLLECTION_WORLDS) {
       expect(world.cover).toBe(`/assets/worlds/${world.id}/cover.webp`);
-      expect(world.hero).toBe(`/assets/worlds/${world.id}/hero.webp`);
     }
   });
   it('gives every World a distinct, muted accent clear of amber, danger and energy hues', () => {

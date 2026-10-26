@@ -34,7 +34,6 @@ export const COLLECTION_WORLDS = worlds.map(([id, name, accent]) => ({
   // Static artwork. Only the World page header uses `cover`; Tonight tiles are
   // text-only so a row of Worlds stays calm.
   cover: `/assets/worlds/${id}/cover.webp`,
-  hero: `/assets/worlds/${id}/hero.webp`,
   collectionIds: Object.values(COLLECTION_CATALOG)
     .filter((entry) => entry.worldId === id)
     .map((entry) => entry.providerId),

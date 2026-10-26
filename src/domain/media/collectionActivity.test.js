@@ -3,7 +3,6 @@ import {
   getSagaActivity,
   preserveSagaOrder,
   rankSagas,
-  searchSagaName,
   selectTonightSagas,
 } from './collectionActivity.js';
 import {
@@ -140,8 +139,7 @@ describe('household saga activity', () => {
       ),
     ).toEqual(['a', 'b']);
   });
-  it('searches suffixes, case and accents, with deterministic alphabetical fallback', () => {
-    expect(searchSagaName('ÉCLAIR Collection')).toBe('eclair');
+  it('falls back to alphabetical order when activity ties', () => {
     expect(
       rankSagas(
         [saga('z', 'Z Collection', []), saga('a', 'A Collection', [])],

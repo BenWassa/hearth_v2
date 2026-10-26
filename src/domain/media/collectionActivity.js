@@ -3,11 +3,6 @@ import { toMillis } from '../../utils/time.js';
 const DAY = 86400000;
 export const sagaName = (title = '') =>
   title.replace(/\s+collection$/i, '').trim();
-export const searchSagaName = (title = '') =>
-  sagaName(title)
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
 const nameOrder = (a, b) =>
   sagaName(a.title).localeCompare(sagaName(b.title), 'en') ||
   a.id.localeCompare(b.id);
@@ -89,20 +84,16 @@ export const getSagaActivity = (saga, now, providerTotal = null) => {
   };
 };
 
-export const rankSagas = (
-  sagas,
-  { now, counts = new Map(), sort = 'recent' },
-) =>
+export const rankSagas = (sagas, { now, counts = new Map() }) =>
   sagas
     .map((saga) => ({
       ...saga,
       activity: getSagaActivity(saga, now, counts.get(saga.id)),
     }))
-    .sort((a, b) =>
-      sort === 'az'
-        ? nameOrder(a, b)
-        : b.activity.lastActivityAt - a.activity.lastActivityAt ||
-          nameOrder(a, b),
+    .sort(
+      (a, b) =>
+        b.activity.lastActivityAt - a.activity.lastActivityAt ||
+        nameOrder(a, b),
     );
 
 export const selectTonightSagas = (sagas, options) =>

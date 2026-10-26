@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Orbit } from 'lucide-react';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
 import { buildWorlds } from '../../../config/collectionWorlds.js';
 import { rankSagas } from '../../../domain/media/collectionActivity.js';
@@ -21,13 +22,24 @@ const WorldsGrid = ({ collections = [], items = [], onOpenWorld, counts }) => {
   );
   if (!worlds.length) return null;
   return (
-    <section aria-label="Worlds" className="space-y-3 px-1">
-      <h2 className="font-serif text-xl text-stone-100">Worlds</h2>
-      <div className="grid grid-cols-2 gap-3">
-        {worlds.map((world) => (
+    <section aria-label="Worlds" className="space-y-2 shrink-0">
+      <div className="flex items-center gap-1.5 px-1">
+        <Orbit className="w-4 h-4 text-stone-400" />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400">
+          Worlds
+        </h3>
+      </div>
+      <div className="grid grid-cols-2 gap-3 px-1">
+        {worlds.map((world, index) => (
           <WorldCover
             key={world.id}
             world={world}
+            // An odd last tile spans both columns rather than leaving a hole.
+            className={
+              worlds.length % 2 === 1 && index === worlds.length - 1
+                ? 'col-span-2'
+                : ''
+            }
             onOpen={(event) => onOpenWorld?.(world.id, event.currentTarget)}
           />
         ))}

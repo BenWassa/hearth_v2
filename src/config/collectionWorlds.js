@@ -35,11 +35,6 @@ export const COLLECTION_WORLDS = worlds.map(([id, name, accent]) => ({
   // text-only so a row of Worlds stays calm.
   cover: `/assets/worlds/${id}/cover.webp`,
   hero: `/assets/worlds/${id}/hero.webp`,
-  wordmark: `/assets/worlds/${id}/wordmark.${
-    ['star-wars', 'wizarding-world', 'studio-ghibli'].includes(id)
-      ? 'svg'
-      : 'png'
-  }`,
   collectionIds: Object.values(COLLECTION_CATALOG)
     .filter((entry) => entry.worldId === id)
     .map((entry) => entry.providerId),

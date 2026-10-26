@@ -27,14 +27,6 @@ describe('approved World membership', () => {
     for (const world of COLLECTION_WORLDS) {
       expect(world.cover).toBe(`/assets/worlds/${world.id}/cover.webp`);
       expect(world.hero).toBe(`/assets/worlds/${world.id}/hero.webp`);
-      const suffix = ['star-wars', 'wizarding-world', 'studio-ghibli'].includes(
-        world.id,
-      )
-        ? 'svg'
-        : 'png';
-      expect(world.wordmark).toBe(
-        `/assets/worlds/${world.id}/wordmark.${suffix}`,
-      );
     }
   });
   it('gives every World a distinct, muted accent clear of amber, danger and energy hues', () => {

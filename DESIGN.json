@@ -293,7 +293,7 @@
       "rowArtworkWidth": "96px",
       "minimumTouchTarget": "44px",
       "worldColumns": 2,
-      "worldTiles": "Worlds grid under the hero: text-only, identical type, per-World deep muted textured fill from config. Separate finite non-looping Collections rail of saga posters above The Classics, ending with a neutral All collections tile",
+      "worldTiles": "Worlds grid after the first suggestion rail: text-only, odd last tile spans two columns, identical type, per-World deep muted textured fill from config. Separate finite non-looping Collections rail of saga posters above The Classics, ending with a neutral All collections tile (only past three sagas); the index itself is plain rows with no search, sort or counts",
       "worldPage": "Edge-to-edge 16:9 art behind the status bar fading to Shell Black, title only, then finite scroll-snap poster shelves per saga (no search, sort, chips or visible counts)",
       "eligibility": "Editorial catalog defaults only; no household override UI",
       "ordering": "Frozen during a visit; meaningful activity or A–Z",

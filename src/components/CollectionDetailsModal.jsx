@@ -414,9 +414,9 @@ const CollectionDetailsModal = ({
                     trackClassName="bg-stone-50/15"
                   />
                 </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-label font-semibold uppercase tracking-[0.18em] text-stone-300">
+                <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-sm font-medium text-stone-300">
                   <span>
-                    {watchedCount} / {ownedTotalCount} watched on your shelf
+                    {watchedCount} of {ownedTotalCount} watched
                   </span>
                   {collection.year ? (
                     <span className="whitespace-nowrap tabular-nums text-stone-400">

@@ -92,16 +92,33 @@ try {
     await rail.scrollIntoViewIfNeeded();
     const railCells = await rail.locator('li').count();
     const cardCount = await rail.locator('[data-saga-card]').count();
-    if (railCells !== cardCount + 1) {
+    const hasAllTile = (await rail.locator('[data-all-collections]').count()) > 0;
+    if (railCells !== cardCount + (hasAllTile ? 1 : 0) || hasAllTile !== cardCount > 3) {
       throw new Error(`Collections rail has unexpected cells at ${width}px`);
     }
-    if (!(await rail.locator('li').last().locator('[data-all-collections]').count())) {
+    if (hasAllTile && !(await rail.locator('li').last().locator('[data-all-collections]').count())) {
       throw new Error('All collections tile is not last in the rail');
     }
     await page.screenshot({
       path: resolve(out, `tonight-collections-row-${width}.png`),
       animations: 'disabled',
     });
+
+    // The plain index opened from the final tile: no search, sort or count.
+    if (hasAllTile) {
+      const allTile = rail.locator('[data-all-collections]');
+      await allTile.click();
+      await page.locator('[aria-label="All sagas"]').waitFor();
+      if (await page.locator('#saga-search, #saga-sort').count()) {
+        throw new Error(`Index still has search or sort at ${width}px`);
+      }
+      await page.screenshot({
+        path: resolve(out, `collections-index-${width}.png`),
+        animations: 'disabled',
+      });
+      await page.keyboard.press('Escape');
+      await page.locator('[aria-label="All sagas"]').waitFor({ state: 'detached' });
+    }
 
     for (const id of ids) {
       const card = page.locator(`[data-world-id="${id}"]`).first();

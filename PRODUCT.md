@@ -38,4 +38,4 @@ Target WCAG 2.1 AA for text contrast and focus visibility, with particular care 
 
 ## Collections
 
-Tonight shows every represented World so the household can enter a familiar brand, choose a saga and reach a film. A complete searchable saga browser stays one tap away. World affiliation, editorial saga eligibility and activity relevance are separate decisions. Standalone films and shorts never become invented sagas, and shelf progress is distinct from franchise completion.
+Tonight shows every represented World so the household can enter a familiar brand, choose a saga and reach a film. A plain list of every saga stays one tap away. World affiliation, editorial saga eligibility and activity relevance are separate decisions. Standalone films and shorts never become invented sagas, and shelf progress is distinct from franchise completion.

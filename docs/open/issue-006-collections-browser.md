@@ -26,7 +26,7 @@ The [GitHub issue #6](https://github.com/BenWassa/hearth_v2/issues/6) contains t
 ## Working checklist
 
 - [x] Decide preview entry vs preview cards at realistic mobile sizes.
-- [x] Implement dedicated finite searchable Collections browser and navigation.
+- [x] Implement dedicated finite Collections browser and navigation (search and sort were later deferred; the index is a plain recent-activity list for now).
 - [x] Define verified activity-sorting semantics (no false freshness).
 - [x] Clarify collection progress denominator and labels.
 - [x] Bound optional external metadata lookups.
@@ -45,3 +45,5 @@ Eligibility follows the approved editorial catalog with no household override UI
 Worlds include Wizarding World, Marvel, Star Wars, Pixar, Disney, DC, DreamWorks Animation and optionally Ghibli when represented. Child sagas, standalone features, shorts/specials and TV have separate sections and counts. Bond uses Explore films rather than an invented next-film sequence. Nested film details preserve the saga and its focus/scroll. On-demand provider hydration is bounded at three and never substitutes a TV show for a missing movie ID.
 
 The shared-preference service/hook has 21 targeted tests and the new Firestore rules have passed 25 actual isolated emulator attack checks. No production household writes or deployment occurred. The rules must ship with the later reviewed release. See [complete validation and mobile screenshots](../collections/VALIDATION.md) for the final integrated test/build results and [implementation decisions](../../COLLECTIONS_REDESIGN.md) for semantics and limitations. Keep this issue record open until review/merge and actual GitHub closure.
+
+**Update (2026-10-26):** the full All collections index has no search, sort, refresh or count for now, and it no longer repeats the Worlds grid. The pure search and sort helpers remain in the domain code, unused by the UI. Worlds sit on Tonight after the first suggestion rail.

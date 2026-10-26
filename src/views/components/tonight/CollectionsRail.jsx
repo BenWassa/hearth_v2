@@ -15,7 +15,7 @@ const focusRing =
 // Every eligible saga, most recently active first, as one finite rail in the
 // same vocabulary as the other Tonight rails. It is a plain scroll-snap row:
 // no cloned cards, no auto-advance, no looping. The last tile is the neutral
-// All collections tile that opens the searchable index. Cards carry no counts.
+// All collections tile that opens the full index (shown only past three sagas). Cards carry no counts.
 // Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
   collections = [],
@@ -49,7 +49,11 @@ const CollectionsRail = ({
             WebkitOverflowScrolling: 'touch',
           }}
         >
-          <ul aria-label="All collections" className="flex gap-2.5 min-w-max">
+          <ul
+            role="list"
+            aria-label="All collections"
+            className="flex gap-2.5 min-w-max"
+          >
             {sagas.map((saga) => (
               <li
                 key={saga.id}
@@ -82,18 +86,21 @@ const CollectionsRail = ({
                 </button>
               </li>
             ))}
-            <li className={cell} style={{ scrollSnapAlign: 'start' }}>
-              <WorldCover
-                neutral
-                className="aspect-[2/3] !min-h-0"
-                world={{
-                  id: 'all-collections',
-                  name: 'All collections',
-                  sagas,
-                }}
-                onOpen={onBrowse}
-              />
-            </li>
+            {/* The row already shows everything when there are only a few. */}
+            {sagas.length > 3 && (
+              <li className={cell} style={{ scrollSnapAlign: 'start' }}>
+                <WorldCover
+                  neutral
+                  className="aspect-[2/3] !min-h-0"
+                  world={{
+                    id: 'all-collections',
+                    name: 'All collections',
+                    sagas,
+                  }}
+                  onOpen={onBrowse}
+                />
+              </li>
+            )}
           </ul>
         </div>
       </div>

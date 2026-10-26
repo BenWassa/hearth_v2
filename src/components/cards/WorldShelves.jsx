@@ -67,33 +67,59 @@ export const PosterShelf = ({
   id,
   title,
   srDetail,
+  reason = '',
+  headingHidden = false,
   films,
   size = 'regular',
   onOpenHeading,
   onOpenFilm,
 }) => (
   <section aria-label={title} data-shelf={id} className="mt-5">
-    <h2 className="font-serif text-xl leading-snug text-stone-100">
-      {onOpenHeading ? (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.currentTarget.focus({ preventScroll: true });
-            onOpenHeading();
-          }}
-          className={`min-h-[44px] max-w-full rounded-lg text-left ${focusRing}`}
-        >
-          {title}
-          <span aria-hidden="true" className="ml-1 text-stone-400">
-            ›
-          </span>
-        </button>
-      ) : (
-        title
-      )}
-    </h2>
+    {headingHidden ? (
+      <>
+        <h2 className="sr-only">{title}</h2>
+        {onOpenHeading && (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              onOpenHeading();
+            }}
+            aria-label={`${title} details`}
+            className={`min-h-[44px] rounded-lg text-sm text-stone-400 ${focusRing}`}
+          >
+            Saga details
+            <span aria-hidden="true" className="ml-1">
+              ›
+            </span>
+          </button>
+        )}
+      </>
+    ) : (
+      <h2 className="font-serif text-xl leading-snug text-stone-100">
+        {onOpenHeading ? (
+          <button
+            type="button"
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              onOpenHeading();
+            }}
+            className={`min-h-[44px] max-w-full rounded-lg text-left ${focusRing}`}
+          >
+            {title}
+            <span aria-hidden="true" className="ml-1 text-stone-400">
+              ›
+            </span>
+          </button>
+        ) : (
+          title
+        )}
+      </h2>
+    )}
+    {reason && <p className="text-sm text-stone-400">{reason}</p>}
     {srDetail && <p className="sr-only">{srDetail}</p>}
     <ul
+      role="list"
       className="shelf-scroll -mx-4 mt-2 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2"
       onKeyDown={moveWithArrows}
     >

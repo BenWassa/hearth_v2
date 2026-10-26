@@ -39,16 +39,6 @@ const button = (text) =>
       b.textContent.includes(text) ||
       b.getAttribute('aria-label')?.includes(text),
   );
-const search = async (value) => {
-  const input = host.querySelector('input');
-  await act(async () => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      'value',
-    ).set.call(input, value);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  });
-};
 afterEach(async () => {
   if (root) await act(async () => root.unmount());
   host?.remove();
@@ -82,7 +72,7 @@ it.each([0, 1, 3, 25, 50])(
     }
   },
 );
-it('makes 50 sagas searchable, handles no results, clear and A–Z', async () => {
+it('lists every saga plainly: no search, sort, refresh, count or Worlds grid', async () => {
   await mount(
     <CollectionsBrowseView
       collections={Array.from({ length: 50 }, (_, i) => makeSaga(i))}
@@ -91,65 +81,16 @@ it('makes 50 sagas searchable, handles no results, clear and A–Z', async () =>
     />,
   );
   expect(host.querySelectorAll('h3')).toHaveLength(50);
-  await search('SAGA 49 collection');
-  expect(host.querySelectorAll('h3')).toHaveLength(1);
-  expect(host.querySelector('h3').textContent).toBe('Saga 49');
-  await search('nothing matches');
-  expect(host.textContent).toContain('No sagas found');
-  await click(button('Clear'));
-  expect(host.querySelectorAll('h3')).toHaveLength(50);
-  await act(async () => {
-    const select = host.querySelector('select');
-    select.value = 'az';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  expect(
-    [...host.querySelectorAll('h3')].slice(0, 2).map((h) => h.textContent),
-  ).toEqual(['Saga 00', 'Saga 01']);
-});
-it('opens every World including singletons and restores overview focus and scroll', async () => {
-  const open = vi.fn();
-  const collections = [
-    makeSaga(0, '86311'),
-    makeSaga(1, '131292'),
-    makeSaga(2, '10'),
-    ...Array.from({ length: 4 }, (_, i) => makeSaga(i + 3)),
-  ];
-  await mount(
-    <CollectionsBrowseView
-      collections={collections}
-      onClose={vi.fn()}
-      onOpenCollection={open}
-    />,
-  );
-  await click(button('Star Wars'));
-  expect(host.querySelector('h1').textContent).toBe('Star Wars');
-  expect(open).not.toHaveBeenCalled();
-  await click(button('Back to All collections'));
-  await act(
-    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
-  );
-  const marvel = button('Marvel');
-  marvel.focus();
-  const scroller = host.querySelector('.overflow-y-auto');
-  scroller.scrollTop = 180;
-  await click(marvel);
-  expect(host.querySelector('h1').textContent).toBe('Marvel');
-  // Counts are screen-reader context only; nothing numeric is visible.
-  const counts = [...host.querySelectorAll('[data-world-hero] p')].find((p) =>
-    p.textContent.includes('feature films on your shelf'),
-  );
-  expect(counts.classList.contains('sr-only')).toBe(true);
-  expect(host.querySelectorAll('[data-saga-shelf]')).toHaveLength(2);
-  await click(button('Back to All collections'));
-  await act(
-    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
-  );
   expect(host.querySelector('h1').textContent).toBe('Collections');
-  expect(document.activeElement).toBe(button('Marvel'));
-  expect(scroller.scrollTop).toBe(180);
+  expect(host.querySelector('input')).toBeNull();
+  expect(host.querySelector('select')).toBeNull();
+  expect(host.textContent).not.toContain('Refresh order');
+  expect(host.textContent).not.toContain('on your shelf');
+  expect(host.querySelector('[data-world-id]')).toBeNull();
+  // Rows carry a short progress line that cannot wrap to three lines.
+  expect(host.querySelector('h3 + p').textContent).toBe('1 of 2 watched');
 });
-it('keeps order during live activity and provider enrichment; explicit refresh incorporates changes', async () => {
+it('keeps the index order stable through live activity and provider enrichment', async () => {
   const collections = [makeSaga(0), makeSaga(1), makeSaga(2)];
   const render = (items, counts) => (
     <CollectionsBrowseView
@@ -180,8 +121,7 @@ it('keeps order during live activity and provider enrichment; explicit refresh i
   expect([...host.querySelectorAll('h3')].map((h) => h.textContent)).toEqual(
     before,
   );
-  await click(button('Refresh order'));
-  expect(host.querySelector('h3').textContent).toBe('Saga 02');
+  expect(host.textContent).not.toContain('Refresh order');
 });
 it('small libraries skip Worlds and have an accessible empty state and Escape', async () => {
   const close = vi.fn();
@@ -454,7 +394,7 @@ it('shows every eligible saga in a finite Collections row ordered by activity, e
   const ungrouped = makeSaga(2, 'other-2');
   await mount(
     <CollectionsRail
-      collections={[older, ungrouped, newer]}
+      collections={[older, ungrouped, newer, makeSaga(3, 'other-3')]}
       onOpenCollection={openCollection}
       onBrowse={browse}
     />,
@@ -462,14 +402,15 @@ it('shows every eligible saga in a finite Collections row ordered by activity, e
   const rail = host.querySelector('ul[aria-label="All collections"]');
   const cells = [...rail.querySelectorAll('li')];
   // One card per saga (including those in no World) plus the neutral tile.
-  expect(cells).toHaveLength(4);
+  expect(cells).toHaveLength(5);
+  expect(rail.getAttribute('role')).toBe('list');
   const order = cells
-    .slice(0, 3)
+    .slice(0, 4)
     .map((cell) => cell.querySelector('button').dataset.sagaCard);
   expect(order[0]).toBe('saga-1');
   expect(order).toContain('saga-2');
   // Finite and plain scroll-snap: no cloned cards, no looping hooks.
-  expect(new Set(order).size).toBe(3);
+  expect(new Set(order).size).toBe(4);
   expect(host.querySelectorAll('[data-rail-card]')).toHaveLength(0);
   // No count text on the cards.
   const visibleRail = rail.cloneNode(true);
@@ -482,7 +423,7 @@ it('shows every eligible saga in a finite Collections row ordered by activity, e
     expect.objectContaining({ id: 'saga-1' }),
     cells[0].querySelector('button'),
   );
-  const tile = cells[3].querySelector('button');
+  const tile = cells[4].querySelector('button');
   expect(tile.hasAttribute('data-all-collections')).toBe(true);
   expect(tile.hasAttribute('data-world-id')).toBe(false);
   expect(tile.style.getPropertyValue('--world-accent')).toBe('');
@@ -490,6 +431,38 @@ it('shows every eligible saga in a finite Collections row ordered by activity, e
   expect(tile.textContent).toContain('All collections');
   await click(tile);
   expect(browse).toHaveBeenCalledOnce();
+});
+
+it('leaves out the All collections tile when the row already shows three or fewer sagas', async () => {
+  await mount(
+    <CollectionsRail
+      collections={[makeSaga(0), makeSaga(1), makeSaga(2)]}
+      onBrowse={vi.fn()}
+    />,
+  );
+  expect(host.querySelectorAll('[data-saga-card]')).toHaveLength(3);
+  expect(host.querySelector('[data-all-collections]')).toBeNull();
+});
+
+it('lets an odd last World tile span both columns under a Tonight-style eyebrow', async () => {
+  await mount(
+    <WorldsGrid
+      collections={[
+        makeSaga(0, '86311'),
+        makeSaga(1, '10'),
+        makeSaga(2, '1241'),
+      ]}
+      onOpenWorld={vi.fn()}
+    />,
+  );
+  const tiles = [...host.querySelectorAll('[data-world-id]')];
+  expect(tiles).toHaveLength(3);
+  expect(tiles[2].className).toContain('col-span-2');
+  expect(tiles[0].className).not.toContain('col-span-2');
+  const eyebrow = host.querySelector('h3');
+  expect(eyebrow.textContent).toBe('Worlds');
+  expect(eyebrow.className).toContain('uppercase');
+  expect(host.querySelector('h2')).toBeNull();
 });
 
 it('hides the Collections row when there are no sagas', async () => {
@@ -529,6 +502,31 @@ it('shows a World as finite poster shelves with saga details and film opens', as
   expect(openItem).toHaveBeenCalledWith(
     expect.objectContaining({ title: 'Thor' }),
   );
+});
+
+it('suppresses the duplicate shelf heading for a lone saga but keeps Details reachable', async () => {
+  const openCollection = vi.fn();
+  const saga = withTitles(makeSaga(0, '10'), ['A New Hope', 'Empire']);
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="star-wars"
+      collections={[saga]}
+      onClose={vi.fn()}
+      onOpenCollection={openCollection}
+    />,
+  );
+  const shelf = host.querySelector('[data-saga-shelf]');
+  const heading = shelf.querySelector('h2');
+  expect(heading.classList.contains('sr-only')).toBe(true);
+  const details = shelf.querySelector('button[aria-label$="details"]');
+  expect(details.textContent).toContain('Saga details');
+  await click(details);
+  expect(openCollection).toHaveBeenCalledWith(
+    expect.objectContaining({ id: 'saga-0' }),
+  );
+  // Next up appears for the featured shelf from data already on the shelf.
+  expect(shelf.textContent).toContain('Next up: Empire');
+  expect(shelf.querySelector('ul').getAttribute('role')).toBe('list');
 });
 
 it('keeps World pages to the title and shelves: no search, sort, chips or visible counts', async () => {

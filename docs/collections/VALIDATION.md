@@ -37,7 +37,7 @@ The household override backend below is **dormant**: no UI uses it and no listen
 
 Movie watch-transition transaction behavior is tested separately against controlled SDK mocks; live multi-device watch-status contention remains unverified. Shared preference authorization and two-client writes/reset have actual emulator coverage.
 
-The final UI review covers 320×844, 390×844 and 448×844, with all represented Worlds visible on Tonight, direct World entry even for a single saga, full saga search, provider fallback, and scroll/focus restoration. Regenerate the captures below from the final integrated UI rather than relying on the previous two-saga-preview screenshots.
+The final UI review covers 320×844, 390×844 and 448×844, with all represented Worlds visible on Tonight, direct World entry even for a single saga, the plain all-saga index, provider fallback, and scroll/focus restoration. Regenerate the captures below from the final integrated UI rather than relying on the previous two-saga-preview screenshots.
 
 ## Screenshots
 

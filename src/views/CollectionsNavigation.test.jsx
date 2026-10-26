@@ -39,7 +39,11 @@ it('opens any saga, preserves search and scroll through details, and reaches its
     [...host.querySelectorAll('button')].find(
       (node) =>
         !node.closest('[inert]') &&
-        node.textContent.toLowerCase().includes(text.toLowerCase()),
+        (node.textContent.toLowerCase().includes(text.toLowerCase()) ||
+          node
+            .getAttribute('aria-label')
+            ?.toLowerCase()
+            .includes(text.toLowerCase())),
     );
   const click = async (node) => {
     await act(async () => {
@@ -60,25 +64,19 @@ it('opens any saga, preserves search and scroll through details, and reaches its
     expect(
       host.querySelector('[aria-labelledby="collections-heading"]'),
     ).not.toBeNull();
-    const input = host.querySelector('#saga-search');
-    await act(async () => {
-      Object.getOwnPropertyDescriptor(
-        HTMLInputElement.prototype,
-        'value',
-      ).set.call(input, 'Avengers collection');
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-    const browserScroller = input.closest('.overflow-y-auto');
+    const browserScroller = host.querySelector(
+      '[aria-labelledby="collections-heading"] .overflow-y-auto',
+    );
+    expect(host.querySelector('#saga-search')).toBeNull();
     browserScroller.scrollTop = 52;
     await click(button('The Avengers'));
-    expect(host.textContent).toContain('watched on your shelf');
+    expect(host.textContent).toMatch(/\d+ of \d+ watched/);
     expect(host.textContent).toContain('Full series details are unavailable');
     await act(async () =>
       document.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
       ),
     );
-    expect(input.value).toBe('Avengers collection');
     expect(browserScroller.scrollTop).toBe(52);
     expect(document.activeElement.textContent).toContain('The Avengers');
     await click(button('The Avengers'));
@@ -88,13 +86,14 @@ it('opens any saga, preserves search and scroll through details, and reaches its
     expect(document.activeElement.textContent.toLowerCase()).toContain(
       'next up',
     );
-    expect(input.value).toBe('Avengers collection');
     const closeSaga = [...host.querySelectorAll('button')].find(
       (node) => node.getAttribute('aria-label') === 'Close collection',
     );
     if (closeSaga) await click(closeSaga);
-    await click(button('Tonight'));
-    expect(host.querySelector('#saga-search')).toBeNull();
+    await click(button('Back to Tonight'));
+    expect(
+      host.querySelector('[aria-labelledby="collections-heading"]'),
+    ).toBeNull();
     expect(document.activeElement.textContent).toContain('All collections');
   } finally {
     await act(async () => root.unmount());
@@ -177,8 +176,9 @@ it('renders Tonight and the Collections index without reading household preferen
       all.focus();
       all.click();
     });
-    expect(host.querySelector('#saga-search')).not.toBeNull();
-    expect(host.textContent).toContain('25 sagas on your shelf');
+    expect(host.querySelectorAll('[aria-label="All sagas"] h3')).toHaveLength(
+      25,
+    );
     expect(host.textContent).not.toContain('Manage sagas');
     expect(host.textContent).not.toContain('Could not load');
     expect(subscribe).not.toHaveBeenCalled();
@@ -208,7 +208,7 @@ it('opens a saga from the Tonight Collections row and returns focus to the same 
     await act(async () => {
       await vi.dynamicImportSettled();
     });
-    expect(host.textContent).toContain('watched on your shelf');
+    expect(host.textContent).toMatch(/\d+ of \d+ watched/);
     await act(async () => {
       document.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),

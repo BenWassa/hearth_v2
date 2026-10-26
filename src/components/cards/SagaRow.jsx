@@ -3,7 +3,7 @@ import LazyMediaImage from '../media/LazyMediaImage.jsx';
 import { getBackdropSrc } from '../../utils/poster.js';
 import { sagaName } from '../../domain/media/collectionActivity.js';
 
-const SagaRow = ({ saga, onOpen, reason = false }) => (
+const SagaRow = ({ saga, onOpen }) => (
   <button
     type="button"
     onClick={(event) => {
@@ -26,11 +26,8 @@ const SagaRow = ({ saga, onOpen, reason = false }) => (
       <h3 className="font-serif text-lg leading-snug text-stone-100 break-words">
         {sagaName(saga.title)}
       </h3>
-      {reason && saga.activity?.reason && (
-        <p className="text-sm text-amber-300">{saga.activity.reason}</p>
-      )}
       <p className="text-sm text-stone-400">
-        {saga.watchedCount} of {saga.totalCount} watched on your shelf
+        {saga.watchedCount} of {saga.totalCount} watched
       </p>
     </div>
   </button>

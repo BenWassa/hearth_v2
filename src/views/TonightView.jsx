@@ -412,6 +412,24 @@ const TonightView = ({
   };
 
   const hasOpenedDetails = useHasBeenTrue(isDetailOpen);
+  // Worlds sit after the first suggestion rail so decision content comes first.
+  const worldsAfter =
+    [
+      ['currently', currentlyWatchingShows.length],
+      ['comfort', uniqueComfortWatches.length],
+      ['comedies', uniqueComedies.length],
+      ['quick', uniqueQuickBites.length],
+      ['focused', uniqueFocusedWatches.length],
+      ['visual', uniqueVisualMovies.length],
+    ].find(([, count]) => count > 0)?.[0] || 'top';
+  const worldsGrid = (
+    <WorldsGrid
+      collections={collections}
+      items={items}
+      onOpenWorld={openWorld}
+    />
+  );
+
   const hasOpenedCollection = useHasBeenTrue(isCollectionOpen);
   const hasOpenedAudit = useHasBeenTrue(isAuditModalOpen);
   const hasOpenedWipe = useHasBeenTrue(isWipeConfirmOpen);
@@ -491,11 +509,7 @@ const TonightView = ({
               <>
                 <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
 
-                <WorldsGrid
-                  collections={collections}
-                  items={items}
-                  onOpenWorld={openWorld}
-                />
+                {worldsAfter === 'top' && worldsGrid}
 
                 {currentlyWatchingShows.length > 0 && (
                   <SuggestionSection
@@ -514,6 +528,8 @@ const TonightView = ({
                     className="shrink-0"
                   />
                 )}
+
+                {worldsAfter === 'currently' && worldsGrid}
 
                 <ComingSoonRail
                   releases={upcomingReleases}
@@ -541,6 +557,8 @@ const TonightView = ({
                   />
                 )}
 
+                {worldsAfter === 'comfort' && worldsGrid}
+
                 {uniqueComedies.length > 0 && (
                   <SuggestionSection
                     title="Need a Laugh"
@@ -559,6 +577,8 @@ const TonightView = ({
                     className="shrink-0"
                   />
                 )}
+
+                {worldsAfter === 'comedies' && worldsGrid}
 
                 {uniqueQuickBites.length > 0 && (
                   <SuggestionSection
@@ -579,6 +599,8 @@ const TonightView = ({
                   />
                 )}
 
+                {worldsAfter === 'quick' && worldsGrid}
+
                 {uniqueFocusedWatches.length > 0 && (
                   <SuggestionSection
                     title="Deep Dives"
@@ -598,6 +620,8 @@ const TonightView = ({
                   />
                 )}
 
+                {worldsAfter === 'focused' && worldsGrid}
+
                 {uniqueVisualMovies.length > 0 && (
                   <SuggestionSection
                     title="Spectacles"
@@ -616,6 +640,8 @@ const TonightView = ({
                     className="shrink-0"
                   />
                 )}
+
+                {worldsAfter === 'visual' && worldsGrid}
 
                 <CollectionsRail
                   collections={collections}

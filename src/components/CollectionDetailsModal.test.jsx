@@ -62,7 +62,7 @@ it('separates provider shorts from owned feature progress and keeps unowned film
     parts: [feature, short, film('3', 'Unowned sequel', 'unwatched', 110)],
   };
   await render(saga([feature, short]));
-  expect(host.textContent).toContain('1 / 1 watched on your shelf');
+  expect(host.textContent).toContain('1 of 1 watched');
   expect(host.textContent).toContain('2 films in the feature saga');
   expect(
     host.querySelector('[aria-label="Shorts and specials"]').textContent,
@@ -120,5 +120,5 @@ it('retains short ownership even when the saga rollup contains only features', a
   await render(saga([feature]), { householdItems: [feature, short] });
   expect(button('Open Owned short')).toBeTruthy();
   expect(button('Add Owned short to shelf')).toBeFalsy();
-  expect(host.textContent).toContain('0 / 1 watched on your shelf');
+  expect(host.textContent).toContain('0 of 1 watched');
 });

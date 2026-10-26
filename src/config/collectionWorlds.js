@@ -182,3 +182,63 @@ export const buildWorlds = (
     )
     .sort((a, b) => b.activity - a.activity || a.name.localeCompare(b.name));
 };
+
+// Tonight shows six Worlds: four fixed, two chosen from a short candidate list
+// by household activity. Nothing marks the difference on screen. The choice
+// is held for a week so the grid does not reshuffle while the household
+// watches.
+export const TONIGHT_PERMANENT_WORLD_IDS = [
+  'disney-animation',
+  'pixar',
+  'marvel',
+  'dreamworks',
+];
+export const TONIGHT_ADAPTIVE_WORLD_IDS = [
+  'star-wars',
+  'wizarding-world',
+  'dc',
+  'studio-ghibli',
+];
+export const TONIGHT_ADAPTIVE_SLOTS = 2;
+export const WORLD_ROTATION_MS = 7 * 24 * 60 * 60 * 1000;
+
+// `stored` is the last { period, ids } pick. It is reused while the week holds
+// and every pick is still on the shelf; otherwise the pick is recomputed from
+// activity, then watched count, then size, then candidate order. Worlds
+// with nothing on the shelf are skipped, so a tile never opens an empty page.
+export const selectTonightWorlds = (
+  worlds = [],
+  { now = Date.now(), stored = null } = {},
+) => {
+  const byId = new Map(worlds.map((world) => [world.id, world]));
+  const candidates = TONIGHT_ADAPTIVE_WORLD_IDS.filter((id) => byId.has(id));
+  const slots = Math.min(TONIGHT_ADAPTIVE_SLOTS, candidates.length);
+  const period = Math.floor(now / WORLD_ROTATION_MS);
+  const storedIds = Array.isArray(stored?.ids) ? stored.ids : [];
+  const keep =
+    stored?.period === period &&
+    storedIds.length === slots &&
+    storedIds.every((id) => candidates.includes(id));
+  const adaptiveIds = keep
+    ? storedIds
+    : [...candidates]
+        .sort((a, b) => {
+          const left = byId.get(a);
+          const right = byId.get(b);
+          return (
+            right.activity - left.activity ||
+            right.ownedFeatureWatchedCount - left.ownedFeatureWatchedCount ||
+            right.ownedTotal - left.ownedTotal ||
+            TONIGHT_ADAPTIVE_WORLD_IDS.indexOf(a) -
+              TONIGHT_ADAPTIVE_WORLD_IDS.indexOf(b)
+          );
+        })
+        .slice(0, slots);
+  return {
+    worlds: [
+      ...TONIGHT_PERMANENT_WORLD_IDS.filter((id) => byId.has(id)),
+      ...adaptiveIds,
+    ].map((id) => byId.get(id)),
+    pick: { period, ids: adaptiveIds },
+  };
+};

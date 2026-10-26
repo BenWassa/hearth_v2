@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Orbit } from 'lucide-react';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
-import { buildWorlds } from '../../../config/collectionWorlds.js';
+import {
+  buildWorlds,
+  selectTonightWorlds,
+} from '../../../config/collectionWorlds.js';
 import { rankSagas } from '../../../domain/media/collectionActivity.js';
 
-// Compact, finite two-column grid of every represented World: text-only tiles,
-// no artwork requests. Sagas outside any World are reached from the Collections
-// row further down Tonight.
+const PICK_KEY = 'hearth:tonight-worlds';
+const readPick = () => {
+  try {
+    return JSON.parse(localStorage.getItem(PICK_KEY));
+  } catch {
+    return null;
+  }
+};
+const writePick = (pick) => {
+  try {
+    localStorage.setItem(PICK_KEY, JSON.stringify(pick));
+  } catch {
+    // Storage can be blocked; the pick is then recomputed each visit.
+  }
+};
+
+// Six text-only tiles in a finite two-column grid: four fixed Worlds and two
+// that follow household activity (see selectTonightWorlds). Every other World
+// and saga is reached from the Collections row further down Tonight.
 const WorldsGrid = ({ collections = [], items = [], onOpenWorld, counts }) => {
   const [clock] = useState(Date.now);
-  const worlds = buildWorlds(
-    rankSagas(collections, { now: clock, counts }),
-    items,
+  const [stored] = useState(readPick);
+  const { worlds, pick } = selectTonightWorlds(
+    buildWorlds(rankSagas(collections, { now: clock, counts }), items),
+    { now: clock, stored },
   );
-  const [order] = useState(() => worlds.map((world) => world.id));
-  worlds.sort(
-    (a, b) =>
-      (order.includes(a.id) ? order.indexOf(a.id) : Infinity) -
-        (order.includes(b.id) ? order.indexOf(b.id) : Infinity) ||
-      a.name.localeCompare(b.name),
-  );
+  const pickKey = JSON.stringify(pick);
+  useEffect(() => {
+    if (pickKey !== JSON.stringify(stored)) writePick(JSON.parse(pickKey));
+  }, [pickKey, stored]);
   if (!worlds.length) return null;
   return (
     <section aria-label="Worlds" className="space-y-2 shrink-0">
@@ -37,8 +54,8 @@ const WorldsGrid = ({ collections = [], items = [], onOpenWorld, counts }) => {
             // An odd last tile spans both columns rather than leaving a hole.
             className={
               worlds.length % 2 === 1 && index === worlds.length - 1
-                ? 'col-span-2'
-                : ''
+                ? 'col-span-2 min-h-[72px]'
+                : 'aspect-[16/9]'
             }
             onOpen={(event) => onOpenWorld?.(world.id, event.currentTarget)}
           />

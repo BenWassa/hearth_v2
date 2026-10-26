@@ -44,7 +44,7 @@ afterEach(async () => {
   host?.remove();
 });
 it.each([0, 1, 3, 25, 50])(
-  'shows every represented World directly on Tonight for %i sagas',
+  'shows at most six Worlds directly on Tonight for %i sagas',
   async (size) => {
     const openWorld = vi.fn();
     const browse = vi.fn();
@@ -60,7 +60,7 @@ it.each([0, 1, 3, 25, 50])(
       />,
     );
     expect(host.querySelectorAll('[data-world-id]')).toHaveLength(
-      Math.min(size, ids.length),
+      Math.min(size, ids.length, 6),
     );
     // The grid is only Worlds: no All collections tile and no Browse-all link.
     expect(button('All collections')).toBeUndefined();
@@ -72,6 +72,27 @@ it.each([0, 1, 3, 25, 50])(
     }
   },
 );
+it('keeps the adaptive Worlds for the week once chosen', async () => {
+  localStorage.removeItem('hearth:tonight-worlds');
+  const ids = ['86311', '1241', '10', '10194', '386382', '263', '2150'];
+  const collections = ids.map((id, i) => makeSaga(i, id));
+  await mount(<WorldsGrid collections={collections} onOpenWorld={vi.fn()} />);
+  const tiles = () =>
+    [...host.querySelectorAll('[data-world-id]')].map(
+      (el) => el.dataset.worldId,
+    );
+  const first = tiles();
+  expect(first).toHaveLength(6);
+  expect(first.slice(0, 4)).toEqual([
+    'disney-animation',
+    'pixar',
+    'marvel',
+    'dreamworks',
+  ]);
+  const saved = JSON.parse(localStorage.getItem('hearth:tonight-worlds'));
+  expect(saved.ids).toEqual(first.slice(4));
+  localStorage.removeItem('hearth:tonight-worlds');
+});
 it('lists every saga plainly: no search, sort, refresh, count or Worlds grid', async () => {
   await mount(
     <CollectionsBrowseView

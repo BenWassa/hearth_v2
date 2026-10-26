@@ -27,7 +27,7 @@ const WorldCover = ({ world, onOpen, neutral = false, className = '' }) => (
     }}
     className={`world-tile ${
       neutral ? 'world-tile-neutral' : ''
-    } flex min-h-[72px] w-full min-w-0 items-center rounded-xl py-3 pl-4 pr-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 ${className}`}
+    } flex w-full min-w-0 items-center rounded-xl py-3 pl-4 pr-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 ${className}`}
   >
     <span className="world-tile-name font-serif text-stone-100">
       {world.name}

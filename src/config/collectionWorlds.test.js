@@ -3,6 +3,8 @@ import { COLLECTION_CATALOG } from './collectionCatalog.js';
 import {
   buildWorlds,
   COLLECTION_WORLDS,
+  selectTonightWorlds,
+  WORLD_ROTATION_MS,
   worldForItem,
   worldForSaga,
 } from './collectionWorlds.js';
@@ -159,5 +161,100 @@ describe('approved World membership', () => {
     expect(
       buildWorlds([], [pixar, ghibli], { now }).every((w) => w.activity === 0),
     ).toBe(true);
+  });
+});
+
+describe('Tonight World selection', () => {
+  const world = (id, extra = {}) => ({
+    id,
+    activity: 0,
+    ownedFeatureWatchedCount: 0,
+    ownedTotal: 1,
+    ...extra,
+  });
+  const all = (overrides = {}) =>
+    COLLECTION_WORLDS.map((entry) => world(entry.id, overrides[entry.id]));
+  const ids = (result) => result.worlds.map((entry) => entry.id);
+  const week = 100 * WORLD_ROTATION_MS;
+
+  it('shows the four permanent Worlds first, then the two most active candidates', () => {
+    const result = selectTonightWorlds(
+      all({
+        dc: { activity: 30 },
+        'studio-ghibli': { activity: 20 },
+        'star-wars': { activity: 10 },
+      }),
+      { now: week },
+    );
+    expect(ids(result)).toEqual([
+      'disney-animation',
+      'pixar',
+      'marvel',
+      'dreamworks',
+      'dc',
+      'studio-ghibli',
+    ]);
+  });
+  it('breaks activity ties by watched count, size, then candidate order', () => {
+    const tied = selectTonightWorlds(
+      all({
+        'wizarding-world': { ownedFeatureWatchedCount: 3 },
+        dc: { ownedTotal: 9 },
+      }),
+      { now: week },
+    );
+    expect(ids(tied).slice(4)).toEqual(['wizarding-world', 'dc']);
+    expect(ids(selectTonightWorlds(all(), { now: week })).slice(4)).toEqual([
+      'star-wars',
+      'wizarding-world',
+    ]);
+  });
+  it('omits Worlds with nothing on the shelf rather than showing empty pages', () => {
+    const result = selectTonightWorlds(
+      all().filter((entry) => !['pixar', 'dc'].includes(entry.id)),
+      { now: week },
+    );
+    expect(ids(result)).toEqual([
+      'disney-animation',
+      'marvel',
+      'dreamworks',
+      'star-wars',
+      'wizarding-world',
+    ]);
+  });
+  it('holds the adaptive pick for the rotation period, even as activity changes', () => {
+    const first = selectTonightWorlds(all({ dc: { activity: 30 } }), {
+      now: week,
+    });
+    const later = selectTonightWorlds(
+      all({ 'studio-ghibli': { activity: 99 }, 'star-wars': { activity: 98 } }),
+      { now: week + WORLD_ROTATION_MS - 1, stored: first.pick },
+    );
+    expect(ids(later)).toEqual(ids(first));
+  });
+  it('re-picks when the period turns over or a held World leaves the shelf', () => {
+    const first = selectTonightWorlds(all({ dc: { activity: 30 } }), {
+      now: week,
+    });
+    const next = all({ 'studio-ghibli': { activity: 99 } });
+    expect(
+      ids(
+        selectTonightWorlds(next, {
+          now: week + WORLD_ROTATION_MS,
+          stored: first.pick,
+        }),
+      ).slice(4),
+    ).toContain('studio-ghibli');
+    const removed = selectTonightWorlds(
+      all().filter((entry) => entry.id !== 'dc'),
+      { now: week, stored: first.pick },
+    );
+    expect(ids(removed)).not.toContain('dc');
+    expect(removed.worlds).toHaveLength(6);
+  });
+  it('tolerates a corrupt stored pick', () => {
+    expect(
+      selectTonightWorlds(all(), { now: week, stored: { ids: 'dc' } }).worlds,
+    ).toHaveLength(6);
   });
 });

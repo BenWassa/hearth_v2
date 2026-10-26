@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import {
+  hasFilmFormatMetadata,
+  isFeatureFilm,
+} from '../domain/media/collectionEligibility.js';
 import { getCollectionDetails } from '../services/mediaApi/client.js';
 
 const collectionPartCountCache = new Map();
@@ -40,9 +44,15 @@ const getCollectionPartCount = async ({ provider, providerId, locale }) => {
       optional: true,
       details: false,
     }),
-  ).then((collection) =>
-    Array.isArray(collection?.parts) ? collection.parts.length : 0,
-  );
+  ).then((collection) => {
+    const parts = Array.isArray(collection?.parts) ? collection.parts : [];
+    // Lightweight provider lists often omit runtime/kind. Unknown is not a
+    // certified feature count and must never be used as one.
+    if (!parts.every(hasFilmFormatMetadata)) return null;
+    return parts.filter((part) =>
+      isFeatureFilm({ ...part, type: part.type || 'movie' }),
+    ).length;
+  });
   collectionPartCountCache.set(cacheKey, promise);
 
   try {
@@ -123,7 +133,7 @@ const useCollectionPartCounts = (
       requests.forEach(({ collectionKey, provider, providerId }) => {
         getCollectionPartCount({ provider, providerId, locale })
           .then((count) => {
-            if (ignore) return;
+            if (ignore || typeof count !== 'number') return;
             setCounts((current) => {
               if (current.get(collectionKey) === count) return current;
               const updated = new Map(current);

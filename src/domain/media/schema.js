@@ -1,3 +1,4 @@
+import { getExplicitWorldMetadata } from '../../config/collectionWorlds.js';
 import { normalizeWatchStatus } from './status.js';
 
 const asString = (value) => (typeof value === 'string' ? value.trim() : '');
@@ -55,6 +56,7 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   const mediaId = buildMediaId(item);
   const status = normalizeWatchStatus(item.status || 'unwatched');
   const payload = {
+    ...getExplicitWorldMetadata(item),
     mediaId,
     title: asString(item.title),
     type: asString(item.type || 'movie'),
@@ -131,6 +133,7 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
   const mediaId = buildMediaId(item);
 
   return {
+    ...getExplicitWorldMetadata(item),
     schemaVersion: WATCHLIST_SCHEMA_VERSION,
     mediaId,
     addedBy: userId,
@@ -164,6 +167,7 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
       locale: asString(source.locale || 'en-US'),
     },
     media: {
+      ...getExplicitWorldMetadata(item),
       type,
       title,
       originalTitle: asString(media.originalTitle),

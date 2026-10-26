@@ -131,6 +131,25 @@ service cloud.firestore {
       allow delete: if isSpaceMember(appId, spaceId);
     }
 
+    // Shared household display override. Identity lives in the canonical
+    // provider:collection document ID; there is no per-film progress here.
+    function isValidCollectionPreference(preferenceId) {
+      return preferenceId.matches('^[a-z][a-z0-9_-]{0,19}:[A-Za-z0-9_-]{1,80}$')
+        && request.resource.data.keys().hasAll(['visible', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['visible', 'updatedAt'])
+        && request.resource.data.visible is bool
+        && request.resource.data.updatedAt is timestamp
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /artifacts/{appId}/spaces/{spaceId}/collection_preferences/{preferenceId} {
+      allow read: if isTrustedUser() && isSpaceMember(appId, spaceId);
+      allow create, update: if isTrustedUser() && isSpaceMember(appId, spaceId)
+        && isValidCollectionPreference(preferenceId);
+      // Deletion restores the editorial default rather than persisting false.
+      allow delete: if isTrustedUser() && isSpaceMember(appId, spaceId);
+    }
+
     // Default deny for everything else
     match /{document=**} {
       allow read, write: if false;

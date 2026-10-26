@@ -960,7 +960,7 @@ const ItemDetailsModal = ({
     <Dialog
       onClose={onClose}
       aria-label={item.title || 'Film details'}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center sm:p-6 animate-in fade-in duration-200"
     >
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"

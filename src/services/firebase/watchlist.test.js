@@ -313,3 +313,97 @@ it.each(['manual', 'import'])(
     );
   },
 );
+
+describe('explicit optional World metadata storage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getDocMock.mockReset();
+    onSnapshotMock.mockReset();
+    writeBatchMock.mockReset();
+  });
+  it('writes validated canonical World metadata to the catalog and reads it back for TV', async () => {
+    const { buildWatchlistPayload } = await import(
+      '../../domain/media/schema.js'
+    );
+    const { adaptWatchlistItem } = await import(
+      '../../domain/media/adapters.js'
+    );
+    const { worldForItem } = await import('../../config/collectionWorlds.js');
+    const { addWatchlistItem, subscribeWatchlist } = await loadModule();
+    const set = vi.fn();
+    writeBatchMock.mockReturnValue({
+      set,
+      commit: vi.fn().mockResolvedValue(undefined),
+    });
+    const payload = buildWatchlistPayload(
+      {
+        type: 'show',
+        title: 'Synthetic World TV',
+        source: { provider: 'tmdb', providerId: 'synthetic-world-tv' },
+        media: { type: 'show', title: 'Synthetic World TV' },
+        worldIds: ['wizarding-world', 'invalid', 'wizarding-world'],
+      },
+      'synthetic-user',
+    );
+    await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'shared',
+      payload,
+    });
+    const catalog = set.mock.calls[0][1];
+    const watch = set.mock.calls[1][1];
+    expect(catalog.media.worldIds).toEqual(['wizarding-world']);
+    expect(watch).not.toHaveProperty('worldIds');
+    let emit;
+    onSnapshotMock.mockImplementation((_query, onNext) => {
+      emit = onNext;
+      return vi.fn();
+    });
+    getDocMock.mockResolvedValue({ exists: () => true, data: () => catalog });
+    const onNext = vi.fn();
+    subscribeWatchlist({ db: 'db', appId: 'app', spaceId: 'shared', onNext });
+    emit({ docs: [{ id: payload.mediaId, data: () => watch }] });
+    await vi.waitFor(() => expect(onNext).toHaveBeenCalledOnce());
+    const result = adaptWatchlistItem(onNext.mock.calls[0][0].docs[0].data());
+    expect(result.media.worldIds).toEqual(['wizarding-world']);
+    expect(worldForItem(result)?.id).toBe('wizarding-world');
+  });
+  it('omits affiliation on ordinary provider writes rather than inventing or clearing it', async () => {
+    const { addWatchlistItem } = await loadModule();
+    const set = vi.fn();
+    writeBatchMock.mockReturnValue({
+      set,
+      commit: vi.fn().mockResolvedValue(),
+    });
+    await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'space',
+      payload: {
+        type: 'movie',
+        title: 'Unclassified movie',
+        source: { provider: 'tmdb', providerId: 'synthetic-movie' },
+        media: { type: 'movie', title: 'Unclassified movie' },
+      },
+    });
+    expect(set.mock.calls[0][1].media).not.toHaveProperty('worldIds');
+    expect(set.mock.calls[0][2]).toEqual({ merge: true });
+  });
+  it('routes validated explicit affiliation edits to catalog metadata', async () => {
+    const { updateWatchlistItem } = await loadModule();
+    const set = vi.fn();
+    writeBatchMock.mockReturnValue({
+      set,
+      commit: vi.fn().mockResolvedValue(),
+    });
+    await updateWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'space',
+      itemId: 'synthetic',
+      updates: { 'media.worldId': 'dc' },
+    });
+    expect(set.mock.calls[0][1]).toMatchObject({ 'media.worldIds': ['dc'] });
+  });
+});

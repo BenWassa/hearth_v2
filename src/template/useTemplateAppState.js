@@ -1,3 +1,7 @@
+import {
+  getExplicitWorldMetadata,
+  normalizeWorldIds,
+} from '../config/collectionWorlds.js';
 import { buildCollectionFixture } from './collectionFixtures.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
@@ -209,6 +213,7 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
   const seasonCount = type === 'show' ? seasonCountRaw : null;
 
   return {
+    ...getExplicitWorldMetadata(item),
     id: asString(item.id) || fallbackId,
     additionOrigin: item.additionOrigin || 'seed',
     collection: media.collection || item.collection || null,
@@ -237,6 +242,7 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
     },
     media: {
       ...media,
+      ...getExplicitWorldMetadata(item),
       type,
       title,
       year: asString(media.year || item.year),
@@ -330,6 +336,7 @@ const hydrateTemplateItem = async (item, state = {}) => {
         locale: 'en-US',
       },
       media: {
+        ...getExplicitWorldMetadata(item),
         provider,
         providerId,
         type: baseType,
@@ -381,12 +388,26 @@ const hydrateTemplateItem = async (item, state = {}) => {
 const applyTemplateUpdates = (currentItem, updates) => {
   const next = { ...currentItem };
   Object.entries(asObject(updates)).forEach(([key, value]) => {
+    if (
+      ['worldId', 'worldIds', 'media.worldId', 'media.worldIds'].includes(key)
+    ) {
+      const worldIds = normalizeWorldIds(value);
+      next.worldIds = worldIds;
+      next.media = { ...next.media, worldIds };
+      return;
+    }
     if (key.includes('.')) {
       setValueByPath(next, key, value);
     } else {
       next[key] = value;
     }
   });
+
+  const worldMetadata = getExplicitWorldMetadata(next);
+  if (Object.prototype.hasOwnProperty.call(worldMetadata, 'worldIds')) {
+    next.worldIds = worldMetadata.worldIds;
+    next.media = { ...next.media, ...worldMetadata };
+  }
 
   if (next.showData && typeof next.showData === 'object') {
     next.seasons = next.showData.seasons || next.seasons;

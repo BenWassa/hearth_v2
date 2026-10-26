@@ -1,7 +1,7 @@
 import fixtures from './collections-fixture.json';
 
 // Read-only demo scenario. Never used by the connected household app.
-// Metadata from TMDB, 2026-10-25; activity is synthetic, relative to injected now.
+// Metadata from TMDB, 2026-10-26; activity is synthetic, relative to injected now.
 export const buildCollectionFixture = ({
   count = 25,
   now = Date.now(),

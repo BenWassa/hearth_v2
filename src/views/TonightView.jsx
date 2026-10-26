@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Armchair, Coffee, Eye, Smile, Clock, Tv, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import CollectionDetailsModal from '../components/CollectionDetailsModal.jsx';
@@ -15,11 +15,14 @@ import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import WipeConfirmModal from './components/tonight/WipeConfirmModal.jsx';
 import { getUpcomingReleases } from './components/tonight/upcomingReleases.js';
 import { buildCollectionRollups } from '../domain/media/collections.js';
-import useCollectionPartCounts from '../hooks/useCollectionPartCounts.js';
+import useCollectionPreferences from '../hooks/useCollectionPreferences.js';
+import {
+  isFeatureFilm,
+  filterEligibleCollections,
+  distinctShelfItems,
+} from '../domain/media/collectionEligibility.js';
 import { toMillis } from '../utils/time.js';
 import { getBackdropSrc } from '../utils/poster.js';
-
-const MIN_COLLECTION_SIZE = 3;
 
 const getModifiedAt = (item) =>
   toMillis(
@@ -163,18 +166,46 @@ const TonightView = ({
 
   const rawCollections = useMemo(
     () =>
-      buildCollectionRollups(items).filter(
-        (entry) => entry?.type === 'collection',
-      ),
+      buildCollectionRollups(
+        distinctShelfItems(items).filter(isFeatureFilm),
+      ).filter((entry) => entry?.type === 'collection'),
     [items],
   );
-  const collectionPartCounts = useCollectionPartCounts(rawCollections, {
-    minCollectionSize: MIN_COLLECTION_SIZE,
-  });
-  // Eligibility is local and stable: include every recognized TMDB saga,
-  // including two-film sagas. Optional provider enrichment never gates browsing.
-  const collections = rawCollections;
+  const {
+    preferences,
+    setPreference,
+    loading: preferenceLoading,
+    saving: preferenceSaving,
+    error: preferenceError,
+  } = useCollectionPreferences({ spaceId, isTemplateSession });
+  const collections = useMemo(
+    () => filterEligibleCollections(rawCollections, preferences),
+    [rawCollections, preferences],
+  );
   const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
+  const [browseWorldId, setBrowseWorldId] = useState(null);
+  const collectionsOpener = useRef(null);
+  const browseCollections = (event) => {
+    collectionsOpener.current = event?.currentTarget || null;
+    event?.currentTarget?.focus({ preventScroll: true });
+    setBrowseWorldId(null);
+    setIsCollectionsBrowseOpen(true);
+  };
+  const openWorld = (worldId, opener) => {
+    collectionsOpener.current = opener;
+    setBrowseWorldId(worldId);
+    setIsCollectionsBrowseOpen(true);
+  };
+
+  const closeCollectionsBrowse = () => {
+    setIsCollectionsBrowseOpen(false);
+    // The background becomes inert before Dialog's mount effect can capture its
+    // opener in real browsers. Restore the saved control after removing inert.
+    requestAnimationFrame(() => {
+      if (collectionsOpener.current?.isConnected)
+        collectionsOpener.current.focus({ preventScroll: true });
+    });
+  };
 
   // 1. Low friction, easy viewing
   const comfortWatches = useMemo(() => {
@@ -427,9 +458,11 @@ const TonightView = ({
                 <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
 
                 <CollectionsRail
+                  isLoading={preferenceLoading}
                   collections={collections}
-                  counts={collectionPartCounts}
-                  onBrowse={() => setIsCollectionsBrowseOpen(true)}
+                  items={items}
+                  onOpenWorld={openWorld}
+                  onBrowse={browseCollections}
                   onOpenCollection={openCollection}
                 />
 
@@ -591,6 +624,7 @@ const TonightView = ({
 
       <CollectionDetailsModal
         isOpen={isCollectionOpen}
+        householdItems={items}
         collection={
           collections.find((entry) => entry.id === collectionDetail?.id) ||
           collectionDetail
@@ -611,8 +645,16 @@ const TonightView = ({
       {isCollectionsBrowseOpen && (
         <CollectionsBrowseView
           collections={collections}
-          counts={collectionPartCounts}
-          onClose={() => setIsCollectionsBrowseOpen(false)}
+          items={items}
+          allCollections={rawCollections}
+          preferences={preferences}
+          onPreferenceChange={setPreference}
+          preferenceLoading={preferenceLoading}
+          preferenceSaving={preferenceSaving}
+          preferenceError={preferenceError}
+          initialWorldId={browseWorldId}
+          onOpenItem={openDetails}
+          onClose={closeCollectionsBrowse}
           onOpenCollection={openCollection}
         />
       )}

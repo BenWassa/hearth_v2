@@ -10,6 +10,10 @@ import {
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
+import {
+  getExplicitWorldMetadata,
+  normalizeWorldIds,
+} from '../../config/collectionWorlds.js';
 import { buildMediaId } from '../../domain/media/schema.js';
 import { normalizeWatchStatus } from '../../domain/media/status.js';
 
@@ -113,6 +117,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
       locale: asString(source.locale || 'en-US'),
     },
     media: {
+      ...getExplicitWorldMetadata(payload),
       type,
       title,
       originalTitle: asString(media.originalTitle),
@@ -221,7 +226,11 @@ const buildWatchlistPayload = (
 };
 
 const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
-  const media = asObject(catalogData.media);
+  const catalogWorldMetadata = getExplicitWorldMetadata(catalogData);
+  const worldMetadata = Object.keys(catalogWorldMetadata).length
+    ? catalogWorldMetadata
+    : getExplicitWorldMetadata(watchData);
+  const media = { ...asObject(catalogData.media), ...worldMetadata };
   const source = asObject(catalogData.source);
   const showData = asObject(catalogData.showData);
   const userState = asObject(watchData.userState);
@@ -234,6 +243,7 @@ const mergeWatchlistWithCatalog = (watchData = {}, catalogData = {}) => {
 
   return {
     ...watchData,
+    ...worldMetadata,
     schemaVersion: 2,
     mediaId: asString(watchData.mediaId || catalogData.mediaId),
     source,
@@ -411,6 +421,20 @@ export const updateWatchlistItem = async ({
   const entries = Object.entries(updates || {});
 
   entries.forEach(([key, value]) => {
+    if (
+      ['worldId', 'worldIds', 'media.worldId', 'media.worldIds'].includes(key)
+    ) {
+      catalogUpdates['media.worldIds'] = normalizeWorldIds(value);
+      return;
+    }
+    if (key === 'media' && value && typeof value === 'object') {
+      catalogUpdates.media = {
+        ...value,
+        ...getExplicitWorldMetadata({ media: value }),
+      };
+      delete catalogUpdates.media.worldId;
+      return;
+    }
     if (WATCHLIST_ONLY_KEYS.has(key)) {
       watchlistUpdates[key] = value;
       return;

@@ -702,5 +702,667 @@
         "backdrop": "/ctiw6FZK4N36LmkjSklWEbuvlq9.jpg"
       }
     ]
+  },
+  {
+    "providerId": "529892",
+    "name": "Black Panther Collection",
+    "backdrop": "/nsiBzWsmmerBMuD8TKHpYBTnfhD.jpg",
+    "poster": "/9ZSPIsxI3TZDgfg0Jzk0RZl4INg.jpg",
+    "parts": [
+      {
+        "providerId": "284054",
+        "title": "Black Panther",
+        "year": "2018",
+        "poster": "/uxzzxijgPIY7slzFvMotPv8wjKA.jpg",
+        "backdrop": "/b6ZJZHUdMEFECvGiDpJjlfUWela.jpg"
+      },
+      {
+        "providerId": "505642",
+        "title": "Black Panther: Wakanda Forever",
+        "year": "2022",
+        "poster": "/sv1xJUazXeYqALzczSZ3O6nkH75.jpg",
+        "backdrop": "/83H0C66AcvkwpG2738VCTHMY9uv.jpg"
+      },
+      {
+        "providerId": "1386618",
+        "title": "Black Panther 3",
+        "year": "2028",
+        "poster": "/zJc9fYZxgq4yzI0Oru2e1Cf3a3V.jpg",
+        "backdrop": "/5b8t06v1cTd9H5IgWs6gj6987JM.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "453993",
+    "name": "The Wolverine Collection",
+    "backdrop": "/1RCXCJzxCiw95qpZWaHHc4ctU1u.jpg",
+    "poster": "/c18HVnKTybcAUYVQd8rOcdbqwY.jpg",
+    "parts": [
+      {
+        "providerId": "2080",
+        "title": "X-Men Origins: Wolverine",
+        "year": "2009",
+        "poster": "/yj8LbTju1p7CUJg7US2unSBk33s.jpg",
+        "backdrop": "/p4GzAzjlL7lXIVGvayg7zvzGTSi.jpg"
+      },
+      {
+        "providerId": "76170",
+        "title": "The Wolverine",
+        "year": "2013",
+        "poster": "/t2wVAcoRlKvEIVSbiYDb8d0QqqS.jpg",
+        "backdrop": "/bEAQfLTykGg232kJogBlxRYaRqU.jpg"
+      },
+      {
+        "providerId": "263115",
+        "title": "Logan",
+        "year": "2017",
+        "poster": "/fnbjcRDYn6YviCcePDnGdyAkYsB.jpg",
+        "backdrop": "/4DZxWNSAyksN6N3JkvpJ53Yq6zU.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "556",
+    "name": "Spider-Man Collection",
+    "backdrop": "/waZqriYTuBE3WqXI3SDGi3kfDQE.jpg",
+    "poster": "/bp5PqLa06QA1LsELA1SsKZ008H7.jpg",
+    "parts": [
+      {
+        "providerId": "557",
+        "title": "Spider-Man",
+        "year": "2002",
+        "poster": "/or6XJBVpcEbIkma0V9zshnbEtx4.jpg",
+        "backdrop": "/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg"
+      },
+      {
+        "providerId": "558",
+        "title": "Spider-Man 2",
+        "year": "2004",
+        "poster": "/aGuvNAaaZuWXYQQ6N2v7DeuP6mB.jpg",
+        "backdrop": "/6al048Lat3eLVQOuKtc9h6Tu94d.jpg"
+      },
+      {
+        "providerId": "559",
+        "title": "Spider-Man 3",
+        "year": "2007",
+        "poster": "/qFmwhVUoUSXjkKRmca5yGDEXBIj.jpg",
+        "backdrop": "/FfAU0PUs8AJkMU2VbkVNFtRXR4.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "125574",
+    "name": "The Amazing Spider-Man Collection",
+    "backdrop": "/yFGBYtzbvSKKI5qSvyUBWeq1uiJ.jpg",
+    "poster": "/m8fyI7bQYC0WSBShdFU7q2CkszH.jpg",
+    "parts": [
+      {
+        "providerId": "102382",
+        "title": "The Amazing Spider-Man 2",
+        "year": "2014",
+        "poster": "/bU7nTmvmy0h3VUP01v1T2imgH6N.jpg",
+        "backdrop": "/k0hlAzTryCYX1O1LyC6P8tAa8s0.jpg"
+      },
+      {
+        "providerId": "1930",
+        "title": "The Amazing Spider-Man",
+        "year": "2012",
+        "poster": "/jexoNYnPd6vVrmygwF6QZmWPFdu.jpg",
+        "backdrop": "/sxskOU71CO8LaNX2LOtjYFUtKv7.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "748",
+    "name": "X-Men Collection",
+    "backdrop": "/ykVHlrE3aSvHYeIXOrWDsYZ18vv.jpg",
+    "poster": "/31rqs6ZxFdi5nWZZaFPIr17q8jt.jpg",
+    "parts": [
+      {
+        "providerId": "36657",
+        "title": "X-Men",
+        "year": "2000",
+        "poster": "/bRDAc4GogyS9ci3ow7UnInOcriN.jpg",
+        "backdrop": "/3QUVzbcNyfGe3ocWkYAT8emK8Co.jpg"
+      },
+      {
+        "providerId": "36658",
+        "title": "X2",
+        "year": "2003",
+        "poster": "/bst4alFUXCxISwdRUKSMhhkrX1M.jpg",
+        "backdrop": "/7TYITrR804tLITNur3b8VLCK6tw.jpg"
+      },
+      {
+        "providerId": "36668",
+        "title": "X-Men: The Last Stand",
+        "year": "2006",
+        "poster": "/a2xicU8DpKtRizOHjQLC1JyCSRS.jpg",
+        "backdrop": "/nLMXULCGLnzRxz11txPzPqbOHSz.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "618529",
+    "name": "Doctor Strange Collection",
+    "backdrop": "/t7Xl8fNVuETzrbpmf6dGosjIHPN.jpg",
+    "poster": "/bm7UlW3ctMJAvD6NNXrCDdRyyKn.jpg",
+    "parts": [
+      {
+        "providerId": "284052",
+        "title": "Doctor Strange",
+        "year": "2016",
+        "poster": "/uGBVj3bEbCoZbDjjl9wTxcygko1.jpg",
+        "backdrop": "/kkoiH8ZWxJ9WSAjOadGtuHUQxbm.jpg"
+      },
+      {
+        "providerId": "453395",
+        "title": "Doctor Strange in the Multiverse of Madness",
+        "year": "2022",
+        "poster": "/ddJcSKbcp4rKZTmuyWaMhuwcfMz.jpg",
+        "backdrop": "/lv3TXqhpaIxkclIHbhN2MRMOemQ.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "422834",
+    "name": "Ant-Man Collection",
+    "backdrop": "/2KjtWUBiksmN8LsUouaZnxocu5N.jpg",
+    "poster": "/9llE4J9sVv8qsvfVGkpugiPTxUV.jpg",
+    "parts": [
+      {
+        "providerId": "102899",
+        "title": "Ant-Man",
+        "year": "2015",
+        "poster": "/rQRnQfUl3kfp78nCWq8Ks04vnq1.jpg",
+        "backdrop": "/1K3JmSNUN8OpjYsCjc0Hy0SYxAb.jpg"
+      },
+      {
+        "providerId": "363088",
+        "title": "Ant-Man and the Wasp",
+        "year": "2018",
+        "poster": "/cFQEO687n1K6umXbInzocxcnAQz.jpg",
+        "backdrop": "/iYdgEUE2W2aJkgqfSjf1x3gFfuV.jpg"
+      },
+      {
+        "providerId": "640146",
+        "title": "Ant-Man and the Wasp: Quantumania",
+        "year": "2023",
+        "poster": "/qnqGbB22YJ7dSs4o6M7exTpNxPz.jpg",
+        "backdrop": "/m8JTwHFwX7I7JY5fPe4SjqejWag.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "435259",
+    "name": "Fantastic Beasts Collection",
+    "backdrop": "/oTAuBBcUiUBNKxurftOmEAoye0a.jpg",
+    "poster": "/wsVseA7i3FqX24m26Z2gD3EtH4l.jpg",
+    "parts": [
+      {
+        "providerId": "259316",
+        "title": "Fantastic Beasts and Where to Find Them",
+        "year": "2016",
+        "poster": "/h6NYfVUyM6CDURtZSnBpz647Ldd.jpg",
+        "backdrop": "/8Qsr8pvDL3s1jNZQ4HK1d1Xlvnh.jpg"
+      },
+      {
+        "providerId": "338953",
+        "title": "Fantastic Beasts: The Secrets of Dumbledore",
+        "year": "2022",
+        "poster": "/3c5GNLB4yRSLBby0trHoA1DSQxQ.jpg",
+        "backdrop": "/zGLHX92Gk96O1DJvLil7ObJTbaL.jpg"
+      },
+      {
+        "providerId": "338952",
+        "title": "Fantastic Beasts: The Crimes of Grindelwald",
+        "year": "2018",
+        "poster": "/fMMrl8fD9gRCFJvsx0SuFwkEOop.jpg",
+        "backdrop": "/i3rRY0EKYhSpyOLRAQ7iB05zhAp.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "1022790",
+    "name": "Inside Out Collection",
+    "backdrop": "/7hYG0v6BEErqqwnU7vWJjWgYJJp.jpg",
+    "poster": "/kvJqs0vm29U0xJa373wlzHb3FRh.jpg",
+    "parts": [
+      {
+        "providerId": "150540",
+        "title": "Inside Out",
+        "year": "2015",
+        "poster": "/2H1TmgdfNtsKlU9jKdeNyYL5y8T.jpg",
+        "backdrop": "/jJKZaTBNenlFclQyjrnvzkRmvWE.jpg"
+      },
+      {
+        "providerId": "1022789",
+        "title": "Inside Out 2",
+        "year": "2024",
+        "poster": "/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg",
+        "backdrop": "/p5ozvmdgsmbWe0H8Xk7Rc8SCwAB.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "87250",
+    "name": "Bambi Collection",
+    "backdrop": "/2VEzZVvMhlqrz1iPpCtbsTYB868.jpg",
+    "poster": "/b941y7oiWBXJZaoWemW4exlpDxf.jpg",
+    "parts": [
+      {
+        "providerId": "3170",
+        "title": "Bambi",
+        "year": "1942",
+        "poster": "/wV9e2y4myJ4KMFsyFfWYcUOawyK.jpg",
+        "backdrop": "/rKgqYwlpU32ZO9UTCuXNdhdnU4B.jpg"
+      },
+      {
+        "providerId": "13205",
+        "title": "Bambi II",
+        "year": "2006",
+        "poster": "/wIVLCnwYynKIiAheJoEQtC8gTjq.jpg",
+        "backdrop": "/tyKOUk8qVvwCtfMD2eKRNiiEhcM.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "136214",
+    "name": "Pocahontas Collection",
+    "backdrop": "/or6DYoMtttpgs0g7cTBE5DgeUUf.jpg",
+    "poster": "/fcFFdNwgkLXCdIxe0H7RFasmogh.jpg",
+    "parts": [
+      {
+        "providerId": "10530",
+        "title": "Pocahontas",
+        "year": "1995",
+        "poster": "/kZ1ft0QZ4e3zDUPMBftEkwI9ftd.jpg",
+        "backdrop": "/fDZ2DCKW2D7J0ABNr9EICdD2H1s.jpg"
+      },
+      {
+        "providerId": "13761",
+        "title": "Pocahontas II: Journey to a New World",
+        "year": "1998",
+        "poster": "/sUvNHmUGJP3RkYpE65i7ZF0v0nE.jpg",
+        "backdrop": "/fzAnRGmaKJtm8sZuZ8a1nwSNTd3.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "86027",
+    "name": "Aladdin Collection",
+    "backdrop": "/kUHyN9PzQ59e2n3CwqMG99yxBvh.jpg",
+    "poster": "/fDyauH6Yc8IA5gtfq3IWHDwOve8.jpg",
+    "parts": [
+      {
+        "providerId": "812",
+        "title": "Aladdin",
+        "year": "1992",
+        "poster": "/eLFfl7vS8dkeG1hKp5mwbm37V83.jpg",
+        "backdrop": "/nenJjvfe2Eq8uBMXFJnWj5mw4bi.jpg"
+      },
+      {
+        "providerId": "15969",
+        "title": "The Return of Jafar",
+        "year": "1994",
+        "poster": "/7SC793qtORB6YL4mu0F5o3hfjDQ.jpg",
+        "backdrop": "/mOOJm3tamy9iHg2mOEA77CM6ufZ.jpg"
+      },
+      {
+        "providerId": "11238",
+        "title": "Aladdin and the King of Thieves",
+        "year": "1996",
+        "poster": "/kTH7qEyvdDYMoQraQZm3LFKCge3.jpg",
+        "backdrop": "/gkzfPl0rjp5COdFXPaxitp9J3X3.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "33085",
+    "name": "The Little Mermaid Collection",
+    "backdrop": "/gt7ccJrOgeOTWggy1PubLhWxX9g.jpg",
+    "poster": "/pYZPkQaoPGT2md3j90C4aqt7EHl.jpg",
+    "parts": [
+      {
+        "providerId": "10144",
+        "title": "The Little Mermaid",
+        "year": "1989",
+        "poster": "/plcZXvI310FkbwIptvd6rqk63LP.jpg",
+        "backdrop": "/qGZXYHvWR1TYOU9raCaEABrj9m7.jpg"
+      },
+      {
+        "providerId": "13676",
+        "title": "The Little Mermaid: Ariel's Beginning",
+        "year": "2008",
+        "poster": "/6EwcdQH134T4HGr0W3m2FnLjTnc.jpg",
+        "backdrop": "/1UNDNyqTV4CS03T4gMuRYiahtpd.jpg"
+      },
+      {
+        "providerId": "10898",
+        "title": "The Little Mermaid II: Return to the Sea",
+        "year": "2000",
+        "poster": "/k3UHxvYv8ZgWLL0lM45f979OSo7.jpg",
+        "backdrop": "/rNOeiC5uruGnr5n7YW8hvnrbX9q.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "468552",
+    "name": "Wonder Woman Collection",
+    "backdrop": "/n9KlvCOBFDmSyw3BgNrkUkxMFva.jpg",
+    "poster": "/8AQRfTuTHeFTddZN4IUAqprN8Od.jpg",
+    "parts": [
+      {
+        "providerId": "297762",
+        "title": "Wonder Woman",
+        "year": "2017",
+        "poster": "/v4ncgZjG2Zu8ZW5al1vIZTsSjqX.jpg",
+        "backdrop": "/AaABt75ZzfMGrscUR2seabz4PEX.jpg"
+      },
+      {
+        "providerId": "464052",
+        "title": "Wonder Woman 1984",
+        "year": "2020",
+        "poster": "/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg",
+        "backdrop": "/egg7KFi18TSQc1s24RMmR9i2zO6.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "573693",
+    "name": "Aquaman Collection",
+    "backdrop": "/ieX3uWD8G1OFkATC1LCi5Xw2YlX.jpg",
+    "poster": "/jhD3r3Jy2PcyKcyjWXFixesLz2p.jpg",
+    "parts": [
+      {
+        "providerId": "297802",
+        "title": "Aquaman",
+        "year": "2018",
+        "poster": "/ufl63EFcc5XpByEV2Ecdw6WJZAI.jpg",
+        "backdrop": "/9QusGjxcYvfPD1THg6oW3RLeNn7.jpg"
+      },
+      {
+        "providerId": "572802",
+        "title": "Aquaman and the Lost Kingdom",
+        "year": "2023",
+        "poster": "/7lTnXOy0iNtBAdRP3TZvaKJ77F6.jpg",
+        "backdrop": "/bckxSN9ueOgm0gJpVJmPQrecWul.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "489724",
+    "name": "The Trolls Collection",
+    "backdrop": "/xtgonS6wcxK5RfnWWohYZF3mhjM.jpg",
+    "poster": "/i4aII37O184x7K3dC7fpF9CAfS4.jpg",
+    "parts": [
+      {
+        "providerId": "136799",
+        "title": "Trolls",
+        "year": "2016",
+        "poster": "/9VlK2j0THZWzhQPq0W3Oc0IIdBB.jpg",
+        "backdrop": "/gXyYOWAkk4FdQU3adK8WFj8nN9J.jpg"
+      },
+      {
+        "providerId": "446893",
+        "title": "Trolls World Tour",
+        "year": "2020",
+        "poster": "/7W0G3YECgDAfnuiHG91r8WqgIOe.jpg",
+        "backdrop": "/qsxhnirlp7y4Ae9bd11oYJSX59j.jpg"
+      },
+      {
+        "providerId": "901362",
+        "title": "Trolls Band Together",
+        "year": "2023",
+        "poster": "/3ySgD2xwasTHOK6R9bNZiEwKgYo.jpg",
+        "backdrop": "/mDW6z7I6de6JbUgPOkAEZwKbg7G.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "519457",
+    "name": "The Boss Baby Collection",
+    "backdrop": "/yb45SupYbuT9hPG8Z8XEVFQOBuE.jpg",
+    "poster": "/fj4qkq5ZaMUhCQTY8DJ95MJOxmF.jpg",
+    "parts": [
+      {
+        "providerId": "295693",
+        "title": "The Boss Baby",
+        "year": "2017",
+        "poster": "/9MsQJKe4cUAGxc7R2NGaFQLqOPc.jpg",
+        "backdrop": "/8280R0bDR1FusPyThAOmAcSC4nu.jpg"
+      },
+      {
+        "providerId": "459151",
+        "title": "The Boss Baby: Family Business",
+        "year": "2021",
+        "poster": "/aQ7huOn3F0iJCJrFezS8p9WEsri.jpg",
+        "backdrop": "/yBov7O4eXDcBLDpZrOHZzFr8rIl.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "464577",
+    "name": "The Croods Collection",
+    "backdrop": "/8MjzBahFKCuQbwytpPPds7qboQa.jpg",
+    "poster": "/56Dkztdng1HL4T3RHTt1zm3gFmE.jpg",
+    "parts": [
+      {
+        "providerId": "49519",
+        "title": "The Croods",
+        "year": "2013",
+        "poster": "/27zvjVOtOi5ped1HSlJKNsKXkFH.jpg",
+        "backdrop": "/wFN8llYh215M8i2fqWAcPV8CSyL.jpg"
+      },
+      {
+        "providerId": "529203",
+        "title": "The Croods: A New Age",
+        "year": "2020",
+        "poster": "/tbVZ3Sq88dZaCANlUcewQuHQOaE.jpg",
+        "backdrop": "/ytTQoYkdpsgtfDWrNFCei8Mfbxu.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "115575",
+    "name": "Star Trek: Alternate Reality Collection",
+    "backdrop": "/gWl5pN2FplE709aVtA4lakwsE6t.jpg",
+    "poster": "/v6ktLScPnUKTSdLZ6TUe5cfOArM.jpg",
+    "parts": [
+      {
+        "providerId": "13475",
+        "title": "Star Trek",
+        "year": "2009",
+        "poster": "/lV5OpzAss1z06YNagOVap1I35mH.jpg",
+        "backdrop": "/cqXEwYFcwyKPZCKl1jAPaG3cMsl.jpg"
+      },
+      {
+        "providerId": "54138",
+        "title": "Star Trek Into Darkness",
+        "year": "2013",
+        "poster": "/Aim3kVNh1MPIxPEFeJrl9e9Uf1a.jpg",
+        "backdrop": "/npDrIM6ZbuD7nUxI7ZzNBxs4IRF.jpg"
+      },
+      {
+        "providerId": "188927",
+        "title": "Star Trek Beyond",
+        "year": "2016",
+        "poster": "/wI5VghYNYLktDRPUa5rrVcVA1h7.jpg",
+        "backdrop": "/nkr43pY7ZzUt9b0kDFwJLVuDP8G.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "420",
+    "name": "The Chronicles of Narnia Collection",
+    "backdrop": "/ojjzZUQlqKTsN1T7s5OAVZSjYMH.jpg",
+    "poster": "/sh6Kn8VBfXotJ6qsvJkdfscxXKR.jpg",
+    "parts": [
+      {
+        "providerId": "411",
+        "title": "The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",
+        "year": "2005",
+        "poster": "/iREd0rNCjYdf5Ar0vfaW32yrkm.jpg",
+        "backdrop": "/tuDhEdza074bA497bO9WFEPs6O6.jpg"
+      },
+      {
+        "providerId": "2454",
+        "title": "The Chronicles of Narnia: Prince Caspian",
+        "year": "2008",
+        "poster": "/qxz3WIyjZiSKUhaTIEJ3c1GcC9z.jpg",
+        "backdrop": "/9pBv1BOSloAUgAkF0meJWdnbV4Q.jpg"
+      },
+      {
+        "providerId": "10140",
+        "title": "The Chronicles of Narnia: The Voyage of the Dawn Treader",
+        "year": "2010",
+        "poster": "/pP27zlm9yeKrCeDZLFLP2HKELot.jpg",
+        "backdrop": "/oc3be3waruLd0PB9h4bomN7Le3v.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "722971",
+    "name": "Knives Out Collection",
+    "backdrop": "/G7qYINSq5xyDd0I0zn3DpAssA0.jpg",
+    "poster": "/pkjW3K0UDnwYWDcUR83VzfHNQA4.jpg",
+    "parts": [
+      {
+        "providerId": "546554",
+        "title": "Knives Out",
+        "year": "2019",
+        "poster": "/pThyQovXQrw2m0s9x82twj48Jq4.jpg",
+        "backdrop": "/4HWAQu28e2yaWrtupFPGFkdNU7V.jpg"
+      },
+      {
+        "providerId": "661374",
+        "title": "Glass Onion: A Knives Out Mystery",
+        "year": "2022",
+        "poster": "/vDGr1YdrlfbU9wxTOdpf3zChmv9.jpg",
+        "backdrop": "/y3uOfZAYwLkbvhunswBCskNMrfI.jpg"
+      },
+      {
+        "providerId": "812583",
+        "title": "Wake Up Dead Man: A Knives Out Mystery",
+        "year": "2025",
+        "poster": "/iV9LM8aUb83BjCCx2RUnKE5sSQg.jpg",
+        "backdrop": "/fiRDzpcJe7qz3yIR43hdXIE3NHv.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "726871",
+    "name": "Dune Collection",
+    "backdrop": "/fahk0Fu7VUUfK6IkTt1R3waOD9F.jpg",
+    "poster": "/lxIGYkpvYjLtYtZH684AQft0FhD.jpg",
+    "parts": [
+      {
+        "providerId": "438631",
+        "title": "Dune",
+        "year": "2021",
+        "poster": "/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg",
+        "backdrop": "/jYEW5xZkZk2WTrdbMGAPFuBqbDc.jpg"
+      },
+      {
+        "providerId": "693134",
+        "title": "Dune: Part Two",
+        "year": "2024",
+        "poster": "/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg",
+        "backdrop": "/eZ239CUp1d6OryZEBPnO2n87gMG.jpg"
+      },
+      {
+        "providerId": "1170608",
+        "title": "Dune: Part Three",
+        "year": "2026",
+        "poster": "/d43fvHQsIMa4kpyhKXw0haEJIvI.jpg",
+        "backdrop": "/i5E9H7Ik0u61ylDDTbmUpTL3Yw.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "645",
+    "name": "James Bond Collection",
+    "backdrop": "/dOSECZImeyZldoq0ObieBE0lwie.jpg",
+    "poster": "/ofwSiqOFShhunAIYYdSMHMJQSx2.jpg",
+    "parts": [
+      {
+        "providerId": "253",
+        "title": "Live and Let Die",
+        "year": "1973",
+        "poster": "/39qkrjqMZs6utwNmihVImC3ghas.jpg",
+        "backdrop": "/hzmmXx6UeYQeylioNbliFKjSbV7.jpg"
+      },
+      {
+        "providerId": "646",
+        "title": "Dr. No",
+        "year": "1962",
+        "poster": "/9zCOLJmLNst0sCPZlkW1IRoH65E.jpg",
+        "backdrop": "/srgq7bzZsuDw7NoGXdazRXp7Hl6.jpg"
+      },
+      {
+        "providerId": "657",
+        "title": "From Russia with Love",
+        "year": "1963",
+        "poster": "/zx4V17FP8oclNvOpTgs2iCCtiYk.jpg",
+        "backdrop": "/8JMiQa0OqsCYvbNUrQIrMzwV7g2.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "9485",
+    "name": "The Fast and the Furious Collection",
+    "backdrop": "/z5A5W3WYJc3UVEWljSGwdjDgQ0j.jpg",
+    "poster": "/zOCnMPoUxgJK1RFPfN4PcnT16gr.jpg",
+    "parts": [
+      {
+        "providerId": "584",
+        "title": "2 Fast 2 Furious",
+        "year": "2003",
+        "poster": "/6nDZExrDKIXvSAghsFKVFRVJuSf.jpg",
+        "backdrop": "/90ooE5SbUEO0OVJHewNO7pgySb6.jpg"
+      },
+      {
+        "providerId": "9615",
+        "title": "The Fast and the Furious: Tokyo Drift",
+        "year": "2006",
+        "poster": "/46xqGOwHbh2TH2avWSw3SMXph4E.jpg",
+        "backdrop": "/dMARcKLrv0T7kVJ4iQR3vqTTdtT.jpg"
+      },
+      {
+        "providerId": "9799",
+        "title": "The Fast and the Furious",
+        "year": "2001",
+        "poster": "/gqY0ITBgT7A82poL9jv851qdnIb.jpg",
+        "backdrop": "/jY9ef5nqY4xIIMu3yzW3qamUCoi.jpg"
+      }
+    ]
+  },
+  {
+    "providerId": "264",
+    "name": "Back to the Future Collection",
+    "backdrop": "/c9C9Pg2QctyjZHRmS0P8rZg1OTA.jpg",
+    "poster": "/5Xsu2o5IsZRuuxCEVZ9nVve21FP.jpg",
+    "parts": [
+      {
+        "providerId": "105",
+        "title": "Back to the Future",
+        "year": "1985",
+        "poster": "/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg",
+        "backdrop": "/5bzPWQ2dFUl2aZKkp7ILJVVkRed.jpg"
+      },
+      {
+        "providerId": "165",
+        "title": "Back to the Future Part II",
+        "year": "1989",
+        "poster": "/hQq8xZe5uLjFzSBt4LanNP7SQjl.jpg",
+        "backdrop": "/w6tPctxWAsHoQXeKxxNOT6lYKpx.jpg"
+      },
+      {
+        "providerId": "196",
+        "title": "Back to the Future Part III",
+        "year": "1990",
+        "poster": "/crzoVQnMzIrRfHtQw0tLBirNfVg.jpg",
+        "backdrop": "/AtF7TESJEMmImBRUj9Z7HmW2ZH0.jpg"
+      }
+    ]
   }
 ]

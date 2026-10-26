@@ -38,4 +38,4 @@ Target WCAG 2.1 AA for text contrast and focus visibility, with particular care 
 
 ## Collections
 
-Collections offer up to two recent household saga shortcuts on Tonight, with a complete searchable browser one tap away. Optional Worlds help larger shelves without becoming mandatory navigation. Activity labels describe deliberate household actions; they never claim viewing telemetry or infer dates from imports. Shelf progress is distinct from franchise completion.
+Tonight shows every represented World so the household can enter a familiar brand, choose a saga and reach a film. A complete searchable saga browser stays one tap away. World affiliation, editorial saga eligibility and activity relevance are separate decisions. Shared household Show/Hide preferences override the defaults. Standalone films and shorts never become invented sagas, and shelf progress is distinct from franchise completion.

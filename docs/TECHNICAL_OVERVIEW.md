@@ -144,8 +144,10 @@ Target: Firebase App Hosting
   - API normalization tests
   - UI regressions in Tonight and ItemDetails modal
 
-## Activity-aware Collections
+## World-first Collections
 
-`TonightView` derives canonical movie saga rollups. `collectionActivity.js` aggregates only explicit manual additions and current movie watch transitions with an injected clock; `CollectionsRail` retains at most two entry-time IDs. `CollectionsBrowseView` retains visit order and navigation state while reusing `CollectionDetailsModal`. `collectionWorlds.js` is a versioned provider-ID taxonomy, with no duplicated progress. Optional provider counts share a three-request queue and locale-aware cache and do not gate local eligibility.
+Tonight derives deduplicated feature rollups, applies the pure editorial/default classifier and shared household overrides, and displays every represented World. `collectionCatalog.js` separates recognized saga defaults from `collectionWorlds.js` primary affiliation. World details separate child sagas, standalone features, shorts and TV; membership metadata is preserved when a card is hidden. Visit order and navigation state survive nested details.
 
-Watchlist records add optional `additionOrigin` and `userState.markedWatchedAt`. Status writes transact against the current shared record to avoid refreshing dates for repeated/concurrent same-status writes. Undo clears the event; imports and historical records do not receive invented watch history. No schema backfill is needed. See [Collections](../COLLECTIONS_REDESIGN.md) for ranking windows, navigation, fixtures and limitations.
+`collection_preferences/{provider:collectionId}` under each space is member-only shared state; a boolean overrides the default and deleting restores it. `useCollectionPreferences` isolates household snapshots and offline/template state, including loading/error handling. The new rules are source-only until a reviewed release deploys them; emulator attack tests and an audit are included.
+
+Activity uses explicit manual addition origin and transactional movie watch timestamps, never metadata/import freshness. Unknown historical dates remain unknown. Tonight has no provider-count fan-out. On-demand collection details hydrate at concurrency three, distinguish unknown provider format from verified features, and never fall back from a missing movie to an unrelated TV ID. See [Collections](../COLLECTIONS_REDESIGN.md) for policy, validation and release prerequisites.

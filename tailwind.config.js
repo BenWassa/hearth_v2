@@ -15,6 +15,11 @@ module.exports = {
       colors: {
         shell: 'var(--shell-bg)',
       },
+      // DESIGN.md "label" step: 11px is the floor for metadata and eyebrows
+      // (stone-400 or lighter). Anything a user must read to decide is 14px+.
+      fontSize: {
+        label: ['0.6875rem', { lineHeight: '1rem' }],
+      },
     },
   },
   plugins: [],

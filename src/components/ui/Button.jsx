@@ -9,7 +9,7 @@ const Button = ({
   ...rest
 }) => {
   const baseStyle =
-    'px-6 py-3 rounded-xl font-medium transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2';
+    'px-6 py-3 rounded-xl font-medium transition-[opacity,transform] duration-200 transform motion-safe:active:scale-95 motion-reduce:active:scale-100 flex items-center justify-center gap-2';
   const variants = {
     primary:
       'bg-amber-600 text-stone-900 hover:bg-amber-500 shadow-lg shadow-amber-900/20',

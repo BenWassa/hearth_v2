@@ -234,7 +234,7 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Uppercase tracked metadata and section eyebrows."
+        "purpose": "Uppercase tracked metadata and section eyebrows; text-label is 0.6875rem / 1rem (11px / 16px), the minimum text size. Use stone-400 or lighter on dark surfaces and 14px or larger for decision-critical copy."
       }
     },
     "shadows": [
@@ -268,7 +268,7 @@
       {
         "name": "ease-state",
         "value": "cubic-bezier(0, 0, 0.2, 1)",
-        "purpose": "Color, opacity and transform transitions at 200ms to 300ms."
+        "purpose": "Opacity and transform motion at 200ms to 300ms; progress uses 500ms. Reduced motion minimizes transitions. Never animate layout properties or fills."
       },
       {
         "name": "press",
@@ -302,17 +302,17 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single main action on a surface.",
-      "html": "<button class=\"ds-btn-primary\">Pick for tonight</button>",
-      "css": ".ds-btn-primary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:#d97706;color:#1c1917;border:none;box-shadow:0 10px 15px -3px rgba(120,53,15,0.2)}.ds-btn-primary:hover{background:#f59e0b}.ds-btn-primary:active{transform:scale(.95)}.ds-btn-primary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+      "description": "Button variant=\"primary\" (default): the main action on a surface. Native button props and className customize context sizing.",
+      "html": "<button class=\"ds-btn-primary\">Save title</button>",
+      "css": ".ds-btn-primary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;min-height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:opacity .2s ease-out,transform .2s ease-out;background:#d97706;color:#1c1917;border:none;box-shadow:0 10px 15px -3px rgba(120,53,15,0.2)}.ds-btn-primary:hover{background:#f59e0b}.ds-btn-primary:active{transform:scale(.95)}.ds-btn-primary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}@media(prefers-reduced-motion:reduce){[class^=\"ds-btn-\"]{transition:none}[class^=\"ds-btn-\"]:active{transform:none}}"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Supporting actions beside the primary.",
-      "html": "<button class=\"ds-btn-secondary\">Not tonight</button>",
-      "css": ".ds-btn-secondary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:#292524;color:#d6d3d1;border:1px solid #44403c}.ds-btn-secondary:hover{background:#44403c}.ds-btn-secondary:active{transform:scale(.95)}.ds-btn-secondary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+      "description": "Button variant=\"secondary\": supporting actions, stone-800 fill, stone-200 text and stone-700 border.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;min-height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:opacity .2s ease-out,transform .2s ease-out;background:#292524;color:#e7e5e4;border:1px solid #44403c}.ds-btn-secondary:hover{background:#44403c}.ds-btn-secondary:active{transform:scale(.95)}.ds-btn-secondary:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}@media(prefers-reduced-motion:reduce){[class^=\"ds-btn-\"]{transition:none}[class^=\"ds-btn-\"]:active{transform:none}}"
     },
     {
       "name": "Ghost Button",
@@ -320,7 +320,7 @@
       "refersTo": "button-ghost",
       "description": "Low-emphasis actions on dark surfaces.",
       "html": "<button class=\"ds-btn-ghost\">Skip</button>",
-      "css": ".ds-btn-ghost{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;background:transparent;color:#d6d3d1;border:none}.ds-btn-ghost:hover{color:#fbbf24}.ds-btn-ghost:active{transform:scale(.95)}.ds-btn-ghost:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}"
+      "css": ".ds-btn-ghost{font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-weight:500;font-size:16px;padding:12px 24px;min-height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:opacity .2s ease-out,transform .2s ease-out;background:transparent;color:#d6d3d1;border:none}.ds-btn-ghost:hover{color:#fbbf24}.ds-btn-ghost:active{transform:scale(.95)}.ds-btn-ghost:focus-visible{outline:2px solid #fbbf24;outline-offset:2px}@media(prefers-reduced-motion:reduce){[class^=\"ds-btn-\"]{transition:none}[class^=\"ds-btn-\"]:active{transform:none}}"
     },
     {
       "name": "Search Input",
@@ -328,31 +328,87 @@
       "refersTo": "input-field",
       "description": "Serif text field with a warm amber focus ring.",
       "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search for a title\">",
-      "css": ".ds-input{width:100%;box-sizing:border-box;background:rgba(41,37,36,.5);border:1px solid #44403c;color:#f5f5f4;padding:16px;border-radius:12px;font-family:ui-serif,Georgia,Cambria,\"Times New Roman\",serif;font-size:18px;outline:none;transition:all .3s}.ds-input::placeholder{color:#a8a29e}.ds-input:focus{border-color:rgba(180,83,9,.5);box-shadow:0 0 0 2px rgba(120,53,15,.5)}"
+      "css": ".ds-input{width:100%;box-sizing:border-box;background:rgba(41,37,36,.5);border:1px solid #44403c;color:#f5f5f4;padding:16px;border-radius:12px;font-family:ui-serif,Georgia,Cambria,\"Times New Roman\",serif;font-size:18px;outline:none;transition:opacity .2s ease-out,transform .2s ease-out}.ds-input::placeholder{color:#a8a29e}.ds-input:focus{border-color:rgba(217,119,6,.6);box-shadow:0 0 0 2px rgba(245,158,11,.6)}"
     },
     {
       "name": "Energy Chip",
       "kind": "chip",
       "refersTo": null,
-      "description": "Light, balanced or focused indicator; always labeled.",
+      "description": "Static light, balanced or focused indicator; always labeled. ENERGY_STYLES in src/config/energyStyles.js supplies badge, icon and selected colors. getEnergyStyle falls back to balanced; unknown poster energy shows no band or badge.",
       "html": "<span class=\"ds-chip\">Balanced</span>",
-      "css": ".ds-chip{display:inline-block;background:#fbbf24;color:#451a03;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:9999px}"
+      "css": ".ds-chip{display:inline-block;background:#fbbf24;color:#451a03;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:9999px}"
     },
     {
       "name": "Dock Item (current)",
       "kind": "nav",
       "refersTo": null,
-      "description": "Floating bottom dock; the current page is an inert amber wash.",
-      "html": "<nav class=\"ds-dock\"><button class=\"ds-dock-item\">Tonight</button><button class=\"ds-dock-item ds-current\" disabled>Library</button></nav>",
-      "css": ".ds-dock{display:flex;gap:8px;padding:8px;background:rgba(28,25,23,.4);backdrop-filter:blur(40px);border:1px solid rgba(68,64,60,.5);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.4)}.ds-dock-item{flex:1;padding:12px 16px;background:transparent;border:1px solid transparent;border-radius:16px;color:#a8a29e;font-size:12px;font-weight:700;letter-spacing:.025em;cursor:pointer;transition:all .3s}.ds-dock-item:hover{background:rgba(255,255,255,.05);color:#e7e5e4}.ds-dock-item:active{transform:scale(.95)}.ds-current{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#fcd34d;cursor:default}"
+      "description": "Floating Add / Tonight / Library dock over scrolling artwork. Current Tonight item uses aria-current=\"page\" and an amber wash; targets are at least 44px and the fixed dock includes --safe-bottom.",
+      "html": "<nav class=\"ds-dock\" aria-label=\"Main\"><button class=\"ds-dock-item\">Add</button><button class=\"ds-dock-item ds-current\" aria-current=\"page\">Tonight</button><button class=\"ds-dock-item\">Library</button></nav>",
+      "css": ".ds-dock{display:flex;gap:8px;padding:8px;background:rgba(28,25,23,.4);backdrop-filter:blur(40px);border:1px solid rgba(68,64,60,.5);border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.4)}.ds-dock-item{flex:1;padding:12px 16px;background:transparent;border:1px solid transparent;border-radius:16px;color:#a8a29e;font-size:12px;font-weight:700;letter-spacing:.025em;cursor:pointer;transition:opacity .2s ease-out,transform .2s ease-out}.ds-dock-item:hover{background:rgba(245,245,244,.05);color:#e7e5e4}.ds-dock-item:active{transform:scale(.95)}.ds-current{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#fcd34d;cursor:default}@media(prefers-reduced-motion:reduce){.ds-dock-item{transition:none}.ds-dock-item:active{transform:none}}"
     },
     {
       "name": "Poster Card",
       "kind": "card",
       "refersTo": null,
-      "description": "Poster with a 4px energy band and a progress bar for shows in progress.",
+      "description": "Poster with a 4px top energy band and labeled energy state. Shows in progress use shared ProgressBar at the base; watched state also has an icon.",
       "html": "<div class=\"ds-card\"><div class=\"ds-band\"></div><div class=\"ds-poster\"><div class=\"ds-track\"><div class=\"ds-fill\"></div></div></div><div class=\"ds-card-title\">Severance</div></div>",
-      "css": ".ds-card{width:140px;font-family:ui-serif,Georgia,serif}.ds-band{height:4px;background:#fbbf24}.ds-poster{position:relative;aspect-ratio:2/3;background:#1c1917;border:1px solid #292524;box-shadow:0 10px 15px -3px rgba(0,0,0,.3);overflow:hidden}.ds-track{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(12,10,9,.9);border-top:1px solid #292524}.ds-fill{width:60%;height:100%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6)}.ds-card-title{margin-top:8px;color:#f5f5f4;font-size:16px;line-height:1.35}"
+      "css": ".ds-card{width:140px;font-family:ui-serif,Georgia,serif}.ds-band{height:4px;background:#fbbf24}.ds-poster{position:relative;aspect-ratio:2/3;background:#1c1917;border:1px solid #292524;box-shadow:0 10px 15px -3px rgba(0,0,0,.3);overflow:hidden}.ds-track{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(12,10,9,.9);border-top:1px solid #292524}.ds-fill{width:100%;height:100%;transform-origin:left;transform:scaleX(.6);transition:transform .5s ease-out;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6)}.ds-card-title{margin-top:8px;color:#f5f5f4;font-size:16px;line-height:1.35}@media(prefers-reduced-motion:reduce){.ds-fill{transition:none}}"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": null,
+      "description": "Button variant=\"danger\": destructive actions, red-900/20 fill, red-400 text and red-900/30 border; hover uses red-900/40. All Button variants use a 12px radius, press scale with reduced-motion reset, and 50% disabled opacity.",
+      "html": "<button class=\"ds-btn-danger\">Delete title</button>",
+      "css": ".ds-btn-danger{min-height:44px;padding:12px 24px;border-radius:12px;background:rgba(127,29,29,.2);color:#f87171;border:1px solid rgba(127,29,29,.3)}.ds-btn-danger:hover{background:rgba(127,29,29,.4)}"
+    },
+    {
+      "name": "Glass Button",
+      "kind": "button",
+      "refersTo": null,
+      "description": "Button variant=\"glass\" exists for artwork overlays only: stone-900/60 fill, backdrop-blur-md, stone-800 border and stone-200 text; hover uses stone-800. Never use blur on a plain background or modal scrim.",
+      "html": "<button class=\"ds-btn-glass\">View details</button>",
+      "css": ".ds-btn-glass{min-height:44px;padding:12px 24px;border-radius:12px;background:rgba(28,25,23,.6);backdrop-filter:blur(12px);border:1px solid #292524;color:#e7e5e4}.ds-btn-glass:hover{background:#292524}"
+    },
+    {
+      "name": "Dialog",
+      "kind": "dialog",
+      "refersTo": null,
+      "description": "Use Dialog for modal roots, or useDialog on an existing root. Mount only while open and name it with aria-labelledby. Both provide role=\"dialog\", aria-modal, initial focus, a focus trap, topmost-only Escape and Tab handling, and focus return to the opener. useDialog accepts initialFocusRef. A scrim is a decorative sibling to the panel, aria-hidden and outside the tab order; preserve a named close control. Use flat bg-stone-950/85 without blur because the current var(--shell-bg) Tailwind color does not support bg-shell/NN opacity modifiers.",
+      "html": "<div class=\"ds-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"ds-dialog-title\" tabindex=\"-1\"><div class=\"ds-scrim\" aria-hidden=\"true\"></div><section class=\"ds-dialog-panel\"><h2 id=\"ds-dialog-title\">Title details</h2><button aria-label=\"Close details\">Close</button></section></div>",
+      "css": ".ds-dialog{position:relative;padding:24px}.ds-scrim{position:absolute;inset:0;background:rgba(12,10,9,.85)}.ds-dialog-panel{position:relative;background:#1c1917;border:1px solid #44403c;border-radius:16px;padding:24px;color:#f5f5f4}"
+    },
+    {
+      "name": "IconButton",
+      "kind": "button",
+      "refersTo": null,
+      "description": "Use for icon-only close, back and dismiss controls. label is required and becomes aria-label. plain is for plain surfaces; overlay uses a stone-950/90 fill and stone-700 border over artwork. Both have a 44px minimum target, amber focus ring and reduced-motion-aware press feedback.",
+      "html": "<button class=\"ds-icon-button\" type=\"button\" aria-label=\"Close details\"><span aria-hidden=\"true\">×</span></button>",
+      "css": ".ds-icon-button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border-radius:9999px;border:0;background:transparent;color:#d6d3d1}.ds-icon-button:focus-visible{outline:2px solid #f59e0b;outline-offset:2px}"
+    },
+    {
+      "name": "ProgressBar",
+      "kind": "progress",
+      "refersTo": null,
+      "description": "Use shared ProgressBar for TV, collection and import progress. value is clamped to 0-100; min keeps a sliver for started items. heightClassName defaults to h-1.5 (6px); square removes pill rounding. The full-width fill uses transform scaleX with a 500ms motion-safe transition. label exposes progressbar role and values; omit label when an adjacent text count makes the bar decorative.",
+      "html": "<div class=\"ds-progress\" role=\"progressbar\" aria-label=\"Import progress\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"60\"><div class=\"ds-progress-fill\"></div></div>",
+      "css": ".ds-progress{height:6px;width:100%;overflow:hidden;border-radius:9999px;background:#292524}.ds-progress-fill{height:100%;width:100%;transform-origin:left;transform:scaleX(.6);border-radius:inherit;background:#f59e0b}@media(prefers-reduced-motion:no-preference){.ds-progress-fill{transition:transform .5s ease-out}}"
+    },
+    {
+      "name": "SelectChip",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Use for short sets such as vibe, energy and type. selected is exposed with aria-pressed, an underlined selected label and an amber wash, never color alone. Supply visible text or an icon with text. selectedClassName supports energy-specific styles from ENERGY_STYLES. The control uses 12px text and a 44px minimum target.",
+      "html": "<button class=\"ds-select-chip\" type=\"button\" aria-pressed=\"true\"><span>Balanced</span></button>",
+      "css": ".ds-select-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:9999px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.15);color:#fde68a;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.ds-select-chip:focus-visible{outline:2px solid #f59e0b;outline-offset:2px} .ds-select-chip[aria-pressed=\"true\"] span{text-decoration:underline;text-underline-offset:4px}"
+    },
+    {
+      "name": "CollectionCardLandscape",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Landscape collection artwork reserves a top-aligned h-12 sm:h-14 title or logo zone and an h-8 metadata zone. Text titles clamp to two lines; logos retain proportions. Count and year begin consistently, with whitespace-nowrap tabular-nums years and spacing instead of a separator dot. Started collections use a 2px top ProgressBar with min={4} and square; complete collections also show a text badge.",
+      "html": "<div class=\"ds-collection\"><div class=\"ds-collection-title\">The collection</div><div class=\"ds-collection-meta\"><span>2 of 4 watched</span><span class=\"ds-collection-year\">2001-2010</span></div></div>",
+      "css": ".ds-collection{width:280px;aspect-ratio:16/9;position:relative;border-radius:12px;overflow:hidden;background:#1c1917;color:#f5f5f4;box-sizing:border-box;padding:38px 16px 10px}.ds-collection-title{height:48px;overflow:hidden;font-family:ui-serif,Georgia,serif;font-size:16px;line-height:1.375}.ds-collection-meta{height:32px;display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;column-gap:12px;row-gap:2px;margin-top:6px;overflow:hidden;font-size:11px;line-height:16px;color:#d6d3d1;text-transform:uppercase;letter-spacing:.18em}.ds-collection-year{white-space:nowrap;font-variant-numeric:tabular-nums;color:#a8a29e}@media(min-width:640px){.ds-collection-title{height:56px}}"
     }
   ],
   "narrative": {
@@ -360,7 +416,7 @@
     "overview": "Hearth is a dark, warm room with one source of light. The shell is a near-black with a trace of brown, and everything else is lit from within: poster and backdrop artwork supplies the drama, and a single amber accent plays the role of the lamp. The interface chrome stays low and quiet so two people on a couch can look at titles, not at controls.",
     "keyCharacteristics": [
       "Near-black warm shell; amber as the only brand accent.",
-      "Serif titles over a system sans body; tiny uppercase tracked labels for metadata.",
+      "Serif titles over a system sans body; uppercase tracked labels with an 11px floor.",
       "Soft, large radii (12px controls, 16px to 24px containers, full pills for chips).",
       "Artwork-first: posters and backdrops are the saturated element, chrome recedes.",
       "Tonal depth first, shadow second; blur only where text must sit on artwork.",
@@ -389,7 +445,7 @@
       },
       {
         "name": "The Small Caps Eyebrow Rule",
-        "body": "Eyebrows are 10px to 11px, bold, uppercase, widely tracked, and never carry primary information.",
+        "body": "Eyebrows and metadata use text-label at 0.6875rem / 1rem (11px / 16px) or larger, stone-400 or lighter on dark surfaces, bold uppercase tracking, and never carry primary information. Decision-critical text is 14px or larger.",
         "section": "typography"
       },
       {
@@ -399,8 +455,13 @@
       },
       {
         "name": "The Functional Blur Rule",
-        "body": "Backdrop blur is a legibility device over imagery, never decoration.",
+        "body": "Backdrop blur is a legibility device over imagery only. Plain backgrounds stay flat. Modal scrims use flat bg-stone-950/85 without blur; bg-shell/NN opacity is unsupported by the current CSS-variable color definition.",
         "section": "elevation"
+      },
+      {
+        "name": "The Product Register Rule",
+        "body": "Keep a calm, literal interface for two people sharing a shelf, with one clear page heading, visible focus and clear selected, disabled, empty, loading and error states. Preserve current workflows during visual cleanup: no new decision CTA, Tonight rail cap, duplicate-detection or undo behavior, show-modal primary-action changes, or plain-title Import redesign. Automatic hero advance stops after interaction and is disabled for reduced motion.",
+        "section": "components"
       }
     ],
     "dos": [
@@ -409,16 +470,22 @@
       "Do tint every neutral warm (the stone ramp); end at Bone (#f5f5f4) and Shell Black (#0c0a09).",
       "Do pair every color-coded state (energy, watched, in progress) with a label or icon.",
       "Do paint the shell Shell Black behind notches and overscroll, and add --safe-* insets to fixed bars.",
-      "Do honor prefers-reduced-motion on any new animation, and animate transform and opacity only."
+      "Do honor prefers-reduced-motion on any new animation, and animate transform and opacity only.",
+      "Do use shared Dialog/useDialog, IconButton, ProgressBar and SelectChip primitives for consistent behavior and accessible states.",
+      "Do keep text at least 11px and stone-400 or lighter on dark surfaces, decision-critical copy at least 14px, and interactive targets at least 44px.",
+      "Do give fields persistent labels and explain errors near the affected field without relying on color alone."
     ],
     "donts": [
       "Don't build a gamified or social app: no streaks, badges, feeds, leaderboards or notification nags.",
-      "Don't drift into a generic dark SaaS dashboard: no cold blue-grey panels, glass cards, gradient accents or gradient text.",
+      "Don't drift into a generic dark SaaS dashboard: no cold blue-grey panels, glass cards, gradient accents, gradient fills or gradient text.",
       "Don't show algorithmic recommender patterns: no match percentages, no \"because you watched\", no ranked or explained suggestions.",
       "Don't use blur or translucency on plain backgrounds; it is only for legibility over artwork.",
       "Don't use #000 or #fff, or introduce a second brand hue beside amber.",
       "Don't add border-left or border-right wider than 1px as a colored accent.",
-      "Don't create endless rows, autoplay or infinite scroll; the shelf is finite on purpose."
+      "Don't create endless rows, autoplay or infinite scroll; the shelf is finite on purpose.",
+      "Don't nest cards inside cards or add a container where spacing would do.",
+      "Don't use em dashes in interface copy.",
+      "Don't use gradients outside neutral scrims over artwork; plain backgrounds stay flat."
     ]
   }
 }

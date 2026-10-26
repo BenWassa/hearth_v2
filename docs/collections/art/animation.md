@@ -44,7 +44,7 @@ Landscape exports preserve full source width with modest atmospheric extension r
 - **Generator trace:** image generation ID `5b9a4a53-4654-4df8-b09c-c0bddc846794`. Other visual iterations were considered but not committed. Preserve the raw generated study outside the runtime asset tree if remastering is needed.
 - **Source quality:** source panels measure roughly 490–506px across covers and 417–432px across portraits. Raster resampling produces the exact contractual WebP dimensions but **does not add genuine high-resolution detail**. Review on retina/large displays before merge. Artifacts must not be described as native 1600×900 or native 1080×1920 *generation*.
 - **Marks / rights:** The image model rendered signatures and motifs *evocative of existing studio title cards*. It may closely resemble established studio logos, trade dress, or protected visual elements (notably Pixar lamp/ball, Disney castle/script, and DreamWorks moon/angler). No trademark licence, affiliation, endorsement or permission is asserted. Since Hearth may become publicly distributed, **owner/licensing review is a required merge gate**; replace or remove any risky motif/signature before public release if rights are not independently established. A plain-text accessible World title remains the recommended legal fallback.
-- **Text and overlay caveat:** Image-generation source panels include studio name artwork baked into images. This is a conscious divergence from #10's preference for text-free raster, because the supplied image generator repeatedly produced full brand-led title compositions. `wordmark.png` is an optional presentation asset; **do not overlay them onto the same baked-in titles**. UI must always expose the World name as live accessible text, including on offline/error fallback. No counts, buttons, watch state or private data are embedded.
+- **Text and overlay caveat:** Image-generation source panels include studio name artwork baked into images. This is a conscious divergence from #10's preference for text-free raster, because the supplied image generator repeatedly produced full brand-led title compositions. `wordmark.png` is an optional presentation asset; **do not overlay it onto the baked-in titles**. UI must always expose the World name as live accessible text, including on offline/error fallback. No counts, buttons, watch state or private data are embedded.
 - **No original corporate files:** The generated renderings should be treated as unlicensed concept renderings, *not* accurate official logo files or released marketing imagery.
 
 ## QA and review gates
@@ -52,7 +52,7 @@ Landscape exports preserve full source width with modest atmospheric extension r
 - [x] Three generated image-based 16:9 covers, three independently generated portrait treatments, and three raster wordmark signatures
 - [x] `cover.webp` and `hero.webp` decode as RGB at exactly 1600×900 and 1080×1920
 - [x] All WebPs are within parent issue target transfer budgets
-- [x] Cropped source PNGs retained for transparency and rework; The PNG is the sole wordmark asset; SVG wrappers removed at owner's direction
+- [x] Cropped source PNGs retained for transparency and rework; `wordmark.png` is the sole signature asset after removing the SVG wrappers at the owner's direction
 - [x] 165px two-column card simulation and portrait previews in contact sheet
 - [x] No React, CSS, config, Firestore, shared design or other-lane files changed
 - [ ] Visual owner approval for noncommercial/brand fidelity and mobile legibility

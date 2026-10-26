@@ -64,10 +64,23 @@ try {
     });
     const page = await context.newPage();
     await page.goto(origin + '/?demo=1&collectionsFixture=25', { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-world-id]').first().waitFor({ timeout: 20000 });
-    await page.locator('[data-world-id] img').first().evaluate(async (img) => {
-      await img.decode().catch(() => undefined);
-    });
+    const cards = page.locator('[data-world-id]');
+    await cards.first().waitFor({ timeout: 20000 });
+    // The app correctly lazy-loads off-screen covers. Walk the rail first so
+    // a full-page QA screenshot does not record blank cards mid-load.
+    for (let index = 0; index < (await cards.count()); index += 1) {
+      const card = cards.nth(index);
+      await card.scrollIntoViewIfNeeded();
+      const image = card.locator('img');
+      await image.evaluate(async (img) => {
+        await img.decode();
+      });
+      const loaded = await image.evaluate((img) => img.naturalWidth > 0);
+      if (!loaded) {
+        throw new Error(`World cover did not decode at ${width}px, card ${index}`);
+      }
+    }
+    await cards.first().scrollIntoViewIfNeeded();
 
     const coverGeometry = await page.locator('[data-world-id]').first().evaluate(
       (el) => ({
@@ -115,6 +128,10 @@ try {
         + (await page.locator('[aria-label="Shorts & specials"] button').count())
         + (await page.locator('[aria-label="TV series"] button').count());
       if (!contentVisible) throw new Error(`No directly browsable content in ${id}`);
+      const worldWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+      if (worldWidth > width + 1) {
+        throw new Error(`World page horizontally overflows: ${id} at ${width}px`);
+      }
       await page.screenshot({
         path: resolve(out, `world-${id}-${width}.png`),
         animations: 'disabled',

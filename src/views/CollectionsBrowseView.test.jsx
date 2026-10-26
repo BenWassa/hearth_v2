@@ -49,7 +49,7 @@ afterEach(async () => {
   if (root) await act(async () => root.unmount());
   host?.remove();
 });
-it.each([0, 1, 25, 50])(
+it.each([0, 1, 3, 25, 50])(
   'shows every represented World directly on Tonight for %i sagas',
   async (size) => {
     const openWorld = vi.fn();
@@ -382,4 +382,27 @@ it('keeps a title when artwork fails, including a World with no sagas', async ()
   });
   expect(host.querySelector('#collections-heading').textContent).toBe('Pixar');
   expect(host.querySelector('[aria-label="Other films"]').textContent).toContain('Up');
+});
+
+it('retains readable landscape World cover labels when an image is corrupt', async () => {
+  const openWorld = vi.fn();
+  await mount(
+    <CollectionsRail
+      collections={[makeSaga(0, '86311')]}
+      onOpenWorld={openWorld}
+      onBrowse={vi.fn()}
+    />,
+  );
+  const cover = host.querySelector('[data-world-id="marvel"]');
+  expect(cover.className).toContain('aspect-video');
+  expect(cover.querySelector('img').getAttribute('src')).toBe(
+    '/assets/worlds/marvel/cover.webp',
+  );
+  await act(async () =>
+    cover.querySelector('img').dispatchEvent(new Event('error')),
+  );
+  expect(cover.querySelector('img')).toBeNull();
+  expect(cover.textContent).toContain('Marvel');
+  await click(cover);
+  expect(openWorld).toHaveBeenCalledWith('marvel', cover);
 });

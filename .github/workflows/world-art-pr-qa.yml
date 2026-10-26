@@ -39,11 +39,16 @@ jobs:
       - run: npm run format:check
       - run: npm run test
       - run: npm run build
-      - name: Install browser verification dependencies
+      - name: Install isolated Chromium verification environment
         run: |
-          npm install --no-save --package-lock=false playwright@1.56.1
+          mkdir -p /tmp/hearth-playwright
+          cd /tmp/hearth-playwright
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.56.1
           npx playwright install --with-deps chromium
       - name: Capture and assert 320/390/448px World UI
+        env:
+          PLAYWRIGHT_MODULE: /tmp/hearth-playwright/node_modules/playwright/index.mjs
         run: node scripts/captureWorldArt.mjs
       - name: Upload Chromium screenshots
         if: always()

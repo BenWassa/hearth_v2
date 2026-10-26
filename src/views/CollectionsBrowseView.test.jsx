@@ -12,8 +12,13 @@ const makeSaga = (i, providerId = `other-${i}`) => ({
   totalCount: 2,
   watchedCount: 1,
   items: [
-    { id: `w-${i}`, status: 'watched', markedWatchedAt: now - i * 1000 },
-    { id: `u-${i}`, status: 'unwatched' },
+    {
+      id: `w-${i}`,
+      type: 'movie',
+      status: 'watched',
+      markedWatchedAt: now - i * 1000,
+    },
+    { id: `u-${i}`, type: 'movie', status: 'unwatched' },
   ],
 });
 let root, host;
@@ -45,23 +50,29 @@ afterEach(async () => {
   host?.remove();
 });
 it.each([0, 1, 25, 50])(
-  'caps Tonight and opens full browser for %i sagas',
+  'shows every represented World directly on Tonight for %i sagas',
   async (size) => {
-    const open = vi.fn();
+    const openWorld = vi.fn();
     const browse = vi.fn();
+    const ids = ['86311', '1241', '10', '10194', '386382', '263', '2150'];
+    const collections = Array.from({ length: size }, (_, i) =>
+      makeSaga(i, ids[i % ids.length]),
+    );
     await mount(
       <CollectionsRail
-        collections={Array.from({ length: size }, (_, i) => makeSaga(i))}
-        onOpenCollection={open}
+        collections={collections}
+        onOpenWorld={openWorld}
         onBrowse={browse}
       />,
     );
-    expect(host.querySelectorAll('h3').length).toBe(Math.min(size, 2));
+    expect(host.querySelectorAll('[data-world-id]')).toHaveLength(
+      Math.min(size, ids.length),
+    );
     await click(button(`Browse all ${size}`));
     expect(browse).toHaveBeenCalledOnce();
     if (size) {
-      await click(button('Saga 00'));
-      expect(open.mock.calls[0][0].id).toBe('saga-0');
+      await click(button('Marvel'));
+      expect(openWorld).toHaveBeenCalledWith('marvel', button('Marvel'));
     }
   },
 );
@@ -90,7 +101,7 @@ it('makes 50 sagas searchable, handles no results, clear and A–Z', async () =>
     [...host.querySelectorAll('h3')].slice(0, 2).map((h) => h.textContent),
   ).toEqual(['Saga 00', 'Saga 01']);
 });
-it('opens Worlds, bypasses single-saga Worlds, and restores overview search/focus/scroll', async () => {
+it('opens every World including singletons and restores overview focus and scroll', async () => {
   const open = vi.fn();
   const collections = [
     makeSaga(0, '86311'),
@@ -106,7 +117,12 @@ it('opens Worlds, bypasses single-saga Worlds, and restores overview search/focu
     />,
   );
   await click(button('Star Wars'));
-  expect(open.mock.calls[0][0].id).toBe('saga-2');
+  expect(host.querySelector('h1').textContent).toBe('Star Wars');
+  expect(open).not.toHaveBeenCalled();
+  await click(button('All collections'));
+  await act(
+    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
+  );
   const marvel = button('Marvel');
   marvel.focus();
   const scroller = host.querySelector('.overflow-y-auto');
@@ -114,7 +130,7 @@ it('opens Worlds, bypasses single-saga Worlds, and restores overview search/focu
   await click(marvel);
   expect(host.querySelector('h1').textContent).toBe('Marvel');
   expect(host.textContent).toContain(
-    '2 sagas · 4 films on your shelf · 2 unwatched',
+    '2 sagas · 4 feature films on your shelf · 2 unwatched',
   );
   expect(host.querySelectorAll('h3')).toHaveLength(2);
   await click(button('All collections'));
@@ -180,37 +196,157 @@ it('small libraries skip Worlds and have an accessible empty state and Escape', 
   expect(close).toHaveBeenCalledOnce();
 });
 
-it('removes an undone watch shortcut without replacing it or reordering its neighbor', async () => {
-  const collections = [makeSaga(0), makeSaga(1), makeSaga(2)];
+it('keeps all World entry points when watch activity is undone or dormant', async () => {
+  const collections = [
+    makeSaga(0, '86311'),
+    makeSaga(1, '1241'),
+    makeSaga(2, '263'),
+  ];
   await mount(
     <CollectionsRail
       collections={collections}
       onBrowse={vi.fn()}
-      onOpenCollection={vi.fn()}
+      onOpenWorld={vi.fn()}
     />,
   );
-  const changed = collections.map((saga, index) =>
-    index === 0
-      ? {
-          ...saga,
-          items: saga.items.map((item) => ({
-            ...item,
-            status: 'unwatched',
-            markedWatchedAt: null,
-          })),
-        }
-      : saga,
+  const before = [...host.querySelectorAll('[data-world-id]')].map(
+    (node) => node.dataset.worldId,
   );
+  const changed = collections.map((saga) => ({
+    ...saga,
+    items: saga.items.map((item) => ({
+      ...item,
+      status: 'unwatched',
+      markedWatchedAt: null,
+    })),
+  }));
   await act(async () =>
     root.render(
       <CollectionsRail
         collections={changed}
         onBrowse={vi.fn()}
-        onOpenCollection={vi.fn()}
+        onOpenWorld={vi.fn()}
       />,
     ),
   );
-  expect([...host.querySelectorAll('h3')].map((h) => h.textContent)).toEqual([
-    'Saga 01',
-  ]);
+  expect(
+    [...host.querySelectorAll('[data-world-id]')].map(
+      (node) => node.dataset.worldId,
+    ),
+  ).toEqual(before);
+});
+
+it('opens a World directly from Tonight and returns there without an extra overview step', async () => {
+  const close = vi.fn();
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="star-wars"
+      collections={[makeSaga(0, '10')]}
+      onClose={close}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  expect(host.querySelector('h1').textContent).toBe('Star Wars');
+  expect(host.querySelectorAll('h3')).toHaveLength(1);
+  await click(button('Tonight'));
+  expect(close).toHaveBeenCalledOnce();
+});
+
+it('keeps standalone films, shorts and TV in separate World sections without fake sagas', async () => {
+  const openItem = vi.fn();
+  const items = [
+    {
+      id: 'up',
+      type: 'movie',
+      title: 'Up',
+      worldId: 'pixar',
+      runtimeMinutes: 96,
+    },
+    {
+      id: 'short',
+      type: 'movie',
+      title: 'A short',
+      worldId: 'pixar',
+      runtimeMinutes: 7,
+    },
+    { id: 'show', type: 'show', title: 'A show', worldId: 'pixar' },
+  ];
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="pixar"
+      collections={[]}
+      items={items}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+      onOpenItem={openItem}
+    />,
+  );
+  expect(host.querySelector('h1').textContent).toBe('Pixar');
+  expect(host.querySelectorAll('h3')).toHaveLength(0);
+  expect(host.textContent).toContain('1 feature film on your shelf');
+  expect(
+    host.querySelector('[aria-label="Other films"]').textContent,
+  ).toContain('Up');
+  expect(
+    [...host.querySelectorAll('section')].find(
+      (node) => node.getAttribute('aria-label') === 'Shorts & specials',
+    ).textContent,
+  ).toContain('A short');
+  expect(host.querySelector('[aria-label="TV series"]').textContent).toContain(
+    'A show',
+  );
+  await click(button('Up'));
+  expect(openItem).toHaveBeenCalledWith(items[0]);
+});
+
+it('exposes shared Show/Hide/Default controls including excluded metadata candidates', async () => {
+  const change = vi.fn();
+  const hidden = makeSaga(0, '488924');
+  hidden.title = 'Paddington Collection';
+  await mount(
+    <CollectionsBrowseView
+      collections={[]}
+      allCollections={[hidden]}
+      preferences={{ 'tmdb:488924': false }}
+      onPreferenceChange={change}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  await click(button('Manage sagas'));
+  const select = host.querySelector(
+    '[aria-label="Visibility for Paddington Collection"]',
+  );
+  expect(select.value).toBe('false');
+  await act(async () => {
+    select.value = 'true';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(change).toHaveBeenLastCalledWith('tmdb:488924', true);
+  await act(async () => {
+    select.value = 'default';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(change).toHaveBeenLastCalledWith('tmdb:488924', null);
+});
+
+it('moves direct World navigation to the full overview with restored focus and a reset scroll', async () => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="marvel"
+      collections={[makeSaga(0, '86311')]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  const scroller = host.querySelector('.overflow-y-auto');
+  scroller.scrollTop = 130;
+  await click(button('All collections'));
+  await act(
+    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
+  );
+  expect(scroller.scrollTop).toBe(0);
+  expect(document.activeElement).toBe(
+    host.querySelector('#collections-heading'),
+  );
 });

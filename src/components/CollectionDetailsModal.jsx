@@ -7,6 +7,13 @@ import {
   Plus,
   X,
 } from 'lucide-react';
+import { COLLECTION_CATALOG } from '../config/collectionCatalog.js';
+import {
+  getCollectionIdentity,
+  hasFilmFormatMetadata,
+  isFeatureFilm,
+  isShortOrSpecial,
+} from '../domain/media/collectionEligibility.js';
 import useCollectionDetails from '../hooks/useCollectionDetails.js';
 import Dialog from './ui/Dialog.jsx';
 import IconButton from './ui/IconButton.jsx';
@@ -104,11 +111,25 @@ const CollectionShelfSkeleton = () => (
 const CollectionDetailsModal = ({
   isOpen,
   collection,
+  householdItems = [],
   onClose,
   onOpenItem,
 }) => {
   const [logoFailed, setLogoFailed] = useState(false);
-  const items = Array.isArray(collection?.items) ? collection.items : [];
+  const collectionIdentity = getCollectionIdentity(collection || {});
+  const relatedShelfItems = householdItems.filter(
+    (item) =>
+      collectionIdentity && getCollectionIdentity(item) === collectionIdentity,
+  );
+  const shelfItems = [
+    ...new Map(
+      [
+        ...(Array.isArray(collection?.items) ? collection.items : []),
+        ...relatedShelfItems,
+      ].map((item) => [getItemKey(item), item]),
+    ).values(),
+  ];
+  const items = shelfItems.filter(isFeatureFilm);
   const firstItem = items[0] || null;
   const collectionProvider =
     asString(collection?.collection?.provider) || 'tmdb';
@@ -152,46 +173,70 @@ const CollectionDetailsModal = ({
   if (!isOpen || !collection) return null;
 
   const backdrop = getBackdropSrc(collection) || getPosterSrc(collection);
-  const nextItem = collection.nextItem;
+  const isAnthology =
+    (collection.eligibility?.sequenceMode ||
+      COLLECTION_CATALOG[getCollectionIdentity(collection)]?.sequenceMode) ===
+    'anthology';
+  const nextItem = items.find((item) => item.status !== 'watched') || null;
   const ownedByKey = new Map(
-    items.map((item) => [getItemKey(item), item]).filter(([key]) => key),
+    [...shelfItems, ...householdItems]
+      .map((item) => [getItemKey(item), item])
+      .filter(([key]) => key),
   );
-  const fullParts = Array.isArray(collectionDetails?.parts)
-    ? collectionDetails.parts
+  const providerParts = Array.isArray(collectionDetails?.parts)
+    ? collectionDetails.parts.map((part) => ({
+        ...part,
+        type: part.type || 'movie',
+      }))
     : [];
-  const displayItems = (fullParts.length ? fullParts : items).map((part) => {
-    const ownedItem = ownedByKey.get(getItemKey(part)) || null;
-    return mapDiscoveryItem(part, fullParts.length ? ownedItem : part);
-  });
+  const fullParts = providerParts.filter(isFeatureFilm);
+  const providerFeatureCountKnown =
+    providerParts.length > 0 && providerParts.every(hasFilmFormatMetadata);
+  const mappedParts = (parts) =>
+    parts.map((part) => {
+      const ownedItem = ownedByKey.get(getItemKey(part)) || null;
+      return mapDiscoveryItem(part, ownedItem);
+    });
+  // Keep shelf films visible when a provider returns incomplete metadata.
+  const mergeParts = (providerItems, ownedItems) => {
+    const byKey = new Map();
+    [...providerItems, ...ownedItems].forEach((part) =>
+      byKey.set(getItemKey(part), part),
+    );
+    return mappedParts([...byKey.values()]);
+  };
+  const displayItems = mergeParts(fullParts, items);
+  const shortItems = mergeParts(
+    providerParts.filter(isShortOrSpecial),
+    shelfItems.filter(isShortOrSpecial),
+  );
   const subCollectionRows =
     Array.isArray(collectionDetails?.subCollections) &&
     collectionDetails.subCollections.length > 0
       ? collectionDetails.subCollections
           .map((subCollection) => ({
             ...subCollection,
-            parts: (Array.isArray(subCollection.parts)
-              ? subCollection.parts
-              : []
-            ).map((part) =>
-              mapDiscoveryItem(part, ownedByKey.get(getItemKey(part)) || null),
+            parts: mappedParts(
+              (Array.isArray(subCollection.parts) ? subCollection.parts : [])
+                .map((part) => ({ ...part, type: part.type || 'movie' }))
+                .filter(isFeatureFilm),
             ),
           }))
           .filter((subCollection) => subCollection.parts.length > 0)
       : [];
-  const ownedTotalCount = items.length || Number(collection.totalCount) || 0;
-  const fullTotalCount =
-    fullParts.length || displayItems.length || ownedTotalCount;
-  const watchedCount = Number(collection.watchedCount) || 0;
+  const ownedTotalCount = items.length;
+  const fullTotalCount = fullParts.length || ownedTotalCount;
+  const watchedCount = items.filter((item) => item.status === 'watched').length;
   const progressPercentage =
     ownedTotalCount > 0
       ? Math.round((watchedCount / ownedTotalCount) * 100)
       : 0;
   const isComplete = ownedTotalCount > 0 && watchedCount >= ownedTotalCount;
-  const showNextUp = nextItem && nextItem.status !== 'watched' && !isComplete;
+  const showNextUp = !isAnthology && nextItem && !isComplete;
+
   const nextItemPoster = nextItem ? getPosterSrc(nextItem) : '';
 
   const openItem = (item) => {
-    onClose?.();
     onOpenItem?.(item.watchlistItem || item);
   };
 
@@ -201,10 +246,11 @@ const CollectionDetailsModal = ({
         const poster = getPosterSrc(item);
         const isOwned = item.owned !== false;
         const isWatched = isOwned && item.status === 'watched';
-        const queuePosition = isOwned
-          ? items.findIndex((ownedItem) => ownedItem === item.watchlistItem) +
-              1 || index + 1
-          : null;
+        const queuePosition =
+          isOwned && !isAnthology && isFeatureFilm(item)
+            ? items.findIndex((ownedItem) => ownedItem === item.watchlistItem) +
+                1 || index + 1
+            : null;
         const itemTitle = item.title || 'Untitled movie';
         const key = getItemKey(item) || `${itemTitle}-${index}`;
 
@@ -212,7 +258,10 @@ const CollectionDetailsModal = ({
           <button
             key={key}
             type="button"
-            onClick={() => openItem(item)}
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              openItem(item);
+            }}
             className="group flex flex-col text-left focus:outline-none"
             aria-label={
               isOwned ? `Open ${itemTitle}` : `Add ${itemTitle} to shelf`
@@ -241,16 +290,19 @@ const CollectionDetailsModal = ({
                 <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-amber-500 text-amber-950 shadow-md shadow-black/40 ring-2 ring-stone-950/60">
                   <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
                 </div>
-              ) : isOwned ? (
-                <div className="absolute right-1.5 top-1.5 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-stone-950/85 px-1.5 text-label font-bold tabular-nums text-stone-300 ring-1 ring-stone-50/10 backdrop-blur-sm">
+              ) : isOwned && queuePosition ? (
+                <div
+                  aria-label={`Film ${queuePosition} in saga order`}
+                  className="absolute right-1.5 top-1.5 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-stone-950/85 px-1.5 text-label font-bold tabular-nums text-stone-300 ring-1 ring-stone-50/10 backdrop-blur-sm"
+                >
                   {queuePosition}
                 </div>
-              ) : (
+              ) : !isOwned ? (
                 <div className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-stone-950/90 text-amber-300 shadow-md shadow-black/40 ring-1 ring-amber-400/35 backdrop-blur-sm">
                   <Library className="h-3.5 w-3.5" />
                   <Plus className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-amber-500 p-0.5 text-amber-950 ring-1 ring-stone-950" />
                 </div>
-              )}
+              ) : null}
 
               {isWatched && (
                 <div className="pointer-events-none absolute inset-0 bg-stone-950/35" />
@@ -382,7 +434,10 @@ const CollectionDetailsModal = ({
             {showNextUp && (
               <button
                 type="button"
-                onClick={() => openItem(nextItem)}
+                onClick={(event) => {
+                  event.currentTarget.focus({ preventScroll: true });
+                  openItem(nextItem);
+                }}
                 className="group mb-6 flex w-full items-center gap-4 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-left transition-opacity hover:border-amber-400/50 hover:bg-amber-500/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               >
                 <div className="aspect-[2/3] w-14 shrink-0 overflow-hidden rounded-lg bg-stone-900 ring-1 ring-stone-50/10">
@@ -427,11 +482,15 @@ const CollectionDetailsModal = ({
             {/* Section header for the shelf */}
             <div className="mb-3 flex items-baseline justify-between px-0.5">
               <div className="text-label font-bold uppercase tracking-[0.22em] text-stone-400">
-                The collection
+                {isAnthology ? 'Explore films' : 'Feature films'}
               </div>
               <div className="text-label font-medium text-stone-400">
                 {fullTotalCount} {fullTotalCount === 1 ? 'film' : 'films'}{' '}
-                {fullParts.length ? 'in the saga' : 'on your shelf'}
+                {fullParts.length
+                  ? providerFeatureCountKnown
+                    ? 'in the feature saga'
+                    : 'listed by provider'
+                  : 'on your shelf'}
               </div>
             </div>
 
@@ -450,6 +509,21 @@ const CollectionDetailsModal = ({
               </div>
             ) : (
               renderPosterGrid(displayItems)
+            )}
+
+            {!isCollectionLoading && shortItems.length > 0 && (
+              <section
+                aria-label="Shorts and specials"
+                className="mt-7 space-y-3"
+              >
+                <h3 className="font-serif text-xl text-stone-100">
+                  Shorts &amp; specials
+                </h3>
+                <p className="text-sm text-stone-400">
+                  Separate from feature-film progress.
+                </p>
+                {renderPosterGrid(shortItems)}
+              </section>
             )}
 
             {collectionError && !isCollectionLoading && (

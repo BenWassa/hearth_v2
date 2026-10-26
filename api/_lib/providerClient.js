@@ -1,3 +1,4 @@
+const { mapWithConcurrency } = require('./concurrency');
 const { mapSearchItem } = require('./mappers/searchMapper');
 const { mapMovieDetails, mapShowDetails } = require('./mappers/mediaMapper');
 const { mapSeason } = require('./mappers/seasonMapper');
@@ -472,32 +473,25 @@ const buildSubCollections = async ({ parentId, parts, locale }) => {
   });
 };
 
-const hydrateCollectionPartDetails = async ({ parts, locale }) => {
-  const detailResults = await Promise.all(
-    parts.map(async (part) => {
-      const providerId = String(part?.providerId || '').trim();
-      if (!providerId) return part;
-
-      const result = await getMediaDetails({
-        id: providerId,
-        type: 'movie',
-        locale,
-      });
-      if (!result.ok) return part;
-
-      return {
-        ...part,
-        ...result.data,
-        provider: part.provider || result.data.provider,
-        providerId,
-        type: 'movie',
-        collection: part.collection || result.data.collection,
-      };
-    }),
-  );
-
-  return detailResults;
-};
+const hydrateCollectionPartDetails = async ({ parts, locale }) =>
+  mapWithConcurrency(parts, 3, async (part) => {
+    const providerId = String(part?.providerId || '').trim();
+    if (!providerId) return part;
+    const result = await tryFetchDetails({
+      id: providerId,
+      type: 'movie',
+      locale,
+    });
+    if (!result.ok) return part;
+    return {
+      ...part,
+      ...result.data,
+      provider: part.provider || result.data.provider,
+      providerId,
+      type: 'movie',
+      collection: part.collection || result.data.collection,
+    };
+  });
 
 const mergeHydratedSubCollections = ({ subCollections, hydratedParts }) => {
   const hydratedByProviderId = new Map(

@@ -176,3 +176,84 @@ test('optional hydrated collection endpoint returns empty details for missing co
   assert.equal(res.output.body.meta.optional, true);
   assert.equal(res.output.body.meta.found, false);
 });
+
+test('hydrated collection limits detail concurrency and retains films whose metadata fails', async () => {
+  process.env.MEDIA_PROVIDER_API_KEY = 'test-key';
+  const pending = [];
+  let active = 0;
+  let peak = 0;
+  const requested = [];
+  global.fetch = async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname.includes('/collection/')) {
+      return {
+        ok: true,
+        json: async () => ({
+          id: 999800,
+          name: 'Synthetic Collection',
+          parts: Array.from({ length: 8 }, (_, i) => ({
+            id: 800 + i,
+            title: `Film ${i}`,
+            release_date: `20${10 + i}-01-01`,
+          })),
+        }),
+      };
+    }
+    const id = Number(parsed.pathname.match(/\/(?:movie|tv)\/(\d+)/)?.[1]);
+    requested.push({ id, movie: parsed.pathname.includes('/movie/') });
+    active++;
+    peak = Math.max(peak, active);
+    return new Promise((resolve) =>
+      pending.push(() => {
+        active--;
+        resolve(
+          id === 803
+            ? {
+                ok: false,
+                status: 404,
+                json: async () => ({ status_message: 'Not found' }),
+              }
+            : {
+                ok: true,
+                json: async () => ({
+                  id,
+                  title: `Detailed ${id}`,
+                  runtime: 100,
+                }),
+              },
+        );
+      }),
+    );
+  };
+  const req = createMockReq({
+    query: { provider: 'tmdb', id: '999800', details: 'true' },
+  });
+  const res = createMockRes();
+  let finished = false;
+  const operation = collectionHandler(req, res).finally(() => {
+    finished = true;
+  });
+  while (!finished) {
+    await new Promise((resolve) => setImmediate(resolve));
+    pending.splice(0).forEach((complete) => complete());
+  }
+  await operation;
+  assert.equal(peak, 3);
+  assert.equal(requested.filter((request) => request.movie).length, 8);
+  assert.equal(
+    requested.every((request) => request.movie),
+    true,
+    'Missing movie metadata must never load an unrelated TV ID',
+  );
+  assert.equal(res.output.statusCode, 200);
+  assert.equal(res.output.body.data.parts.length, 8);
+  assert.equal(
+    res.output.body.data.parts.find((part) => part.providerId === '803').title,
+    'Film 3',
+  );
+  assert.equal(
+    res.output.body.data.parts.find((part) => part.providerId === '804')
+      .runtimeMinutes,
+    100,
+  );
+});

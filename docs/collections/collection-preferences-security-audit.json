@@ -1,0 +1,27 @@
+{
+  "score": 5,
+  "scope": "New collection_preferences rule only; existing application rules are unchanged and not comprehensively re-audited.",
+  "summary": "The new shared household override path validates bounded canonical IDs, a strict two-field document, boolean visibility and a server timestamp on every create/update. Access uses existing trusted authentication plus stored household membership. Reset requires the same membership and deletes the override. Anonymous demo clients cannot persist preferences.",
+  "findings": [],
+  "validation": {
+    "sdkTests": "21 service/hook tests passed, including false versus absent, delayed initialization, stale household reads/errors, template isolation and failed writes.",
+    "rulesCompilation": "Official Firebase rules compilation dry run passed; no release or rules deployment was performed.",
+    "emulatorProject": "demo-hearth-collections",
+    "emulatorChecks": 25,
+    "emulatorResult": "All passed against the actual Firestore rules evaluator. No production household records were read or written by these tests."
+  },
+  "attackChecks": [
+    "A trusted nonmember cannot read or overwrite another household's preference.",
+    "An untrusted authenticated client cannot read, create or delete preferences.",
+    "A member cannot write through a different household path.",
+    "An anonymous template visitor cannot persist preferences.",
+    "Create rejects missing fields, nonboolean visibility, extra privilege fields and forged historical timestamps.",
+    "Create rejects malformed and oversized provider/collection identities.",
+    "A valid create does not let a later update bypass strict schema validation.",
+    "The household collection query is permitted for actual members.",
+    "Two trusted household members can read and change the same canonical override.",
+    "Member deletion restores absence, distinct from explicit false."
+  ],
+  "releaseNotes": "Prototype Security Rules scoped to the existing trusted membership model. Review and verify them before broadly sharing the app. This revision performs no production deployment. Include the new collection_preferences rules in the reviewed future release before enabling connected-household Show/Hide writes; otherwise the existing default-deny rules reject that path.",
+  "reviewedAt": "2026-10-26"
+}

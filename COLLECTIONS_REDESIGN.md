@@ -1,56 +1,50 @@
-# Collections
+# Collections: Worlds on Tonight
 
-Implemented from [Issue #6 and both research comments](https://github.com/BenWassa/hearth_v2/issues/6).
+Implemented from [Issue #6](https://github.com/BenWassa/hearth_v2/issues/6), its [approved classification decisions](https://github.com/BenWassa/hearth_v2/issues/6#issuecomment-6402151427), and the user's subsequent navigation correction. Reviewed 2026-10-26.
 
-## Navigation and presentation
+## Navigation
 
-Tonight shows zero to two compact, directly actionable saga rows and a 44px **Browse all N sagas** action. With no reliable recent activity it shows the browse entry alone. Two compact rows keep a predictable footprint; a large lead cover plus a second row took space away from Currently Watching. There is no horizontal Collections carousel and no fourth dock tab.
+**Tonight → World → saga → film.** Every represented World appears directly in Tonight's Collections section as a finite two-column set of artwork/typographic tiles. There is no two-World cap, activity gate, five-saga threshold or singleton bypass. Even a World with one saga opens its World page. Empty, unrepresented Worlds are omitted.
 
-The full-height Collections browser has search, Recently active and A–Z, an optional World section, and every saga exactly once across Recently active and the remaining list. Search covers the whole library directly, including unclassified sagas. It ignores case, diacritics and the trailing “Collection” suffix. World navigation is an optional shortcut rather than a required hierarchy.
+World pages list child sagas, then separate Other films, Shorts & specials and TV series sections when supplied metadata supports them. Films without sequels are not invented sagas. Back from a World opened on Tonight returns directly to the same Tonight tile; All collections provides an alternative searchable full index. Worlds entered through that overview return to its saved scroll and tile focus.
 
-Libraries of five or fewer sagas skip World tiles. Only represented Worlds appear. A World with one saga opens that saga directly. There is no artificial “Other” World. World details show saga count, films on the household shelf and unwatched shelf films. Back restores the overview's scroll and tile focus; saga details leave the browser mounted, preserving search, sort, scroll and focus. Escape dismisses the topmost dialog.
+The full browser retains name search, Recently active/A–Z, all eligible sagas (including ungrouped ones), and Manage sagas. Search ignores case, diacritics and a trailing Collection suffix. World search includes its standalone films and other sections. Opening film details leaves the saga mounted underneath, so closing the film restores focus and scroll to the same saga control. Escape dismisses only the top dialog. New controls are at least 44px high; no horizontal Collections carousel or additional dock tab is introduced.
 
-**Eligibility decision:** include every recognized movie saga with a stable provider collection ID and name, including two-film collections and a single owned part. This consciously replaces the old three-provider-part gate: missing or failed provider counts cannot hide a household saga or cause async entries to appear.
+## Four distinct decisions
 
-## Household intent and migration
+1. **Membership:** preserve canonical TMDB collection metadata on a film.
+2. **World affiliation:** a versioned editorial collection/movie-ID mapping or validated explicit World metadata assigns a primary brand group.
+3. **Collection eligibility:** a curated recognized-franchise default plus a persistent shared household Show/Hide override determines first-class saga visibility.
+4. **Activity relevance:** meaningful watch/add events order browsing within the stable visit. Relevance never removes a represented World from Tonight.
 
-`watchlist_items` gains optional `additionOrigin: manual | import` and `userState.markedWatchedAt`. Manual adds get a server creation timestamp; imports retain creation time for record existence but never gain a recent-intent boost. An imported watched film does not acquire a fabricated watch date.
+`src/config/collectionCatalog.js` and `src/domain/media/collectionEligibility.js` are the pure classification boundary. Provider size, ratings, corporate ownership and raw title matching never promote a card. Missing metadata and unknown collections default safely to individual shelf films; Manage sagas can explicitly show a collection with a valid canonical ID and feature film.
 
-Movie status transitions use a Firestore transaction that reads the current shared record. Unwatched → watched sets a server timestamp; watched → unwatched clears it. Repeated writes of the same status preserve the original event, including writes from another household member. Direct detail status edits use the same path. TV progress, notes, metadata refreshes, ratings and `updatedAt` never contribute.
+Approved examples include Avengers, Harry Potter, Fantastic Beasts, Skywalker Star Wars, Star Trek reboot, Narnia, Knives Out, Dune (2021), Toy Story, James Bond, Fast & Furious, Dark Knight and Back to the Future. Fast & Furious, Dark Knight and Back to the Future can qualify with one owned feature. Paddington and Ghostbusters are hidden by default even when multiple features are owned, unless the household overrides. James Bond is an anthology: Explore films replaces an invented Next up order.
 
-No backfill or destructive migration is required. Old records without origin/watch-event fields have unknown activity and deterministic alphabetical fallback. This intentionally trades some initial personalization for truthful history. Undo removes the watch signal; intentional add activity can remain. Rewatch event history and chronological streaming telemetry are out of scope.
+## Shared household preferences
 
-## Ranking
+`artifacts/{appId}/spaces/{spaceId}/collection_preferences/{provider:collectionId}` stores `{ visible: boolean, updatedAt: server timestamp }`. Absence is the editorial default; false is explicit Hide; resetting deletes the preference. Existing trusted space membership controls access. Keys, field names, types, size and timestamps are validated identically for create/update. Realtime snapshots share changes across members; stale household responses cannot cross spaces.
 
-Pure functions in `src/domain/media/collectionActivity.js` take an injected clock. Invalid/future timestamps are ignored. Distinct film identities count once.
+Manage sagas includes hidden metadata candidates so a user can reverse Hide. Loading does not flash editorial defaults before saved preferences arrive. Read/write errors are shown and failed writes never pretend success. Template preferences are isolated in session memory and never write to a connected household. Source rules and emulator tests are included; **rules must be deployed with a future reviewed release**, not during this implementation.
 
-Tonight uses an actionability ladder:
+## Worlds and truthful counts
 
-1. Explicit watch within 30 days with another unwatched film on the shelf.
-2. Deliberate addition within 14 days with unwatched shelf films.
-3. Explicit watch within seven days with known additional unowned provider parts.
-4. In-progress shelf saga with an explicit watch within 60 days.
+The catalog supports Wizarding World, Marvel, Star Wars, Pixar, Disney, DC, DreamWorks Animation and Studio Ghibli. Disney means traditional Disney films, not every Disney-owned brand. Avengers is one child saga of Marvel; Dark Knight is a child of DC. Existing Disney IDs remain stable. Standalone affiliations use verified movie IDs or validated optional World IDs, never company-name guessing.
 
-Within a tier, watch intent decays with a ten-day half-life, add intent with seven days, with a bounded boost for multiple distinct films added in the last week. Fully exhausted sagas never fill Tonight merely to reach two rows. Browser order instead uses the most recent meaningful event, independent of completion, then name and stable ID. Ratings do not participate.
+Canonical provider/type identities deduplicate shelf records. Explicit shorts/specials/compilations and positive runtimes <=40 minutes are excluded from feature progress; runtime is a fallback heuristic and unknown runtime is not proof of a short. Features, watched features, shorts and TV have separate counts. World membership does not create sequel relationships.
 
-Tonight identities, browser order, recent-section membership and World order freeze for the visit. Live progress and removals still update. New sagas append deterministically. Re-entering the browser or **Refresh order** explicitly incorporates newer activity. Provider enrichment changes neither eligibility nor the saved order.
+Saga details distinguish owned features from provider listings. Provider shorts have a separate section and retain correct shelf ownership. Unknown provider format metadata is labeled as provider-listed films rather than a certified feature total. Missing provider data retains the household shelf; unknown totals never imply franchise completion or an owned next film. Opening another saga never briefly exposes the previous saga's provider parts.
 
-## Worlds and artwork
+## Activity, stability and providers
 
-`src/config/collectionWorlds.js` is editorial taxonomy version 1, verified against TMDB collection and search APIs on 2026-10-25. It maps provider collection IDs to Marvel, Star Wars, Pixar, Disney Animation and DreamWorks. Marvel includes recognizable Sony Marvel sagas. Avengers is one saga within Marvel, not the MCU. Disney Animation deliberately excludes Pixar, Marvel, Lucasfilm and unrelated Disney-owned live-action brands. Unmapped IDs remain fully searchable.
+Movie unwatched→watched transitions transact against the current shared record and set `userState.markedWatchedAt`; undo clears it, and repeated same-status writes preserve it. `additionOrigin` distinguishes manual adds from imports. No historical watch dates are backfilled. Notes, refreshes, ratings, TV progress and general updatedAt do not create saga freshness.
 
-Worlds reference canonical rollups and never duplicate watchlist/progress storage. Ordering uses the most recently active child, rather than a size-biased sum. Maintain classification by checking the provider ID/name and incrementing the version for editorial changes; never guess from a title or company name.
+Browser order uses meaningful last-event time with alphabetical/ID fallback. World relevance uses the most recent child/shelf activity, not a size-biased sum. Positions freeze while browsing; progress and removals update live, and explicit refresh/entry incorporates newer ordering. The pure activity-ranking functions remain tested, but Tonight renders Worlds rather than a capped saga recommendation preview.
 
-Saga rows use existing TMDB collection artwork with 96px landscape crops, lazy loading and w300 TMDB sources. World covers use original CSS geometry with warm tonal surfaces and serif titles, avoiding falsely representative films or unlicensed promotional art. The optional `cover` property accepts a supplied, licensed custom image; load failures preserve the typographic treatment. No Disney+ assets or imitation logos are used. TMDB imagery remains subject to the app's existing attribution and [TMDB terms](https://developer.themoviedb.org/docs/faq).
+Tonight performs no provider-count fan-out for classification or World counts. Saga metadata is requested on demand. Backend collection-part hydration is capped at three, retains partial base metadata on individual failures, and never falls back from a missing movie ID to an unrelated TV show. The optional small-saga count helper also retains its three-request FIFO/cache, but only certifies a feature count when format metadata supports it.
 
-## Providers and failure
+## Artwork and validation
 
-Optional small-saga counts share a process-wide FIFO pool capped at three active requests, cached/deduplicated by provider, ID and locale. Health/provider failures leave all local sagas available. Counts are hints, not proof that all franchise films are owned. Saga details reuse the existing loading/error experience and label shelf progress separately from known saga totals.
+Saga rows use existing TMDB collection artwork, lazy loading and w300 thumbnail crops. Original warm geometric/typographic World covers support optional supplied licensed covers and preserve their text fallback on image failure. No scraped Disney+ promotional art or imitation logos. TMDB imagery follows the app's existing attribution and terms.
 
-Limitations: provider totals are optional and currently fetched for locally small sagas; unknown totals never imply exhaustion or an owned next film. Taxonomy is intentionally finite and needs editorial additions over time. Upcoming parts can appear in provider details and are labeled as outside the shelf until added.
-
-## Reproduction and validation
-
-Read-only template fixtures: `?demo=1&collectionsFixture=25`, `50`, `1` or `0`. Add `&dispersedWorlds=1` for unclassified distribution. These never write to a connected household. Metadata in `src/template/collections-fixture.json` comes from TMDB; activity and members are synthetic. `buildCollectionFixture` accepts a fixed clock for tests.
-
-Tests cover ranking, expiration, imports, undo, concurrent repeated status writes, unknown/future dates, missing classifications, distributions, zero through 75 sagas, search, sorting, World drill-down/back/focus/scroll, frozen realtime ordering, and 50 provider lookups with failure and peak concurrency three. Mobile captures live in `docs/collections/screenshots/` at 320px, 390px and 448px. Controls were measured at >=44px and browser/page widths matched each viewport.
+Synthetic demo scenarios are available at `?demo=1&collectionsFixture=25` (also 0/1/50), with optional `dispersedWorlds=1`. Large/dispersed scenarios exercise unclassified metadata candidates rather than forcing them into an invented World. No household export or private watch history is used. See [validation, emulator checks and captures](docs/collections/VALIDATION.md) for final results and limitations.

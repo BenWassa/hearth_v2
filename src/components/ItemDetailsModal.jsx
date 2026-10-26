@@ -959,7 +959,7 @@ const ItemDetailsModal = ({
 
   // Mobile-first design updates
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
+    <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center sm:p-6">
       <div
         className="absolute inset-0 bg-stone-950/85"
         onClick={onClose}

@@ -68,7 +68,11 @@ describe('useCollectionPartCounts', () => {
 
   it('loads overall provider part counts without hydrated details', async () => {
     getCollectionDetails.mockResolvedValueOnce({
-      parts: [{ providerId: '1' }, { providerId: '2' }, { providerId: '3' }],
+      parts: [
+        { providerId: '1', runtimeMinutes: 100 },
+        { providerId: '2', runtimeMinutes: 100 },
+        { providerId: '3', runtimeMinutes: 100 },
+      ],
     });
     const mounted = await renderHookHarness({
       collections: [makeCollection('2002')],
@@ -132,7 +136,10 @@ it('bounds 50 provider requests to three concurrent calls and tolerates failure'
         pending.push(() => {
           active--;
           if (pending.length % 5 === 0) reject(new Error('offline'));
-          else resolve({ parts: [{}, {}] });
+          else
+            resolve({
+              parts: [{ runtimeMinutes: 100 }, { runtimeMinutes: 100 }],
+            });
         });
       }),
   );
@@ -156,6 +163,46 @@ it('bounds 50 provider requests to three concurrent calls and tolerates failure'
     ),
   ).toHaveLength(50);
   expect(peak).toBe(3);
+  await mounted.cleanup();
+  global.fetch = originalFetch;
+});
+
+it('excludes explicitly identified shorts and specials from optional feature counts', async () => {
+  global.IS_REACT_ACT_ENVIRONMENT = true;
+  global.fetch = vi.fn().mockResolvedValue({ ok: true });
+  getCollectionDetails.mockResolvedValueOnce({
+    parts: [
+      { providerId: 'feature', runtimeMinutes: 100 },
+      { providerId: 'short', runtimeMinutes: 7 },
+      { providerId: 'special', contentKind: 'special', runtimeMinutes: 50 },
+      { providerId: 'feature2', runtimeMinutes: 90 },
+    ],
+  });
+  const mounted = await renderHookHarness({
+    collections: [makeCollection('features-only-count')],
+  });
+  await flushPromises();
+  expect(latestHookValue.get('collection:tmdb:features-only-count')).toBe(2);
+  await mounted.cleanup();
+  global.fetch = originalFetch;
+});
+
+it('leaves provider feature totals unknown when runtimes and format metadata are missing', async () => {
+  global.IS_REACT_ACT_ENVIRONMENT = true;
+  global.fetch = vi.fn().mockResolvedValue({ ok: true });
+  getCollectionDetails.mockResolvedValueOnce({
+    parts: [
+      { providerId: 'unknown' },
+      { providerId: 'feature', runtimeMinutes: 100 },
+    ],
+  });
+  const mounted = await renderHookHarness({
+    collections: [makeCollection('unknown-feature-count')],
+  });
+  await flushPromises();
+  expect(latestHookValue.has('collection:tmdb:unknown-feature-count')).toBe(
+    false,
+  );
   await mounted.cleanup();
   global.fetch = originalFetch;
 });

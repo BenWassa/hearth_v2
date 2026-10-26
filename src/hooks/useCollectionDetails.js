@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCollectionDetails } from '../services/mediaApi/client.js';
 
-const EMPTY_COLLECTION_DETAILS = {
-  parts: [],
-  subCollections: [],
-};
-
 const useCollectionDetails = ({
   provider = 'tmdb',
   providerId,
@@ -14,48 +9,49 @@ const useCollectionDetails = ({
   details = false,
   optional = false,
 } = {}) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  const requestKey = [provider, providerId, locale, details, optional].join(
+    ':',
+  );
+  const [result, setResult] = useState({
+    key: '',
+    data: null,
+    loading: false,
+    error: null,
+  });
   useEffect(() => {
-    if (!enabled || !providerId) {
-      setLoading(false);
-      setError(null);
-      return undefined;
-    }
-
+    if (!enabled || !providerId) return undefined;
     let ignore = false;
-    setLoading(true);
-    setError(null);
-
+    setResult({ key: requestKey, data: null, loading: true, error: null });
     getCollectionDetails({ provider, providerId, locale, details, optional })
-      .then((details) => {
+      .then((data) => {
         if (ignore) return;
-        setData({
-          ...EMPTY_COLLECTION_DETAILS,
-          ...(details || {}),
-          parts: Array.isArray(details?.parts) ? details.parts : [],
-          subCollections: Array.isArray(details?.subCollections)
-            ? details.subCollections
-            : [],
+        setResult({
+          key: requestKey,
+          loading: false,
+          error: null,
+          data: {
+            ...(data || {}),
+            parts: Array.isArray(data?.parts) ? data.parts : [],
+            subCollections: Array.isArray(data?.subCollections)
+              ? data.subCollections
+              : [],
+          },
         });
       })
-      .catch((err) => {
-        if (ignore) return;
-        setData(null);
-        setError(err);
-      })
-      .finally(() => {
-        if (!ignore) setLoading(false);
+      .catch((error) => {
+        if (!ignore)
+          setResult({ key: requestKey, data: null, loading: false, error });
       });
-
     return () => {
       ignore = true;
     };
-  }, [details, enabled, locale, optional, provider, providerId]);
-
-  return { data, loading, error };
+  }, [details, enabled, locale, optional, provider, providerId, requestKey]);
+  if (!enabled || !providerId)
+    return { data: null, loading: false, error: null };
+  // The render on an identity change runs before effects: never expose old parts.
+  return result.key === requestKey
+    ? result
+    : { data: null, loading: true, error: null };
 };
 
 export default useCollectionDetails;

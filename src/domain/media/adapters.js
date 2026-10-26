@@ -1,3 +1,7 @@
+import {
+  getExplicitWorldMetadata,
+  normalizeWorldIds,
+} from '../../config/collectionWorlds.js';
 import { WATCHLIST_SCHEMA_VERSION } from './schema.js';
 import { normalizeWatchStatus } from './status.js';
 
@@ -42,7 +46,12 @@ const pickPrimaryCredit = ({ rawItem = {}, media = {}, type = '' }) => {
 };
 
 export const adaptWatchlistItem = (rawItem = {}) => {
-  if (rawItem?.schemaVersion !== WATCHLIST_SCHEMA_VERSION) return rawItem;
+  const worldMetadata = getExplicitWorldMetadata(rawItem);
+  if (rawItem?.schemaVersion !== WATCHLIST_SCHEMA_VERSION) {
+    return Object.keys(worldMetadata).length
+      ? { ...rawItem, ...worldMetadata }
+      : rawItem;
+  }
 
   const source = asObject(rawItem.source);
   const media = asObject(rawItem.media);
@@ -52,8 +61,9 @@ export const adaptWatchlistItem = (rawItem = {}) => {
 
   return {
     ...rawItem,
+    ...worldMetadata,
     source,
-    media,
+    media: { ...media, ...worldMetadata },
     showData,
     userState,
     status: normalizeWatchStatus(
@@ -132,6 +142,19 @@ export const mapWatchlistUpdatesForWrite = (item = {}, updates = {}) => {
   }
   if (Object.prototype.hasOwnProperty.call(updates, 'logo')) {
     mapped['media.logo'] = updates.logo;
+  }
+
+  const metadata = getExplicitWorldMetadata(updates);
+  if (Object.prototype.hasOwnProperty.call(metadata, 'worldIds')) {
+    delete mapped.worldId;
+    delete mapped.worldIds;
+    mapped['media.worldIds'] = metadata.worldIds;
+  }
+  for (const key of ['media.worldId', 'media.worldIds']) {
+    if (Object.prototype.hasOwnProperty.call(updates, key)) {
+      delete mapped[key];
+      mapped['media.worldIds'] = normalizeWorldIds(updates[key]);
+    }
   }
 
   return mapped;

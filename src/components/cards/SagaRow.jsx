@@ -6,7 +6,10 @@ import { sagaName } from '../../domain/media/collectionActivity.js';
 const SagaRow = ({ saga, onOpen, reason = false }) => (
   <button
     type="button"
-    onClick={() => onOpen(saga)}
+    onClick={(event) => {
+      event.currentTarget.focus({ preventScroll: true });
+      onOpen(saga);
+    }}
     className="flex w-full min-h-[88px] items-center gap-3 rounded-xl py-2 text-left hover:bg-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
   >
     <div className="w-24 shrink-0 aspect-video overflow-hidden rounded-lg bg-stone-800">

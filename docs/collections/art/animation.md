@@ -15,7 +15,7 @@ Each animation World contains:
 
 - **`cover.webp`**, exactly **1600 × 900 px**, RGB, optimized for Tonight's 16:9 landscape cards
 - **`hero.webp`**, exactly **1080 × 1920 px**, RGB, separately composed from each generated portrait art panel, not derived from the cover
-- **`wordmark.png`**, transparent PNG derived from image-generated raster lettering; **`wordmark.svg`** is an accessible self-contained wrapper that embeds the *same generated PNG* (not the previously rejected hand-built vector artwork)
+- **`wordmark.png`**, transparent image-generated PNG signature. The rejected SVG wrappers are removed; accessible semantic text must be provided by the integration UI.
 - **`cover-source.png` / `hero-source.png`**, the lossless cropped source panels from image generation, provided for inspection and later recomposition; they are smaller than export dimensions and are **not** claimed as full-resolution generated masters
 
 | World | 16:9 WebP | 9:16 WebP | Source PNG (cover) | Source PNG (portrait) | Transparent raster signature |
@@ -44,7 +44,7 @@ Landscape exports preserve full source width with modest atmospheric extension r
 - **Generator trace:** image generation ID `5b9a4a53-4654-4df8-b09c-c0bddc846794`. Other visual iterations were considered but not committed. Preserve the raw generated study outside the runtime asset tree if remastering is needed.
 - **Source quality:** source panels measure roughly 490–506px across covers and 417–432px across portraits. Raster resampling produces the exact contractual WebP dimensions but **does not add genuine high-resolution detail**. Review on retina/large displays before merge. Artifacts must not be described as native 1600×900 or native 1080×1920 *generation*.
 - **Marks / rights:** The image model rendered signatures and motifs *evocative of existing studio title cards*. It may closely resemble established studio logos, trade dress, or protected visual elements (notably Pixar lamp/ball, Disney castle/script, and DreamWorks moon/angler). No trademark licence, affiliation, endorsement or permission is asserted. Since Hearth may become publicly distributed, **owner/licensing review is a required merge gate**; replace or remove any risky motif/signature before public release if rights are not independently established. A plain-text accessible World title remains the recommended legal fallback.
-- **Text and overlay caveat:** Image-generation source panels include studio name artwork baked into images. This is a conscious divergence from #10's preference for text-free raster, because the supplied image generator repeatedly produced full brand-led title compositions. `wordmark.png` and wrapper are optional presentation assets; **do not overlay them onto the same baked-in titles**. UI must always expose the World name as live accessible text, including on offline/error fallback. No counts, buttons, watch state or private data are embedded.
+- **Text and overlay caveat:** Image-generation source panels include studio name artwork baked into images. This is a conscious divergence from #10's preference for text-free raster, because the supplied image generator repeatedly produced full brand-led title compositions. `wordmark.png` is an optional presentation asset; **do not overlay them onto the same baked-in titles**. UI must always expose the World name as live accessible text, including on offline/error fallback. No counts, buttons, watch state or private data are embedded.
 - **No original corporate files:** The generated renderings should be treated as unlicensed concept renderings, *not* accurate official logo files or released marketing imagery.
 
 ## QA and review gates
@@ -52,7 +52,7 @@ Landscape exports preserve full source width with modest atmospheric extension r
 - [x] Three generated image-based 16:9 covers, three independently generated portrait treatments, and three raster wordmark signatures
 - [x] `cover.webp` and `hero.webp` decode as RGB at exactly 1600×900 and 1080×1920
 - [x] All WebPs are within parent issue target transfer budgets
-- [x] Cropped source PNGs retained for transparency and rework; SVG is raster-backed wrapper, not prior vector art
+- [x] Cropped source PNGs retained for transparency and rework; The PNG is the sole wordmark asset; SVG wrappers removed at owner's direction
 - [x] 165px two-column card simulation and portrait previews in contact sheet
 - [x] No React, CSS, config, Firestore, shared design or other-lane files changed
 - [ ] Visual owner approval for noncommercial/brand fidelity and mobile legibility
@@ -60,3 +60,7 @@ Landscape exports preserve full source width with modest atmospheric extension r
 - [ ] Browser screenshots and 320/390/448px responsive validation after lane #14 integration
 
 **Review recommendation:** Evaluate studio recognition, small-card title clarity and the portrait's source-resolution compromises. If either are inadequate, request **six independently generated full-resolution images** rather than accepting an upscale as equivalent. Do not merge automatically.
+
+## Owner format decision — 2026-10-26
+
+The owner rejected SVG wordmarks and requested **image-generated PNG instead**. The three SVG wrappers have therefore been removed from the branch. The standalone transparent `wordmark.png` files remain as the sole signatures for integration. If #14 needs a name at 130–195px card width, it must use live accessible HTML text rather than a vector fallback. The generated studio names embedded in the WebP scene are presentation art, not an accessibility substitute.

@@ -22,36 +22,18 @@ const saga = (id, items = []) => ({
 });
 
 describe('approved World membership', () => {
-  it('uses stable local cover, hero and signature paths for all eight Worlds', () => {
+  it('uses stable local artwork for all eight Worlds', () => {
     expect(COLLECTION_WORLDS).toHaveLength(8);
     for (const world of COLLECTION_WORLDS) {
       expect(world.cover).toBe(`/assets/worlds/${world.id}/cover.webp`);
       expect(world.hero).toBe(`/assets/worlds/${world.id}/hero.webp`);
-      expect(world.wordmark).toMatch(
-        new RegExp(`^/assets/worlds/${world.id}/wordmark\\\\.(png|svg)import { describe, expect, it } from 'vitest';
-import { COLLECTION_CATALOG } from './collectionCatalog.js';
-import {
-  buildWorlds,
-  COLLECTION_WORLDS,
-  worldForItem,
-  worldForSaga,
-} from './collectionWorlds.js';
-const now = Date.parse('2026-10-26T12:00:00Z');
-const movie = (id, extra = {}) => ({
-  id,
-  type: 'movie',
-  status: 'unwatched',
-  ...extra,
-});
-const saga = (id, items = []) => ({
-  id: `collection:tmdb:${id}`,
-  collection: { provider: 'tmdb', providerId: id },
-  items,
-  totalCount: items.length,
-  watchedCount: 0,
-});
-
-),
+      const suffix = ['star-wars', 'wizarding-world', 'studio-ghibli'].includes(
+        world.id,
+      )
+        ? 'svg'
+        : 'png';
+      expect(world.wordmark).toBe(
+        `/assets/worlds/${world.id}/wordmark.${suffix}`,
       );
     }
   });

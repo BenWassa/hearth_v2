@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 
-// All shipped portrait assets contain baked-in studio/World typography.
-// The superhero crops can hide that typography, so retain a visible live
-// heading for those Worlds. Do not layer a second PNG/SVG wordmark over art.
-const NEEDS_VISIBLE_TITLE = new Set(['marvel', 'dc']);
-
+// Portrait crop and viewport height can hide a title baked into the artwork.
+// Keep one consistently readable, semantic live heading at the bottom; avoid
+// adding separate PNG/SVG wordmarks on top of already-branded images.
 const WorldHero = ({ world, headingRef }) => {
   const [imageFailed, setImageFailed] = useState(false);
-  const [imageReady, setImageReady] = useState(false);
   const sagaCount = world.sagas?.length || 0;
   const filmCount = world.ownedTotal || 0;
-  const visibleHeading =
-    imageFailed || !imageReady || NEEDS_VISIBLE_TITLE.has(world.id);
 
   return (
     <section
@@ -25,7 +20,6 @@ const WorldHero = ({ world, headingRef }) => {
           alt=""
           decoding="async"
           fetchPriority="high"
-          onLoad={() => setImageReady(true)}
           onError={() => setImageFailed(true)}
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -36,11 +30,7 @@ const WorldHero = ({ world, headingRef }) => {
           id="collections-heading"
           ref={headingRef}
           tabIndex={-1}
-          className={
-            visibleHeading
-              ? 'mb-2 font-serif text-3xl font-semibold leading-tight text-stone-50'
-              : 'sr-only'
-          }
+          className="mb-2 font-serif text-3xl font-semibold leading-tight text-stone-50"
         >
           {world.name}
         </h1>

@@ -1,6 +1,8 @@
 name: World art integration PR checks
 
 on:
+  push:
+    branches: [feat/world-art-integration]
   pull_request:
     branches:
       - design/impeccable-critique-optimize-extract
@@ -10,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: world-art-pr-${{ github.event.pull_request.number }}
+  group: world-art-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:

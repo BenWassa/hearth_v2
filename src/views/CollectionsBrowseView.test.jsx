@@ -424,13 +424,13 @@ it('retains readable landscape World cover labels when an image is corrupt', asy
 });
 
 it.each([
-  ['marvel', true],
-  ['dc', true],
-  ['pixar', false],
-  ['wizarding-world', false],
+  ['marvel', 'Marvel', true],
+  ['dc', 'DC', true],
+  ['pixar', 'Pixar', false],
+  ['wizarding-world', 'Wizarding World', false],
 ])(
   'uses a readable heading without stacking logos in %s artwork',
-  async (id, visible) => {
+  async (id, name, visible) => {
     await mount(
       <CollectionsBrowseView
         initialWorldId={id}
@@ -450,15 +450,7 @@ it.each([
     );
     const hero = host.querySelector(`[data-world-hero="${id}"]`);
     const heading = hero.querySelector('h1');
-    expect(heading.textContent).toBe(
-      id === 'marvel'
-        ? 'Marvel'
-        : id === 'dc'
-        ? 'DC'
-        : id === 'pixar'
-        ? 'Pixar'
-        : 'Wizarding World',
-    );
+    expect(heading.textContent).toBe(name);
     // The image already contains typography; don't overlay PNG/SVG wordmarks.
     expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
     const image = hero.querySelector('img[src$="/hero.webp"]');

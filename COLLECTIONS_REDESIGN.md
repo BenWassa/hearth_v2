@@ -4,28 +4,26 @@ Implemented from [Issue #6](https://github.com/BenWassa/hearth_v2/issues/6), its
 
 ## Navigation
 
-**Tonight → World → saga → film.** Every represented World appears directly in Tonight's Collections section as a finite two-column set of artwork/typographic tiles. There is no two-World cap, activity gate, five-saga threshold or singleton bypass. Even a World with one saga opens its World page. Empty, unrepresented Worlds are omitted.
+**Tonight → World → saga → film.** Every represented World appears directly in Tonight's Collections section as a compact two-column grid of text-only tiles directly under the hero, each a deep muted textured fill (CSS only, one recipe, hue from the World's config tint). Further down, a finite, non-looping **Collections** row sits directly above The Classics (and still shows when Classics is absent): every eligible saga, including sagas in no World, as poster cards in recent-activity order with no counts, ending with a neutral **All collections** tile that opens the full searchable index. There is no Browse-all link. There is no two-World cap, activity gate, five-saga threshold or singleton bypass. Even a World with one saga opens its World page. Empty, unrepresented Worlds are omitted.
 
-World pages list child sagas, then separate Other films, Shorts & specials and TV series sections when supplied metadata supports them. Films without sequels are not invented sagas. Back from a World opened on Tonight returns directly to the same Tonight tile; All collections provides an alternative searchable full index. Worlds entered through that overview return to its saved scroll and tile focus.
+World pages open with edge-to-edge artwork and the World title only (counts are screen-reader context, not visible), then one finite horizontal poster shelf per saga (owned films only; the saga with a real next action uses larger posters), then Other films, Shorts & specials and TV series shelves when supplied metadata supports them. World pages have no search, sort, refresh or chips: shelves are the navigation, and the shelf headings are just the saga name. Search and sort live on the All collections index, which is how sagas outside any World are found. Films without sequels are not invented sagas. Back from a World opened on Tonight returns directly to the same Tonight tile; All collections provides an alternative searchable full index. Worlds entered through that overview return to its saved scroll and tile focus.
 
-The full browser retains name search, Recently active/A–Z, all eligible sagas (including ungrouped ones), and Manage sagas. Search ignores case, diacritics and a trailing Collection suffix. World search includes its standalone films and other sections. Opening film details leaves the saga mounted underneath, so closing the film restores focus and scroll to the same saga control. Escape dismisses only the top dialog. New controls are at least 44px high; no horizontal Collections carousel or additional dock tab is introduced.
+The full browser retains name search, Recently active/A–Z, and all eligible sagas (including ungrouped ones). Search ignores case, diacritics and a trailing Collection suffix. Opening film details leaves the saga mounted underneath, so closing the film restores focus and scroll to the same saga control. Escape dismisses only the top dialog. New controls are at least 44px high; No additional dock tab is introduced. The Tonight Collections row and the World-page poster shelves are the only horizontal rails here; each is finite and bounded (no looping, cloned cards, autoplay or infinite scroll).
 
 ## Four distinct decisions
 
 1. **Membership:** preserve canonical TMDB collection metadata on a film.
 2. **World affiliation:** a versioned editorial collection/movie-ID mapping or validated explicit World metadata assigns a primary brand group.
-3. **Collection eligibility:** a curated recognized-franchise default plus a persistent shared household Show/Hide override determines first-class saga visibility.
+3. **Collection eligibility:** the curated recognized-franchise catalog alone determines first-class saga visibility. There is no household Show/Hide control.
 4. **Activity relevance:** meaningful watch/add events order browsing within the stable visit. Relevance never removes a represented World from Tonight.
 
-`src/config/collectionCatalog.js` and `src/domain/media/collectionEligibility.js` are the pure classification boundary. Provider size, ratings, corporate ownership and raw title matching never promote a card. Missing metadata and unknown collections default safely to individual shelf films; Manage sagas can explicitly show a collection with a valid canonical ID and feature film.
+`src/config/collectionCatalog.js` and `src/domain/media/collectionEligibility.js` are the pure classification boundary. Provider size, ratings, corporate ownership and raw title matching never promote a card. Missing metadata and unknown collections default safely to individual shelf films.
 
 Approved examples include Avengers, Harry Potter, Fantastic Beasts, Skywalker Star Wars, Star Trek reboot, Narnia, Knives Out, Dune (2021), Toy Story, James Bond, Fast & Furious, Dark Knight and Back to the Future. Fast & Furious, Dark Knight and Back to the Future can qualify with one owned feature. Paddington and Ghostbusters are hidden by default even when multiple features are owned, unless the household overrides. James Bond is an anthology: Explore films replaces an invented Next up order.
 
-## Shared household preferences
+## Household preferences (dormant)
 
-`artifacts/{appId}/spaces/{spaceId}/collection_preferences/{provider:collectionId}` stores `{ visible: boolean, updatedAt: server timestamp }`. Absence is the editorial default; false is explicit Hide; resetting deletes the preference. Existing trusted space membership controls access. Keys, field names, types, size and timestamps are validated identically for create/update. Realtime snapshots share changes across members; stale household responses cannot cross spaces.
-
-Manage sagas includes hidden metadata candidates so a user can reverse Hide. Loading does not flash editorial defaults before saved preferences arrive. Read/write errors are shown and failed writes never pretend success. Template preferences are isolated in session memory and never write to a connected household. Source rules and emulator tests are included; **rules must be deployed with a future reviewed release**, not during this implementation.
+There is no UI for household Show/Hide overrides, and the app opens no Firestore listener or read for them, so Collections never waits on, or fails because of, preference loading. Sagas and Worlds render immediately from the editorial catalog. The earlier backend (`useCollectionPreferences`, `services/firebase/collectionPreferences`, the `collection_preferences` block in `firestore.rules`, the emulator script and their tests) is intentionally left in the repository, unused, pending a decision to delete it.
 
 ## Worlds and truthful counts
 
@@ -45,6 +43,6 @@ Tonight performs no provider-count fan-out for classification or World counts. S
 
 ## Artwork and validation
 
-Saga rows use existing TMDB collection artwork, lazy loading and w300 thumbnail crops. Original warm geometric/typographic World covers support optional supplied licensed covers and preserve their text fallback on image failure. No scraped Disney+ promotional art or imitation logos. TMDB imagery follows the app's existing attribution and terms.
+Saga rows use existing TMDB collection artwork, lazy loading and w300 thumbnail crops. Tonight World tiles are text-only; the supplied World artwork is used only at the top of a World page (natural 16:9, with a live heading and a text-only fallback if the image fails). No scraped Disney+ promotional art or imitation logos. TMDB imagery follows the app's existing attribution and terms.
 
 Synthetic demo scenarios are available at `?demo=1&collectionsFixture=25` (also 0/1/50), with optional `dispersedWorlds=1`. Large/dispersed scenarios exercise unclassified metadata candidates rather than forcing them into an invented World. No household export or private watch history is used. See [validation, emulator checks and captures](docs/collections/VALIDATION.md) for final results and limitations.

@@ -37,6 +37,21 @@ describe('approved World membership', () => {
       );
     }
   });
+  it('gives every World a distinct, muted accent clear of amber, danger and energy hues', () => {
+    const accents = COLLECTION_WORLDS.map((world) => world.accent);
+    expect(new Set(accents).size).toBe(accents.length);
+    for (const accent of accents) {
+      const [, , chroma, hue] = accent.match(/oklch\((\d+)% ([\d.]+) (\d+)\)/);
+      expect(Number(chroma)).toBeLessThan(0.1);
+      const h = Number(hue);
+      // Amber (brand), red (danger/focused energy), sky (light energy).
+      expect(h < 55 && h > 15 ? 'reserved' : 'ok').toBe('ok');
+      expect(h >= 55 && h <= 95 ? 'reserved' : 'ok').toBe('ok');
+      expect(
+        h >= 215 && h <= 250 && Number(chroma) > 0.03 ? 'reserved' : 'ok',
+      ).toBe('ok');
+    }
+  });
   it('represents all approved brand Worlds without corporate or continuity conflation', () => {
     expect(COLLECTION_WORLDS.map((w) => w.name)).toEqual([
       'Wizarding World',

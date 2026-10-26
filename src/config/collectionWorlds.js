@@ -12,21 +12,27 @@ import { toMillis } from '../utils/time.js';
 // disney-animation ID remains for compatibility; Disney includes selected
 // traditional animated/live-action films, not corporate ownership in general.
 export const COLLECTION_WORLDS_VERSION = 2;
+// Each World carries one muted OKLCH accent (the World Tint Rule in DESIGN.md).
+// Tonight tiles and World pages read it as --world-accent, so colour is defined
+// here and nowhere else. It is decorative only: never amber (the one brand
+// hue), never in the red/sky bands that mean danger and energy, always beside
+// the World's name, and low chroma.
 const worlds = [
-  ['wizarding-world', 'Wizarding World', 'story'],
-  ['marvel', 'Marvel', 'orbit'],
-  ['star-wars', 'Star Wars', 'stars'],
-  ['pixar', 'Pixar', 'play'],
-  ['disney-animation', 'Disney', 'story'],
-  ['dc', 'DC', 'orbit'],
-  ['dreamworks', 'DreamWorks Animation', 'moon'],
-  ['studio-ghibli', 'Studio Ghibli', 'moon'],
+  ['wizarding-world', 'Wizarding World', 'oklch(66% 0.08 300)'],
+  ['marvel', 'Marvel', 'oklch(55% 0.09 5)'],
+  ['star-wars', 'Star Wars', 'oklch(70% 0.015 240)'],
+  ['pixar', 'Pixar', 'oklch(68% 0.07 190)'],
+  ['disney-animation', 'Disney', 'oklch(62% 0.07 265)'],
+  ['dc', 'DC', 'oklch(64% 0.07 120)'],
+  ['dreamworks', 'DreamWorks Animation', 'oklch(68% 0.07 335)'],
+  ['studio-ghibli', 'Studio Ghibli', 'oklch(66% 0.08 160)'],
 ];
-export const COLLECTION_WORLDS = worlds.map(([id, name, motif]) => ({
+export const COLLECTION_WORLDS = worlds.map(([id, name, accent]) => ({
   id,
   name,
-  motif,
-  // Static, local production artwork; the button/heading always retains live text.
+  accent,
+  // Static artwork. Only the World page header uses `cover`; Tonight tiles are
+  // text-only so a row of Worlds stays calm.
   cover: `/assets/worlds/${id}/cover.webp`,
   hero: `/assets/worlds/${id}/hero.webp`,
   wordmark: `/assets/worlds/${id}/wordmark.${

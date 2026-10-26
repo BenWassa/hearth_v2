@@ -31,13 +31,13 @@ The script refuses to run without `FIRESTORE_EMULATOR_HOST`. An isolated tempora
 
 ## Scope and release boundary
 
-Collection display overrides live at `artifacts/{appId}/spaces/{spaceId}/collection_preferences/{provider:collectionId}` and are shared through realtime household snapshots. A boolean override wins over editorial defaults; deleting the document restores absence. Template preferences stay in memory and never write to Firestore.
+The household override backend below is **dormant**: no UI uses it and no listener is opened, so Collections renders immediately from the editorial catalog. Collection display overrides were built to live at `artifacts/{appId}/spaces/{spaceId}/collection_preferences/{provider:collectionId}` and are shared through realtime household snapshots. A boolean override wins over editorial defaults; deleting the document restores absence. Template preferences stay in memory and never write to Firestore.
 
-**The new preference rules are source-only until the reviewed future release.** Deploy the matching `firestore.rules` with that release before expecting connected-household Show/Hide writes to succeed. Nothing in this work releases or deploys the app, and no production household data was modified during validation. See [the scoped security audit](collection-preferences-security-audit.json).
+**The new preference rules are source-only until the reviewed future release.** Deploy the matching `firestore.rules` with that release only if the override UI is ever restored. Nothing in this work releases or deploys the app, and no production household data was modified during validation. See [the scoped security audit](collection-preferences-security-audit.json).
 
 Movie watch-transition transaction behavior is tested separately against controlled SDK mocks; live multi-device watch-status contention remains unverified. Shared preference authorization and two-client writes/reset have actual emulator coverage.
 
-The final UI review covers 320×844, 390×844 and 448×844, with all represented Worlds visible on Tonight, direct World entry even for a single saga, full saga search, editorial Show/Hide/Default, provider fallback, and scroll/focus restoration. Regenerate the captures below from the final integrated UI rather than relying on the previous two-saga-preview screenshots.
+The final UI review covers 320×844, 390×844 and 448×844, with all represented Worlds visible on Tonight, direct World entry even for a single saga, full saga search, provider fallback, and scroll/focus restoration. Regenerate the captures below from the final integrated UI rather than relying on the previous two-saga-preview screenshots.
 
 ## Screenshots
 
@@ -60,4 +60,4 @@ Captures use the integrated demo UI and a synthetic household.
 
 Every represented World is visible directly on Tonight, including Wizarding World and DC. At 320/390/448px the document width matches the viewport and new collection controls meet 44px. A singleton Wizarding World opens its own page; back restores the originating Tonight tile. Film Escape restores saga Next up focus, then saga Escape restores its World row. This was checked in a real browser, including the background-inert focus behavior that jsdom does not emulate.
 
-Template Manage sagas was exercised: hiding Harry Potter changes the visible saga count from 25 to 24; restoring Use default returns it to 25. These actions are isolated from household storage. Twelve refreshed captures show the 25-saga synthetic library. No release, production rules deployment or production household mutation was performed.
+The Manage sagas control was later removed. Twelve refreshed captures show the 25-saga synthetic library. No release, production rules deployment or production household mutation was performed.

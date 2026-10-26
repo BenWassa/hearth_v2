@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, expect, it, vi } from 'vitest';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
+import WorldsGrid from './components/tonight/WorldsGrid.jsx';
+import { COLLECTION_WORLDS } from '../config/collectionWorlds.js';
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const now = Date.now();
 const makeSaga = (i, providerId = `other-${i}`) => ({
@@ -32,8 +34,10 @@ const click = async (button) => {
   await act(async () => button.click());
 };
 const button = (text) =>
-  [...host.querySelectorAll('button')].find((b) =>
-    b.textContent.includes(text),
+  [...host.querySelectorAll('button')].find(
+    (b) =>
+      b.textContent.includes(text) ||
+      b.getAttribute('aria-label')?.includes(text),
   );
 const search = async (value) => {
   const input = host.querySelector('input');
@@ -59,7 +63,7 @@ it.each([0, 1, 3, 25, 50])(
       makeSaga(i, ids[i % ids.length]),
     );
     await mount(
-      <CollectionsRail
+      <WorldsGrid
         collections={collections}
         onOpenWorld={openWorld}
         onBrowse={browse}
@@ -68,8 +72,10 @@ it.each([0, 1, 3, 25, 50])(
     expect(host.querySelectorAll('[data-world-id]')).toHaveLength(
       Math.min(size, ids.length),
     );
-    await click(button(`Browse all ${size}`));
-    expect(browse).toHaveBeenCalledOnce();
+    // The grid is only Worlds: no All collections tile and no Browse-all link.
+    expect(button('All collections')).toBeUndefined();
+    expect(host.textContent).not.toContain('Browse all');
+    expect(browse).not.toHaveBeenCalled();
     if (size) {
       await click(button('Marvel'));
       expect(openWorld).toHaveBeenCalledWith('marvel', button('Marvel'));
@@ -119,7 +125,7 @@ it('opens every World including singletons and restores overview focus and scrol
   await click(button('Star Wars'));
   expect(host.querySelector('h1').textContent).toBe('Star Wars');
   expect(open).not.toHaveBeenCalled();
-  await click(button('All collections'));
+  await click(button('Back to All collections'));
   await act(
     async () => new Promise((resolve) => requestAnimationFrame(resolve)),
   );
@@ -129,11 +135,13 @@ it('opens every World including singletons and restores overview focus and scrol
   scroller.scrollTop = 180;
   await click(marvel);
   expect(host.querySelector('h1').textContent).toBe('Marvel');
-  expect(host.textContent).toContain(
-    '2 sagas · 4 feature films on your shelf · 2 unwatched',
+  // Counts are screen-reader context only; nothing numeric is visible.
+  const counts = [...host.querySelectorAll('[data-world-hero] p')].find((p) =>
+    p.textContent.includes('feature films on your shelf'),
   );
-  expect(host.querySelectorAll('h3')).toHaveLength(2);
-  await click(button('All collections'));
+  expect(counts.classList.contains('sr-only')).toBe(true);
+  expect(host.querySelectorAll('[data-saga-shelf]')).toHaveLength(2);
+  await click(button('Back to All collections'));
   await act(
     async () => new Promise((resolve) => requestAnimationFrame(resolve)),
   );
@@ -203,7 +211,7 @@ it('keeps all World entry points when watch activity is undone or dormant', asyn
     makeSaga(2, '263'),
   ];
   await mount(
-    <CollectionsRail
+    <WorldsGrid
       collections={collections}
       onBrowse={vi.fn()}
       onOpenWorld={vi.fn()}
@@ -222,7 +230,7 @@ it('keeps all World entry points when watch activity is undone or dormant', asyn
   }));
   await act(async () =>
     root.render(
-      <CollectionsRail
+      <WorldsGrid
         collections={changed}
         onBrowse={vi.fn()}
         onOpenWorld={vi.fn()}
@@ -247,7 +255,7 @@ it('opens a World directly from Tonight and returns there without an extra overv
     />,
   );
   expect(host.querySelector('h1').textContent).toBe('Star Wars');
-  expect(host.querySelectorAll('h3')).toHaveLength(1);
+  expect(host.querySelectorAll('[data-saga-shelf]')).toHaveLength(1);
   await click(button('Tonight'));
   expect(close).toHaveBeenCalledOnce();
 });
@@ -282,7 +290,7 @@ it('keeps standalone films, shorts and TV in separate World sections without fak
     />,
   );
   expect(host.querySelector('h1').textContent).toBe('Pixar');
-  expect(host.querySelectorAll('h3')).toHaveLength(0);
+  expect(host.querySelectorAll('[data-saga-shelf]')).toHaveLength(0);
   expect(host.textContent).toContain('1 feature film on your shelf');
   expect(
     host.querySelector('[aria-label="Other films"]').textContent,
@@ -297,37 +305,6 @@ it('keeps standalone films, shorts and TV in separate World sections without fak
   );
   await click(button('Up'));
   expect(openItem).toHaveBeenCalledWith(items[0]);
-});
-
-it('exposes shared Show/Hide/Default controls including excluded metadata candidates', async () => {
-  const change = vi.fn();
-  const hidden = makeSaga(0, '488924');
-  hidden.title = 'Paddington Collection';
-  await mount(
-    <CollectionsBrowseView
-      collections={[]}
-      allCollections={[hidden]}
-      preferences={{ 'tmdb:488924': false }}
-      onPreferenceChange={change}
-      onClose={vi.fn()}
-      onOpenCollection={vi.fn()}
-    />,
-  );
-  await click(button('Manage sagas'));
-  const select = host.querySelector(
-    '[aria-label="Visibility for Paddington Collection"]',
-  );
-  expect(select.value).toBe('false');
-  await act(async () => {
-    select.value = 'true';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  expect(change).toHaveBeenLastCalledWith('tmdb:488924', true);
-  await act(async () => {
-    select.value = 'default';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  expect(change).toHaveBeenLastCalledWith('tmdb:488924', null);
 });
 
 it('moves direct World navigation to the full overview with restored focus and a reset scroll', async () => {
@@ -351,7 +328,7 @@ it('moves direct World navigation to the full overview with restored focus and a
   );
 });
 
-it('renders a bounded portrait hero and already-accessible saga on the first World page', async () => {
+it('renders natural-ratio artwork and already-accessible saga on the first World page', async () => {
   await mount(
     <CollectionsBrowseView
       initialWorldId="marvel"
@@ -362,12 +339,14 @@ it('renders a bounded portrait hero and already-accessible saga on the first Wor
   );
   const hero = host.querySelector('[data-world-hero="marvel"]');
   expect(hero).not.toBeNull();
-  expect(
-    hero.querySelector('img[src="/assets/worlds/marvel/hero.webp"]'),
-  ).not.toBeNull();
-  expect(
-    host.querySelector('[aria-label="All sagas"] h3').textContent,
-  ).toContain('Saga 00');
+  const art = hero.querySelector('img[src="/assets/worlds/marvel/cover.webp"]');
+  expect(art).not.toBeNull();
+  // Full 16:9 composition rather than a portrait cropped into a short strip.
+  expect(art.parentElement.className).toContain('world-hero-art');
+  expect(hero.querySelector('img[src$="/hero.webp"]')).toBeNull();
+  expect(host.querySelector('[data-saga-shelf] h2').textContent).toContain(
+    'Saga 00',
+  );
   expect(host.textContent).not.toContain('Explore Marvel');
 });
 
@@ -400,27 +379,25 @@ it('keeps a title when artwork fails, including a World with no sagas', async ()
   ).toContain('Up');
 });
 
-it('retains readable landscape World cover labels when an image is corrupt', async () => {
+it('renders text-only World tiles with a shared treatment and per-World accent', async () => {
   const openWorld = vi.fn();
   await mount(
-    <CollectionsRail
+    <WorldsGrid
       collections={[makeSaga(0, '86311')]}
       onOpenWorld={openWorld}
       onBrowse={vi.fn()}
     />,
   );
-  const cover = host.querySelector('[data-world-id="marvel"]');
-  expect(cover.className).toContain('aspect-video');
-  expect(cover.querySelector('img').getAttribute('src')).toBe(
-    '/assets/worlds/marvel/cover.webp',
+  const tile = host.querySelector('[data-world-id="marvel"]');
+  expect(host.querySelectorAll('[data-world-id] img')).toHaveLength(0);
+  expect(tile.className).toContain('world-tile');
+  expect(tile.style.getPropertyValue('--world-accent')).toBe(
+    COLLECTION_WORLDS.find((world) => world.id === 'marvel').accent,
   );
-  await act(async () =>
-    cover.querySelector('img').dispatchEvent(new Event('error')),
-  );
-  expect(cover.querySelector('img')).toBeNull();
-  expect(cover.textContent).toContain('Marvel');
-  await click(cover);
-  expect(openWorld).toHaveBeenCalledWith('marvel', cover);
+  expect(tile.textContent).toContain('Marvel');
+  expect(tile.textContent).toMatch(/1 saga/);
+  await click(tile);
+  expect(openWorld).toHaveBeenCalledWith('marvel', tile);
 });
 
 it.each([
@@ -452,8 +429,163 @@ it.each([
   expect(heading.classList.contains('sr-only')).toBe(false);
   // The source can already contain typography; do not stack a wordmark image.
   expect(hero.querySelector('img[src*="wordmark."]')).toBeNull();
-  const image = hero.querySelector('img[src$="/hero.webp"]');
+  const image = hero.querySelector('img[src$="/cover.webp"]');
   expect(image).not.toBeNull();
   await act(async () => image.dispatchEvent(new Event('load')));
   expect(heading.classList.contains('sr-only')).toBe(false);
+});
+
+const withTitles = (saga, titles) => ({
+  ...saga,
+  items: saga.items.map((item, index) => ({
+    ...item,
+    title: titles[index],
+  })),
+});
+
+it('shows every eligible saga in a finite Collections row ordered by activity, ending with a neutral All collections tile', async () => {
+  const browse = vi.fn();
+  const openCollection = vi.fn();
+  const older = {
+    ...makeSaga(0, '10'),
+    items: [
+      {
+        id: 'o1',
+        type: 'movie',
+        status: 'watched',
+        markedWatchedAt: now - 5e8,
+      },
+      { id: 'o2', type: 'movie', status: 'unwatched' },
+    ],
+  };
+  const newer = makeSaga(1, 'other-1');
+  const ungrouped = makeSaga(2, 'other-2');
+  await mount(
+    <CollectionsRail
+      collections={[older, ungrouped, newer]}
+      onOpenCollection={openCollection}
+      onBrowse={browse}
+    />,
+  );
+  const rail = host.querySelector('ul[aria-label="All collections"]');
+  const cells = [...rail.querySelectorAll('li')];
+  // One card per saga (including those in no World) plus the neutral tile.
+  expect(cells).toHaveLength(4);
+  const order = cells
+    .slice(0, 3)
+    .map((cell) => cell.querySelector('button').dataset.sagaCard);
+  expect(order[0]).toBe('saga-1');
+  expect(order).toContain('saga-2');
+  // Finite and plain scroll-snap: no cloned cards, no looping hooks.
+  expect(new Set(order).size).toBe(3);
+  expect(host.querySelectorAll('[data-rail-card]')).toHaveLength(0);
+  // No count text on the cards.
+  const visibleRail = rail.cloneNode(true);
+  visibleRail.querySelectorAll('.sr-only').forEach((node) => node.remove());
+  expect(visibleRail.textContent).not.toMatch(
+    /\d+ of \d+|\d+ sagas?|\d+ films?/,
+  );
+  await click(cells[0].querySelector('button'));
+  expect(openCollection).toHaveBeenCalledWith(
+    expect.objectContaining({ id: 'saga-1' }),
+    cells[0].querySelector('button'),
+  );
+  const tile = cells[3].querySelector('button');
+  expect(tile.hasAttribute('data-all-collections')).toBe(true);
+  expect(tile.hasAttribute('data-world-id')).toBe(false);
+  expect(tile.style.getPropertyValue('--world-accent')).toBe('');
+  expect(tile.className).toContain('world-tile-neutral');
+  expect(tile.textContent).toContain('All collections');
+  await click(tile);
+  expect(browse).toHaveBeenCalledOnce();
+});
+
+it('hides the Collections row when there are no sagas', async () => {
+  await mount(<CollectionsRail collections={[]} onBrowse={vi.fn()} />);
+  expect(host.querySelector('[aria-label="Collections"]')).toBeNull();
+});
+
+it('shows a World as finite poster shelves with saga details and film opens', async () => {
+  const openCollection = vi.fn();
+  const openItem = vi.fn();
+  const avengers = withTitles(makeSaga(0, '86311'), ['Iron Man', 'Thor']);
+  const ironMan = withTitles(makeSaga(1, '131292'), ['Hulk', 'Captain A']);
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="marvel"
+      collections={[avengers, ironMan]}
+      onClose={vi.fn()}
+      onOpenCollection={openCollection}
+      onOpenItem={openItem}
+    />,
+  );
+  const shelves = [...host.querySelectorAll('[data-saga-shelf]')];
+  expect(shelves).toHaveLength(2);
+  // Finite: exactly the owned films, no looping or duplicated posters.
+  for (const shelf of shelves) {
+    expect(shelf.querySelectorAll('li')).toHaveLength(2);
+  }
+  // Only the shelf with a real next action gets the larger posters.
+  const widths = shelves.map((shelf) => shelf.querySelector('li').className);
+  expect(widths.filter((name) => name.includes('w-[132px]'))).toHaveLength(1);
+  // Heading opens saga details; a poster opens the film.
+  await click(shelves[0].querySelector('h2 button'));
+  expect(openCollection).toHaveBeenCalledWith(
+    expect.objectContaining({ id: 'saga-0' }),
+  );
+  await click(button('Thor'));
+  expect(openItem).toHaveBeenCalledWith(
+    expect.objectContaining({ title: 'Thor' }),
+  );
+});
+
+it('keeps World pages to the title and shelves: no search, sort, chips or visible counts', async () => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="marvel"
+      collections={[makeSaga(0, '86311'), makeSaga(1, '131292')]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  expect(host.querySelector('#saga-search')).toBeNull();
+  expect(host.querySelector('#saga-sort')).toBeNull();
+  expect(host.querySelector('nav[aria-label="Jump to a saga"]')).toBeNull();
+  const visible = host.querySelector('[data-saga-shelf]').cloneNode(true);
+  visible.querySelectorAll('.sr-only').forEach((node) => node.remove());
+  const visibleText = visible.textContent;
+  expect(visibleText).not.toMatch(/\d+ of \d+/);
+  const shelfContext = host.querySelector('[data-saga-shelf] .sr-only');
+  expect(shelfContext.textContent).toContain('1 of 2 watched on your shelf');
+});
+
+it('renders Tonight tiles and a World page without React warnings', async () => {
+  const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    await mount(
+      <>
+        <WorldsGrid
+          collections={[makeSaga(0, '86311')]}
+          onOpenWorld={vi.fn()}
+        />
+        <CollectionsRail
+          collections={[makeSaga(0, '86311')]}
+          onBrowse={vi.fn()}
+        />
+      </>,
+    );
+    await act(async () => root.unmount());
+    host.remove();
+    await mount(
+      <CollectionsBrowseView
+        initialWorldId="marvel"
+        collections={[makeSaga(0, '86311')]}
+        onClose={vi.fn()}
+        onOpenCollection={vi.fn()}
+      />,
+    );
+    expect(errors).not.toHaveBeenCalled();
+  } finally {
+    errors.mockRestore();
+  }
 });

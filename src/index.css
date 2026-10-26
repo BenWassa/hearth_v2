@@ -109,82 +109,88 @@ body {
   }
 }
 
-/* Warm typographic fallback remains visible when an artwork request fails. */
-.world-cover {
-  background-color: oklch(23% 0.014 65);
+/* World tiles on Tonight and the overview: text only, one shared recipe. The
+   accent arrives as --world-accent from collectionWorlds.js and is the only
+   thing that varies. Layers, all CSS (no images, no requests):
+   1. a deep, low-chroma fill mixed from the accent over Soot;
+   2. a soft light-spot (a blurred pseudo-element, never backdrop-filter, per
+      the Functional Blur Rule);
+   3. faint film grain from an inline SVG at low opacity;
+   4. a 1px inner border for definition.
+   The fill stays dark enough for Bone text to clear 4.5:1 (DESIGN.md). */
+.world-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: color-mix(
+    in oklab,
+    var(--world-accent) 40%,
+    oklch(17% 0.012 65)
+  );
+  box-shadow: inset 0 0 0 1px oklch(95% 0.01 65 / 0.12);
 }
-.world-cover::before {
+.world-tile::before {
   content: '';
   position: absolute;
-  pointer-events: none;
-  width: 150px;
-  height: 150px;
-  right: -55px;
-  top: -45px;
-  border: 1px solid oklch(65% 0.04 70 / 0.25);
+  z-index: -2;
+  top: -60%;
+  right: -25%;
+  width: 90%;
+  height: 170%;
   border-radius: 50%;
+  background: color-mix(in oklab, var(--world-accent) 70%, oklch(86% 0.02 65));
+  opacity: 0.27;
+  filter: blur(22px);
+  pointer-events: none;
 }
-.world-cover-orbit::before {
-  box-shadow: 0 0 0 16px oklch(65% 0.04 70 / 0.06),
-    0 0 0 35px oklch(65% 0.04 70 / 0.05);
-  transform: rotate(-30deg) scaleX(0.55);
+.world-tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .96 0 0 0 0 .95 0 0 0 0 .94 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
 }
-.world-cover-stars {
-  background-image: radial-gradient(
-      circle at 80% 25%,
-      oklch(85% 0.02 70 / 0.5) 1px,
-      transparent 2px
-    ),
-    radial-gradient(
-      circle at 60% 65%,
-      oklch(85% 0.02 70 / 0.3) 1px,
-      transparent 2px
-    );
-}
-.world-cover-play::before {
-  border-radius: 24px;
-  transform: rotate(25deg);
-}
-.world-cover-story::before {
-  border-radius: 70% 10% 0 0;
-  transform: rotate(-20deg);
-}
-.world-cover-moon::before {
-  background: oklch(40% 0.025 70 / 0.2);
-  box-shadow: -18px 10px 0 oklch(60% 0.035 70 / 0.12);
-}
-
-/* Direction D2: true 16:9 cover; natural grid sizing at 320–448px. */
-.world-cover-art::before {
-  display: none;
-}
-.world-cover-shade {
-  background: linear-gradient(
-    180deg,
-    transparent 18%,
-    rgba(12, 10, 9, 0.82) 100%
-  );
-}
-.world-cover-title {
-  font-size: clamp(0.76rem, 3.7vw, 1.13rem);
+.world-tile-name {
+  font-size: 1.0625rem;
+  line-height: 1.25;
   overflow-wrap: break-word;
   text-wrap: balance;
-  text-shadow: 0 1px 3px rgba(12, 10, 9, 0.78);
 }
 
-/* The World page is the destination, not an interstitial. Scrolling continues
-   directly from this bounded hero into search, sagas and standalone titles. */
-.world-hero {
-  height: clamp(216px, 39dvh, 360px);
+/* The World page is the destination, not an interstitial. The art reserves its
+   16:9 box plus the safe-area-top (so it paints behind the notch without being
+   zoomed much), then a vignette fades it into Shell Black (see DESIGN.md
+   Elevation). Percent padding is relative to the width. */
+.world-hero-art {
+  height: 0;
+  padding-bottom: calc(56.25% + var(--safe-top, 0px));
 }
-.world-hero > img:first-child {
-  object-position: center 40%;
-}
-.world-hero-shade {
+.world-hero-scrim {
   background: linear-gradient(
     180deg,
-    rgba(12, 10, 9, 0.04) 5%,
-    rgba(12, 10, 9, 0.35) 45%,
+    rgba(12, 10, 9, 0.5) 0%,
+    rgba(12, 10, 9, 0) 26%,
+    rgba(12, 10, 9, 0) 42%,
+    rgba(12, 10, 9, 0.8) 80%,
     #0c0a09 100%
   );
+}
+.world-hero-rule {
+  background: var(--world-accent);
+}
+
+/* Poster shelves and saga chips scroll natively and snap; the scrollbar is
+   hidden visually. Peeking cards, not a bar, signal there is more. */
+.shelf-scroll {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.shelf-scroll::-webkit-scrollbar {
+  display: none;
+}
+.world-tile-neutral {
+  --world-accent: oklch(62% 0.012 65);
 }

@@ -293,8 +293,9 @@
       "rowArtworkWidth": "96px",
       "minimumTouchTarget": "44px",
       "worldColumns": 2,
-      "worldArtwork": "Original warm tonal geometry with optional licensed cover",
-      "eligibility": "Editorial defaults plus persistent shared household Show/Hide overrides",
+      "worldTiles": "Worlds grid under the hero: text-only, identical type, per-World deep muted textured fill from config. Separate finite non-looping Collections rail of saga posters above The Classics, ending with a neutral All collections tile",
+      "worldPage": "Edge-to-edge 16:9 art behind the status bar fading to Shell Black, title only, then finite scroll-snap poster shelves per saga (no search, sort, chips or visible counts)",
+      "eligibility": "Editorial catalog defaults only; no household override UI",
       "ordering": "Frozen during a visit; meaningful activity or A–Z",
       "progress": "Separate household feature, provider, short and TV counts"
     }
@@ -438,6 +439,11 @@
       {
         "name": "The Energy Code Rule",
         "body": "Sky, amber and red appear together only as the light / balanced / focused energy indicator, always with a text label.",
+        "section": "colors"
+      },
+      {
+        "name": "The World Tint Rule",
+        "body": "Each World has one muted OKLCH tint (chroma under 0.1) defined in collectionWorlds.js. Decorative only: a deep muted tile fill with a CSS-only blurred light-spot and faint grain (one recipe for all tiles), plus a short rule or ring on the World page; never amber, never in danger/energy hues, never a side stripe or saturated block, never sole carrier of meaning, always beside the World's name; Bone text stays above 4.5:1.",
         "section": "colors"
       },
       {

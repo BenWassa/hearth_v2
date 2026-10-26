@@ -1,64 +1,102 @@
 import React, { useState } from 'react';
+import { Library } from 'lucide-react';
+import LazyMediaImage from '../../../components/media/LazyMediaImage.jsx';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
-import { buildWorlds } from '../../../config/collectionWorlds.js';
-import { rankSagas } from '../../../domain/media/collectionActivity.js';
+import { getPosterSrc } from '../../../utils/poster.js';
+import {
+  preserveSagaOrder,
+  rankSagas,
+  sagaName,
+} from '../../../domain/media/collectionActivity.js';
 
+const focusRing =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400';
+
+// Every eligible saga, most recently active first, as one finite rail in the
+// same vocabulary as the other Tonight rails. It is a plain scroll-snap row:
+// no cloned cards, no auto-advance, no looping. The last tile is the neutral
+// All collections tile that opens the searchable index. Cards carry no counts.
+// Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
-  isLoading = false,
   collections = [],
-  items = [],
-  onOpenWorld,
+  onOpenCollection,
   onBrowse,
   counts,
 }) => {
   const [clock] = useState(Date.now);
-  const worlds = buildWorlds(
+  const [order] = useState(() =>
+    rankSagas(collections, { now: clock, counts }).map((saga) => saga.id),
+  );
+  if (!collections.length) return null;
+  const sagas = preserveSagaOrder(
     rankSagas(collections, { now: clock, counts }),
-    items,
+    order,
   );
-  const [order] = useState(() => worlds.map((world) => world.id));
-  worlds.sort(
-    (a, b) =>
-      (order.includes(a.id) ? order.indexOf(a.id) : Infinity) -
-        (order.includes(b.id) ? order.indexOf(b.id) : Infinity) ||
-      a.name.localeCompare(b.name),
-  );
+  const cell = 'w-[clamp(7rem,32vw,9rem)] shrink-0';
   return (
-    <section aria-label="Collections" className="space-y-3 px-1">
-      <div className="flex flex-wrap items-center justify-between gap-x-2">
-        <h2 className="font-serif text-xl text-stone-100">Collections</h2>
-        <button
-          type="button"
-          onClick={onBrowse}
-          disabled={isLoading}
-          className="min-h-[44px] py-2 text-sm text-amber-300 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-        >
-          {isLoading
-            ? 'Loading collections…'
-            : `Browse all ${collections.length} ${
-                collections.length === 1 ? 'saga' : 'sagas'
-              }`}
-          <span className="ml-1" aria-hidden="true">
-            →
-          </span>
-        </button>
+    <section aria-label="Collections" className="space-y-2 shrink-0">
+      <div className="flex items-center gap-1.5 px-1">
+        <Library className="w-4 h-4 text-stone-400" />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400">
+          Collections
+        </h3>
       </div>
-      {isLoading && (
-        <p role="status" className="py-3 text-sm text-stone-400">
-          Loading your household collections…
-        </p>
-      )}
-      {!isLoading && worlds.length > 0 && (
-        <div aria-label="Worlds" className="grid grid-cols-2 gap-3">
-          {worlds.map((world) => (
-            <WorldCover
-              key={world.id}
-              world={world}
-              onOpen={(event) => onOpenWorld?.(world.id, event.currentTarget)}
-            />
-          ))}
+      <div className="relative px-1">
+        <div
+          className="pb-1 overflow-x-auto overflow-y-hidden no-scrollbar"
+          style={{
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <ul aria-label="All collections" className="flex gap-2.5 min-w-max">
+            {sagas.map((saga) => (
+              <li
+                key={saga.id}
+                className={cell}
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <button
+                  type="button"
+                  data-saga-card={saga.id}
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    onOpenCollection?.(saga, event.currentTarget);
+                  }}
+                  className={`relative block aspect-[2/3] w-full overflow-hidden rounded-lg bg-stone-800 shadow-lg shadow-black/20 ${focusRing}`}
+                >
+                  <LazyMediaImage
+                    src={getPosterSrc(saga)}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    fallback={
+                      <span
+                        aria-hidden="true"
+                        className="flex h-full w-full items-center justify-center p-2 text-center font-serif text-sm leading-snug text-stone-300"
+                      >
+                        {sagaName(saga.title)}
+                      </span>
+                    }
+                  />
+                  <span className="sr-only">{sagaName(saga.title)}</span>
+                </button>
+              </li>
+            ))}
+            <li className={cell} style={{ scrollSnapAlign: 'start' }}>
+              <WorldCover
+                neutral
+                className="aspect-[2/3] !min-h-0"
+                world={{
+                  id: 'all-collections',
+                  name: 'All collections',
+                  sagas,
+                }}
+                onOpen={onBrowse}
+              />
+            </li>
+          </ul>
         </div>
-      )}
+      </div>
     </section>
   );
 };

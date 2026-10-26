@@ -66,38 +66,40 @@ try {
     await page.goto(origin + '/?demo=1&collectionsFixture=25', { waitUntil: 'domcontentloaded' });
     const cards = page.locator('[data-world-id]');
     await cards.first().waitFor({ timeout: 20000 });
-    // The app correctly lazy-loads off-screen covers. Walk the rail first so
-    // a full-page QA screenshot does not record blank cards mid-load.
+    // Tonight World tiles are text-only: no artwork requests, at least 44px
+    // tall, and no horizontal overflow.
     for (let index = 0; index < (await cards.count()); index += 1) {
       const card = cards.nth(index);
       await card.scrollIntoViewIfNeeded();
-      const image = card.locator('img');
-      await image.evaluate(async (img) => {
-        await img.decode();
-      });
-      const loaded = await image.evaluate((img) => img.naturalWidth > 0);
-      if (!loaded) {
-        throw new Error(`World cover did not decode at ${width}px, card ${index}`);
+      if (await card.locator('img').count()) {
+        throw new Error(`World tile ${index} loads an image at ${width}px`);
       }
+      const height = await card.evaluate((el) => el.getBoundingClientRect().height);
+      if (height < 44) throw new Error(`World tile ${index} under 44px at ${width}px`);
     }
     await cards.first().scrollIntoViewIfNeeded();
-
-    const coverGeometry = await page.locator('[data-world-id]').first().evaluate(
-      (el) => ({
-        ratio: el.getBoundingClientRect().width / el.getBoundingClientRect().height,
-        width: window.innerWidth,
-        documentWidth: document.documentElement.scrollWidth,
-      }),
-    );
-    if (Math.abs(coverGeometry.ratio - 16 / 9) > 0.05) {
-      throw new Error(`Cover aspect ratio incorrect at ${width}px: ${coverGeometry.ratio}`);
-    }
-    if (coverGeometry.documentWidth > coverGeometry.width + 1) {
-      throw new Error(`Horizontal overflow at ${width}px: ${JSON.stringify(coverGeometry)}`);
+    const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    if (documentWidth > width + 1) {
+      throw new Error(`Horizontal overflow at ${width}px: ${documentWidth}`);
     }
     await page.screenshot({
-      path: resolve(out, `tonight-${width}.png`),
-      fullPage: true,
+      path: resolve(out, `tonight-worlds-${width}.png`),
+      animations: 'disabled',
+    });
+    // The Collections row: every saga plus the neutral All collections tile,
+    // finite (no cloned cards) and scrolled into view for the capture.
+    const rail = page.locator('section[aria-label="Collections"]');
+    await rail.scrollIntoViewIfNeeded();
+    const railCells = await rail.locator('li').count();
+    const cardCount = await rail.locator('[data-saga-card]').count();
+    if (railCells !== cardCount + 1) {
+      throw new Error(`Collections rail has unexpected cells at ${width}px`);
+    }
+    if (!(await rail.locator('li').last().locator('[data-all-collections]').count())) {
+      throw new Error('All collections tile is not last in the rail');
+    }
+    await page.screenshot({
+      path: resolve(out, `tonight-collections-row-${width}.png`),
       animations: 'disabled',
     });
 
@@ -110,7 +112,7 @@ try {
       await card.click();
       const hero = page.locator(`[data-world-hero="${id}"]`);
       await hero.waitFor({ state: 'visible', timeout: 10000 });
-      const image = hero.locator('img[src$="/hero.webp"]');
+      const image = hero.locator('img[src$="/cover.webp"]');
       await image.evaluate(async (img) => {
         await img.decode().catch(() => undefined);
       });
@@ -123,7 +125,7 @@ try {
       if (title.height < 20) {
         throw new Error(`World title not visibly readable: ${id} at ${width}px`);
       }
-      const contentVisible = (await page.locator('[aria-label="All sagas"] h3').count())
+      const contentVisible = (await page.locator('[data-saga-shelf]').count())
         + (await page.locator('[aria-label="Other films"] button').count())
         + (await page.locator('[aria-label="Shorts & specials"] button').count())
         + (await page.locator('[aria-label="TV series"] button').count());

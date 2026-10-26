@@ -10,6 +10,7 @@ import { Armchair, Coffee, Eye, Smile, Clock, Tv, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
+import WorldsGrid from './components/tonight/WorldsGrid.jsx';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
@@ -23,7 +24,6 @@ import {
 } from '../app/lazyWithPrefetch.js';
 import { getUpcomingReleases } from './components/tonight/upcomingReleases.js';
 import { buildCollectionRollups } from '../domain/media/collections.js';
-import useCollectionPreferences from '../hooks/useCollectionPreferences.js';
 import {
   isFeatureFilm,
   filterEligibleCollections,
@@ -192,16 +192,11 @@ const TonightView = ({
       ).filter((entry) => entry?.type === 'collection'),
     [items],
   );
-  const {
-    preferences,
-    setPreference,
-    loading: preferenceLoading,
-    saving: preferenceSaving,
-    error: preferenceError,
-  } = useCollectionPreferences({ spaceId, isTemplateSession });
+  // Editorial defaults only: there are no household overrides to wait for, so
+  // sagas and Worlds render immediately.
   const collections = useMemo(
-    () => filterEligibleCollections(rawCollections, preferences),
-    [rawCollections, preferences],
+    () => filterEligibleCollections(rawCollections),
+    [rawCollections],
   );
   const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
   const [browseWorldId, setBrowseWorldId] = useState(null);
@@ -343,7 +338,11 @@ const TonightView = ({
     setIsDetailOpen(true);
   }, []);
 
-  const openCollection = useCallback((collection) => {
+  // A card on Tonight passes itself so closing the saga returns focus to it
+  // once the background is no longer inert; opens from the browser pass none.
+  const collectionOpener = useRef(null);
+  const openCollection = useCallback((collection, opener = null) => {
+    collectionOpener.current = opener;
     setCollectionDetail(collection);
     setIsCollectionOpen(true);
   }, []);
@@ -356,6 +355,10 @@ const TonightView = ({
   const closeCollection = () => {
     setIsCollectionOpen(false);
     setCollectionDetail(null);
+    requestAnimationFrame(() => {
+      if (collectionOpener.current?.isConnected)
+        collectionOpener.current.focus({ preventScroll: true });
+    });
   };
 
   const openAuditModal = async () => {
@@ -488,13 +491,10 @@ const TonightView = ({
               <>
                 <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
 
-                <CollectionsRail
-                  isLoading={preferenceLoading}
+                <WorldsGrid
                   collections={collections}
                   items={items}
                   onOpenWorld={openWorld}
-                  onBrowse={browseCollections}
-                  onOpenCollection={openCollection}
                 />
 
                 {currentlyWatchingShows.length > 0 && (
@@ -617,6 +617,12 @@ const TonightView = ({
                   />
                 )}
 
+                <CollectionsRail
+                  collections={collections}
+                  onOpenCollection={openCollection}
+                  onBrowse={browseCollections}
+                />
+
                 {uniqueClassicMovies.length > 0 && (
                   <SuggestionSection
                     title="The Classics"
@@ -689,12 +695,6 @@ const TonightView = ({
         <CollectionsBrowseView
           collections={collections}
           items={items}
-          allCollections={rawCollections}
-          preferences={preferences}
-          onPreferenceChange={setPreference}
-          preferenceLoading={preferenceLoading}
-          preferenceSaving={preferenceSaving}
-          preferenceError={preferenceError}
           initialWorldId={browseWorldId}
           onOpenItem={openDetails}
           onClose={closeCollectionsBrowse}

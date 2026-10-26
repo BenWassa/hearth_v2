@@ -56,7 +56,7 @@ it('opens any saga, preserves search and scroll through details, and reaches its
         <TonightView items={buildCollectionFixture({ count: 25 })} />,
       ),
     );
-    await click(button('Browse all 25'));
+    await click(button('All collections'));
     expect(
       host.querySelector('[aria-labelledby="collections-heading"]'),
     ).not.toBeNull();
@@ -95,7 +95,7 @@ it('opens any saga, preserves search and scroll through details, and reaches its
     if (closeSaga) await click(closeSaga);
     await click(button('Tonight'));
     expect(host.querySelector('#saga-search')).toBeNull();
-    expect(document.activeElement.textContent).toContain('Browse all 25');
+    expect(document.activeElement.textContent).toContain('All collections');
   } finally {
     await act(async () => root.unmount());
     host.remove();
@@ -118,9 +118,9 @@ it('uses Tonight World tiles as direct entry points even when there is one saga'
     expect(host.querySelector('#collections-heading').textContent).toBe(
       'Marvel',
     );
-    expect(
-      host.querySelector('[aria-label="All sagas"] h3').textContent,
-    ).toContain('Avengers');
+    expect(host.querySelector('[data-saga-shelf] h2').textContent).toContain(
+      'Avengers',
+    );
     await act(async () =>
       document.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
@@ -146,4 +146,78 @@ it('keeps fifty editorially eligible fixture sagas reachable without a World lim
     ),
   ).filter((entry) => entry.type === 'collection');
   expect(filterEligibleCollections(candidates)).toHaveLength(50);
+});
+
+it('renders Tonight and the Collections index without reading household preferences', async () => {
+  const prefs = await import('../services/firebase/collectionPreferences.js');
+  const subscribe = vi
+    .spyOn(prefs, 'subscribeCollectionPreferences')
+    .mockImplementation(({ onError }) => {
+      onError?.(new Error('Missing or insufficient permissions.'));
+      return () => {};
+    });
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  try {
+    await act(async () =>
+      root.render(
+        <TonightView
+          items={buildCollectionFixture({ count: 25 })}
+          spaceId="space-1"
+        />,
+      ),
+    );
+    // Worlds are there immediately: no spinner, empty state or error.
+    expect(host.querySelectorAll('[data-world-id]').length).toBeGreaterThan(0);
+    expect(host.textContent).not.toContain('Could not load');
+    expect(host.textContent).not.toContain('Loading your household');
+    const all = host.querySelector('[data-all-collections]');
+    await act(async () => {
+      all.focus();
+      all.click();
+    });
+    expect(host.querySelector('#saga-search')).not.toBeNull();
+    expect(host.textContent).toContain('25 sagas on your shelf');
+    expect(host.textContent).not.toContain('Manage sagas');
+    expect(host.textContent).not.toContain('Could not load');
+    expect(subscribe).not.toHaveBeenCalled();
+  } finally {
+    subscribe.mockRestore();
+    await act(async () => root.unmount());
+    host.remove();
+  }
+});
+
+it('opens a saga from the Tonight Collections row and returns focus to the same card', async () => {
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  try {
+    await act(async () =>
+      root.render(
+        <TonightView items={buildCollectionFixture({ count: 25 })} />,
+      ),
+    );
+    const card = host.querySelector('[data-saga-card]');
+    expect(card).not.toBeNull();
+    await act(async () => {
+      card.focus();
+      card.click();
+    });
+    await act(async () => {
+      await vi.dynamicImportSettled();
+    });
+    expect(host.textContent).toContain('watched on your shelf');
+    await act(async () => {
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      );
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    });
+    expect(document.activeElement).toBe(card);
+  } finally {
+    await act(async () => root.unmount());
+    host.remove();
+  }
 });

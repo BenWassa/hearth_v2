@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
-// Portrait crop and viewport height can hide a title baked into the artwork.
-// Keep one consistently readable, semantic live heading at the bottom; avoid
-// adding separate PNG/SVG wordmarks on top of already-branded images.
+// The art runs edge to edge from the very top of the screen (behind the status
+// bar and the floating back controls) at its natural 16:9, so it is not zoomed
+// into a strip, then fades into Shell Black. The artwork may carry its own
+// title, so the live heading sits on the faded bottom rather than over it. If
+// the image fails, the heading and counts remain.
 const WorldHero = ({ world, headingRef }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const sagaCount = world.sagas?.length || 0;
@@ -12,29 +14,38 @@ const WorldHero = ({ world, headingRef }) => {
     <section
       aria-label={`${world.name} artwork and overview`}
       data-world-hero={world.id}
-      className="world-hero relative -mx-4 mb-3 flex flex-col justify-end overflow-hidden bg-stone-900 px-5 pb-6"
+      style={{ '--world-accent': world.accent }}
+      className="world-hero -mx-4"
     >
-      {world.hero && !imageFailed && (
-        <img
-          src={world.hero}
-          alt=""
-          decoding="async"
-          fetchPriority="high"
-          onError={() => setImageFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover"
+      <div className="world-hero-art relative w-full overflow-hidden bg-stone-900">
+        {world.cover && !imageFailed && (
+          <img
+            src={world.cover}
+            alt=""
+            decoding="async"
+            // React 18 warns on camelCase fetchPriority; the attribute is lowercase.
+            // eslint-disable-next-line react/no-unknown-property
+            fetchpriority="high"
+            onError={() => setImageFailed(true)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+        <div className="world-hero-scrim absolute inset-0" aria-hidden="true" />
+      </div>
+      <div className="world-hero-body relative z-10 mx-4 -mt-14">
+        <span
+          aria-hidden="true"
+          className="world-hero-rule mb-2 block h-[3px] w-10 rounded-full"
         />
-      )}
-      <div className="world-hero-shade absolute inset-0" aria-hidden="true" />
-      <div className="relative z-10">
         <h1
           id="collections-heading"
           ref={headingRef}
           tabIndex={-1}
-          className="mb-2 font-serif text-3xl font-semibold leading-tight text-stone-50"
+          className="font-serif text-3xl leading-tight text-stone-100"
         >
           {world.name}
         </h1>
-        <p className="text-sm leading-snug text-stone-200">
+        <p className="sr-only">
           {sagaCount} {sagaCount === 1 ? 'saga' : 'sagas'} · {filmCount}{' '}
           {filmCount === 1 ? 'feature film' : 'feature films'} on your shelf ·{' '}
           {world.unwatched || 0} unwatched

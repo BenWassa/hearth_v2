@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const describeWorld = (world) => {
   if (world.sagas.length) {
@@ -13,40 +13,27 @@ const describeWorld = (world) => {
   return `${world.showCount || 0} TV series`;
 };
 
-const WorldCover = ({ world, onOpen }) => {
-  const [failed, setFailed] = useState(false);
-
-  return (
-    <button
-      type="button"
-      data-world-id={world.id}
-      onClick={(event) => {
-        event.currentTarget.focus({ preventScroll: true });
-        onOpen(event);
-      }}
-      className={`world-cover ${
-        world.cover && !failed
-          ? 'world-cover-art'
-          : `world-cover-${world.motif}`
-      } relative block w-full min-w-0 aspect-video overflow-hidden rounded-xl border border-stone-700/70 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400`}
-    >
-      {world.cover && !failed && (
-        <img
-          src={world.cover}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      )}
-      <span aria-hidden="true" className="world-cover-shade absolute inset-0" />
-      <span className="world-cover-title absolute inset-x-2 bottom-2 z-10 block font-serif font-semibold leading-tight text-stone-50">
-        {world.name}
-      </span>
-      <span className="sr-only">{describeWorld(world)}</span>
-    </button>
-  );
-};
+// Text-only tile: identical type, size and placement for every World. Only the
+// accent (rule and faint wash) changes, supplied by the World's own colour.
+const WorldCover = ({ world, onOpen, neutral = false, className = '' }) => (
+  <button
+    type="button"
+    data-world-id={neutral ? undefined : world.id}
+    data-all-collections={neutral ? '' : undefined}
+    style={{ '--world-accent': world.accent }}
+    onClick={(event) => {
+      event.currentTarget.focus({ preventScroll: true });
+      onOpen(event);
+    }}
+    className={`world-tile ${
+      neutral ? 'world-tile-neutral' : ''
+    } flex min-h-[72px] w-full min-w-0 items-center rounded-xl py-3 pl-4 pr-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 ${className}`}
+  >
+    <span className="world-tile-name font-serif text-stone-100">
+      {world.name}
+    </span>
+    <span className="sr-only">{describeWorld(world)}</span>
+  </button>
+);
 
 export default WorldCover;

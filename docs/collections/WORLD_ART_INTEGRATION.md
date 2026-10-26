@@ -8,10 +8,10 @@ All eight canonical IDs use local `cover.webp` (1600×900, 16:9) and `hero.webp`
 
 ## Behaviour
 
-- Tonight and the full Collections overview display 16:9 landscape cover buttons with visible HTML titles, image error fallback and stable layout. Household-represented World visibility and all existing editorial rules remain unchanged.
-- One click opens the **actual** World view. The artwork is a bounded first section inside the same scroll container, immediately followed by search, sort, sagas, Other films, Shorts & specials and TV. No Explore gate, extra route, carousel or new dock tab.
-- Portrait hero uses at most 39dvh (216–360px), fades into the shell and reserves dimensions before images decode. The shipped portraits may have logos baked into areas outside the responsive crop. Every World therefore retains a **visible, live heading**, including animation, superhero and magic Worlds; no second PNG/SVG wordmark is overlaid. If a hero image fails, the same heading remains visible over the background fallback.
-- Existing overview/tile focus restoration, Escape/back, nested saga→film navigation, pagination/search, 44px controls and PR #9 reduced-motion behavior are reused rather than rewritten.
+- Tonight's Worlds grid and the full Collections overview show **text-only** World tiles (no artwork requests, one shared type treatment, a deep muted textured fill whose hue comes from `collectionWorlds.js`) with no All collections tile in the grid; that neutral tile ends the separate Tonight Collections rail of saga posters. The earlier 16:9 cover-card grid was too busy and was removed; `cover.webp` is now used only on the World page. Household-represented World visibility and all existing editorial rules remain unchanged.
+- One click opens the **actual** World view. The 16:9 `cover.webp` fills the top edge to edge behind the status bar, with the floating back controls above it and a vignette fading into Shell Black; the live title sits on the faded bottom (no visible counts). Directly below: finite poster shelves per saga and for Other films, Shorts & specials and TV, with no search, sort or chip row. No Explore gate, extra route, interstitial or new dock tab. `hero.webp` (portrait) and the wordmarks are no longer used by the UI.
+- The heading and a text fallback remain if the image fails; counts stay as screen-reader context only. No second wordmark is overlaid on baked-in titles.
+- Existing overview/tile focus restoration, Escape/back, nested saga→film navigation, 44px controls and PR #9 reduced-motion behavior are reused rather than rewritten.
 
 ## QA / blockers
 

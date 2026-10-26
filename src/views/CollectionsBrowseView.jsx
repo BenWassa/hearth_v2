@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import SagaRow from '../components/cards/SagaRow.jsx';
 import WorldCover from '../components/cards/WorldCover.jsx';
+import WorldHero from '../components/cards/WorldHero.jsx';
 import { getPosterSrc } from '../utils/poster.js';
 import { buildWorlds } from '../config/collectionWorlds.js';
 import {
@@ -145,27 +146,24 @@ const CollectionsBrowseView = ({
             All collections
           </button>
         )}
-        <h1
-          id="collections-heading"
-          ref={heading}
-          tabIndex={-1}
-          className="mt-3 font-serif text-3xl text-stone-100"
-        >
-          {worldId ? world?.name || 'World' : 'Collections'}
-        </h1>
-        <p className="mt-2 text-sm text-stone-400">
-          {worldId
-            ? `${source.length} ${source.length === 1 ? 'saga' : 'sagas'} · ${
-                world?.ownedTotal || 0
-              } ${
-                (world?.ownedTotal || 0) === 1
-                  ? 'feature film'
-                  : 'feature films'
-              } on your shelf · ${world?.unwatched || 0} unwatched`
-            : `${collections.length} sagas on your shelf`}
-        </p>
+        {!worldId && (
+          <>
+            <h1
+              id="collections-heading"
+              ref={heading}
+              tabIndex={-1}
+              className="mt-3 font-serif text-3xl text-stone-100"
+            >
+              Collections
+            </h1>
+            <p className="mt-2 text-sm text-stone-400">
+              {collections.length} sagas on your shelf
+            </p>
+          </>
+        )}
       </header>
       <div ref={scroller} className="flex-1 min-h-0 overflow-y-auto px-4 pb-8">
+        {worldId && world && <WorldHero key={world.id} world={world} headingRef={heading} />}
         <div className="sticky top-0 z-10 bg-stone-950 py-3 space-y-2">
           <label htmlFor="saga-search" className="sr-only">
             {worldId ? 'Search this World' : 'Search sagas'}

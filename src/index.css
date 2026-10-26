@@ -109,7 +109,7 @@ body {
   }
 }
 
-/* Original typographic World covers: no third-party promotional artwork. */
+/* Warm typographic fallback remains visible when an artwork request fails. */
 .world-cover {
   background-color: oklch(23% 0.014 65);
 }
@@ -152,4 +152,35 @@ body {
 .world-cover-moon::before {
   background: oklch(40% 0.025 70 / 0.2);
   box-shadow: -18px 10px 0 oklch(60% 0.035 70 / 0.12);
+}
+
+/* Direction D2: true 16:9 cover; natural grid sizing at 320–448px. */
+.world-cover-art::before {
+  display: none;
+}
+.world-cover-shade {
+  background: linear-gradient(180deg, transparent 18%, rgba(12, 10, 9, 0.82) 100%);
+}
+.world-cover-title {
+  font-size: clamp(0.76rem, 3.7vw, 1.13rem);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+  text-shadow: 0 1px 3px rgba(12, 10, 9, 0.78);
+}
+
+/* The World page is the destination, not an interstitial. Scrolling continues
+   directly from this bounded hero into search, sagas and standalone titles. */
+.world-hero {
+  height: clamp(216px, 39dvh, 360px);
+}
+.world-hero > img:first-child {
+  object-position: center 40%;
+}
+.world-hero-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 9, 0.04) 5%,
+    rgba(12, 10, 9, 0.35) 45%,
+    #0c0a09 100%
+  );
 }

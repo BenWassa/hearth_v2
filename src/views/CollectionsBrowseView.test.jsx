@@ -350,3 +350,36 @@ it('moves direct World navigation to the full overview with restored focus and a
     host.querySelector('#collections-heading'),
   );
 });
+
+it('renders a bounded portrait hero and already-accessible saga on the first World page', async () => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="marvel"
+      collections={[makeSaga(0, '86311')]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  const hero = host.querySelector('[data-world-hero="marvel"]');
+  expect(hero).not.toBeNull();
+  expect(hero.querySelector('img[src="/assets/worlds/marvel/hero.webp"]')).not.toBeNull();
+  expect(host.querySelector('[aria-label="All sagas"] h3').textContent).toContain('Saga 00');
+  expect(host.textContent).not.toContain('Explore Marvel');
+});
+
+it('keeps a title when artwork fails, including a World with no sagas', async () => {
+  await mount(
+    <CollectionsBrowseView
+      initialWorldId="pixar"
+      collections={[]}
+      items={[{ id: 'up', type: 'movie', title: 'Up', worldId: 'pixar', runtimeMinutes: 96 }]}
+      onClose={vi.fn()}
+      onOpenCollection={vi.fn()}
+    />,
+  );
+  await act(async () => {
+    host.querySelector('[data-world-hero] img').dispatchEvent(new Event('error'));
+  });
+  expect(host.querySelector('#collections-heading').textContent).toBe('Pixar');
+  expect(host.querySelector('[aria-label="Other films"]').textContent).toContain('Up');
+});

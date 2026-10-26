@@ -163,7 +163,9 @@ const CollectionsBrowseView = ({
         )}
       </header>
       <div ref={scroller} className="flex-1 min-h-0 overflow-y-auto px-4 pb-8">
-        {worldId && world && <WorldHero key={world.id} world={world} headingRef={heading} />}
+        {worldId && world && (
+          <WorldHero key={world.id} world={world} headingRef={heading} />
+        )}
         <div className="sticky top-0 z-10 bg-stone-950 py-3 space-y-2">
           <label htmlFor="saga-search" className="sr-only">
             {worldId ? 'Search this World' : 'Search sagas'}

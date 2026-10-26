@@ -159,7 +159,11 @@ body {
   display: none;
 }
 .world-cover-shade {
-  background: linear-gradient(180deg, transparent 18%, rgba(12, 10, 9, 0.82) 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 18%,
+    rgba(12, 10, 9, 0.82) 100%
+  );
 }
 .world-cover-title {
   font-size: clamp(0.76rem, 3.7vw, 1.13rem);

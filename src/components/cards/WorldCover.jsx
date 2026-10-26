@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 
 const describeWorld = (world) => {
   if (world.sagas.length) {
-    return `${world.sagas.length} ${world.sagas.length === 1 ? 'saga' : 'sagas'}`;
+    return `${world.sagas.length} ${
+      world.sagas.length === 1 ? 'saga' : 'sagas'
+    }`;
   }
   if (world.ownedTotal) {
     return `${world.ownedTotal} ${world.ownedTotal === 1 ? 'film' : 'films'}`;
@@ -23,7 +25,11 @@ const WorldCover = ({ world, onOpen }) => {
         event.currentTarget.focus({ preventScroll: true });
         onOpen(event);
       }}
-      className={`world-cover ${world.cover && !failed ? 'world-cover-art' : `world-cover-${world.motif}`} relative block w-full min-w-0 aspect-video overflow-hidden rounded-xl border border-stone-700/70 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400`}
+      className={`world-cover ${
+        world.cover && !failed
+          ? 'world-cover-art'
+          : `world-cover-${world.motif}`
+      } relative block w-full min-w-0 aspect-video overflow-hidden rounded-xl border border-stone-700/70 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400`}
     >
       {world.cover && !failed && (
         <img

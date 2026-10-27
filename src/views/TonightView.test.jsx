@@ -31,7 +31,7 @@ vi.mock('../components/ItemDetailsModal.jsx', () => ({
   default: () => null,
 }));
 
-vi.mock('../components/CollectionDetailsModal.jsx', () => ({
+vi.mock('../components/SagaPage.jsx', () => ({
   default: () => null,
 }));
 

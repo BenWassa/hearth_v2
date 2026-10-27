@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 
 // The art runs edge to edge from the very top of the screen (behind the status
 // bar and the floating back controls) at its natural 16:9, so it is not zoomed
-// into a strip, then fades into Shell Black. The artwork may carry its own
-// title, so the live heading sits on the faded bottom rather than over it. If
-// the image fails, the heading and counts remain.
+// into a strip, then fades into Shell Black. The artwork carries the World name
+// itself, so the live h1 is screen-reader text (it keeps focus and names the
+// dialog). If the image is missing or fails, the h1 shows on the faded bottom so
+// the page never has no title.
 const WorldHero = ({ world, headingRef }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const sagaCount = world.sagas?.length || 0;
   const filmCount = world.ownedTotal || 0;
+  const showTitle = !world.cover || imageFailed;
 
   return (
     <section
       aria-label={`${world.name} artwork and overview`}
       data-world-hero={world.id}
-      style={{ '--world-accent': world.accent }}
       className="world-hero -mx-4"
     >
       <div className="world-hero-art relative w-full overflow-hidden bg-stone-900">
@@ -32,16 +33,20 @@ const WorldHero = ({ world, headingRef }) => {
         )}
         <div className="world-hero-scrim absolute inset-0" aria-hidden="true" />
       </div>
-      <div className="world-hero-body relative z-10 mx-4 -mt-14">
-        <span
-          aria-hidden="true"
-          className="world-hero-rule mb-2 block h-[3px] w-10 rounded-full"
-        />
+      <div
+        className={`world-hero-body relative z-10 ${
+          showTitle ? 'mx-4 -mt-14' : ''
+        }`}
+      >
         <h1
           id="collections-heading"
           ref={headingRef}
           tabIndex={-1}
-          className="font-serif text-3xl leading-tight text-stone-100"
+          className={
+            showTitle
+              ? 'font-serif text-3xl leading-tight text-stone-100'
+              : 'sr-only'
+          }
         >
           {world.name}
         </h1>

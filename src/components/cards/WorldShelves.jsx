@@ -61,61 +61,38 @@ const PosterButton = ({ film, onOpen }) => {
   );
 };
 
-// One labelled shelf: a heading (a button when it opens details) above a
-// horizontal scroll-snap row of 2:3 posters.
+// One labelled shelf: a plain serif heading above a horizontal scroll-snap row
+// of 2:3 posters. A quiet Details text button on the heading row opens the
+// saga's own page when onOpenHeading is given.
 export const PosterShelf = ({
   id,
   title,
   srDetail,
   reason = '',
-  headingHidden = false,
   films,
   size = 'regular',
   onOpenHeading,
   onOpenFilm,
 }) => (
   <section aria-label={title} data-shelf={id} className="mt-5">
-    {headingHidden ? (
-      <>
-        <h2 className="sr-only">{title}</h2>
-        {onOpenHeading && (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.currentTarget.focus({ preventScroll: true });
-              onOpenHeading();
-            }}
-            aria-label={`${title} details`}
-            className={`min-h-[44px] rounded-lg text-sm text-stone-400 ${focusRing}`}
-          >
-            Saga details
-            <span aria-hidden="true" className="ml-1">
-              ›
-            </span>
-          </button>
-        )}
-      </>
-    ) : (
-      <h2 className="font-serif text-xl leading-snug text-stone-100">
-        {onOpenHeading ? (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.currentTarget.focus({ preventScroll: true });
-              onOpenHeading();
-            }}
-            className={`min-h-[44px] max-w-full rounded-lg text-left ${focusRing}`}
-          >
-            {title}
-            <span aria-hidden="true" className="ml-1 text-stone-400">
-              ›
-            </span>
-          </button>
-        ) : (
-          title
-        )}
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="min-w-0 font-serif text-xl leading-snug text-stone-100">
+        {title}
       </h2>
-    )}
+      {onOpenHeading && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            onOpenHeading();
+          }}
+          aria-label={`${title} details`}
+          className={`min-h-[44px] shrink-0 rounded-lg -mr-2 px-2 text-right text-sm text-stone-400 ${focusRing}`}
+        >
+          Details
+        </button>
+      )}
+    </div>
     {reason && <p className="text-sm text-stone-400">{reason}</p>}
     {srDetail && <p className="sr-only">{srDetail}</p>}
     <ul

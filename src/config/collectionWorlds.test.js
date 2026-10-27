@@ -3,6 +3,7 @@ import { COLLECTION_CATALOG } from './collectionCatalog.js';
 import {
   buildWorlds,
   COLLECTION_WORLDS,
+  isRailSaga,
   selectTonightWorlds,
   WORLD_ROTATION_MS,
   worldForItem,
@@ -28,21 +29,8 @@ describe('approved World membership', () => {
     expect(COLLECTION_WORLDS).toHaveLength(8);
     for (const world of COLLECTION_WORLDS) {
       expect(world.cover).toBe(`/assets/worlds/${world.id}/cover.webp`);
-    }
-  });
-  it('gives every World a distinct, muted accent clear of amber, danger and energy hues', () => {
-    const accents = COLLECTION_WORLDS.map((world) => world.accent);
-    expect(new Set(accents).size).toBe(accents.length);
-    for (const accent of accents) {
-      const [, , chroma, hue] = accent.match(/oklch\((\d+)% ([\d.]+) (\d+)\)/);
-      expect(Number(chroma)).toBeLessThan(0.1);
-      const h = Number(hue);
-      // Amber (brand), red (danger/focused energy), sky (light energy).
-      expect(h < 55 && h > 15 ? 'reserved' : 'ok').toBe('ok');
-      expect(h >= 55 && h <= 95 ? 'reserved' : 'ok').toBe('ok');
-      expect(
-        h >= 215 && h <= 250 && Number(chroma) > 0.03 ? 'reserved' : 'ok',
-      ).toBe('ok');
+      expect(world.tile).toBe(`/assets/worlds/${world.id}/tile.webp`);
+      expect(world.wordmark).toBe(`/assets/worlds/${world.id}/wordmark.svg`);
     }
   });
   it('represents all approved brand Worlds without corporate or continuity conflation', () => {
@@ -160,6 +148,74 @@ describe('approved World membership', () => {
     expect(
       buildWorlds([], [pixar, ghibli], { now }).every((w) => w.activity === 0),
     ).toBe(true);
+  });
+});
+
+describe('World rail and tile sagas', () => {
+  const films = (n, prefix) =>
+    Array.from({ length: n }, (_, i) => movie(`${prefix}-${i}`));
+  const marvelWorld = (sagas) =>
+    buildWorlds(sagas, [], { now }).find((w) => w.id === 'marvel');
+
+  it('flags exactly the eight editorial rail sagas in the catalog', () => {
+    const flagged = Object.values(COLLECTION_CATALOG)
+      .filter((entry) => entry.rail === true)
+      .map((entry) => `${entry.providerId}:${entry.name}`)
+      .sort();
+    expect(flagged).toEqual(
+      [
+        '86311:The Avengers',
+        '131296:Thor',
+        '748:X-Men',
+        '1241:Harry Potter',
+        '10:Star Wars / Skywalker Saga',
+        '10194:Toy Story',
+        '2150:Shrek',
+        '77816:Kung Fu Panda',
+      ].sort(),
+    );
+    expect(isRailSaga(saga('86311'))).toBe(true);
+    expect(isRailSaga(saga('131292'))).toBe(false);
+    expect(isRailSaga(saga('not-in-catalog'))).toBe(false);
+  });
+  it('splits child sagas into rails and tiles and keeps sagas unchanged', () => {
+    const avengers = saga('86311', films(3, 'av'));
+    const ironMan = saga('131292', films(2, 'im'));
+    const thor = saga('131296', films(2, 'th'));
+    const panther = saga('529892', films(1, 'bp'));
+    const input = [ironMan, avengers, panther, thor];
+    const world = marvelWorld(input);
+    expect(world.railSagas).toEqual([avengers, thor]);
+    expect(world.tileSagas).toEqual([ironMan, panther]);
+    expect(world.sagas).toEqual(input);
+    expect(world.cover).toBe('/assets/worlds/marvel/cover.webp');
+    expect(world.collectionIds).toContain('86311');
+  });
+  it('drops a flagged saga with fewer than two owned films into tiles', () => {
+    const avengers = saga('86311', films(1, 'av'));
+    const world = marvelWorld([avengers]);
+    expect(world.railSagas).toEqual([]);
+    expect(world.tileSagas).toEqual([avengers]);
+  });
+  it('preserves the incoming ranked order in both lists', () => {
+    const a = saga('131296', films(2, 'th'));
+    const b = saga('86311', films(2, 'av'));
+    const c = saga('748', films(2, 'xm'));
+    const x = saga('573436', films(1, 'sv'));
+    const y = saga('131292', films(1, 'im'));
+    const z = saga('529892', films(1, 'bp'));
+    const world = marvelWorld([z, a, y, b, x, c]);
+    expect(world.railSagas).toEqual([a, b, c]);
+    expect(world.tileSagas).toEqual([z, y, x]);
+  });
+  it('leaves zero-item sagas out of both lists but in sagas', () => {
+    const empty = saga('86311', []);
+    const emptyTile = saga('131292', []);
+    const owned = saga('529892', films(1, 'bp'));
+    const world = marvelWorld([empty, emptyTile, owned]);
+    expect(world.railSagas).toEqual([]);
+    expect(world.tileSagas).toEqual([owned]);
+    expect(world.sagas).toEqual([empty, emptyTile, owned]);
   });
 });
 

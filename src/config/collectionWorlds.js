@@ -12,28 +12,24 @@ import { toMillis } from '../utils/time.js';
 // disney-animation ID remains for compatibility; Disney includes selected
 // traditional animated/live-action films, not corporate ownership in general.
 export const COLLECTION_WORLDS_VERSION = 2;
-// Each World carries one muted OKLCH accent (the World Tint Rule in DESIGN.md).
-// Tonight tiles and World pages read it as --world-accent, so colour is defined
-// here and nowhere else. It is decorative only: never amber (the one brand
-// hue), never in the red/sky bands that mean danger and energy, always beside
-// the World's name, and low chroma.
 const worlds = [
-  ['wizarding-world', 'Wizarding World', 'oklch(66% 0.08 300)'],
-  ['marvel', 'Marvel', 'oklch(55% 0.09 5)'],
-  ['star-wars', 'Star Wars', 'oklch(70% 0.015 240)'],
-  ['pixar', 'Pixar', 'oklch(68% 0.07 190)'],
-  ['disney-animation', 'Disney', 'oklch(62% 0.07 265)'],
-  ['dc', 'DC', 'oklch(64% 0.07 120)'],
-  ['dreamworks', 'DreamWorks Animation', 'oklch(68% 0.07 335)'],
-  ['studio-ghibli', 'Studio Ghibli', 'oklch(66% 0.08 160)'],
+  ['wizarding-world', 'Wizarding World'],
+  ['marvel', 'Marvel'],
+  ['star-wars', 'Star Wars'],
+  ['pixar', 'Pixar'],
+  ['disney-animation', 'Disney'],
+  ['dc', 'DC'],
+  ['dreamworks', 'DreamWorks Animation'],
+  ['studio-ghibli', 'Studio Ghibli'],
 ];
-export const COLLECTION_WORLDS = worlds.map(([id, name, accent]) => ({
+export const COLLECTION_WORLDS = worlds.map(([id, name]) => ({
   id,
   name,
-  accent,
-  // Static artwork. Only the World page header uses `cover`; Tonight tiles are
-  // text-only so a row of Worlds stays calm.
+  // Static artwork. Only the World page header uses `cover`.
   cover: `/assets/worlds/${id}/cover.webp`,
+  // Tonight tile: a 16:9 tonal gradient plus a transparent wordmark.
+  tile: `/assets/worlds/${id}/tile.webp`,
+  wordmark: `/assets/worlds/${id}/wordmark.svg`,
   collectionIds: Object.values(COLLECTION_CATALOG)
     .filter((entry) => entry.worldId === id)
     .map((entry) => entry.providerId),
@@ -91,6 +87,10 @@ const findWorld = (id) =>
 export const worldForSaga = (saga) =>
   findWorld(COLLECTION_CATALOG[getCollectionIdentity(saga)]?.worldId);
 
+// Editorial flag: a big saga that gets its own poster rail on its World page.
+export const isRailSaga = (saga) =>
+  COLLECTION_CATALOG[getCollectionIdentity(saga)]?.rail === true;
+
 export const worldForItem = (item = {}) => {
   const explicit = getExplicitWorldMetadata(item).worldIds?.[0];
   const explicitWorld = findWorld(explicit);
@@ -117,6 +117,16 @@ export const buildWorlds = (
   return COLLECTION_WORLDS.map((world) => {
     const children = sagas.filter(
       (saga) => worldForSaga(saga)?.id === world.id,
+    );
+    // Incoming (ranked) order is kept. A rail needs two owned films to be worth
+    // a rail; a flagged saga with one falls back to a tile.
+    const ownedCount = (saga) => (saga.items || []).length;
+    const railSagas = children.filter(
+      (saga) => isRailSaga(saga) && ownedCount(saga) >= 2,
+    );
+    const tileSagas = children.filter(
+      (saga) =>
+        ownedCount(saga) >= 1 && !(isRailSaga(saga) && ownedCount(saga) >= 2),
     );
     const childItems = distinctShelfItems(
       children.flatMap((saga) => saga.items || []),
@@ -154,6 +164,8 @@ export const buildWorlds = (
     return {
       ...world,
       sagas: children,
+      railSagas,
+      tileSagas,
       otherFilms,
       shorts,
       shows,

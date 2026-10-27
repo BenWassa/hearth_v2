@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Library } from 'lucide-react';
 import LazyMediaImage from '../../../components/media/LazyMediaImage.jsx';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
+import useTonightWorlds from './useTonightWorlds.js';
 import { getPosterSrc } from '../../../utils/poster.js';
+import { worldForSaga } from '../../../config/collectionWorlds.js';
 import {
   preserveSagaOrder,
   rankSagas,
@@ -15,23 +17,33 @@ const focusRing =
 // Every eligible saga, most recently active first, as one finite rail in the
 // same vocabulary as the other Tonight rails. It is a plain scroll-snap row:
 // no cloned cards, no auto-advance, no looping. The last tile is the neutral
-// All collections tile that opens the full index (shown only past three sagas). Cards carry no counts.
+// All collections tile that opens the full index (shown past three sagas, or
+// whenever some sagas are left out of the row). Sagas whose World is already a
+// tile in the Worlds grid are left out here. Cards carry no counts.
 // Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
   collections = [],
+  items = [],
   onOpenCollection,
   onBrowse,
   counts,
 }) => {
   const [clock] = useState(Date.now);
+  const gridWorldIds = useTonightWorlds({ collections, items, counts }).map(
+    (world) => world.id,
+  );
   const [order] = useState(() =>
     rankSagas(collections, { now: clock, counts }).map((saga) => saga.id),
   );
   if (!collections.length) return null;
-  const sagas = preserveSagaOrder(
+  const ranked = preserveSagaOrder(
     rankSagas(collections, { now: clock, counts }),
     order,
   );
+  const sagas = ranked.filter(
+    (saga) => !gridWorldIds.includes(worldForSaga(saga)?.id),
+  );
+  const hasHiddenSagas = sagas.length < ranked.length;
   const cell = 'w-[clamp(7rem,32vw,9rem)] shrink-0';
   return (
     <section aria-label="Collections" className="space-y-2 shrink-0">
@@ -87,7 +99,7 @@ const CollectionsRail = ({
               </li>
             ))}
             {/* The row already shows everything when there are only a few. */}
-            {sagas.length > 3 && (
+            {(sagas.length > 3 || hasHiddenSagas) && (
               <li className={cell} style={{ scrollSnapAlign: 'start' }}>
                 <WorldCover
                   neutral
@@ -95,7 +107,7 @@ const CollectionsRail = ({
                   world={{
                     id: 'all-collections',
                     name: 'All collections',
-                    sagas,
+                    sagas: ranked,
                   }}
                   onOpen={onBrowse}
                 />

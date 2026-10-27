@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Armchair, Coffee, Eye, Smile, Clock, Tv, Zap } from 'lucide-react';
+import { Armchair, Coffee, Eye, Smile, Clock, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
@@ -35,9 +35,7 @@ import { getBackdropSrc } from '../utils/poster.js';
 const ItemDetailsModal = lazyWithPrefetch(() =>
   import('../components/ItemDetailsModal.jsx'),
 );
-const CollectionDetailsModal = lazyWithPrefetch(() =>
-  import('../components/CollectionDetailsModal.jsx'),
-);
+const SagaPage = lazyWithPrefetch(() => import('../components/SagaPage.jsx'));
 const MetadataAuditModal = lazyWithPrefetch(() =>
   import('./components/tonight/MetadataAuditModal.jsx'),
 );
@@ -434,10 +432,7 @@ const TonightView = ({
   const hasOpenedAudit = useHasBeenTrue(isAuditModalOpen);
   const hasOpenedWipe = useHasBeenTrue(isWipeConfirmOpen);
 
-  useEffect(
-    () => prefetchOnIdle([ItemDetailsModal, CollectionDetailsModal]),
-    [],
-  );
+  useEffect(() => prefetchOnIdle([ItemDetailsModal, SagaPage]), []);
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
@@ -514,7 +509,6 @@ const TonightView = ({
                 {currentlyWatchingShows.length > 0 && (
                   <SuggestionSection
                     title="Currently Watching"
-                    Icon={Tv}
                     pool={currentlyWatchingShows}
                     suggestions={currentlyWatchingShows}
                     emptyLabel="No shows in progress yet."
@@ -645,6 +639,7 @@ const TonightView = ({
 
                 <CollectionsRail
                   collections={collections}
+                  items={items}
                   onOpenCollection={openCollection}
                   onBrowse={browseCollections}
                 />
@@ -691,7 +686,7 @@ const TonightView = ({
 
       {hasOpenedCollection && (
         <Suspense fallback={null}>
-          <CollectionDetailsModal
+          <SagaPage
             isOpen={isCollectionOpen}
             householdItems={items}
             collection={

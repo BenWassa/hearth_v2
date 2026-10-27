@@ -3,6 +3,20 @@
 // defaultVisible is a separate editorial decision, never a film-count heuristic.
 export const COLLECTION_CATALOG_VERSION = 2;
 
+// Editorial: big sagas that get their own poster rail on their World page.
+// Every other saga appears as a tile. Ranking and ownership still apply, so a
+// flagged saga with fewer than two owned films falls back to a tile.
+const RAIL_PROVIDER_IDS = new Set([
+  '86311', // The Avengers
+  '131296', // Thor
+  '748', // X-Men
+  '1241', // Harry Potter
+  '10', // Star Wars / Skywalker Saga
+  '10194', // Toy Story
+  '2150', // Shrek
+  '77816', // Kung Fu Panda
+]);
+
 const entries = [
   ['86311', 'The Avengers', 'marvel'],
   ['131292', 'Iron Man', 'marvel'],
@@ -76,6 +90,7 @@ export const COLLECTION_CATALOG = Object.fromEntries(
         worldId,
         defaultVisible,
         sequenceMode,
+        rail: RAIL_PROVIDER_IDS.has(providerId),
       },
     ],
   ),

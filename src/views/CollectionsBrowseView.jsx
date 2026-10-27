@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import SagaRow from '../components/cards/SagaRow.jsx';
+import SagaTile from '../components/cards/SagaTile.jsx';
 import WorldHero from '../components/cards/WorldHero.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
 import { PosterShelf } from '../components/cards/WorldShelves.jsx';
@@ -42,14 +43,16 @@ const CollectionsBrowseView = ({
   const world = worldId
     ? buildWorlds(ranked, items).find((entry) => entry.id === worldId)
     : null;
-  // World shelves: one per saga, owned films only (nothing is fetched).
+  // Rails: one per big saga, owned films only (nothing is fetched). Every other
+  // saga is a tile in the index below.
   const sagaShelves = world
-    ? world.sagas
+    ? (world.railSagas || [])
         .map((saga) => ({ saga, films: saga.items || [] }))
         .filter(({ films }) => films.length)
     : [];
   const featuredSagaId = sagaShelves.find(({ saga }) => saga.activity?.tier > 0)
     ?.saga.id;
+  const tileSagas = world?.tileSagas || [];
   const mediaGroups = world
     ? [
         ['Other films', world.otherFilms || []],
@@ -139,9 +142,6 @@ const CollectionsBrowseView = ({
                   <PosterShelf
                     id={saga.id}
                     title={sagaName(saga.title)}
-                    // The World title already names a lone saga; keep a quiet
-                    // Details control so its page is still reachable.
-                    headingHidden={sagaShelves.length === 1}
                     reason={nextTitle ? `Next up: ${nextTitle}` : ''}
                     srDetail={`${saga.watchedCount} of ${saga.totalCount} watched on your shelf`}
                     films={films}
@@ -152,6 +152,27 @@ const CollectionsBrowseView = ({
                 </div>
               );
             })}
+            {tileSagas.length > 0 && (
+              <section
+                aria-labelledby="world-saga-index-heading"
+                data-saga-index
+                className="mt-6"
+              >
+                <h2
+                  id="world-saga-index-heading"
+                  className="font-serif text-xl leading-snug text-stone-100"
+                >
+                  {sagaShelves.length ? `More ${world.name}` : 'Sagas'}
+                </h2>
+                <ul role="list" className="mt-3 grid grid-cols-2 gap-3">
+                  {tileSagas.map((saga) => (
+                    <li key={saga.id}>
+                      <SagaTile saga={saga} onOpen={onOpenCollection} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
             {mediaGroups.map(
               ([title, films]) =>
                 films.length > 0 && (

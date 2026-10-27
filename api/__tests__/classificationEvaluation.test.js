@@ -36,10 +36,7 @@ test('classification evaluation uses stable prefix limits and explicit canonical
     /Unknown evaluation key/,
   );
   assert.throws(
-    () =>
-      selectLiveFixtures(fixtures, [
-        '--keys=tmdb:movie:1,tmdb:movie:1',
-      ]),
+    () => selectLiveFixtures(fixtures, ['--keys=tmdb:movie:1,tmdb:movie:1']),
     /duplicate keys/,
   );
 });

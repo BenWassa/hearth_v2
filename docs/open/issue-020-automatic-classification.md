@@ -10,7 +10,7 @@
 
 Hearth currently requires users to decide what a movie *is* before they have watched it: Vibe (Comfort, Easy, Gripping, Visual, Classic) and Energy (Light, Balanced, Focused) are configured in the Add screen and persist as user state. That is avoidable decision friction. Users should select a TMDB result and add it without classification questions. Inference must not become an opaque recommendation engine or a high-maintenance public taxonomy.
 
-**Recommended direction: hybrid metadata + rules + optional Gemini semantic inference**; classifications persist as reusable, versioned metadata; overrides are an optional detail-screen correction, never a required step. No automatic AI calls should prevent a successful Add.
+**Recommended direction: hybrid metadata + rules + optional Gemini semantic inference**; classifications persist as reusable, versioned metadata; rare incorrect classifications are corrected manually outside the UI, never via a user-facing edit control. No automatic AI calls should prevent a successful Add.
 
 ### What is fact versus subjective interpretation?
 
@@ -126,7 +126,7 @@ Tonight MECE selector (#7), Decision filters and Shelf cards
 
 **Backfill:** list existing media catalog entries, deduplicate canonical titles, classify unclassified entries in bounded batches, checkpoint progress, retry 429/timeout with exponential backoff and jitter, report classifiable/unknown/errors; never reset watch status, notes or episode progress. Apply the same logic to imported libraries; document unresolved identity records.
 
-**UI:** Search → select → Add; no required mood/focus chips. A small `Edit viewing feel` option under item details, ideally tucked away with other optional metadata. Provide explicit `Automatic` reset rather than always-visible confidence badges. For accessibility ensure correction is keyboard/touch accessible. Do not expose an "AI model" screen in Tonight.
+**UI:** Search → select → Add; no mood/focus chips, no editing controls in item details. Exceptional errors may be corrected by a controlled maintainer/admin workflow outside the application. For accessibility ensure correction is keyboard/touch accessible. Do not expose an "AI model" screen in Tonight.
 
 ## Evaluation and deployment gates
 
@@ -143,7 +143,7 @@ Tonight MECE selector (#7), Decision filters and Shelf cards
 
 - **Stage 0 — product/schema:** coordinate with #7, define attributes and provenance; human benchmark and privacy/terms gate.
 - **Stage 1 — deterministic free foundation:** TMDB keywords normalization and mapper tests; derive low-risk facets; use cached classifications; remove required Add questions; unknown-state fallback.
-- **Stage 2 — correction and migration:** per-space override, reset option, legacy import/manual distinction, adapters/Decision filter compatibility, preserving user edits.
+- **Stage 2 — migration and corrections:** preserve existing manual choices and imports, adapt Decision filters, and document an exceptional maintainer-only correction procedure; no user-facing editing UI.
 - **Stage 3 — optional Gemini A/B pilot:** gated backend with strict schema and model pin/version; measure gold-fixture gain and actual free-tier limits; no private input; maintain fallback.
 - **Stage 4 — library backfill and Tonight integration:** resumable deduped reclassification, UX regression, #7 allocator and runtime fixes, telemetry restricted to aggregate non-personal operational metrics.
 

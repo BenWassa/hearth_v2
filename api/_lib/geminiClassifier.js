@@ -13,8 +13,7 @@ const FACET_DESCRIPTIONS = {
     'Distinctiveness of visual craft. low = broadly conventional presentation; medium = noticeably stylized, polished or visually authored; high = exceptional signature cinematography, production design or animation. Budget and genre alone are not evidence.',
   attentionDemand:
     'Sustained concentration required to follow the title. low = easy to follow with low cognitive load; medium = intermittent concentration or moderate detail/intensity; high = sustained dense tracking, concentration or intensity. Runtime alone is not evidence.',
-  curatedClassic:
-    'Maintainer-only editorial status. Always return unknown.',
+  curatedClassic: 'Maintainer-only editorial status. Always return unknown.',
 };
 const enabled = () =>
   process.env.GEMINI_CLASSIFICATION_ENABLED === 'true' &&
@@ -67,8 +66,7 @@ const infer = async ({ input, reserveAttempt, fetchImpl = fetch }) => {
   });
   if (!enabled()) return finish('disabled');
   const model = process.env.GEMINI_MODEL;
-  if (!/^[a-zA-Z0-9._-]{1,100}$/.test(model))
-    return finish('configuration');
+  if (!/^[a-zA-Z0-9._-]{1,100}$/.test(model)) return finish('configuration');
   // Only an allowlisted projection fetched by this server ever leaves Hearth.
   const publicInput = {
     title: input.title,

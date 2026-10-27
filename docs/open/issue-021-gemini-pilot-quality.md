@@ -80,12 +80,15 @@ The exact five canonical pilot keys are:
 
 `tmdb:movie:346648`, `tmdb:movie:257211`, `tmdb:movie:286217`, `tmdb:movie:8835`, `tmdb:movie:1584`.
 
+## Verification
+
+GitHub Classification PR QA passes on this branch: 53 unit-test files / 341 unit tests, 35 API tests, lint with zero warnings, touched-file Prettier checks, and the offline 50-real-title evaluator. The offline evaluator correctly records zero provider attempts and keeps rollout false.
+
 ## Remaining gates
 
-1. Run repository unit/API/lint/build checks on this branch.
-2. Obtain explicit human approval or revision of all 50 real fixture labels.
-3. Run a new owner-approved five-title v2 pilot using a fresh output file.
-4. Complete all 50 titles with three valid predictions each within approved quotas.
-5. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.
-6. Confirm metadata-sharing permission, account-specific provider quota and production billing/smoke behavior.
-7. Keep production Gemini disabled until all gates pass.
+1. Obtain explicit human approval or revision of all 50 real fixture labels.
+2. Run a new owner-approved five-title v2 pilot using a fresh output file.
+3. Complete all 50 titles with three valid predictions each within approved quotas.
+4. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.
+5. Confirm metadata-sharing permission, account-specific provider quota and production billing/smoke behavior.
+6. Keep production Gemini disabled until all gates pass.

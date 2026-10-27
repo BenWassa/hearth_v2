@@ -101,7 +101,22 @@ Increase the title limit only within the confirmed provider/project quotas. A fu
 
 The JSON report includes per-facet exact agreement, a confusion matrix (including unknown), unavailable rate, multi-run stability, rules predictions alongside hybrid predictions, prompt/model version and subjective reviewer notes. Predetermined thresholds: >=80% agreement per subjective facet, <=35% unknown per subjective facet, >=95% repeated-run stability, all 50 real titles covered, reviewed fixture approved. Classic curation is reported separately from the model quality gate.
 
-Current [offline evidence](issue-020-evaluation.json): deterministic but sparse baseline. Most subjective facets abstain on this fixture. It does **not** meet semantic coverage targets and must not be described as AI quality validation. No live Gemini run has been made; its agreement and stability are unmeasured. Rules remain a safe fallback, not a claim of complete subjective coverage.
+Current [offline evidence](issue-020-evaluation.json): deterministic but sparse baseline. Most subjective facets abstain on this fixture. It does **not** meet semantic coverage targets and must not be described as AI quality validation. Rules remain a safe fallback, not a claim of complete subjective coverage.
+
+### Owner-approved five-title pilot — 2026-10-27
+
+The owner approved a bounded five-title live pilot, including sharing the public metadata projection described above. The [saved report](issue-020-gemini-pilot-2026-10-27.json) used `gemini-3.5-flash-lite`, confirmed available to the configured key through the models API. The five titles were Paddington 2, The Intern, The Martian, Legally Blonde and The School of Rock. Each completed three valid predictions. Seventeen provider attempts were counted in the shared daily budget (limit 20), including one invalid response and one timeout; both incomplete titles completed on a bounded resume. The runner's report contains all 50 real fixture records, but only these five received live predictions.
+
+| Subjective facet | Agreement with provisional labels | Stable across three predictions | Unknown rate |
+| --- | --- | --- | --- |
+| Comfort | 80% | 80% | 0% |
+| Comedy first | 100% | 100% | 0% |
+| Plot momentum | 60% | 60% | 0% |
+| Narrative complexity | 80% | 100% | 0% |
+| Visual distinctiveness | 40% | 20% | 40% |
+| Attention demand | 80% | 80% | 0% |
+
+This small sample does not satisfy the rollout thresholds or substitute for the required reviewed 50-title evaluation. Labels remain provisional; the observed disagreements need editorial adjudication alongside prompt/model review. Production enablement flags and model remain unset. The pilot flags were scoped to the local runner process; no household/catalog classification was written by the evaluator, only the shared operational budget counter. App Hosting secret access was repaired separately, and the existing 3.16.0 release was confirmed live with build `3.16.0-20261027105016-fb57043` and a healthy API.
 
 ## Maintainer correction workflow
 

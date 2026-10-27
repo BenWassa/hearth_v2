@@ -31,7 +31,7 @@ describe('WorldCover', () => {
     expect(wordmark.getAttribute('src')).toBe(
       '/assets/worlds/pixar/wordmark.svg',
     );
-    expect(wordmark.style.width).toBe('56%');
+    expect(wordmark.style.width).toBe('73%');
     [art, wordmark].forEach((img) => {
       expect(img.getAttribute('alt')).toBe('');
       expect(img.getAttribute('loading')).toBe('lazy');

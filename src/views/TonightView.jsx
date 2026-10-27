@@ -10,7 +10,7 @@ import { Armchair, Coffee, Eye, Smile, Clock, Zap } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
-import WorldsGrid from './components/tonight/WorldsGrid.jsx';
+import WorldsRail from './components/tonight/WorldsRail.jsx';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
@@ -420,8 +420,8 @@ const TonightView = ({
       ['focused', uniqueFocusedWatches.length],
       ['visual', uniqueVisualMovies.length],
     ].find(([, count]) => count > 0)?.[0] || 'top';
-  const worldsGrid = (
-    <WorldsGrid
+  const worldsRail = (
+    <WorldsRail
       collections={collections}
       items={items}
       onOpenWorld={openWorld}
@@ -504,7 +504,7 @@ const TonightView = ({
               <>
                 <HeroCarousel items={heroItems} onOpenDetails={openDetails} />
 
-                {worldsAfter === 'top' && worldsGrid}
+                {worldsAfter === 'top' && worldsRail}
 
                 {currentlyWatchingShows.length > 0 && (
                   <SuggestionSection
@@ -523,7 +523,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'currently' && worldsGrid}
+                {worldsAfter === 'currently' && worldsRail}
 
                 <ComingSoonRail
                   releases={upcomingReleases}
@@ -551,7 +551,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'comfort' && worldsGrid}
+                {worldsAfter === 'comfort' && worldsRail}
 
                 {uniqueComedies.length > 0 && (
                   <SuggestionSection
@@ -572,7 +572,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'comedies' && worldsGrid}
+                {worldsAfter === 'comedies' && worldsRail}
 
                 {uniqueQuickBites.length > 0 && (
                   <SuggestionSection
@@ -593,7 +593,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'quick' && worldsGrid}
+                {worldsAfter === 'quick' && worldsRail}
 
                 {uniqueFocusedWatches.length > 0 && (
                   <SuggestionSection
@@ -614,7 +614,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'focused' && worldsGrid}
+                {worldsAfter === 'focused' && worldsRail}
 
                 {uniqueVisualMovies.length > 0 && (
                   <SuggestionSection
@@ -635,7 +635,7 @@ const TonightView = ({
                   />
                 )}
 
-                {worldsAfter === 'visual' && worldsGrid}
+                {worldsAfter === 'visual' && worldsRail}
 
                 <CollectionsRail
                   collections={collections}

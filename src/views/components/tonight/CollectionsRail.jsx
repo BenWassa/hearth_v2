@@ -19,7 +19,7 @@ const focusRing =
 // no cloned cards, no auto-advance, no looping. The last tile is the neutral
 // All collections tile that opens the full index (shown past three sagas, or
 // whenever some sagas are left out of the row). Sagas whose World is already a
-// tile in the Worlds grid are left out here. Cards carry no counts.
+// tile in the Worlds rail are left out here. Cards carry no counts.
 // Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
   collections = [],
@@ -29,7 +29,7 @@ const CollectionsRail = ({
   counts,
 }) => {
   const [clock] = useState(Date.now);
-  const gridWorldIds = useTonightWorlds({ collections, items, counts }).map(
+  const railWorldIds = useTonightWorlds({ collections, items, counts }).map(
     (world) => world.id,
   );
   const [order] = useState(() =>
@@ -41,7 +41,7 @@ const CollectionsRail = ({
     order,
   );
   const sagas = ranked.filter(
-    (saga) => !gridWorldIds.includes(worldForSaga(saga)?.id),
+    (saga) => !railWorldIds.includes(worldForSaga(saga)?.id),
   );
   const hasHiddenSagas = sagas.length < ranked.length;
   const cell = 'w-[clamp(7rem,32vw,9rem)] shrink-0';

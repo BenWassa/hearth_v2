@@ -11,8 +11,8 @@ vi.mock('./components/tonight/CollectionsRail.jsx', () => ({
   default: () => <div data-testid="collections-rail" />,
 }));
 
-vi.mock('./components/tonight/WorldsGrid.jsx', () => ({
-  default: () => <div data-testid="worlds-grid" />,
+vi.mock('./components/tonight/WorldsRail.jsx', () => ({
+  default: () => <div data-testid="worlds-rail" />,
 }));
 
 vi.mock('./components/tonight/SuggestionSection.jsx', () => ({

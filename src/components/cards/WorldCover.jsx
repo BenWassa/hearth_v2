@@ -16,14 +16,14 @@ const describeWorld = (world) => {
 // Share of the tile width each wordmark occupies (the art pack's manifest
 // `cover_wordmark_width_fraction`, tuned per logo aspect ratio).
 const WORDMARK_WIDTH = {
-  'disney-animation': 0.53,
-  pixar: 0.56,
-  marvel: 0.43,
-  dc: 0.285,
-  dreamworks: 0.67,
-  'star-wars': 0.46,
-  'wizarding-world': 0.54,
-  'studio-ghibli': 0.56,
+  'disney-animation': 0.62,
+  pixar: 0.73,
+  marvel: 0.56,
+  dc: 0.36,
+  dreamworks: 0.88,
+  'star-wars': 0.6,
+  'wizarding-world': 0.82,
+  'studio-ghibli': 0.74,
 };
 
 const tileSrc = (world) => world.tile ?? `/assets/worlds/${world.id}/tile.webp`;

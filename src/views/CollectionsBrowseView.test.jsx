@@ -3,7 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, expect, it, vi } from 'vitest';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
-import WorldsGrid from './components/tonight/WorldsGrid.jsx';
+import WorldsRail from './components/tonight/WorldsRail.jsx';
+import {
+  TONIGHT_WORLD_ORDER,
+  worldForSaga,
+} from '../config/collectionWorlds.js';
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const now = Date.now();
 const makeSaga = (i, providerId = `other-${i}`) => ({
@@ -43,7 +47,7 @@ afterEach(async () => {
   host?.remove();
 });
 it.each([0, 1, 3, 25, 50])(
-  'shows at most six Worlds directly on Tonight for %i sagas',
+  'shows every represented World as one finite row for %i sagas',
   async (size) => {
     const openWorld = vi.fn();
     const browse = vi.fn();
@@ -52,16 +56,27 @@ it.each([0, 1, 3, 25, 50])(
       makeSaga(i, ids[i % ids.length]),
     );
     await mount(
-      <WorldsGrid
+      <WorldsRail
         collections={collections}
         onOpenWorld={openWorld}
         onBrowse={browse}
       />,
     );
-    expect(host.querySelectorAll('[data-world-id]')).toHaveLength(
-      Math.min(size, ids.length, 6),
+    const expected = TONIGHT_WORLD_ORDER.filter((id) =>
+      collections.some((saga) => worldForSaga(saga)?.id === id),
     );
-    // The grid is only Worlds: no All collections tile and no Browse-all link.
+    const tiles = [...host.querySelectorAll('[data-world-id]')];
+    expect(tiles.map((tile) => tile.dataset.worldId)).toEqual(expected);
+    expect(tiles).toHaveLength(Math.min(size, ids.length));
+    // One finite single-row list: one cell per World, no clones.
+    if (size) {
+      const list = host.querySelector('ul[role="list"]');
+      expect(list.children).toHaveLength(tiles.length);
+      expect(list.className).toContain('flex');
+    } else {
+      expect(host.querySelector('section')).toBeNull();
+    }
+    // The rail is only Worlds: no All collections tile and no Browse-all link.
     expect(button('All collections')).toBeUndefined();
     expect(host.textContent).not.toContain('Browse all');
     expect(browse).not.toHaveBeenCalled();
@@ -71,28 +86,28 @@ it.each([0, 1, 3, 25, 50])(
     }
   },
 );
-it('keeps the adaptive Worlds for the week once chosen', async () => {
-  localStorage.removeItem('hearth:tonight-worlds');
-  const ids = ['86311', '1241', '10', '10194', '386382', '263', '2150'];
+it('lists Worlds in the fixed brand order whatever the saga activity', async () => {
+  const ids = ['2150', '263', '386382', '10194', '10', '1241', '86311'];
   const collections = ids.map((id, i) => makeSaga(i, id));
-  await mount(<WorldsGrid collections={collections} onOpenWorld={vi.fn()} />);
-  const tiles = () =>
+  await mount(<WorldsRail collections={collections} onOpenWorld={vi.fn()} />);
+  expect(
     [...host.querySelectorAll('[data-world-id]')].map(
       (el) => el.dataset.worldId,
-    );
-  const first = tiles();
-  expect(first).toHaveLength(6);
-  expect(first.slice(0, 4)).toEqual([
-    'disney-animation',
+    ),
+  ).toEqual([
     'pixar',
     'marvel',
+    'star-wars',
+    'wizarding-world',
+    'disney-animation',
     'dreamworks',
+    'dc',
   ]);
-  const saved = JSON.parse(localStorage.getItem('hearth:tonight-worlds'));
-  expect(saved.ids).toEqual(first.slice(4));
-  localStorage.removeItem('hearth:tonight-worlds');
+  const cell = host.querySelector('ul[role="list"] > li');
+  expect(cell.className).toContain('w-[clamp(7.5rem,calc(50vw-2.6rem),11rem)]');
+  expect(cell.style.scrollSnapAlign).toBe('start');
 });
-it('lists every saga plainly: no search, sort, refresh, count or Worlds grid', async () => {
+it('lists every saga plainly: no search, sort, refresh, count or Worlds rail', async () => {
   await mount(
     <CollectionsBrowseView
       collections={Array.from({ length: 50 }, (_, i) => makeSaga(i))}
@@ -171,7 +186,7 @@ it('keeps all World entry points when watch activity is undone or dormant', asyn
     makeSaga(2, '263'),
   ];
   await mount(
-    <WorldsGrid
+    <WorldsRail
       collections={collections}
       onBrowse={vi.fn()}
       onOpenWorld={vi.fn()}
@@ -190,7 +205,7 @@ it('keeps all World entry points when watch activity is undone or dormant', asyn
   }));
   await act(async () =>
     root.render(
-      <WorldsGrid
+      <WorldsRail
         collections={changed}
         onBrowse={vi.fn()}
         onOpenWorld={vi.fn()}
@@ -330,7 +345,7 @@ it('keeps a title when artwork fails, including a World with no sagas', async ()
 it('renders World tiles as gradient art with a wordmark, named by the World', async () => {
   const openWorld = vi.fn();
   await mount(
-    <WorldsGrid
+    <WorldsRail
       collections={[makeSaga(0, '86311')]}
       onOpenWorld={openWorld}
       onBrowse={vi.fn()}
@@ -447,21 +462,17 @@ it('shows eligible sagas outside the hidden Worlds in a finite Collections row o
   expect(browse).toHaveBeenCalledOnce();
 });
 
-it('leaves out exactly the sagas whose World is a tile in the Worlds grid right now', async () => {
-  localStorage.removeItem('hearth:tonight-worlds');
-  // Star Wars (0) and Wizarding World (1) are the most recent, so they take the
-  // two adaptive slots; DC (2) does not. Disney (3) is a fixed tile. Saga 4 has
-  // no World.
+it('leaves out exactly the sagas whose World is a tile in the Worlds rail', async () => {
+  // Pixar (0), Marvel (1) and DC (2) are tiles. Saga 3 has no World.
   const collections = [
-    makeSaga(0, '10'),
-    makeSaga(1, '1241'),
+    makeSaga(0, '10194'),
+    makeSaga(1, '86311'),
     makeSaga(2, '263'),
-    makeSaga(3, '386382'),
-    makeSaga(4),
+    makeSaga(3),
   ];
   await mount(
     <div>
-      <WorldsGrid collections={collections} onOpenWorld={vi.fn()} />
+      <WorldsRail collections={collections} onOpenWorld={vi.fn()} />
       <CollectionsRail
         collections={collections}
         onOpenCollection={vi.fn()}
@@ -469,21 +480,14 @@ it('leaves out exactly the sagas whose World is a tile in the Worlds grid right 
       />
     </div>,
   );
-  const gridIds = [...host.querySelectorAll('[data-world-id]')].map(
+  const railIds = [...host.querySelectorAll('[data-world-id]')].map(
     (tile) => tile.dataset.worldId,
   );
-  expect(gridIds).toEqual(
-    expect.arrayContaining([
-      'disney-animation',
-      'star-wars',
-      'wizarding-world',
-    ]),
+  expect(railIds).toEqual(['pixar', 'marvel', 'dc']);
+  const cardIds = [...host.querySelectorAll('[data-saga-card]')].map(
+    (card) => card.dataset.sagaCard,
   );
-  expect(gridIds).not.toContain('dc');
-  const railIds = [...host.querySelectorAll('[data-saga-card]')]
-    .map((card) => card.dataset.sagaCard)
-    .sort();
-  expect(railIds).toEqual(['saga-2', 'saga-4']);
+  expect(cardIds).toEqual(['saga-3']);
   expect(host.querySelector('[data-all-collections]')).not.toBeNull();
 });
 
@@ -516,9 +520,9 @@ it('leaves out the All collections tile when the row already shows three or fewe
   expect(host.querySelector('[data-all-collections]')).toBeNull();
 });
 
-it('lets an odd last World tile span both columns under a Tonight-style eyebrow', async () => {
+it('puts the Worlds rail under a Tonight-style eyebrow', async () => {
   await mount(
-    <WorldsGrid
+    <WorldsRail
       collections={[
         makeSaga(0, '86311'),
         makeSaga(1, '10'),
@@ -527,10 +531,7 @@ it('lets an odd last World tile span both columns under a Tonight-style eyebrow'
       onOpenWorld={vi.fn()}
     />,
   );
-  const tiles = [...host.querySelectorAll('[data-world-id]')];
-  expect(tiles).toHaveLength(3);
-  expect(tiles[2].className).toContain('col-span-2');
-  expect(tiles[0].className).not.toContain('col-span-2');
+  expect(host.querySelectorAll('[data-world-id]')).toHaveLength(3);
   const eyebrow = host.querySelector('h3');
   expect(eyebrow.textContent).toBe('Worlds');
   expect(eyebrow.className).toContain('uppercase');
@@ -567,7 +568,7 @@ it('renders Tonight tiles and a World page without React warnings', async () => 
   try {
     await mount(
       <>
-        <WorldsGrid
+        <WorldsRail
           collections={[makeSaga(0, '86311')]}
           onOpenWorld={vi.fn()}
         />

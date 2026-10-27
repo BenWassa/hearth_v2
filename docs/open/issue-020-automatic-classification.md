@@ -1,133 +1,151 @@
-# Issue #20: automatic viewing classification
+# Issue #20 — Automatic title classification, zero-friction Add
 
-Status: implementation complete locally; optional Gemini rollout is gated on credentials, independent editorial review, live evaluation, and metadata-sharing permission. Do not close or move to `docs/closed/` until those checks pass.
+- **Status:** Open — research and implementation plan; not implemented
+- **Implementation record:** [issue-020-implementation-record.md](issue-020-implementation-record.md) describes what was built (this document is the original research and plan).
+- **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/20
+- **Research date:** 2026-10-26
+- **Related:** [Tonight MECE categories #7](https://github.com/BenWassa/hearth_v2/issues/7), [#7 research record](issue-007-tonight-mece-rows.md), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [Technical overview](../TECHNICAL_OVERVIEW.md)
+- **Relevant areas:** `src/views/AddView.jsx`; `src/config/constants.js`; `src/views/TonightView.jsx`; `src/domain/media/{schema,adapters}.js`; `src/services/firebase/watchlist.js`; `api/_lib/{providerClient,mappers/mediaMapper}.js`; `src/app/useAppState.js`; Firebase security rules and App Hosting runtime.
 
-Issue: https://github.com/BenWassa/hearth_v2/issues/20
-Companion: [Tonight allocation #7](issue-007-tonight-mece-rows.md)
-Implementation authorized by the user on 2026-10-26. The earlier research-only restriction no longer applies to this work.
+## Product objective
 
-## Product scope and decisions
+Hearth currently requires users to decide what a movie *is* before they have watched it: Vibe (Comfort, Easy, Gripping, Visual, Classic) and Energy (Light, Balanced, Focused) are configured in the Add screen and persist as user state. That is avoidable decision friction. Users should select a TMDB result and add it without classification questions. Inference must not become an opaque recommendation engine or a high-maintenance public taxonomy.
 
-Search → select → **Add to Shelf**. Add, collection-details add, and import review contain no Vibe/Energy selectors. Notes remain optional. Adding waits for valid TMDB title facts, never for Gemini or the full TV episode tree. Existing background episode refresh continues after saving. Import retains its existing identity-resolution workflow.
+**Recommended direction: hybrid metadata + rules + optional Gemini semantic inference**; classifications persist as reusable, versioned metadata; rare incorrect classifications are corrected manually outside the UI, never via a user-facing edit control. No automatic AI calls should prevent a successful Add.
 
-Seven independent facets: `comfort`, `comedyFirst`, `plotMomentum`, `narrativeComplexity`, `visualDistinctiveness`, `attentionDemand`, `curatedClassic`. Each has an allowlisted `unknown | low | medium | high` value, an ordinal confidence using the same vocabulary, and a method. The classification carries `viewing-1`, canonical identity, English locale policy, stable public source revision, and (when used) model and `viewing-prompt-1`. Confidence is not a calibrated probability. `unknown` is an abstention, not low.
+### What is fact versus subjective interpretation?
 
-Public facts (type, duration, genre, release year) remain separate. Exact descriptive TMDB keyword evidence drives the cheap baseline; genre membership, animation, budget, and age alone never imply warmth, visual excellence, attention, or classic status. Uncertain titles remain on the Shelf and in ordinary eligible hero selection. No general-purpose recommendation feed is added.
+| Attribute | Reliable automatic source | Caveat |
+| --- | --- | --- |
+| TMDB title ID, media type, genres, runtime, release year, overview | TMDB details | Facts can be absent, stale or different across TV episodes |
+| Short watch unit / Quick Bites eligibility | Validated **movie** runtime or next watchable episode runtime | TV average/first episode runtime is not always the next episode; `null <= 35` bug in old Tonight logic |
+| Comedy-first, comforting, gripping, narrative complexity | Heuristics + LLM reading synopsis/keywords | Qualitative judgments, cannot be inferred accurately from genre alone |
+| Visual distinctiveness / spectacle | Keyword hints + LLM + small curated fixture | Cinematography cannot be conclusively assessed from synopsis, budget or poster |
+| Focus requirement | Heuristics + LLM estimate | Complex != dark, intense != hard to follow; different viewers have different experiences |
+| Classic | Curated editorial evidence; conditional film year/recognized identity hints | Age and popularity are *insufficient* to qualify |
+| "Currently Watching", watched/unwatched | User episode/action state | **Never** AI-generated |
+| User preference or user correction | Explicit user input, if provided | **Never** replaced by inference |
 
-Keep the six existing Tonight labels in this issue. A pure scored allocator gives each eligible canonical title one thematic home; in-progress/completed shows and watched films are excluded. Visual TV is allowed. Historical manual/unknown-origin tags remain stronger than inferred facets. Quick Bites reserves positive numeric watch units **at most 30 minutes**, using the next released unwatched episode for TV, not typical series runtime. Missing episode metadata abstains. Shorts/short films can qualify. Its placement is unique across thematic rows. Richer #7 dynamic composition and a Get Hooked label remain separate work.
+## Repository audit and consequences
 
-`userState.tagProvenance` records tags per field: new missing fields are `automatic`; imported existing fields are `imported`; unknown historic origins are `legacy`. The resolver accepts known provenance such as seeded/manual too. Existing values are never overwritten or relabelled automatic. Generated facets live in the shared media catalog, separate from per-space tags, notes, status, episode progress, and activity timestamps. A catalog override is a separate facet-only layer. No category editing or reset UI is shipped.
+- `src/config/constants.js`: `VIBES=[comfort,easy,gripping,visual,classic]`; `ENERGIES=[light,balanced,focused]`.
+- `src/views/AddView.jsx`: default empty vibe/energy local state, chip controls, and submitted fields in both flat payload and `userState`; the add UI can be simplified without changing the TMDB search affordance.
+- `src/views/TonightView.jsx`: independent predicates for comfort/energy, comedy/genre, focused/gripping, visual and classic. The #7 record measures **55 raw row placements for 30 titles**, including **22 titles matching at least two**. Those are seed-logic observations, not user-performance data.
+- `api/_lib/providerClient.js`: existing `append_to_response` detail call and retry-on-429 logic; `api/_lib/mappers/mediaMapper.js`: currently maps plot/genre/runtime/rating but not keyword terms.
+- `src/services/firebase/watchlist.js`: separate media catalog and watchlist payloads. `userState.vibe/energy` are mixed with flat compatibility properties; explicit user overrides **must not** be stored as indistinguishable generic inferred values.
+- `src/domain/media/schema.js`, `adapters.js`: schema v2 and flattening require a backwards-compatible read layer. Imports/templates/Decision filters need separate verification.
+- `docs/TECHNICAL_OVERVIEW.md`: App Hosting API + Firestore/Auth; it already refreshes TMDB metadata, but background application jobs are not automatically durable when browser sessions end.
 
-## Implementation map
+## External-source evaluation — free-only requirement
 
-- `src/domain/media/classification.mjs`: normalization, canonical typed identity, versioned evidence rules, strict facet validator, conservative hybrid blending, provenance and admin overlay.
-- `src/domain/media/tonightClassification.js`: category scoring, next-watchable runtime, eligibility and unique allocation. `TonightView.jsx` consumes these rows through its existing balance/shuffle/presentation path.
-- TMDB provider appends `keywords` to existing detail requests. Mapper supports movie `keywords.keywords` and TV `keywords.results`. Existing 429 retry/concurrency behavior is preserved.
-- `POST /api/media/classify`: verified, non-anonymous Firebase ID token plus the existing approved-user allowlist; existing backend rate limiter; strict body containing only `{ id, type }`; `no-store` responses. No client-provided synopsis, notes, identity or history is accepted for inference.
-- `api/_lib/classificationService.js`: in-process promise deduplication, Firestore transaction lease, source-hash/version/policy cache, conditional facet-only catalog writes and shared daily budget.
-- `api/_lib/geminiClassifier.js`: direct REST API, strict JSON Schema/enums, runtime semantic validation, no tools/search, default 5-second timeout (hard maximum 10 seconds), at most two attempts on 5xx. Quota/timeout/invalid response/budget failure returns the baseline. Every provider attempt, including a retry, first reserves a persisted daily budget unit.
-- `src/services/mediaApi/classificationQueue.js`: one title at a time; 1.2-second spacing; three attempts per canonical title per open session; 15-minute transport/persistence retry delay. It polls for newly added/imported titles. The saved shelf is the durable pending-work source; browser retry markers are scoped to app/space. Navigation/unmount aborts the active request and suppresses late results. Storage failure does not prevent the current session from progressing.
-- `persistCatalogClassification`: conditional transaction using actual field-path updates, no activity timestamp update. Repeated additions cannot overwrite cached enrichment with a baseline. Shared spaces retain their own historical tags and progress.
+| Source | Terms/limits (checked Oct 26, 2026) | Quality and decision |
+| --- | --- | --- |
+| TMDB developer API | Non-commercial use is free with logo attribution. Old 40 requests/10 seconds limit was disabled in 2019; current protective rate is roughly 40 requests/second, adjustable; handle 429/Retry-After. | **Primary.** Keep server-side; extend detail call with `keywords`, optionally TV `content_ratings`. No dedicated mood/focus property. |
+| Gemini API free tier | Some supported model input/output tokens free; *live* RPM/TPM/RPD, model access vary by project and can change. JSON Schema structured outputs are supported. **Unpaid requests/outputs can be used for Google product development/human review.** | **Optional** subjective classification. No private notes, identities, whole household list or viewing history. Review provider-data redistribution permissions before sending TMDB synopsis/keywords as prompts. |
+| OMDb | Official free key at 1,000 calls/day, CC BY-NC restrictions on its website. | Fallback only; largely duplicates TMDB facts and does not answer attention/visual questions. |
+| Wikidata | Queryable CC0 data; respect endpoint usage policy. | Possible curated films, external IDs and known facts, not nuanced mood inference. |
+| IMDb bulk datasets | Limited personal non-commercial files, explicit attribution and no IMDb scraping. | Not worth nightly updates, data matching and legal maintenance for mood inference. |
+| TMDB user reviews | Movie reviews endpoint exists but reviews are variable and may be unavailable; third-party prose rights. | **Skip by default**. No external review scraping or large copyrighted text in LLM prompts. |
+| YouTube trailers | YouTube API quota/terms; analysis of audiovisual content adds complexity and dependence. | Out of scope: neither necessary nor safely free at scale. |
 
-## Cache, revision and failure policy
+**Primary verification:**
 
-Canonical inference key is `tmdb:movie:<id>` or `tmdb:tv:<id>`, even where the historic watchlist/catalog ID remains `tmdb:<id>`. This change does not migrate existing document IDs. Catalog writes verify the actual provider/type before applying facets. Legacy manual rows without a usable provider identity receive local rules only until ordinary metadata hydration resolves their identity.
+- TMDB pricing/attribution: https://developer.themoviedb.org/docs/faq
+- TMDB rate limits: https://developer.themoviedb.org/docs/rate-limiting
+- TMDB one-request appended details: https://developer.themoviedb.org/docs/append-to-response
+- TMDB movie keywords: https://developer.themoviedb.org/reference/movie-keywords
+- TMDB TV keywords: https://developer.themoviedb.org/reference/tv-series-keywords
+- TMDB TV content ratings: https://developer.themoviedb.org/reference/tv-series-content-ratings
+- TMDB movie user reviews: https://developer.themoviedb.org/reference/movie-reviews
+- Gemini tier pricing: https://ai.google.dev/gemini-api/docs/pricing
+- Gemini live limits guidance: https://ai.google.dev/gemini-api/docs/rate-limits
+- Gemini structured outputs: https://ai.google.dev/gemini-api/docs/structured-output
+- Gemini privacy/terms: https://ai.google.dev/gemini-api/terms
+- Official OMDb key tiers: https://www.omdbapi.com/apikey.aspx
+- Wikidata rights: https://www.wikidata.org/wiki/Wikidata:SPARQL_query_service/Copyright
+- IMDb limitations: https://help.imdb.com/article/imdb/general-information/can-i-use-imdb-data-in-my-software/G5JTRESSHJBBHTGX
 
-The cache is in server-only `classification_cache`, keyed by canonical identity, storing classifier/prompt/model policy and a SHA-256 hash of normalized public facts. Fresh provider facts invalidate old revisions; fetchedAt, artwork and personal changes do not. Cache hits reuse classification. Successful/disabled results last 30 days; quota/budget/provider inference failures use baseline with a 24-hour enrichment retry. A 60-second lease recovers work after process termination. Simultaneous requests in one process share TMDB too; across instances, the lease prevents duplicate Gemini calls. A crashed call can consume a budget unit without a result; it cannot create unbounded retries.
+### Why not Gemini alone?
 
-No work assumes CPU after an HTTP response or client exit. The browser retries missing/version-stale results on a later active session. Closing the app means pending work can wait. There is no Cloud Functions, scheduler, queue service or always-running worker. A successful cache write followed by a failed catalog write retries the cached result without another model call. Catalog corrections, personal state, and creation/activity dates survive enrichment.
+Pros: quick classification of language-rich titles, fewer editorial heuristics. Cons: free-tier requests may run out, new titles may lack summaries, model revisions change outputs, outputs can be confidently wrong, prompts with user data violate our privacy intention, and a model calling one exclusive category will repeat Tonight's overlap mistakes. Use Gemini only to infer independent facets, and compare its output against human annotation. The application's normal Add flow must remain functional without Gemini.
 
-Server cache and daily-budget documents are denied to clients by the existing catch-all rules; the Admin SDK uses IAM. Library options includes a Credits section with the unmodified official TMDB logo, source link and required non-endorsement notice. The local logo was downloaded from the TMDB attribution page. Existing catalog rules are unchanged. No rule deployment is needed. Existing `(default)` database was verified as STANDARD / FIRESTORE_NATIVE / nam5. No database or other cloud resource was provisioned.
+### LLM input/output contract (proposal; not code)
 
-## Secret setup
+**Input**: `{ provider:'tmdb', providerId, type, title, releaseYear, language, genres, overview, keywordNames, runtimeMinutes }` only after reviewing TMDB usage terms and stripping unsafe markup. Never send `spaceId`, `userId`, users' notes, activity, watchlist contents or other private material. Max input length and request size; publicly available provider description only.
 
-Preferred name: **`GEMINI_API_KEY`**. `GEMINI_API` is accepted as an alias for the user's proposed name. Neither uses a `VITE_` prefix.
+**Output**: versioned object containing `comfort`, `comedyFirst`, `plotMomentum`, `narrativeComplexity`, `visualDistinctiveness`, `attentionDemand` each in `low | medium | high | unknown`; optional `classicEvidence` as `yes | no | unknown`; bounded evidence keywords and `uncertainFields` list. Validate object with independent app-side schema, never assume syntactically valid JSON is semantically correct. Avoid a 0–100 fake precision score. Protect against injected instructions in TMDB summaries/keywords: treat all metadata as untrusted data, not as agent commands.
 
-Local: add the key to the ignored `.env.local` or `.env.api` at the repo root. The server and pilot script load `.env.local`, then `.env.api`, then `.env`; existing shell variables take precedence. `.env.api.example` documents all controls. Do not paste the key into chat or a tracked file.
+**Contract invariants**:
+1. Shared media-level inferred attributes are stored by `provider:type:id`, `classifierVersion`, `modelId` if applicable, `updatedAt`, `sourceRevision` and `provenance`. No raw secrets/private prompts.
+2. Factual runtime/genre/identity are never overwritten by AI output.
+3. Unknown remains unknown; no blank string coerced to `Comfort`.
+4. `effectiveAttribute = explicitSpaceOverride ?? autoAttribute ?? unknown`; differentiate deliberate overrides from legacy imports/defaults. Provenance-less legacy inputs remain intact until a safe migration is designed.
+5. Primary Tonight section is a **selection** derived from independent attributes and current library mix, not an inherent unique movie label. #7 governs unique cross-row placement and Quick Bites priority.
+6. Users do not need to know the underlying implementation.
 
-Production: Firebase console → App Hosting → the Hearth backend → settings/environment → add a **secret** backed by Cloud Secret Manager. Name/map it to `GEMINI_API_KEY`, grant only the backend service identity access, and expose it at **RUNTIME** only. A commented `apphosting.yaml` reference is supplied; it remains commented so deployments without the optional secret continue to work.
+### Concrete mapping examples, not model ground truth
 
-CLI alternative:
+| Title | Multiple valid facets | Suggested Tonight candidate |
+| --- | --- | --- |
+| Paddington 2 | gentle + funny + approachable | Easy & Comforting |
+| Legally Blonde | comedy-first + accessible | Need a Laugh |
+| Ocean's Eleven | plot momentum + accessible | Get Hooked (#7 proposed label) |
+| Severance | focused + intricate | Deep Dives |
+| Spider-Man: Into the Spider-Verse | visual distinctiveness + playful energy | Spectacles |
+| Blade Runner 2049 | visual achievement + attention-heavy | Spectacles, not duplicated Deep Dives |
+| Roman Holiday | warm + funny + curated classic | Classics |
+| Unknown independent film with no overview | genres and date may exist; mood uncertain | General Shelf/unknown, never false comfort |
 
-```sh
-npx -y firebase-tools@latest apphosting:secrets:set GEMINI_API_KEY --project hearthv2
+These are *editorial examples*; validate with annotated reviewers, not by assuming a model's judgments are authoritative.
+
+## Proposed execution architecture
+
+```text
+Search / select title
+   ↓
+existing TMDB details API ── append keywords, normalize/map (no new paid provider)
+   ↓
+Add to Shelf immediately; no vibe/energy form
+   ↓
+lookup media-level classification by provider:type:id + version
+   ├─ present → apply cached independent facets
+   └─ missing → deterministic classification with "unknown" when insufficient
+                    ↓ optional, quota/privacy-approved
+                 Gemini classification with strict JSON schema
+                    ↓ validate, dedupe, version, cache and persist
+   ↓
+derive effective facets (per-space override wins)
+   ↓
+Tonight MECE selector (#7), Decision filters and Shelf cards
 ```
 
-Grant the selected App Hosting backend access using the CLI's backend prompt or console. Do not put a key in the shell command. Add the secret reference from `apphosting.yaml` only after the secret exists, and deploy through the normal release workflow.
+**Verified free-infrastructure boundary (Oct 26, 2026):** Firebase App Hosting **requires Blaze billing**; its underlying Cloud Run has a **2M requests/month no-cost allowance** and other service-specific allowances. Firestore Standard's published single free-database quota is 50,000 document reads/day and 20,000 writes/day. Cloud Functions deployment requires Blaze, and its deployed container storage can incur charges. For this personal, low-traffic app, the existing infrastructure may stay within no-cost allowances, but **zero charges cannot be guaranteed**. Set alerts, protect against unexpected classification loops, and never enable paid Gemini unintentionally. Sources: https://firebase.google.com/docs/app-hosting/costs , https://firebase.google.com/docs/firestore/quotas , https://firebase.google.com/docs/functions/quotas .
 
-Controls:
+**Durability caution:** App Hosting request handlers and browser-driven tasks do not guarantee arbitrary post-response work. Phase 1 can classify heuristically on the existing details request and enqueue pending analysis for next app session; if the requirement is guaranteed work after the app closes, evaluate secured Firestore-triggered background workers/Cloud Tasks and their actual Firebase billing requirements first. Do not market that option as fully free until verified. Prefer idempotent convergence over a hidden permanent polling worker.
 
-| Variable | Default / policy |
-| --- | --- |
-| `GEMINI_API_KEY` | absent, server only; `GEMINI_API` alias accepted |
-| `GEMINI_MODEL` | absent; select a currently available structured-output model with a verified free tier in AI Studio |
-| `GEMINI_CLASSIFICATION_ENABLED` | false; explicit pilot/rollout decision |
-| `GEMINI_METADATA_SHARING_APPROVED` | false; explicit review of TMDB reuse permission |
-| `GEMINI_DAILY_REQUEST_LIMIT` | 20 provider attempts/day, transactional across instances; 0 disables calls; hard ceiling 100 |
-| `GEMINI_TIMEOUT_MS` | 5000; bounded 100–10000 |
+**Cache design:** key by canonical provider+mediaType+id rather than title; version semantic classifier; one owner resolves concurrent requests; no Gemini requests for every view/render; support manual refresh only on explicit action or policy change. Reuse catalog when multiple spaces save the same title. Use normalized keyword list/overview hash to invalidate when source changes rather than every TMDB timestamp refresh.
 
-A key alone does not enable inference. No paid tier is activated by code. Provider availability/prices/quotas must be confirmed in the actual AI Studio project before selecting a model.
+**Backfill:** list existing media catalog entries, deduplicate canonical titles, classify unclassified entries in bounded batches, checkpoint progress, retry 429/timeout with exponential backoff and jitter, report classifiable/unknown/errors; never reset watch status, notes or episode progress. Apply the same logic to imported libraries; document unresolved identity records.
 
-## Privacy, rights and costs
+**UI:** Search → select → Add; no mood/focus chips, no editing controls in item details. Exceptional errors may be corrected by a controlled maintainer/admin workflow outside the application. For accessibility ensure correction is keyboard/touch accessible. Do not expose an "AI model" screen in Tonight.
 
-Gemini receives only a server-fetched projection: title, movie/show type, year, genres and bounded keywords. No TMDB overview, review text, private note, watchlist contents, account identifier, progress or history is sent. No raw model requests/responses are logged or stored. The API key travels in a header, not a URL. Malformed and unexpected schema fields are rejected. The LLM cannot change provider identity, year, duration or facts. `curatedClassic` remains unknown unless set by a maintainer.
+## Evaluation and deployment gates
 
-Google's unpaid-service terms permit content use/service improvement and human review; public-only inputs are intentional. Whether these particular TMDB-derived fields may be shared with the model still needs explicit rights review. TMDB's terms page was unavailable during verification; the implementation does not claim that a free API key grants redistribution/model-input rights. Sharing is gated off until approved.
+1. Annotate >=50 diverse representative titles (the existing 30 seed + 20 varied new) across film/TV, genres, sparse metadata and tricky boundaries. Record two human labels for disagreement where possible.
+2. Compare deterministic-only vs Gemini-assisted with per-attribute exact/adjacent agreement, hard category confusion, abstention rate, version repeatability, row usefulness and user corrections. Define acceptance thresholds before pilot; *do not quote accuracy without measurement*.
+3. Test factual fidelity, empty keyword/overview, multilingual titles, adult/mature handling, timeouts/rate limits, parse failures, malformed model output, duplicate add across spaces, long-running/cancelled tasks, and cached model upgrades.
+4. Compare before/after Add taps: no mandatory Vibe/Energy UI and no regression in save success/time. Include 320px/390px/448px portrait QA.
+5. Implement #7 cross-row de-duplication separately; test attention versus gripping, comedy-first versus genre membership, and next-episode runtime.
+6. Verify actual free Gemini quota **in AI Studio**, Google free-tier data retention terms, TMDB API attribution and third-party prompt processing rights, Firebase hosting/queue charges and secret storage. Budget-circuit-breaker must disable Gemini safely before charge. If license/terms cannot be confirmed, ship rule-only mode.
+7. Do not backfill as a one-shot long UI request; use resumable checkpoints, incremental job status and a report.
+8. QA Firestore rules so only authorized backend paths write automatic catalog metadata and per-space overrides remain restricted to authorized users.
 
-Firebase App Hosting already requires Blaze. This implementation retains `minInstances: 0`, adds no persistent worker, and creates only cache/budget documents on demand. No new infrastructure was deployed or billing plan changed. Initial baseline classification typically adds one cache lease transaction, one cache commit transaction and up to two catalog probes/conditional writes (typed and historical IDs), plus one client catalog transaction; SDK conflict retries can add operations. Each Gemini attempt adds one transactional budget read/write. Cached/version-complete browser work is skipped; no inference is regenerated on app open. API cache retries may re-fetch one TMDB detail payload to validate its revision, but reuse model output.
+## Implementation stages
 
-The database's free allowance is 50,000 reads and 20,000 writes/day (one eligible database), shared with the rest of the app. Existing Cloud Run/build/storage/network and optional Secret Manager usage are independently billable beyond allowances. The small pilot budget bounds model attempts, **not the total Firebase bill**. A dollar-exact incremental cost cannot be guaranteed without live project usage and region-specific billing; monitor billing and set project budget alerts. Do not describe this as guaranteed zero-cost hosting.
+- **Stage 0 — product/schema:** coordinate with #7, define attributes and provenance; human benchmark and privacy/terms gate.
+- **Stage 1 — deterministic free foundation:** TMDB keywords normalization and mapper tests; derive low-risk facets; use cached classifications; remove required Add questions; unknown-state fallback.
+- **Stage 2 — migration and corrections:** preserve existing manual choices and imports, adapt Decision filters, and document an exceptional maintainer-only correction procedure; no user-facing editing UI.
+- **Stage 3 — optional Gemini A/B pilot:** gated backend with strict schema and model pin/version; measure gold-fixture gain and actual free-tier limits; no private input; maintain fallback.
+- **Stage 4 — library backfill and Tonight integration:** resumable deduped reclassification, UX regression, #7 allocator and runtime fixes, telemetry restricted to aggregate non-personal operational metrics.
 
-Primary references, checked 2026-10-26:
-
-- [TMDB append-to-response](https://developer.themoviedb.org/docs/append-to-response), [movie keywords](https://developer.themoviedb.org/reference/movie-keywords), [TV keywords](https://developer.themoviedb.org/reference/tv-series-keywords), [rate limits](https://developer.themoviedb.org/docs/rate-limiting), [FAQ/attribution](https://developer.themoviedb.org/docs/faq).
-- [Gemini keys](https://ai.google.dev/gemini-api/docs/api-key), [structured output](https://ai.google.dev/gemini-api/docs/structured-output), [terms](https://ai.google.dev/gemini-api/terms), [pricing](https://ai.google.dev/gemini-api/docs/pricing), [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits).
-- [App Hosting secrets](https://firebase.google.com/docs/app-hosting/configure), [App Hosting costs](https://firebase.google.com/docs/app-hosting/costs), [Firestore quotas](https://firebase.google.com/docs/firestore/quotas).
-
-## Evaluation and rollout gates
-
-The fixture contains 50 real films/shows, including the existing 30 seeds, plus one synthetic low-information case. Public TMDB identity, genres, keywords and runtime were refreshed during implementation; a mismatched Joan of Arc ID was corrected from the provider. Editorial facet labels are **provisional annotations**, not a measured human consensus or training truth. Each case records reviewer ambiguity; independent reviewers must adjudicate/update `review` before passing a rollout gate.
-
-```sh
-# Offline, deterministic rules evaluation; no AI calls
-node scripts/evaluateClassification.cjs
-
-# Explicit live pilot, three repeated predictions per item; uses persisted budget
-# Set flags/key/model in .env.local or .env.api after rights review. No secret in command.
-node scripts/evaluateClassification.cjs --gemini --limit=5 --out=/tmp/hearth-classification-pilot.json
-```
-
-Increase the title limit only within the confirmed provider/project quotas. A full three-run evaluation needs at least 150 calls and therefore multiple days with the hard daily ceiling, or a pre-existing approved result set. Re-run with the same output path on later days to resume incomplete predictions. Model, prompt and classifier versions must match, and frozen public fixture inputs keep the multi-day comparison reproducible. `--limit` bounds newly attempted titles in one invocation. Do not bypass the hard ceiling or interpret partial batches as a passing full pilot.
-
-The JSON report includes per-facet exact agreement, a confusion matrix (including unknown), unavailable rate, multi-run stability, rules predictions alongside hybrid predictions, prompt/model version and subjective reviewer notes. Predetermined thresholds: >=80% agreement per subjective facet, <=35% unknown per subjective facet, >=95% repeated-run stability, all 50 real titles covered, reviewed fixture approved. Classic curation is reported separately from the model quality gate.
-
-Current [offline evidence](issue-020-evaluation.json): deterministic but sparse baseline. Most subjective facets abstain on this fixture. It does **not** meet semantic coverage targets and must not be described as AI quality validation. No live Gemini run has been made; its agreement and stability are unmeasured. Rules remain a safe fallback, not a claim of complete subjective coverage.
-
-## Maintainer correction workflow
-
-No in-app correction/reset controls. A developer with existing Firebase Admin credentials can inspect a dry-run plan:
-
-```sh
-node scripts/correctClassification.cjs --id=603 --type=movie --facet=visualDistinctiveness --value=high --reason="Reviewed visual craft"
-```
-
-Add `--apply` only after reviewing the plan. It conditionally updates existing matching catalog documents, changes only the named facet override and its audit fields, and leaves generated cache, personal tags, activity and progress intact. `--value=unknown` forces an explicit abstention. Corrections are shared editorial metadata; avoid personal data in the reason. Reload the catalog-backed shelf to display a correction. Remove an override field only through the controlled Admin workflow when intending to restore automatic evidence.
-
-## Verification
-
-All 353 unit tests and 33 API tests pass, plus lint with zero warnings and a production Vite build. Headless Chromium exercised Add and item details at 320/390/448 CSS px with reduced motion: Add enabled after valid metadata, no tag selectors, and no horizontal overflow. Screenshots were visually reviewed. This caught and removed an old demo-only Comfort/Balanced fallback, so unknowns now behave consistently in the demo too. A separate transaction regression covers late/stale classification results and shared-catalog preservation. No browser session used a Gemini key.
-
-## Acceptance ledger
-
-Implemented and locally testable:
-
-- Independent bounded facets, explicit unknown, provenance, pure classifier and validation.
-- Movie/TV keyword normalization, version/source/policy cache, dedupe, leases and atomic budgets.
-- Search/select/add without manual tags; optional episode hydration cannot block a valid title.
-- Import without invented defaults, preservation of historical/imported choices and shared-space state.
-- Resumable bounded backfill with count/error progress in the developer console.
-- Unique thematic placement and positive next-watchable runtime checks; no classification-editing UI.
-- Mocked quota/offline/timeout/malformed output/partial failure/cache race/multi-space tests; full unit and API suites; lint and production build.
-- A 51-case fixture, reproducible evaluation report, external correction workflow and secret/deployment documentation.
-
-Required before closure/AI rollout: live Gemini pilot after the key is supplied, independently reviewed facet gold labels, adjudication of disagreements, TMDB sharing permission, actual AI Studio free-tier quota confirmation, and production smoke/billing review after an authorized deployment. These are external validation gates, not silently passed checkboxes. No deployment or production backfill has been performed in this session.
+**Not accomplished by this document:** no Add redesign, classifiers, Gemini connection, Firestore migrations, background workers or backfills have been implemented or tested. Completion requires the checklist and verifiable tests in issue #20. Upon closure move this record to `docs/closed/` and update issue links + docs index.

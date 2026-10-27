@@ -1,0 +1,204 @@
+// Pure row composition for Tonight (issue #7). Consumes the output of
+// allocateTonightThemes (each canonical title in exactly one array) and returns
+// the bounded, ordered rows the page should render. No React, no I/O.
+
+// Default tie-break order, also the order rows are considered.
+const THEME_ORDER = [
+  'comfort',
+  'comedy',
+  'quick',
+  'focused',
+  'visual',
+  'classic',
+];
+
+const THEME_TITLES = {
+  comfort: 'Easy & Comforting',
+  comedy: 'Need a Laugh',
+  quick: 'Quick Bites',
+  focused: 'Deep Dives',
+  visual: 'Spectacles',
+  classic: 'The Classics',
+};
+
+// OPEN PRODUCT DECISION: both titles below are placeholders. `unknown`
+// (unclassified) titles and titles from rows too small to stand alone are
+// folded into the fallback row; the final name has not been chosen.
+export const FALLBACK_ROW_KEY = 'unknown';
+export const FALLBACK_ROW_TITLE = 'More to Watch';
+export const MIXED_ROW_KEY = 'mixed';
+export const MIXED_ROW_TITLE = "Tonight's picks";
+
+export const MAX_ROW_ITEMS = 12;
+
+// UX test parameters from issue #7, not final policy. The first tier whose
+// `maxEligible` is >= the eligible count applies.
+//   compact: one mixed row instead of thematic rows
+//   maxRows: most rows shown   minItems: fewest cards a thematic row may have
+export const TONIGHT_TIERS = Object.freeze([
+  Object.freeze({ maxEligible: 0, maxRows: 0, minItems: 0, compact: false }),
+  Object.freeze({ maxEligible: 5, maxRows: 1, minItems: 1, compact: true }),
+  Object.freeze({ maxEligible: 12, maxRows: 2, minItems: 2, compact: false }),
+  Object.freeze({ maxEligible: 30, maxRows: 4, minItems: 3, compact: false }),
+  Object.freeze({
+    maxEligible: Infinity,
+    maxRows: 5,
+    minItems: 3,
+    compact: false,
+  }),
+]);
+
+const itemKey = (item) => String(item?.id ?? item?.key ?? '');
+
+// FNV-1a (32-bit) over the string, then a final avalanche so short keys that
+// differ in one character still spread across the range.
+const hashString = (value) => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < value.length; i += 1) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
+};
+
+// Deterministic seeded order. O(n log n); ties on equal hashes fall back to
+// input position so the result is always fully determined.
+export const stableOrder = (items, seed = '') =>
+  (Array.isArray(items) ? items : [])
+    .map((item, index) => ({
+      item,
+      index,
+      hash: hashString(`${seed}\u0000${itemKey(item)}`),
+    }))
+    .sort((a, b) => a.hash - b.hash || a.index - b.index)
+    .map(({ item }) => item);
+
+const finiteScore = (value) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : 0;
+
+const getTier = (eligibleCount) =>
+  TONIGHT_TIERS.find((tier) => eligibleCount <= tier.maxEligible) ||
+  TONIGHT_TIERS[TONIGHT_TIERS.length - 1];
+
+// Score once, then sort by score desc with the seeded order as tie-break.
+const rankItems = (items, scoreItem, seed) => {
+  const seeded = stableOrder(items, seed);
+  return seeded
+    .map((item, position) => ({
+      item,
+      position,
+      score: finiteScore(scoreItem(item)),
+    }))
+    .sort((a, b) => b.score - a.score || a.position - b.position);
+};
+
+const buildRow = (key, title, items, scoreItem, seed) => {
+  const ranked = rankItems(items, scoreItem, seed);
+  return {
+    key,
+    title,
+    items: ranked.slice(0, MAX_ROW_ITEMS).map(({ item }) => item),
+    strength: ranked.reduce((sum, { score }) => sum + score, 0),
+    size: ranked.length,
+  };
+};
+
+const publicRow = ({ key, title, items }) => ({ key, title, items });
+
+/**
+ * Compose the visible Tonight rows from allocated themes.
+ *
+ * @param {Record<string, object[]>} allocated allocateTonightThemes() output.
+ * @param {object} [options]
+ * @param {number} [options.eligibleCount] Eligible unwatched titles; picks the
+ *   size tier. Defaults to the number of distinct titles in `allocated`.
+ * @param {(item: object) => number} [options.scoreItem] Utility per title;
+ *   drives row strength and in-row order. Defaults to 0 (all equal).
+ * @param {string} [options.sessionSeed] Breaks ties between equal scores only.
+ * @returns {{ rows: {key: string, title: string, items: object[]}[], isEmpty: boolean }}
+ *
+ * Tiers (TONIGHT_TIERS): 0 -> empty; 1-5 -> one compact mixed row; 6-12 -> up to
+ * 2 rows of >=2; 13-30 -> up to 4 rows of >=3; 31+ -> up to 5 rows of >=3.
+ * Thematic rows below the tier minimum are merged with `unknown` titles into
+ * one fallback row, shown only if it meets the minimum and a slot is free.
+ * Titles not shown stay on the Shelf. No row ever holds a title twice, and
+ * outside the compact tier no row has fewer than the tier minimum.
+ */
+export const composeTonightRows = (
+  allocated,
+  { eligibleCount, scoreItem = () => 0, sessionSeed = '' } = {},
+) => {
+  const seen = new Set();
+  const groups = {};
+  const allKeys = [...THEME_ORDER, FALLBACK_ROW_KEY];
+  // Include any unexpected allocation keys in the fallback so nothing is lost.
+  const extraKeys = Object.keys(allocated || {}).filter(
+    (key) => !allKeys.includes(key),
+  );
+  for (const key of [...allKeys, ...extraKeys]) {
+    const target = THEME_ORDER.includes(key) ? key : FALLBACK_ROW_KEY;
+    const list = Array.isArray(allocated?.[key]) ? allocated[key] : [];
+    for (const item of list) {
+      const id = itemKey(item);
+      if (id && seen.has(id)) continue;
+      if (id) seen.add(id);
+      (groups[target] ||= []).push(item);
+    }
+  }
+
+  const total = Object.values(groups).reduce((n, list) => n + list.length, 0);
+  const requested = Number.isFinite(eligibleCount)
+    ? Math.max(0, Math.floor(eligibleCount))
+    : total;
+  const tier = getTier(total === 0 ? 0 : requested);
+  const empty = { rows: [], isEmpty: true };
+  if (total === 0 || tier.maxRows === 0) return empty;
+
+  if (tier.compact) {
+    const everything = allKeys.flatMap((key) => groups[key] || []);
+    const row = buildRow(
+      MIXED_ROW_KEY,
+      MIXED_ROW_TITLE,
+      everything,
+      scoreItem,
+      sessionSeed,
+    );
+    return { rows: [publicRow(row)], isEmpty: false };
+  }
+
+  const themed = [];
+  const fallbackPool = [...(groups[FALLBACK_ROW_KEY] || [])];
+  THEME_ORDER.forEach((key, order) => {
+    const list = groups[key] || [];
+    if (list.length >= tier.minItems) {
+      themed.push({
+        ...buildRow(key, THEME_TITLES[key], list, scoreItem, sessionSeed),
+        order,
+      });
+    } else {
+      fallbackPool.push(...list);
+    }
+  });
+
+  themed.sort(
+    (a, b) => b.strength - a.strength || b.size - a.size || a.order - b.order,
+  );
+  const rows = themed.slice(0, tier.maxRows);
+  if (rows.length < tier.maxRows && fallbackPool.length >= tier.minItems) {
+    rows.push(
+      buildRow(
+        FALLBACK_ROW_KEY,
+        FALLBACK_ROW_TITLE,
+        fallbackPool,
+        scoreItem,
+        sessionSeed,
+      ),
+    );
+  }
+  return { rows: rows.map(publicRow), isEmpty: rows.length === 0 };
+};

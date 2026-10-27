@@ -1,0 +1,286 @@
+import { describe, expect, it } from 'vitest';
+import {
+  composeTonightRows,
+  FALLBACK_ROW_TITLE,
+  MAX_ROW_ITEMS,
+  stableOrder,
+  TONIGHT_TIERS,
+} from './tonightComposition.js';
+
+const THEMES = ['comfort', 'comedy', 'quick', 'focused', 'visual', 'classic'];
+
+const make = (prefix, n) =>
+  Array.from({ length: n }, (_, i) => ({ id: `${prefix}-${i}` }));
+
+const allocate = (counts) => {
+  const rows = {
+    comfort: [],
+    comedy: [],
+    quick: [],
+    focused: [],
+    visual: [],
+    classic: [],
+    unknown: [],
+  };
+  Object.entries(counts).forEach(([key, n]) => {
+    rows[key] = make(key, n);
+  });
+  return rows;
+};
+
+// Spreads n titles round-robin over the six themes.
+const spread = (n) => {
+  const counts = {};
+  for (let i = 0; i < n; i += 1) {
+    const key = THEMES[i % THEMES.length];
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  return allocate(counts);
+};
+
+const ids = (result) => result.rows.flatMap((r) => r.items.map((i) => i.id));
+
+const expectInvariants = (result, { compact = false } = {}) => {
+  const all = ids(result);
+  expect(new Set(all).size).toBe(all.length);
+  result.rows.forEach((row) => {
+    expect(row.items.length).toBeLessThanOrEqual(MAX_ROW_ITEMS);
+    if (!compact) expect(row.items.length).toBeGreaterThan(1);
+  });
+};
+
+describe('composeTonightRows sizes', () => {
+  it('returns empty for 0 eligible', () => {
+    expect(composeTonightRows(allocate({}))).toEqual({
+      rows: [],
+      isEmpty: true,
+    });
+    expect(composeTonightRows(undefined)).toEqual({ rows: [], isEmpty: true });
+  });
+
+  it('shows one compact mixed row for 1 and 5 titles', () => {
+    const one = composeTonightRows(allocate({ comedy: 1 }));
+    expect(one.isEmpty).toBe(false);
+    expect(one.rows).toHaveLength(1);
+    expect(one.rows[0].key).toBe('mixed');
+    expect(one.rows[0].items).toHaveLength(1);
+
+    const five = composeTonightRows(
+      allocate({ comfort: 2, comedy: 1, visual: 1, unknown: 1 }),
+    );
+    expect(five.rows).toHaveLength(1);
+    expect(five.rows[0].key).toBe('mixed');
+    expect(five.rows[0].items).toHaveLength(5);
+    expectInvariants(five, { compact: true });
+  });
+
+  it('shows up to 2 rows of >=2 for 12 titles', () => {
+    const result = composeTonightRows(spread(12));
+    expect(result.rows.length).toBeLessThanOrEqual(2);
+    expect(result.rows.length).toBeGreaterThan(0);
+    expectInvariants(result);
+  });
+
+  it('shows up to 4 rows of >=3 for 30 titles', () => {
+    const result = composeTonightRows(
+      allocate({ comfort: 6, comedy: 6, focused: 6, visual: 6, classic: 6 }),
+    );
+    expect(result.rows).toHaveLength(4);
+    result.rows.forEach((r) =>
+      expect(r.items.length).toBeGreaterThanOrEqual(3),
+    );
+    expectInvariants(result);
+  });
+
+  it('shows up to 5 rows of >=3 and caps cards for 50+ titles', () => {
+    const result = composeTonightRows(
+      allocate({
+        comfort: 20,
+        comedy: 10,
+        quick: 8,
+        focused: 7,
+        visual: 5,
+        classic: 4,
+      }),
+    );
+    expect(result.rows).toHaveLength(5);
+    expect(result.rows[0].items).toHaveLength(MAX_ROW_ITEMS);
+    expectInvariants(result);
+  });
+
+  it('uses the supplied eligibleCount to choose the tier', () => {
+    const allocated = allocate({ comfort: 4, comedy: 4 });
+    expect(
+      composeTonightRows(allocated, { eligibleCount: 4 }).rows[0].key,
+    ).toBe('mixed');
+    expect(composeTonightRows(allocated).rows.map((r) => r.key)).toEqual([
+      'comfort',
+      'comedy',
+    ]);
+  });
+
+  it('exposes tunable tiers', () => {
+    expect(TONIGHT_TIERS.map((t) => t.maxEligible)).toEqual([
+      0,
+      5,
+      12,
+      30,
+      Infinity,
+    ]);
+  });
+});
+
+describe('composeTonightRows skew and fallback', () => {
+  it('keeps a comedy-heavy library led by comedy with no tiny rails', () => {
+    const result = composeTonightRows(
+      allocate({ comedy: 18, comfort: 2, visual: 1, focused: 1 }),
+    );
+    expect(result.rows[0].key).toBe('comedy');
+    expectInvariants(result);
+    expect(result.rows.map((r) => r.key)).not.toContain('visual');
+  });
+
+  it('folds undersized themes and unknown titles into More to Watch', () => {
+    const result = composeTonightRows(
+      allocate({ comedy: 8, visual: 1, classic: 1, quick: 1, unknown: 2 }),
+    );
+    expect(result.rows.map((r) => r.key)).toEqual(['comedy', 'unknown']);
+    const fallback = result.rows[1];
+    expect(fallback.title).toBe(FALLBACK_ROW_TITLE);
+    expect(fallback.items).toHaveLength(5);
+    expectInvariants(result);
+  });
+
+  it('omits the fallback row when it would be below the minimum', () => {
+    const result = composeTonightRows(
+      allocate({ comedy: 8, comfort: 4, visual: 1, unknown: 0 }),
+    );
+    expect(result.rows.map((r) => r.key)).toEqual(['comedy', 'comfort']);
+  });
+
+  it('keeps a visual-heavy library led by Spectacles', () => {
+    const result = composeTonightRows(
+      allocate({ visual: 15, comfort: 3, comedy: 3 }),
+    );
+    expect(result.rows[0].key).toBe('visual');
+    expect(result.rows[0].title).toBe('Spectacles');
+    expect(result.rows[0].items).toHaveLength(MAX_ROW_ITEMS);
+    expectInvariants(result);
+  });
+
+  it('puts the fallback last and only when a slot is free', () => {
+    const result = composeTonightRows(
+      allocate({ comfort: 3, comedy: 3, quick: 3, focused: 3, unknown: 4 }),
+    );
+    expect(result.rows).toHaveLength(4);
+    expect(result.rows.map((r) => r.key)).not.toContain('unknown');
+  });
+
+  it('never strands everything: all-singletons fall back to one row', () => {
+    const result = composeTonightRows(spread(6));
+    expect(result.rows.map((r) => r.key)).toEqual(['unknown']);
+    expect(result.rows[0].items).toHaveLength(6);
+  });
+
+  it('drops a title that appears in two allocated rows', () => {
+    const shared = { id: 'dup' };
+    const result = composeTonightRows({
+      comfort: [shared, ...make('a', 3)],
+      comedy: [shared, ...make('b', 3)],
+    });
+    expect(ids(result).filter((id) => id === 'dup')).toHaveLength(1);
+  });
+});
+
+describe('composeTonightRows ordering and determinism', () => {
+  const counts = { comfort: 4, comedy: 4, focused: 4, visual: 4 };
+
+  it('orders equal-strength rows by count then default order', () => {
+    const result = composeTonightRows(
+      allocate({ visual: 5, comfort: 3, comedy: 3 }),
+    );
+    expect(result.rows.map((r) => r.key)).toEqual(['visual', 'comfort']);
+    const equal = composeTonightRows(allocate(counts));
+    expect(equal.rows.map((r) => r.key)).toEqual([
+      'comfort',
+      'comedy',
+      'focused',
+      'visual',
+    ]);
+  });
+
+  it('lets scoreItem change row order', () => {
+    const scoreItem = (item) => (item.id.startsWith('visual') ? 10 : 1);
+    const result = composeTonightRows(allocate(counts), { scoreItem });
+    expect(result.rows[0].key).toBe('visual');
+  });
+
+  it('sorts items inside a row by score before the seeded order', () => {
+    const allocated = allocate({ comfort: 6 });
+    const scoreItem = (item) => (item.id === 'comfort-4' ? 5 : 0);
+    const a = composeTonightRows(allocated, { scoreItem, sessionSeed: 'a' });
+    const b = composeTonightRows(allocated, { scoreItem, sessionSeed: 'b' });
+    expect(a.rows[0].items[0].id).toBe('comfort-4');
+    expect(b.rows[0].items[0].id).toBe('comfort-4');
+  });
+
+  it('is deterministic for the same inputs and seed', () => {
+    const run = () =>
+      composeTonightRows(spread(40), {
+        sessionSeed: 'day-1',
+        scoreItem: () => 1,
+      });
+    expect(run()).toEqual(run());
+  });
+
+  it('changes order across seeds only among equal scores', () => {
+    const allocated = allocate({ comfort: 10 });
+    const scoreItem = (item) =>
+      Number(item.id.split('-')[1]) % 3 === 0 ? 2 : 0;
+    const orders = ['s1', 's2', 's3', 's4'].map((sessionSeed) =>
+      composeTonightRows(allocated, {
+        scoreItem,
+        sessionSeed,
+      }).rows[0].items.map((i) => i.id),
+    );
+    // Score tiers never interleave, whatever the seed.
+    orders.forEach((order) => {
+      const scores = order.map((id) => scoreItem({ id }));
+      expect(scores).toEqual([...scores].sort((x, y) => y - x));
+    });
+    expect(new Set(orders.map((o) => o.join())).size).toBeGreaterThan(1);
+    // Same members every time.
+    orders.forEach((o) => expect([...o].sort()).toEqual([...orders[0]].sort()));
+  });
+});
+
+describe('stableOrder', () => {
+  const items = make('t', 20);
+
+  it('is pure, deterministic and keeps every item once', () => {
+    const copy = [...items];
+    const a = stableOrder(items, 'seed');
+    expect(items).toEqual(copy);
+    expect(stableOrder(items, 'seed')).toEqual(a);
+    expect(a.map((i) => i.id).sort()).toEqual(items.map((i) => i.id).sort());
+  });
+
+  it('depends on the seed', () => {
+    expect(stableOrder(items, 'x')).not.toEqual(stableOrder(items, 'y'));
+  });
+
+  it('does not depend on input order', () => {
+    const forward = stableOrder(items, 'k').map((i) => i.id);
+    const reversed = stableOrder([...items].reverse(), 'k').map((i) => i.id);
+    expect(reversed).toEqual(forward);
+  });
+
+  it('handles empty and invalid input', () => {
+    expect(stableOrder([], 's')).toEqual([]);
+    expect(stableOrder(null, 's')).toEqual([]);
+  });
+
+  it('scales to large inputs', () => {
+    expect(stableOrder(make('big', 20000), 'seed')).toHaveLength(20000);
+  });
+});

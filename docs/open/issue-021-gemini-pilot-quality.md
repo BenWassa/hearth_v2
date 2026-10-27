@@ -38,6 +38,21 @@ These are independent agent adjudications, **not human approval**. The fixture f
 
 Each fixture preserves a detailed disagreement note and still requires a human reviewer.
 
+### Re-score of the saved v1 predictions
+
+No new provider calls were made for this re-score. Applying the adjudicated labels and majority-vote agreement to the existing three predictions per title changes the five-title v1 picture to:
+
+| Facet | Agreement | Stability | Majority unknown |
+| --- | ---: | ---: | ---: |
+| Comfort | 80% | 80% | 0% |
+| Comedy first | 100% | 100% | 0% |
+| Plot momentum | 80% | 60% | 20% |
+| Narrative complexity | 80% | 100% | 0% |
+| Visual distinctiveness | 0% | 20% | 80% |
+| Attention demand | 100% | 80% | 0% |
+
+This isolates the remaining problem more clearly: most non-visual agreement is already at the provisional 80% threshold after benchmark cleanup, but repeat stability still fails for comfort, plot momentum and attention demand, and visual distinctiveness remains unusable. Prompt/policy v2 therefore targets rubric clarity and visual calibration rather than changing the model at the same time.
+
 ## Implemented candidate policy
 
 - Classifier version: `viewing-2`.

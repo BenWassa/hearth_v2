@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   selectLiveFixtures,
+  findRuleExpectedConflicts,
   representativeValue,
 } = require('../../scripts/classificationEvaluation.cjs');
 
@@ -58,4 +59,28 @@ test('classification evaluation uses majority predictions for agreement while le
     'unknown',
   );
   assert.equal(representativeValue([prediction('high')], 'comfort'), 'high');
+});
+
+
+test('classification evaluation exposes deterministic-rule conflicts with fixture labels', () => {
+  assert.deepEqual(
+    findRuleExpectedConflicts([
+      {
+        key: 'tmdb:movie:1',
+        rules: {
+          comfort: { value: 'high' },
+          comedyFirst: { value: 'unknown' },
+        },
+        expected: { comfort: 'medium', comedyFirst: 'unknown' },
+      },
+    ]),
+    [
+      {
+        key: 'tmdb:movie:1',
+        facet: 'comfort',
+        rule: 'high',
+        expected: 'medium',
+      },
+    ],
+  );
 });

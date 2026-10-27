@@ -65,6 +65,8 @@ const TonightHeaderMenu = ({
   isTemplateSession = false,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isDataOpen, setIsDataOpen] = useState(false);
+  const dataTriggerRef = useRef(null);
   const profileRef = useRef(null);
   const utilityRef = useRef(null);
   const utilityTriggerRef = useRef(null);
@@ -80,6 +82,7 @@ const TonightHeaderMenu = ({
   };
 
   useEffect(() => {
+    if (!isMenuOpen) setIsDataOpen(false);
     if (isMenuOpen) {
       focusMenuEdge(utilityMenuRef.current, entryDirectionRef.current);
       entryDirectionRef.current = 'first';
@@ -188,10 +191,17 @@ const TonightHeaderMenu = ({
               {isMenuOpen && (
                 <div
                   ref={utilityMenuRef}
-                  onKeyDown={(event) =>
-                    handleMenuKeyDown(event, setIsMenuOpen, utilityTriggerRef)
-                  }
-                  className={`${menuSurface} left-0 z-30 w-56`}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape' && isDataOpen) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setIsDataOpen(false);
+                      dataTriggerRef.current?.focus();
+                      return;
+                    }
+                    handleMenuKeyDown(event, setIsMenuOpen, utilityTriggerRef);
+                  }}
+                  className={`${menuSurface} left-0 z-30 max-h-[calc(100dvh-6rem)] w-56 overflow-y-auto`}
                   role="menu"
                   aria-label="Library options"
                 >
@@ -222,19 +232,42 @@ const TonightHeaderMenu = ({
                     Export library
                   </button>
                   {onDeleteAll && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        onOpenDeleteAll?.();
-                      }}
-                      className={`${menuItemBase} ${menuDivider} text-red-400 hover:bg-red-950/30 hover:text-red-300 focus-visible:bg-red-950/30`}
-                      role="menuitem"
-                      tabIndex={-1}
-                    >
-                      <Trash2 className="w-4 h-4 shrink-0" />
-                      Delete all titles
-                    </button>
+                    <>
+                      <button
+                        ref={dataTriggerRef}
+                        type="button"
+                        onClick={() => setIsDataOpen((open) => !open)}
+                        className={`${menuItemBase} ${menuDivider} justify-between text-stone-300 hover:bg-stone-900/70 hover:text-stone-100`}
+                        role="menuitem"
+                        tabIndex={-1}
+                        aria-expanded={isDataOpen}
+                        aria-controls="library-data-actions"
+                      >
+                        Data
+                        <span aria-hidden="true">{isDataOpen ? '▴' : '▾'}</span>
+                      </button>
+                      {isDataOpen && (
+                        <div
+                          id="library-data-actions"
+                          role="group"
+                          aria-label="Data"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              onOpenDeleteAll?.();
+                            }}
+                            className={`${menuItemBase} pl-6 text-red-400 hover:bg-red-950/30 hover:text-red-300 focus-visible:bg-red-950/30`}
+                            role="menuitem"
+                            tabIndex={-1}
+                          >
+                            <Trash2 className="w-4 h-4 shrink-0" />
+                            Delete all titles
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                   {showDevMetadataTools && (
                     <>
@@ -262,6 +295,30 @@ const TonightHeaderMenu = ({
                     className={`px-4 py-2.5 text-label text-stone-400 ${menuDivider}`}
                   >
                     v{APP_VERSION}
+                  </div>
+                  <div className={`px-4 pb-3 pt-2 ${menuDivider}`}>
+                    <p className={menuEyebrow}>Credits</p>
+                    <a
+                      href="https://www.themoviedb.org"
+                      target="_blank"
+                      rel="noreferrer"
+                      role="menuitem"
+                      tabIndex={-1}
+                      aria-label="TMDB, movie and TV metadata (opens in a new tab)"
+                      className="my-1 flex min-h-11 items-center rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                    >
+                      <img
+                        src="/tmdb-logo.svg"
+                        alt="TMDB"
+                        width="70"
+                        height="10"
+                        className="h-auto w-[70px]"
+                      />
+                    </a>
+                    <p className="text-xs leading-relaxed text-stone-400">
+                      This product uses the TMDB API but is not endorsed or
+                      certified by TMDB.
+                    </p>
                   </div>
                 </div>
               )}

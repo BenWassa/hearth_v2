@@ -407,3 +407,76 @@ describe('explicit optional World metadata storage', () => {
     expect(set.mock.calls[0][1]).toMatchObject({ 'media.worldIds': ['dc'] });
   });
 });
+
+describe('persistCatalogClassification', () => {
+  beforeEach(() => vi.clearAllMocks());
+  it('uses conditional field-path updates without touching user state or timestamps', async () => {
+    const current = {
+      source: { provider: 'tmdb', providerId: '603' },
+      media: {
+        type: 'movie',
+        classificationOverride: { attributes: { comfort: 'low' } },
+      },
+    };
+    const transaction = {
+      get: vi.fn().mockResolvedValue({ data: () => current }),
+      update: vi.fn(),
+    };
+    runTransactionMock.mockImplementation((_db, callback) =>
+      callback(transaction),
+    );
+    const { persistCatalogClassification } = await loadModule();
+    const classification = { key: 'tmdb:movie:603', classifiedAt: 100 };
+    await persistCatalogClassification({
+      db: 'db',
+      appId: 'app',
+      mediaId: 'tmdb:603',
+      classification,
+    });
+    expect(transaction.update).toHaveBeenCalledWith(expect.anything(), {
+      'media.classification': classification,
+    });
+    expect(current.media.classificationOverride.attributes.comfort).toBe('low');
+    transaction.update.mockClear();
+    current.media.classification = { classifiedAt: 200 };
+    await persistCatalogClassification({
+      db: 'db',
+      appId: 'app',
+      mediaId: 'tmdb:603',
+      classification,
+    });
+    expect(transaction.update).not.toHaveBeenCalled();
+    current.media.type = 'show';
+    await persistCatalogClassification({
+      db: 'db',
+      appId: 'app',
+      mediaId: 'tmdb:603',
+      classification,
+    });
+    expect(transaction.update).not.toHaveBeenCalled();
+  });
+  it('does not overwrite generated classification when adding the same title to another space', async () => {
+    const set = vi.fn();
+    writeBatchMock.mockReturnValue({
+      set,
+      commit: vi.fn().mockResolvedValue(undefined),
+    });
+    const { addWatchlistItem } = await loadModule();
+    await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'another',
+      payload: {
+        title: 'Film',
+        type: 'movie',
+        source: { provider: 'tmdb', providerId: '603' },
+        media: {
+          type: 'movie',
+          title: 'Film',
+          classification: { method: 'rules' },
+        },
+      },
+    });
+    expect(set.mock.calls[0][1].media).not.toHaveProperty('classification');
+  });
+});

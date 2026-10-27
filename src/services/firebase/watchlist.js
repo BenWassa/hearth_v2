@@ -1,4 +1,8 @@
 import {
+  canonicalMediaKey,
+  tagProvenance,
+} from '../../domain/media/classification.mjs';
+import {
   collection,
   deleteDoc,
   doc,
@@ -121,6 +125,7 @@ const buildCatalogPayload = (payload = {}, mediaId) => {
       type,
       title,
       originalTitle: asString(media.originalTitle),
+      keywords: asArray(media.keywords),
       year,
       runtimeMinutes,
       overview: asString(media.overview),
@@ -209,6 +214,7 @@ const buildWatchlistPayload = (
     backdrop: asString(media.backdrop || payload.backdrop),
     logo: asString(media.logo || payload.logo),
     userState: {
+      tagProvenance: tagProvenance(payload),
       status,
       vibe,
       energy,
@@ -548,4 +554,23 @@ export const bulkDeleteWatchlistItems = async ({
       deleteDoc(getWatchlistDocRef(db, appId, spaceId, itemId)),
     ),
   );
+};
+
+// Conditional, facet-only enrichment. update() interprets field paths correctly
+// and never advances the household activity timestamp or overwrites progress.
+export const persistCatalogClassification = async ({
+  db,
+  appId,
+  mediaId,
+  classification,
+}) => {
+  const ref = getCatalogDocRef(db, appId, mediaId);
+  return runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    const current = snapshot.data();
+    if (!current || canonicalMediaKey(current) !== classification.key) return;
+    const existing = current.media?.classification;
+    if (existing?.classifiedAt >= classification.classifiedAt) return;
+    transaction.update(ref, { 'media.classification': classification });
+  });
 };

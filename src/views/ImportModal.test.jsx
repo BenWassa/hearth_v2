@@ -93,37 +93,38 @@ describe('ImportModal', () => {
     await mounted.unmount();
   });
 
-  it('focuses the next missing field when a corrected row disappears, then the review heading', async () => {
-    const mounted = await mount({ onClose: vi.fn(), onImport: vi.fn() });
+  it('imports untagged titles without assigning default classifications', async () => {
+    const onImport = vi.fn().mockResolvedValue(undefined);
+    const mounted = await mount({ onClose: vi.fn(), onImport });
     await pasteRows(mounted.container, [
-      { title: 'First film', type: 'movie', vibe: 'comfort' },
-      { title: 'Second film', type: 'movie', vibe: 'easy' },
+      { title: 'First film', type: 'movie' },
     ]);
-    const firstLight = Array.from(
-      mounted.container.querySelectorAll('button'),
-    ).find((button) => button.textContent === 'Light');
-    firstLight.focus();
-    await act(async () => firstLight.click());
-    expect(mounted.container.querySelector('[value="First film"]')).toBeNull();
-    expect(document.activeElement.getAttribute('aria-labelledby')).toBe(
-      'import-energy-label-1',
+    expect(mounted.container.textContent).not.toContain('Auto-fill Defaults');
+    expect(
+      mounted.container.querySelector(
+        '[aria-labelledby="import-vibe-label-0"]',
+      ),
+    ).toBeNull();
+    await clickByText(mounted.container, 'Import');
+    expect(onImport).toHaveBeenCalledOnce();
+    expect(onImport.mock.calls[0][0][0].vibe).toBe('');
+    expect(onImport.mock.calls[0][0][0].userState.tagProvenance.vibe).toBe(
+      'automatic',
     );
-    await clickByText(mounted.container, 'Light');
-    expect(document.activeElement.textContent).toContain('Step 3 of 3');
     await mounted.unmount();
   });
 
   it('focuses the remaining issue when an import checkbox removes its row', async () => {
     const mounted = await mount({ onClose: vi.fn(), onImport: vi.fn() });
     await pasteRows(mounted.container, [
-      { title: 'First film', type: 'movie', vibe: 'comfort' },
-      { title: 'Second film', type: 'movie', vibe: 'easy' },
+      { title: 'First film', type: 'other', vibe: 'comfort' },
+      { title: 'Second film', type: 'other', vibe: 'easy' },
     ]);
     const checkbox = mounted.container.querySelector('input[type="checkbox"]');
     checkbox.focus();
     await act(async () => checkbox.click());
     expect(document.activeElement.getAttribute('aria-labelledby')).toBe(
-      'import-energy-label-1',
+      'import-type-label-1',
     );
     await mounted.unmount();
   });
@@ -139,11 +140,6 @@ describe('ImportModal', () => {
         '[aria-labelledby="import-type-label-0"]',
         'Type must be movie or show.',
       ],
-      ['[aria-labelledby="import-vibe-label-0"]', 'Choose a vibe.'],
-      [
-        '[aria-labelledby="import-energy-label-0"]',
-        'Energy must be one of the listed options.',
-      ],
     ];
     for (const [selector, message] of errors) {
       const field = mounted.container.querySelector(selector);
@@ -156,7 +152,7 @@ describe('ImportModal', () => {
     expect(mounted.container.textContent).not.toContain(
       'marked in red or orange',
     );
-    await clickByText(mounted.container, 'Assign Manually');
+    await clickByText(mounted.container, 'Fix details');
     expect(document.activeElement).toBe(
       mounted.container.querySelector('input[aria-label="Title"]'),
     );

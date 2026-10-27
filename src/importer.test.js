@@ -58,11 +58,11 @@ describe('importer', () => {
       source: null,
       media: null,
       showData: null,
-      userState: null,
+      userState: { tagProvenance: { vibe: 'imported', energy: 'imported' } },
     });
   });
 
-  it('flags missing energy and vibe when allowed', () => {
+  it('allows missing classification fields in preview', () => {
     const item = normalizeItem({ title: 'Paddington 2', type: 'movie' });
     const result = validateItem(item, {
       validVibes: VALID_VIBES,
@@ -70,18 +70,18 @@ describe('importer', () => {
       allowMissing: true,
     });
 
-    expect(result.missing).toEqual(['vibe', 'energy']);
+    expect(result.missing).toEqual([]);
     expect(result.isValid).toBe(true);
   });
 
-  it('requires missing energy and vibe for commit', () => {
+  it('allows missing classification fields for commit', () => {
     const item = normalizeItem({ title: 'Paddington 2', type: 'movie' });
     const result = validateItem(item, {
       validVibes: VALID_VIBES,
       validEnergies: VALID_ENERGIES,
     });
 
-    expect(result.isValid).toBe(false);
+    expect(result.isValid).toBe(true);
   });
 
   it('applies defaults before commit', () => {

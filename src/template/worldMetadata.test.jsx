@@ -64,3 +64,36 @@ it('retains valid explicit TV affiliation through demo add, edit and metadata re
     host.remove();
   }
 });
+
+it('does not manufacture Comfort or Balanced tags for an unclassified demo addition', async () => {
+  let state;
+  const Harness = () => {
+    state = useTemplateAppState();
+    return null;
+  };
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  try {
+    await act(async () => root.render(<Harness />));
+    await act(async () =>
+      state.handleAddItem({
+        type: 'movie',
+        title: 'Unknown mood',
+        source: { provider: 'tmdb', providerId: '603' },
+        userState: {
+          tagProvenance: { vibe: 'automatic', energy: 'automatic' },
+        },
+      }),
+    );
+    expect(state.items[0].vibe).toBe('');
+    expect(state.items[0].energy).toBe('');
+    expect(state.items[0].tagProvenance).toEqual({
+      vibe: 'automatic',
+      energy: 'automatic',
+    });
+  } finally {
+    await act(async () => root.unmount());
+    host.remove();
+  }
+});

@@ -196,3 +196,8 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 - All checkboxes in [issue #7](https://github.com/BenWassa/hearth_v2/issues/7) verified, full scenario matrix passing, no duplicated visible thematic titles, and no false-short `Quick Bites`.
 - The Tonight selection clearly reduces choices without burying unique saved titles.
 - When completed, move this file (preserving history via git) from `docs/open/` to `docs/closed/`, update status and link in the issue.
+
+
+## Issue #20 integration (2026-10-26)
+
+[Automatic classification implementation](issue-020-automatic-classification.md) now supplies independent, versioned viewing facets. `tonightClassification.js` implements scored primary assignment, typed canonical deduplication, exclusion of active/completed shows, and positive finite next-watchable runtime checks. Existing six labels remain; Quick Bites uses <=30 minutes and reserves its titles once. Automatic Comfort is never inferred from a missing tag or Light energy alone. Historic user/import tags stay preserved. These safety/assignment changes support #7, but do not claim completion of its dynamic row composition, activity weighting, taxonomy experiments, or user validation. Rules-only coverage is deliberately sparse; the optional Gemini quality pilot is still gated.

@@ -74,3 +74,27 @@ env:
     availability:
       - BUILD
       - RUNTIME
+
+# Optional Gemini pilot: create GEMINI_API_KEY in App Hosting's secret settings
+# (Cloud Secret Manager), then uncomment this runtime-only reference. Keep the
+# flags false until metadata sharing and the 50-title quality pilot are approved.
+#  - variable: GEMINI_API_KEY
+#    secret: GEMINI_API_KEY
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_MODEL
+#    value: <free-tier-model-confirmed-in-AI-Studio>
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_CLASSIFICATION_ENABLED
+#    value: "false"
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_METADATA_SHARING_APPROVED
+#    value: "false"
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_DAILY_REQUEST_LIMIT
+#    value: "20"
+#    availability:
+#      - RUNTIME

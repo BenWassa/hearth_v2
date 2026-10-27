@@ -1,3 +1,4 @@
+import { tagProvenance } from './classification.mjs';
 import { getExplicitWorldMetadata } from '../../config/collectionWorlds.js';
 import { normalizeWatchStatus } from './status.js';
 
@@ -57,6 +58,7 @@ export const buildLegacyWatchlistPayload = (item = {}, userId) => {
   const status = normalizeWatchStatus(item.status || 'unwatched');
   const payload = {
     ...getExplicitWorldMetadata(item),
+    tagProvenance: tagProvenance(item),
     mediaId,
     title: asString(item.title),
     type: asString(item.type || 'movie'),
@@ -171,6 +173,8 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
       type,
       title,
       originalTitle: asString(media.originalTitle),
+      keywords: asArray(media.keywords),
+      ...(media.classification ? { classification: media.classification } : {}),
       year: asString(media.year || item.year),
       runtimeMinutes,
       overview: asString(media.overview),
@@ -203,6 +207,7 @@ export const buildV2WatchlistPayload = (item = {}, userId) => {
       seasons,
     },
     userState: {
+      tagProvenance: tagProvenance(item),
       status,
       vibe,
       energy,

@@ -1,3 +1,4 @@
+import { tagProvenance } from '../domain/media/classification.mjs';
 import {
   getExplicitWorldMetadata,
   normalizeWorldIds,
@@ -187,8 +188,8 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
   const title = asString(media.title || item.title) || 'Untitled';
   const createdAt =
     item.createdAt || item.timestamp || fallbackCreatedAt || now;
-  const vibe = asString(userState.vibe || item.vibe) || 'comfort';
-  const energy = asString(userState.energy || item.energy) || 'balanced';
+  const vibe = asString(userState.vibe || item.vibe);
+  const energy = asString(userState.energy || item.energy);
   const overview = asString(media.overview || item.overview);
   const poster = asString(media.poster || media.posterUrl || item.poster);
   const backdrop = asString(
@@ -223,6 +224,7 @@ const normalizeTemplateItem = (rawItem, fallbackId, fallbackCreatedAt) => {
     year: asString(media.year || item.year),
     vibe,
     energy,
+    tagProvenance: tagProvenance(item),
     status: normalizeStatus(userState.status || item.status),
     note: asString(userState.note || item.note),
     runtimeMinutes,

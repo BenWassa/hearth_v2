@@ -74,8 +74,8 @@ const detailsEndpointForType = (type, id) => {
 };
 
 const DETAILS_APPEND = {
-  movie: 'credits,release_dates,images',
-  show: 'credits,content_ratings,images',
+  movie: 'credits,release_dates,images,keywords',
+  show: 'credits,content_ratings,images,keywords',
 };
 
 const buildImageLanguageParam = (locale = 'en-US') => {
@@ -218,12 +218,16 @@ const tryFetchDetails = async ({ id, type, locale = 'en-US' }) => {
   });
   if (!response.ok) return response;
 
+  const mapped =
+    type === 'show'
+      ? mapShowDetails(response.data)
+      : mapMovieDetails(response.data);
+  const { classifyMedia } = await import(
+    '../../src/domain/media/classification.mjs'
+  );
   return {
     ok: true,
-    data:
-      type === 'show'
-        ? mapShowDetails(response.data)
-        : mapMovieDetails(response.data),
+    data: { ...mapped, classification: classifyMedia({ ...mapped, locale }) },
     raw: response.data,
     type,
   };

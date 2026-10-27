@@ -94,6 +94,39 @@ describe('TonightHeaderMenu', () => {
     },
   );
 
+  it('hides deletion behind Data and resets it when the menu closes', async () => {
+    const onDeleteAll = vi.fn();
+    const onOpenDeleteAll = vi.fn();
+    await render({ onDeleteAll, onOpenDeleteAll });
+    const trigger = container.querySelector(
+      'button[aria-label="Open library options"]',
+    );
+    const findItem = (text) =>
+      Array.from(container.querySelectorAll('[role="menuitem"]')).find((item) =>
+        item.textContent.includes(text),
+      );
+    await click(trigger);
+    expect(findItem('Delete all titles')).toBeUndefined();
+    await click(findItem('Data'));
+    expect(findItem('Data').getAttribute('aria-expanded')).toBe('true');
+    expect(onOpenDeleteAll).not.toHaveBeenCalled();
+    findItem('Data').focus();
+    await press(findItem('Data'), 'ArrowDown');
+    expect(document.activeElement).toBe(findItem('Delete all titles'));
+    await press(document.activeElement, 'Escape');
+    expect(document.activeElement).toBe(findItem('Data'));
+    expect(findItem('Delete all titles')).toBeUndefined();
+    await click(findItem('Data'));
+    await click(trigger);
+    await click(trigger);
+    expect(findItem('Delete all titles')).toBeUndefined();
+    await click(findItem('Data'));
+    await click(findItem('Delete all titles'));
+    expect(onOpenDeleteAll).toHaveBeenCalledOnce();
+    expect(onDeleteAll).not.toHaveBeenCalled();
+    expect(container.querySelector('[role="menu"]')).toBeNull();
+  });
+
   it('lets Tab leave and closes without returning focus', async () => {
     vi.useFakeTimers();
     await render();

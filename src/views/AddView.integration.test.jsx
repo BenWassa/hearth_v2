@@ -117,7 +117,7 @@ describe('AddView integration', () => {
 
     const enabledSubmitButton = Array.from(
       mounted.container.querySelectorAll('button'),
-    ).find((button) => button.textContent.includes('Put on Shelf'));
+    ).find((button) => button.textContent.includes('Add to Shelf'));
     expect(enabledSubmitButton.disabled).toBe(false);
     await act(async () => {
       enabledSubmitButton.dispatchEvent(
@@ -131,6 +131,13 @@ describe('AddView integration', () => {
     expect(payload.source.provider).toBe('tmdb');
     expect(payload.media.title).toBe('Spirited Away');
     expect(payload.userState.status).toBe('unwatched');
+    expect(payload.userState.tagProvenance).toEqual({
+      vibe: 'automatic',
+      energy: 'automatic',
+    });
+    expect(payload.userState).not.toHaveProperty('vibe');
+    expect(mounted.container.textContent).not.toContain('Vibe');
+    expect(mounted.container.textContent).not.toContain('Energy');
 
     await cleanupDom(mounted);
   });
@@ -257,14 +264,14 @@ describe('AddView integration', () => {
     await cleanupDom(mounted);
   });
 
-  it('explains why Put on Shelf is disabled', async () => {
+  it('explains why Add to Shelf is disabled', async () => {
     const mounted = await renderIntoDom(
       <AddView onBack={() => {}} onSubmit={() => {}} />,
     );
 
     const submit = Array.from(
       mounted.container.querySelectorAll('button'),
-    ).find((button) => button.textContent.includes('Put on Shelf'));
+    ).find((button) => button.textContent.includes('Add to Shelf'));
     expect(submit.disabled).toBe(true);
     const hint = mounted.container.querySelector(
       `#${submit.getAttribute('aria-describedby')}`,

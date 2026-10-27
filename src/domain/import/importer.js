@@ -558,7 +558,13 @@ export const normalizeItem = (raw) => {
     source,
     media,
     showData,
-    userState,
+    userState: {
+      ...userState,
+      tagProvenance: userState?.tagProvenance || {
+        vibe: userState?.vibe || raw?.vibe ? 'imported' : 'automatic',
+        energy: userState?.energy || raw?.energy ? 'imported' : 'automatic',
+      },
+    },
   };
 };
 
@@ -568,10 +574,7 @@ export const resolveDefaults = (item, defaults = {}) => ({
   energy: item.energy || defaults.energy,
 });
 
-export const validateItem = (
-  item,
-  { validVibes, validEnergies, allowMissing = false } = {},
-) => {
+export const validateItem = (item, { allowMissing = false } = {}) => {
   const errors = [];
   const missing = [];
 
@@ -585,24 +588,8 @@ export const validateItem = (
     errors.push({ field: 'type', message: 'Type must be movie or show.' });
   }
 
-  if (!item.vibe) {
-    missing.push('vibe');
-  } else if (validVibes && !validVibes.includes(item.vibe)) {
-    errors.push({
-      field: 'vibe',
-      message: 'Vibe must be one of the listed options.',
-    });
-  }
-
-  if (!item.energy) {
-    missing.push('energy');
-  } else if (validEnergies && !validEnergies.includes(item.energy)) {
-    errors.push({
-      field: 'energy',
-      message: 'Energy must be one of the listed options.',
-    });
-  }
-
+  // Historic imported tags are preserved without making them required or
+  // asking users to correct classification metadata during import.
   const isValid = errors.length === 0 && (allowMissing || missing.length === 0);
 
   return { errors, missing, isValid };

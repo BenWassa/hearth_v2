@@ -8,13 +8,10 @@ import {
   Tv,
   X,
 } from 'lucide-react';
-import { ENERGIES, VIBES } from '../config/constants.js';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
-import SelectChip from '../components/ui/SelectChip.jsx';
 import TextArea from '../components/ui/TextArea.jsx';
 import { getMediaDetails } from '../services/mediaApi/client.js';
-import { hydrateShowData } from '../services/mediaApi/showData.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
 
 const SectionLabel = ({ children, icon: Icon, htmlFor }) => {
@@ -80,11 +77,9 @@ const SearchResultSkeleton = ({ count = 3 }) => (
   </>
 );
 
-const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
+const AddView = ({ onBack, onSubmit }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [type, setType] = useState('movie');
-  const [vibe, setVibe] = useState('');
-  const [energy, setEnergy] = useState('');
   const [note, setNote] = useState('');
   const [selectedResult, setSelectedResult] = useState(null);
   const [enrichedPayload, setEnrichedPayload] = useState(null);
@@ -172,12 +167,18 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
       const nextType = details.type === 'show' ? 'show' : 'movie';
       setType(nextType);
 
+      // Save once title facts are available. Episode hydration belongs to the
+      // existing post-save refresh path and must not block Add to Shelf.
       const showData =
         nextType === 'show'
-          ? await hydrateShowData({
-              provider: result.provider,
-              providerId: result.providerId,
-            })
+          ? {
+              seasonCount: details.seasonCount || 0,
+              seasons: (details.seasonSummaries || []).map((season) => ({
+                ...season,
+                number: season.seasonNumber,
+                episodes: [],
+              })),
+            }
           : null;
 
       setEnrichedPayload({
@@ -234,8 +235,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
         enrichedPayload?.media?.title || selectedResult?.title || searchQuery,
       ).trim(),
       type,
-      vibe,
-      energy,
+
       note: note.trim(),
       status: 'unwatched',
     };
@@ -262,8 +262,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
           : { seasonCount: null, seasons: [] };
       payload.userState = {
         status: 'unwatched',
-        vibe,
-        energy,
+        tagProvenance: { vibe: 'automatic', energy: 'automatic' },
         note: payload.note,
         episodeProgress: {},
       };
@@ -513,51 +512,6 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
                 {submitError}
               </div>
             )}
-            {allowManualEntry && (
-              <div className="text-xs text-stone-400">
-                Choose the official title from search before saving.
-              </div>
-            )}
-          </section>
-
-          {/* Vibe */}
-          <section className="space-y-2.5">
-            <SectionLabel>Vibe</SectionLabel>
-            <div className="flex flex-wrap gap-2">
-              {VIBES.map((v) => {
-                const isSelected = vibe === v.id;
-                return (
-                  <SelectChip
-                    key={v.id}
-                    onClick={() => setVibe(v.id)}
-                    selected={isSelected}
-                    icon={v.icon}
-                  >
-                    {v.label}
-                  </SelectChip>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Energy */}
-          <section className="space-y-2.5">
-            <SectionLabel>Energy</SectionLabel>
-            <div className="flex flex-wrap gap-2">
-              {ENERGIES.map((e) => {
-                const isSelected = energy === e.id;
-                return (
-                  <SelectChip
-                    key={e.id}
-                    onClick={() => setEnergy(e.id)}
-                    selected={isSelected}
-                    icon={e.icon}
-                  >
-                    {e.label}
-                  </SelectChip>
-                );
-              })}
-            </div>
           </section>
 
           {/* Note */}
@@ -602,7 +556,7 @@ const AddView = ({ onBack, onSubmit, allowManualEntry = false }) => {
           className="w-full"
           aria-describedby={!selectedResult ? 'add-submit-hint' : undefined}
         >
-          {isEnriching ? 'Loading Metadata...' : 'Put on Shelf'}
+          {isEnriching ? 'Loading Metadata...' : 'Add to Shelf'}
         </Button>
       </div>
     </div>

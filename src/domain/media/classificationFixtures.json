@@ -1,0 +1,2295 @@
+[
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "346648",
+      "type": "movie",
+      "title": "Paddington 2",
+      "year": "2017",
+      "runtimeMinutes": 104,
+      "genres": [
+        "Adventure",
+        "Comedy",
+        "Family"
+      ],
+      "keywords": [
+        "london, england",
+        "based on novel or book",
+        "sequel",
+        "bear",
+        "train",
+        "based on children's book",
+        "animals",
+        "aging actor",
+        "duringcreditsstinger",
+        "live action and animation",
+        "candid",
+        "talking animal",
+        "cgi-live action hybrid",
+        "witty",
+        "vibrant",
+        "prison drama"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "257211",
+      "type": "movie",
+      "title": "The Intern",
+      "year": "2015",
+      "runtimeMinutes": 121,
+      "genres": [
+        "Comedy"
+      ],
+      "keywords": [
+        "new york city",
+        "friendship",
+        "san francisco, california",
+        "office",
+        "masseuse",
+        "website",
+        "tai chi",
+        "internet",
+        "fish out of water",
+        "brooklyn, new york city",
+        "business start-up",
+        "driver",
+        "senior citizen",
+        "ceo",
+        "father figure",
+        "intern",
+        "social media",
+        "gentleman",
+        "woman director",
+        "city life",
+        "chivalry",
+        "retired life",
+        "professional woman",
+        "internship",
+        "e-comm",
+        "elderly widower",
+        "online store"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "286217",
+      "type": "movie",
+      "title": "The Martian",
+      "year": "2015",
+      "runtimeMinutes": 141,
+      "genres": [
+        "Science Fiction",
+        "Drama",
+        "Adventure"
+      ],
+      "keywords": [
+        "spacecraft",
+        "planet mars",
+        "based on novel or book",
+        "nasa",
+        "isolation",
+        "botanist",
+        "survival",
+        "space",
+        "engineering",
+        "stranded",
+        "astronaut",
+        "struggle for survival",
+        "aftercreditsstinger",
+        "duringcreditsstinger",
+        "deep space",
+        "2030s",
+        "faithful adaptation"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "8835",
+      "type": "movie",
+      "title": "Legally Blonde",
+      "year": "2001",
+      "runtimeMinutes": 96,
+      "genres": [
+        "Comedy"
+      ],
+      "keywords": [
+        "father murder",
+        "blonde",
+        "superficiality",
+        "beauty salon",
+        "law school",
+        "murder",
+        "cynical",
+        "girl power",
+        "toy dog",
+        "chihuahua dog",
+        "blonde stereotype",
+        "proving oneself",
+        "murder confession"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "1584",
+      "type": "movie",
+      "title": "The School of Rock",
+      "year": "2003",
+      "runtimeMinutes": 110,
+      "genres": [
+        "Comedy",
+        "Family",
+        "Music"
+      ],
+      "keywords": [
+        "rock 'n' roll",
+        "musician",
+        "private school",
+        "music competition",
+        "substitute teacher",
+        "elementary school",
+        "teacher",
+        "rock music",
+        "contest",
+        "rock band",
+        "rock concert",
+        "incredulous",
+        "hilarious",
+        "amused",
+        "awestruck",
+        "cheerful",
+        "comforting"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "546554",
+      "type": "movie",
+      "title": "Knives Out",
+      "year": "2019",
+      "runtimeMinutes": 131,
+      "genres": [
+        "Comedy",
+        "Crime",
+        "Mystery"
+      ],
+      "keywords": [
+        "immigrant",
+        "detective",
+        "massachusetts",
+        "investigation",
+        "big family",
+        "mansion",
+        "whodunit",
+        "family home",
+        "murder mystery",
+        "neo-noir",
+        "privilege"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "161",
+      "type": "movie",
+      "title": "Ocean's Eleven",
+      "year": "2001",
+      "runtimeMinutes": 116,
+      "genres": [
+        "Thriller",
+        "Crime"
+      ],
+      "keywords": [
+        "casino",
+        "pickpocket",
+        "heist",
+        "con artist",
+        "remake",
+        "caper",
+        "las vegas",
+        "inside man",
+        "security guard",
+        "ex-wife",
+        "ex-con",
+        "card dealer",
+        "explosives expert",
+        "security system",
+        "casino owner",
+        "professional thief",
+        "fight night",
+        "master plan",
+        "computer hacker",
+        "distractions",
+        "museum curator",
+        "casino vault",
+        "contortionist"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "210577",
+      "type": "movie",
+      "title": "Gone Girl",
+      "year": "2014",
+      "runtimeMinutes": 149,
+      "genres": [
+        "Mystery",
+        "Thriller",
+        "Drama"
+      ],
+      "keywords": [
+        "infidelity",
+        "based on novel or book",
+        "wife",
+        "marriage crisis",
+        "investigation",
+        "disappearance",
+        "psychological thriller",
+        "whodunit",
+        "cynical",
+        "missing person",
+        "search party",
+        "criminal lawyer",
+        "murder suspect",
+        "missing wife",
+        "perspective",
+        "manipulative woman",
+        "toxic relationship",
+        "revenge thriller",
+        "killed during sex",
+        "hate",
+        "controlling wife"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "155",
+      "type": "movie",
+      "title": "The Dark Knight",
+      "year": "2008",
+      "runtimeMinutes": 152,
+      "genres": [
+        "Action",
+        "Thriller",
+        "Crime"
+      ],
+      "keywords": [
+        "sadism",
+        "chaos",
+        "secret identity",
+        "crime fighter",
+        "superhero",
+        "anti hero",
+        "scarecrow",
+        "based on comic",
+        "vigilante",
+        "organized crime",
+        "tragic hero",
+        "anti villain",
+        "criminal mastermind",
+        "district attorney",
+        "super power",
+        "super villain",
+        "neo-noir",
+        "bold"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "324857",
+      "type": "movie",
+      "title": "Spider-Man: Into the Spider-Verse",
+      "year": "2018",
+      "runtimeMinutes": 117,
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure",
+        "Science Fiction"
+      ],
+      "keywords": [
+        "superhero",
+        "based on comic",
+        "aftercreditsstinger",
+        "alternate universe"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "120467",
+      "type": "movie",
+      "title": "The Grand Budapest Hotel",
+      "year": "2014",
+      "runtimeMinutes": 100,
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "keywords": [
+        "hotel",
+        "painting",
+        "wartime",
+        "eastern europe",
+        "author",
+        "gunfight",
+        "theft",
+        "period drama",
+        "bellhop",
+        "mentor protégé relationship",
+        "duringcreditsstinger",
+        "european",
+        "hotel lobby",
+        "renaissance painting",
+        "1960s",
+        "1930s",
+        "hilarious"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "335984",
+      "type": "movie",
+      "title": "Blade Runner 2049",
+      "year": "2017",
+      "runtimeMinutes": 164,
+      "genres": [
+        "Science Fiction",
+        "Drama"
+      ],
+      "keywords": [
+        "future",
+        "android",
+        "bounty hunter",
+        "artificial intelligence (a.i.)",
+        "dystopia",
+        "sequel",
+        "cyberpunk",
+        "transhumanism",
+        "los angeles, california",
+        "las vegas",
+        "tech noir",
+        "cyber thriller",
+        "humanoid robot",
+        "blade runner",
+        "2040s",
+        "slow burn"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "804",
+      "type": "movie",
+      "title": "Roman Holiday",
+      "year": "1953",
+      "runtimeMinutes": 119,
+      "genres": [
+        "Romance",
+        "Comedy",
+        "Drama"
+      ],
+      "keywords": [
+        "dance",
+        "rome, italy",
+        "photography",
+        "boat",
+        "secret identity",
+        "intelligence",
+        "embassy",
+        "forbidden love",
+        "sightseeing",
+        "duty",
+        "black and white"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "high"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "289",
+      "type": "movie",
+      "title": "Casablanca",
+      "year": "1943",
+      "runtimeMinutes": 102,
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
+      "keywords": [
+        "corruption",
+        "nazi",
+        "escape",
+        "love triangle",
+        "resistance",
+        "spy",
+        "patriotism",
+        "casablanca, morocco",
+        "vichy regime",
+        "visa",
+        "nationalism",
+        "world war ii",
+        "morocco",
+        "film noir",
+        "black and white",
+        "war",
+        "psychological drama",
+        "romantic"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "high"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "238",
+      "type": "movie",
+      "title": "The Godfather",
+      "year": "1972",
+      "runtimeMinutes": 175,
+      "genres": [
+        "Drama",
+        "Crime"
+      ],
+      "keywords": [
+        "based on novel or book",
+        "loss of loved one",
+        "love at first sight",
+        "italy",
+        "gangster",
+        "symbolism",
+        "patriarch",
+        "europe",
+        "organized crime",
+        "mafia",
+        "religion",
+        "revenge motive",
+        "crime family",
+        "sicilian mafia",
+        "religious hypocrisy",
+        "gun violence",
+        "rise to power",
+        "gang violence",
+        "1940s",
+        "1950s",
+        "mafia war"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "high"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "97546",
+      "type": "show",
+      "title": "Ted Lasso",
+      "year": "2020",
+      "runtimeMinutes": null,
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "keywords": [
+        "england",
+        "male friendship",
+        "friendship",
+        "fish out of water",
+        "football (soccer)",
+        "american abroad",
+        "teammate",
+        "professional sports",
+        "football (soccer) team",
+        "workplace comedy",
+        "team owner",
+        "football (soccer) coach",
+        "optimist",
+        "coaching",
+        "nice guy",
+        "premier league",
+        "ambivalent"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "4586",
+      "type": "show",
+      "title": "Gilmore Girls",
+      "year": "2000",
+      "runtimeMinutes": 44,
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "keywords": [
+        "grandparent grandchild relationship",
+        "small town",
+        "coffee",
+        "private school",
+        "ambition",
+        "middle class",
+        "high school",
+        "love",
+        "female protagonist",
+        "dating",
+        "single mother",
+        "mother daughter relationship"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "4278",
+      "type": "show",
+      "title": "Friday Night Lights",
+      "year": "2006",
+      "runtimeMinutes": 43,
+      "genres": [
+        "Drama"
+      ],
+      "keywords": [
+        "southern usa",
+        "american football",
+        "texas",
+        "sports",
+        "high school",
+        "based on movie",
+        "teen drama"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "125935",
+      "type": "show",
+      "title": "Abbott Elementary",
+      "year": "2021",
+      "runtimeMinutes": null,
+      "genres": [
+        "Comedy"
+      ],
+      "keywords": [
+        "philadelphia, pennsylvania",
+        "elementary school",
+        "school",
+        "mockumentary",
+        "public school",
+        "sitcom",
+        "thoughtful",
+        "workplace comedy",
+        "elementary school teacher",
+        "amused"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "48891",
+      "type": "show",
+      "title": "Brooklyn Nine-Nine",
+      "year": "2013",
+      "runtimeMinutes": null,
+      "genres": [
+        "Comedy",
+        "Crime"
+      ],
+      "keywords": [
+        "new york city",
+        "detective",
+        "police",
+        "workplace",
+        "big city",
+        "brooklyn, new york city",
+        "nypd",
+        "sitcom",
+        "workplace comedy",
+        "sharp"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "34549",
+      "type": "show",
+      "title": "The Great British Bake Off",
+      "year": "2010",
+      "runtimeMinutes": 60,
+      "genres": [
+        "Reality"
+      ],
+      "keywords": [
+        "competition",
+        "food",
+        "baking",
+        "baking competition"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "107113",
+      "type": "show",
+      "title": "Only Murders in the Building",
+      "year": "2021",
+      "runtimeMinutes": null,
+      "genres": [
+        "Comedy",
+        "Mystery",
+        "Crime"
+      ],
+      "keywords": [
+        "deaf",
+        "friendship",
+        "female protagonist",
+        "murderer",
+        "lgbt",
+        "murder mystery",
+        "evidence",
+        "podcast",
+        "inspirational",
+        "theater",
+        "bisexual woman",
+        "brisk"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "66732",
+      "type": "show",
+      "title": "Stranger Things",
+      "year": "2016",
+      "runtimeMinutes": null,
+      "genres": [
+        "Action & Adventure",
+        "Mystery",
+        "Sci-Fi & Fantasy"
+      ],
+      "keywords": [
+        "monster",
+        "small town",
+        "indiana, usa",
+        "experiment",
+        "halloween",
+        "friendship",
+        "supernatural",
+        "coming of age",
+        "parallel world",
+        "super power",
+        "government conspiracy",
+        "teen drama",
+        "1980s",
+        "supernatural horror",
+        "teen horror",
+        "horror",
+        "depressing"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "95396",
+      "type": "show",
+      "title": "Severance",
+      "year": "2022",
+      "runtimeMinutes": null,
+      "genres": [
+        "Drama",
+        "Mystery",
+        "Sci-Fi & Fantasy"
+      ],
+      "keywords": [
+        "office",
+        "workplace",
+        "memory",
+        "office politics",
+        "brain surgery",
+        "thriller"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "68595",
+      "type": "show",
+      "title": "Planet Earth II",
+      "year": "2016",
+      "runtimeMinutes": null,
+      "genres": [
+        "Documentary",
+        "Family"
+      ],
+      "keywords": [
+        "ocean",
+        "sea",
+        "mountain",
+        "fish",
+        "island",
+        "climate change",
+        "earth",
+        "forest",
+        "savannah",
+        "jungle",
+        "miniseries",
+        "desert",
+        "animals",
+        "nature",
+        "cities",
+        "inspiring",
+        "nature documentary",
+        "sea creature",
+        "captivating",
+        "relaxing"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "65494",
+      "type": "show",
+      "title": "The Crown",
+      "year": "2016",
+      "runtimeMinutes": null,
+      "genres": [
+        "Drama"
+      ],
+      "keywords": [
+        "england",
+        "queen",
+        "prince",
+        "dynasty",
+        "royal family",
+        "princess",
+        "based on true story",
+        "royalty",
+        "based on play or musical",
+        "british politics",
+        "british history",
+        "palace intrigue",
+        "historical drama",
+        "thoughtful",
+        "british royal family",
+        "british monarchy",
+        "political",
+        "power",
+        "intimate"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "94605",
+      "type": "show",
+      "title": "Arcane",
+      "year": "2021",
+      "runtimeMinutes": null,
+      "genres": [
+        "Animation",
+        "Action & Adventure",
+        "Sci-Fi & Fantasy"
+      ],
+      "keywords": [
+        "magic",
+        "war of independence",
+        "steampunk",
+        "class differences",
+        "battle",
+        "based on video game",
+        "death in family",
+        "adult animation",
+        "dark fantasy",
+        "warrior",
+        "broken family",
+        "loving",
+        "lesbian",
+        "war",
+        "3d animation",
+        "sisters",
+        "power"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "2730",
+      "type": "show",
+      "title": "I Love Lucy",
+      "year": "1951",
+      "runtimeMinutes": null,
+      "genres": [
+        "Comedy",
+        "Family"
+      ],
+      "keywords": [
+        "new york city",
+        "husband wife relationship",
+        "housewife",
+        "friendship",
+        "slapstick comedy",
+        "neighbor",
+        "singer",
+        "bandleader",
+        "nightclub entertainer",
+        "sitcom",
+        "grand",
+        "redhead"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "6357",
+      "type": "show",
+      "title": "The Twilight Zone",
+      "year": "1959",
+      "runtimeMinutes": 25,
+      "genres": [
+        "Sci-Fi & Fantasy",
+        "Mystery",
+        "Drama"
+      ],
+      "keywords": [
+        "time travel",
+        "computer",
+        "anthology",
+        "misfit",
+        "space",
+        "surrealism",
+        "alien",
+        "escape",
+        "social commentary",
+        "paranormal phenomena",
+        "robot",
+        "second chance",
+        "psychotronic",
+        "wishes come true",
+        "morality tale",
+        "humanoid alien",
+        "suspenseful",
+        "horror",
+        "sentimental",
+        "hilarious",
+        "narrator",
+        "exhilarated",
+        "horrified"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": true,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "1438",
+      "type": "show",
+      "title": "The Wire",
+      "year": "2002",
+      "runtimeMinutes": null,
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
+      "keywords": [
+        "corruption",
+        "newspaper",
+        "drug trafficking",
+        "drug dealer",
+        "baltimore, usa",
+        "gangster",
+        "police",
+        "organized crime",
+        "police detective",
+        "surveillance",
+        "power politics",
+        "urban decay",
+        "newspaper reporter",
+        "wiretapping",
+        "workers union",
+        "angry",
+        "education system",
+        "docks",
+        "black project",
+        "clinical",
+        "mayoral election",
+        "dramatic",
+        "violence",
+        "tense",
+        "sinister",
+        "depressing",
+        "admiring",
+        "appreciative",
+        "awestruck",
+        "callous",
+        "commanding",
+        "dignified",
+        "hopeful",
+        "horrified",
+        "informative",
+        "objective",
+        "ominous"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "550",
+      "type": "movie",
+      "title": "Fight Club",
+      "year": "1999",
+      "runtimeMinutes": 139,
+      "genres": [
+        "Drama",
+        "Thriller"
+      ],
+      "keywords": [
+        "dual identity",
+        "rage and hate",
+        "based on novel or book",
+        "nihilism",
+        "fight",
+        "support group",
+        "dystopia",
+        "insomnia",
+        "alter ego",
+        "breaking the fourth wall",
+        "split personality",
+        "quitting a job",
+        "dissociative identity disorder",
+        "self destructiveness"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "27205",
+      "type": "movie",
+      "title": "Inception",
+      "year": "2010",
+      "runtimeMinutes": 148,
+      "genres": [
+        "Action",
+        "Science Fiction",
+        "Crime"
+      ],
+      "keywords": [
+        "mission",
+        "dreams",
+        "kidnapping",
+        "spy",
+        "allegory",
+        "intellectual",
+        "manipulation",
+        "heist",
+        "memory",
+        "dream world",
+        "subconscious",
+        "incredulous",
+        "high concept",
+        "dream"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "129",
+      "type": "movie",
+      "title": "Spirited Away",
+      "year": "2001",
+      "runtimeMinutes": 125,
+      "genres": [
+        "Animation",
+        "Family",
+        "Fantasy"
+      ],
+      "keywords": [
+        "witch",
+        "parent child relationship",
+        "darkness",
+        "bath house",
+        "magic",
+        "spirit",
+        "parallel world",
+        "amusement park",
+        "youkai",
+        "japanese mythology",
+        "anime"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "496243",
+      "type": "movie",
+      "title": "Parasite",
+      "year": "2019",
+      "runtimeMinutes": 133,
+      "genres": [
+        "Comedy",
+        "Thriller",
+        "Drama"
+      ],
+      "keywords": [
+        "dark comedy",
+        "con artist",
+        "social commentary",
+        "working class",
+        "infiltration",
+        "psychological thriller",
+        "class differences",
+        "family",
+        "unemployed",
+        "domestic worker",
+        "wealthy family",
+        "south korea",
+        "caste violence",
+        "seoul, south korea",
+        "anti-capitalist"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "194",
+      "type": "movie",
+      "title": "Amélie",
+      "year": "2001",
+      "runtimeMinutes": 122,
+      "genres": [
+        "Comedy",
+        "Romance"
+      ],
+      "keywords": [
+        "daughter",
+        "paris, france",
+        "love triangle",
+        "photography",
+        "ghost train",
+        "sex shop",
+        "shyness",
+        "journey around the world",
+        "postcard",
+        "romcom",
+        "hypochondriac",
+        "romance",
+        "cafe",
+        "kindness",
+        "magic realism",
+        "child's point of view",
+        "nostalgic",
+        "montmartre, paris",
+        "neighbor neighbor relationship",
+        "father daughter relationship",
+        "loving",
+        "happy ending",
+        "childhood memory",
+        "lighthearted"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "372058",
+      "type": "movie",
+      "title": "Your Name.",
+      "year": "2016",
+      "runtimeMinutes": 106,
+      "genres": [
+        "Animation",
+        "Romance",
+        "Drama"
+      ],
+      "keywords": [
+        "high school",
+        "race against time",
+        "dreams",
+        "afterlife",
+        "natural disaster",
+        "supernatural",
+        "time travel",
+        "comet",
+        "romance",
+        "tragedy",
+        "school",
+        "body swap",
+        "high school student",
+        "nonlinear timeline",
+        "star crossed lovers",
+        "power of love",
+        "anime",
+        "japanese high school",
+        "urban fantasy",
+        "powerful"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "360814",
+      "type": "movie",
+      "title": "Dangal",
+      "year": "2016",
+      "runtimeMinutes": 161,
+      "genres": [
+        "Drama",
+        "Family",
+        "Comedy"
+      ],
+      "keywords": [
+        "small town",
+        "strong woman",
+        "sports",
+        "parent child relationship",
+        "empowerment",
+        "abusive father",
+        "feminism",
+        "wrestling",
+        "training",
+        "biography",
+        "autobiography",
+        "domestic abuse",
+        "fighting",
+        "womanhood",
+        "endurance",
+        "woman vs woman fight",
+        "female empowerment",
+        "determination",
+        "strength training",
+        "overcoming fears",
+        "father daughter relationship",
+        "cheerful",
+        "excited"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "20453",
+      "type": "movie",
+      "title": "3 Idiots",
+      "year": "2009",
+      "runtimeMinutes": 171,
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
+      "keywords": [
+        "challenge",
+        "middle class",
+        "slapstick comedy",
+        "coming of age",
+        "flashback",
+        "teacher",
+        "friends",
+        "engineering",
+        "university",
+        "subjective camera",
+        "smart kid",
+        "poor kid",
+        "looking for friend",
+        "plot twist",
+        "inspirational",
+        "student",
+        "life advice",
+        "hilarious",
+        "amused",
+        "delhi"
+      ]
+    },
+    "expected": {
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "4935",
+      "type": "movie",
+      "title": "Howl's Moving Castle",
+      "year": "2004",
+      "runtimeMinutes": 119,
+      "genres": [
+        "Fantasy",
+        "Animation",
+        "Adventure"
+      ],
+      "keywords": [
+        "witch",
+        "flying",
+        "rain",
+        "castle",
+        "scarecrow",
+        "body exchange",
+        "hatter",
+        "bakery",
+        "curse",
+        "steampunk",
+        "demon",
+        "anime",
+        "philosophical",
+        "based on young adult novel",
+        "fantasy",
+        "magical",
+        "adventure",
+        "excited"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "508442",
+      "type": "movie",
+      "title": "Soul",
+      "year": "2020",
+      "runtimeMinutes": 101,
+      "genres": [
+        "Animation",
+        "Family",
+        "Drama",
+        "Music",
+        "Fantasy"
+      ],
+      "keywords": [
+        "new york city",
+        "jazz",
+        "musician",
+        "cat",
+        "self-discovery",
+        "jazz singer or musician",
+        "teacher",
+        "nostalgic",
+        "questioning",
+        "aftercreditsstinger",
+        "duringcreditsstinger",
+        "life after death",
+        "calm",
+        "philosophical",
+        "reflective",
+        "wonder",
+        "introspective",
+        "3d animation",
+        "inspirational",
+        "sentimental",
+        "gentle",
+        "hopeful",
+        "optimistic",
+        "sincere",
+        "pixar"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "37165",
+      "type": "movie",
+      "title": "The Truman Show",
+      "year": "1998",
+      "runtimeMinutes": 103,
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
+      "keywords": [
+        "escape",
+        "paranoia",
+        "dystopia",
+        "dark comedy",
+        "suspicion",
+        "video surveillance",
+        "deception",
+        "hidden camera",
+        "simulated reality",
+        "television producer",
+        "tv show in film",
+        "make believe",
+        "actor"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "329",
+      "type": "movie",
+      "title": "Jurassic Park",
+      "year": "1993",
+      "runtimeMinutes": 127,
+      "genres": [
+        "Adventure",
+        "Science Fiction"
+      ],
+      "keywords": [
+        "exotic island",
+        "island",
+        "triceratops",
+        "brontosaurus",
+        "electric fence",
+        "dna",
+        "tyrannosaurus rex",
+        "paleontology",
+        "dinosaur",
+        "amusement park",
+        "theme park"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "424",
+      "type": "movie",
+      "title": "Schindler's List",
+      "year": "1993",
+      "runtimeMinutes": 195,
+      "genres": [
+        "Drama",
+        "History",
+        "War"
+      ],
+      "keywords": [
+        "factory",
+        "hero",
+        "nazi",
+        "concentration camp",
+        "ss (nazi schutzstaffel)",
+        "holocaust (shoah)",
+        "world war ii",
+        "ghetto",
+        "jew persecution",
+        "kraków, poland",
+        "defense industry",
+        "auschwitz-birkenau concentration camp",
+        "biography",
+        "based on true story",
+        "industrialist",
+        "historical fiction",
+        "black and white",
+        "train",
+        "period drama",
+        "poland",
+        "evil",
+        "historical drama"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "1402",
+      "type": "movie",
+      "title": "The Pursuit of Happyness",
+      "year": "2006",
+      "runtimeMinutes": 117,
+      "genres": [
+        "Drama"
+      ],
+      "keywords": [
+        "work",
+        "worker",
+        "homeless person",
+        "single parent",
+        "san francisco, california",
+        "bus",
+        "homelessness",
+        "church service",
+        "bad luck",
+        "biography",
+        "based on true story",
+        "salesman",
+        "stockbroker",
+        "single father",
+        "inspiring story",
+        "poor",
+        "father son relationship",
+        "working life",
+        "happiness"
+      ]
+    },
+    "expected": {
+      "comfort": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "low",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "166428",
+      "type": "movie",
+      "title": "How to Train Your Dragon: The Hidden World",
+      "year": "2019",
+      "runtimeMinutes": 104,
+      "genres": [
+        "Animation",
+        "Family",
+        "Adventure"
+      ],
+      "keywords": [
+        "based on novel or book",
+        "flying",
+        "villain",
+        "melancholy",
+        "vikings (norsemen)",
+        "sequel",
+        "overpopulation",
+        "dragon",
+        "love interest",
+        "based on children's book",
+        "mourning",
+        "mysterious",
+        "thoughtful",
+        "somber",
+        "philosophical",
+        "reflective",
+        "complex",
+        "wonder",
+        "playful",
+        "introspective",
+        "3d animation",
+        "inspirational",
+        "grand",
+        "intimate",
+        "joyous",
+        "dramatic",
+        "suspenseful",
+        "sentimental",
+        "witty",
+        "intense",
+        "romantic",
+        "admiring",
+        "adoring",
+        "amused",
+        "appreciative",
+        "approving",
+        "awestruck",
+        "bold",
+        "celebratory",
+        "comforting"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "374720",
+      "type": "movie",
+      "title": "Dunkirk",
+      "year": "2017",
+      "runtimeMinutes": 107,
+      "genres": [
+        "War",
+        "Action",
+        "History"
+      ],
+      "keywords": [
+        "army",
+        "beach",
+        "france",
+        "allies",
+        "raf (royal air force)",
+        "military officer",
+        "world war ii",
+        "evacuation",
+        "pilot",
+        "british army",
+        "rescue mission",
+        "europe",
+        "based on true story",
+        "royal navy",
+        "survival",
+        "historical fiction",
+        "soldier",
+        "period drama",
+        "private",
+        "military",
+        "dunkirk",
+        "1940s",
+        "awestruck",
+        "foreboding"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "359940",
+      "type": "movie",
+      "title": "Three Billboards Outside Ebbing, Missouri",
+      "year": "2017",
+      "runtimeMinutes": 115,
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
+      "keywords": [
+        "small town",
+        "police brutality",
+        "missouri",
+        "alcoholism",
+        "murder",
+        "cancer",
+        "teenage girl",
+        "police corruption",
+        "racism",
+        "biting",
+        "guilty conscience",
+        "angry",
+        "serious",
+        "grieving mother"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "780",
+      "type": "movie",
+      "title": "The Passion of Joan of Arc",
+      "year": "1928",
+      "runtimeMinutes": 81,
+      "genres": [
+        "Drama",
+        "History"
+      ],
+      "keywords": [
+        "suffering",
+        "court case",
+        "judge",
+        "sentence",
+        "woman martyr",
+        "heresy",
+        "trial",
+        "religion",
+        "torture chamber",
+        "black and white",
+        "saint",
+        "martyrdom",
+        "dove",
+        "silent film",
+        "catholicism",
+        "martyr",
+        "joan of arc",
+        "forgery",
+        "judiciary",
+        "15th century",
+        "burning at stake",
+        "holy communion",
+        "bloodletting",
+        "inspirational",
+        "jeanne d'arc"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "high"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "335",
+      "type": "movie",
+      "title": "Once Upon a Time in the West",
+      "year": "1968",
+      "runtimeMinutes": 166,
+      "genres": [
+        "Drama",
+        "Western"
+      ],
+      "keywords": [
+        "small town",
+        "loss of loved one",
+        "harmonica",
+        "wedding party",
+        "spaghetti western",
+        "arizona territory",
+        "intercontintental railroad",
+        "outlaw gang",
+        "water pump",
+        "mysterious character",
+        "boom town",
+        "railroad company",
+        "hope for a new life",
+        "railroad construction",
+        "excited",
+        "techniscope"
+      ]
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "medium",
+      "curatedClassic": "high"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "662",
+      "type": "movie",
+      "title": "La Jetée",
+      "year": "1962",
+      "runtimeMinutes": 29,
+      "genres": [
+        "Drama",
+        "Romance",
+        "Science Fiction"
+      ],
+      "keywords": [
+        "paris, france",
+        "nuclear war",
+        "post-apocalyptic future",
+        "paris orly airport",
+        "time travel",
+        "radioactivity",
+        "black and white",
+        "short film"
+      ]
+    },
+    "expected": {
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "high",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "high",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Short experimental film: visual distinctiveness and narrative complexity can both be high. Classic status remains maintainer controlled."
+  },
+  {
+    "seed": false,
+    "input": {
+      "provider": "tmdb",
+      "providerId": "999999999",
+      "type": "movie",
+      "title": "Low-information synthetic title",
+      "year": "",
+      "runtimeMinutes": null,
+      "genres": [],
+      "keywords": []
+    },
+    "expected": {
+      "comfort": "unknown",
+      "comedyFirst": "unknown",
+      "plotMomentum": "unknown",
+      "narrativeComplexity": "unknown",
+      "visualDistinctiveness": "unknown",
+      "attentionDemand": "unknown",
+      "curatedClassic": "unknown"
+    },
+    "review": "provisional",
+    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+  }
+]

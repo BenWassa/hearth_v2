@@ -1,3 +1,4 @@
+import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
 import React, {
   Suspense,
   useCallback,
@@ -221,58 +222,6 @@ const TonightView = ({
     });
   };
 
-  // 1. Low friction, easy viewing
-  const comfortWatches = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) => i.vibe === 'comfort' || i.energy === 'light',
-    );
-    return getStableShuffled(filtered, 'comfort');
-  }, [unwatched]);
-
-  // 2. High attention, gripping narratives
-  const focusedWatches = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) => i.energy === 'focused' || i.vibe === 'gripping',
-    );
-    return getStableShuffled(filtered, 'focused');
-  }, [unwatched]);
-
-  // 3. 30 mins or less (Great for weeknights)
-  const quickBites = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) => i.type === 'show' && (i.runtimeMinutes <= 35 || i.runtime <= 35),
-    );
-    return getStableShuffled(filtered, 'quick');
-  }, [unwatched]);
-
-  // 4. Guaranteed laughs
-  const comedies = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) =>
-        i.vibe !== 'gripping' &&
-        i.vibe !== 'visual' &&
-        Array.isArray(i.genres) &&
-        i.genres.some((g) => g.toLowerCase().includes('comedy')),
-    );
-    return getStableShuffled(filtered, 'comedy');
-  }, [unwatched]);
-
-  // 5. Visually stunning films
-  const visualMovies = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) => i.type === 'movie' && i.vibe === 'visual',
-    );
-    return getStableShuffled(filtered, 'visual');
-  }, [unwatched]);
-
-  // 6. Classic films
-  const classicMovies = useMemo(() => {
-    const filtered = unwatched.filter(
-      (i) => i.type === 'movie' && i.vibe === 'classic',
-    );
-    return getStableShuffled(filtered, 'classic');
-  }, [unwatched]);
-
   const [
     uniqueComfortWatches,
     uniqueComedies,
@@ -280,25 +229,14 @@ const TonightView = ({
     uniqueFocusedWatches,
     uniqueVisualMovies,
     uniqueClassicMovies,
-  ] = useMemo(
-    () =>
-      balanceRows([
-        comfortWatches,
-        comedies,
-        quickBites,
-        focusedWatches,
-        visualMovies,
-        classicMovies,
-      ]),
-    [
-      comfortWatches,
-      comedies,
-      quickBites,
-      focusedWatches,
-      visualMovies,
-      classicMovies,
-    ],
-  );
+  ] = useMemo(() => {
+    const rows = allocateTonightThemes(unwatched);
+    return balanceRows(
+      ['comfort', 'comedy', 'quick', 'focused', 'visual', 'classic'].map(
+        (key) => getStableShuffled(rows[key], key),
+      ),
+    );
+  }, [unwatched]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);

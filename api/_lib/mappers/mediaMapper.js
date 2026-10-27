@@ -35,17 +35,27 @@ const mapSeasonSummaries = (seasons = []) =>
       airDate: season?.air_date || '',
       posterUrl: toImageUrl(season?.poster_path, 'w342'),
     }))
-    .filter((season) => Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1);
+    .filter(
+      (season) =>
+        Number.isFinite(season.seasonNumber) && season.seasonNumber >= 1,
+    );
 
 const mapLogoUrl = (images) => {
   const logos = Array.isArray(images?.logos) ? images.logos : [];
   if (!logos.length) return null;
   const bestLogo =
     logos.find((logo) => logo?.iso_639_1 === 'en' && logo?.file_path) ||
-    logos.find((logo) => typeof logo?.file_path === 'string' && logo.file_path) ||
+    logos.find(
+      (logo) => typeof logo?.file_path === 'string' && logo.file_path,
+    ) ||
     null;
   return bestLogo ? toImageUrl(bestLogo.file_path, 'w500') : null;
 };
+
+const mapKeywords = (data) =>
+  mapNames(data?.keywords?.keywords || data?.keywords?.results, 40).map((s) =>
+    String(s).trim().slice(0, 100),
+  );
 
 const mapMovieDetails = (data = {}) => ({
   provider: 'tmdb',
@@ -60,6 +70,7 @@ const mapMovieDetails = (data = {}) => ({
   backdropUrl: toImageUrl(data.backdrop_path, 'w780'),
   logoUrl: mapLogoUrl(data.images),
   genres: mapNames(data.genres, 8),
+  keywords: mapKeywords(data),
   cast: mapNames(data.credits?.cast, 12),
   creators: [],
   directors: mapCrewByJob(data.credits?.crew, ['Director']),
@@ -87,7 +98,8 @@ const mapShowDetails = (data = {}) => ({
   originalTitle: data.original_name || data.name || '',
   year: yearFromDate(data.first_air_date),
   runtimeMinutes:
-    Array.isArray(data.episode_run_time) && Number.isFinite(data.episode_run_time[0])
+    Array.isArray(data.episode_run_time) &&
+    Number.isFinite(data.episode_run_time[0])
       ? data.episode_run_time[0]
       : null,
   overview: data.overview || '',
@@ -95,14 +107,15 @@ const mapShowDetails = (data = {}) => ({
   backdropUrl: toImageUrl(data.backdrop_path, 'w780'),
   logoUrl: mapLogoUrl(data.images),
   genres: mapNames(data.genres, 8),
+  keywords: mapKeywords(data),
   cast: mapNames(data.credits?.cast, 12),
   creators: mapNames(data.created_by, 6),
   directors: [],
   language: data.original_language || '',
-  country: (Array.isArray(data.origin_country) ? data.origin_country : []).slice(
-    0,
-    3,
-  ),
+  country: (Array.isArray(data.origin_country)
+    ? data.origin_country
+    : []
+  ).slice(0, 3),
   rating: Number.isFinite(data.vote_average) ? data.vote_average : null,
   seasonCount: Number.isFinite(data.number_of_seasons)
     ? data.number_of_seasons
@@ -114,11 +127,13 @@ const mapShowDetails = (data = {}) => ({
   showStatus: typeof data.status === 'string' ? data.status : '',
   inProduction: Boolean(data.in_production),
   nextEpisodeAirDate:
-    data.next_episode_to_air && typeof data.next_episode_to_air.air_date === 'string'
+    data.next_episode_to_air &&
+    typeof data.next_episode_to_air.air_date === 'string'
       ? data.next_episode_to_air.air_date
       : null,
   lastEpisodeAirDate:
-    data.last_episode_to_air && typeof data.last_episode_to_air.air_date === 'string'
+    data.last_episode_to_air &&
+    typeof data.last_episode_to_air.air_date === 'string'
       ? data.last_episode_to_air.air_date
       : null,
   providerUpdatedAt: new Date().toISOString(),

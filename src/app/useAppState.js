@@ -1,3 +1,5 @@
+import { classificationRevision } from '../domain/media/classification.mjs';
+import { startClassificationBackfill } from '../services/mediaApi/classificationQueue.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   buildImportDedupeKey,
@@ -46,6 +48,7 @@ import {
 } from '../services/firebase/spaces.js';
 import {
   addWatchlistItem,
+  persistCatalogClassification,
   bulkDeleteWatchlistItems,
   deleteWatchlistItem,
   subscribeWatchlist,
@@ -393,6 +396,43 @@ export const useAppState = () => {
   const [joinSpaceId, setJoinSpaceId] = useState(() => getJoinSpaceId());
   const [joinError, setJoinError] = useState('');
   const [items, setItems] = useState([]);
+  const classificationItemsRef = useRef(items);
+  classificationItemsRef.current = items;
+  useEffect(() => {
+    if (!user || !isWhitelistedUid(user.uid) || !db || !spaceId)
+      return undefined;
+    let active = true;
+    const stop = startClassificationBackfill({
+      scope: `${appId}:${spaceId}`,
+      getItems: () => classificationItemsRef.current,
+      getToken: () => user.getIdToken(),
+      onResult: async (original, classification) => {
+        await persistCatalogClassification({
+          db,
+          appId,
+          mediaId: original.mediaId || original.id,
+          classification,
+        });
+        if (!active) return;
+        setItems((current) =>
+          current.map((item) =>
+            item.id === original.id
+              ? { ...item, media: { ...item.media, classification } }
+              : item,
+          ),
+        );
+      },
+      onProgress: (progress) => {
+        if (progress.processed || progress.failed)
+          console.info('[classification-backfill]', progress);
+      },
+    });
+    return () => {
+      active = false;
+      stop();
+    };
+  }, [user, db, spaceId]);
+
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState(getInitialView);
   const [decisionResult, setDecisionResult] = useState(null);
@@ -1216,6 +1256,10 @@ export const useAppState = () => {
         status: item.status || 'unwatched',
         vibe: item.vibe,
         energy: item.energy,
+        userState: {
+          tagProvenance:
+            item.userState?.tagProvenance || item.tagProvenance || {},
+        },
       };
       if (item.source?.provider) {
         entry.provider = item.source.provider;
@@ -1396,6 +1440,23 @@ export const useAppState = () => {
       },
       showData: refreshed.showData || { seasonCount: null, seasons: [] },
     };
+
+    // Preserve enrichment on factual no-op refreshes, and keep deliberate
+    // catalog corrections independent of provider payloads.
+    if (currentItem.media?.classificationOverride) {
+      updates.media.classificationOverride =
+        currentItem.media.classificationOverride;
+    }
+    if (
+      currentItem.media?.classification?.pipelineVersion &&
+      classificationRevision(currentItem) ===
+        classificationRevision({
+          source: refreshed.source,
+          media: updates.media,
+        })
+    ) {
+      updates.media.classification = currentItem.media.classification;
+    }
 
     if (refreshed.media?.title) updates.title = refreshed.media.title;
     if (refreshed.media?.type) updates.type = refreshed.media.type;

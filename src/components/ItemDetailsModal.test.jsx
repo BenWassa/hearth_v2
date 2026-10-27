@@ -132,26 +132,17 @@ describe('ItemDetailsModal dialogs', () => {
     },
   );
 
-  it('closes the Add picker before the modal underneath', () => {
-    const { onClose } = renderModal();
+  it('adds directly without a classification picker', async () => {
+    const onAddItem = vi.fn().mockResolvedValue(undefined);
+    const { onClose } = renderModal({ onAddItem });
     const addButton = Array.from(container.querySelectorAll('button')).find(
       (button) => button.textContent.includes('Add to shelf'),
     );
-    act(() => addButton.click());
-
-    const dialogs = container.querySelectorAll('[role="dialog"]');
-    expect(dialogs).toHaveLength(2);
-    const picker = dialogs[1];
-    expect(
-      container.querySelector(`#${picker.getAttribute('aria-labelledby')}`)
-        .textContent,
-    ).toBe('Heat');
-
-    pressEscape();
+    await act(async () => addButton.click());
+    expect(onAddItem).toHaveBeenCalledOnce();
+    expect(onAddItem.mock.calls[0][0].title).toBe('Heat');
     expect(container.querySelectorAll('[role="dialog"]')).toHaveLength(1);
-    expect(onClose).not.toHaveBeenCalled();
-
-    pressEscape();
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(container.textContent).not.toContain('Vibe');
+    expect(onClose).toHaveBeenCalledOnce();
   });
 });

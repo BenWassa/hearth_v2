@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Film, MessageSquare, Tv, X } from 'lucide-react';
-import { ENERGIES, PRESET_SUGGESTIONS, VIBES } from '../config/constants.js';
+import { PRESET_SUGGESTIONS } from '../config/constants.js';
 import {
   buildImportDedupeKey,
   normalizeItem,
   parseText,
-  resolveDefaults,
   validateItem,
 } from '../domain/import/importer.js';
 import { copyToClipboard } from '../utils/clipboard.js';
@@ -27,7 +26,6 @@ const ImportModal = ({
   validEnergies,
   existingItems = [],
 }) => {
-  const defaults = { vibe: 'comfort', energy: 'balanced' };
   const [rawText, setRawText] = useState('');
   const [rows, setRows] = useState([]);
   const [parseError, setParseError] = useState('');
@@ -45,8 +43,6 @@ const ImportModal = ({
   const scrollContainerRef = useRef(null);
   const stepFocusRef = useRef(null);
   const issueRefs = useRef(new Map());
-  const vibeOptions = VIBES.filter((v) => validVibes?.includes(v.id));
-  const energyOptions = ENERGIES.filter((e) => validEnergies?.includes(e.id));
 
   useEffect(() => {
     stepFocusRef.current?.focus({ preventScroll: true });
@@ -107,14 +103,12 @@ Each item must match this schema:
   {
     "title": "string",
     "type": "movie | show",
-    "vibe": "comfort | easy | gripping | visual | classic",
-    "energy": "light | balanced | focused",
     "runtimeMinutes": "optional number",
     "note": "optional string"
   }
 ]
 
-Use the titles below and assign a best-fit type, vibe, and energy.
+Use the titles below and identify their movie or show type. Do not infer viewing categories.
 Titles:
 {{PASTE_TITLES_HERE}}`;
 
@@ -204,26 +198,6 @@ Titles:
       ),
     );
     setLastEditedId(id);
-  };
-
-  const fillDefaults = () => {
-    setRows((prev) =>
-      prev.map((row) => {
-        if (!row.include) return row;
-        const nextData = resolveDefaults(row.data, defaults);
-        const validation = validateItem(nextData, {
-          validVibes,
-          validEnergies,
-          allowMissing: true,
-        });
-        return {
-          ...row,
-          data: nextData,
-          errors: validation.errors,
-          missing: validation.missing,
-        };
-      }),
-    );
   };
 
   const selectedRows = rows.filter((row) => row.include);
@@ -506,7 +480,7 @@ Titles:
                   ref={stepFocusRef}
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
-                  placeholder='[{"title":"Spirited Away","type":"movie","vibe":"visual","energy":"balanced"}]'
+                  placeholder='[{"title":"Spirited Away","type":"movie"}]'
                   rows={8}
                   className={`w-full bg-stone-900/60 border border-stone-800 text-stone-200 placeholder-stone-400 px-4 py-3 rounded-xl focus-visible:border-amber-600/60 transition-opacity font-mono text-xs resize-none ${FIELD_FOCUS}`}
                 />
@@ -530,7 +504,7 @@ Titles:
                   tabIndex={-1}
                   className="text-xs font-bold uppercase tracking-widest text-stone-400 focus:outline-none"
                 >
-                  Step 3 of 3: Fix missing details
+                  Step 3 of 3: Review titles
                 </h4>
                 <p className="text-xs text-stone-400 leading-relaxed">
                   Only items that need attention are shown. Everything else is
@@ -538,20 +512,13 @@ Titles:
                 </p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <Button
-                    variant="secondary"
-                    onClick={fillDefaults}
-                    className="px-4 py-2 text-sm min-h-11"
-                  >
-                    Auto-fill Defaults
-                  </Button>
-                  <Button
                     variant="primary"
                     onClick={() => {
                       jumpToFirstIssue();
                     }}
                     className="px-4 py-2 text-sm min-h-11"
                   >
-                    Assign Manually
+                    Fix details
                   </Button>
                   <div className="flex items-center gap-3 text-xs text-stone-400 sm:ml-auto">
                     <span>{selectedRows.length} selected</span>
@@ -578,22 +545,12 @@ Titles:
                 <div className="divide-y divide-stone-800">
                   {displayRows.map((row, index) => {
                     const errorFields = row.errors.map((e) => e.field);
-                    const missingVibe = row.missing.includes('vibe');
-                    const missingEnergy = row.missing.includes('energy');
                     const hasTypeError = errorFields.includes('type');
-                    const hasVibeError = errorFields.includes('vibe');
-                    const hasEnergyError = errorFields.includes('energy');
                     const fieldError = (field) =>
                       row.errors.find((error) => error.field === field)
                         ?.message;
                     const titleError = fieldError('title');
                     const typeError = fieldError('type');
-                    const vibeError =
-                      fieldError('vibe') ||
-                      (missingVibe ? 'Choose a vibe.' : '');
-                    const energyError =
-                      fieldError('energy') ||
-                      (missingEnergy ? 'Choose an energy.' : '');
 
                     return (
                       <div
@@ -703,112 +660,6 @@ Titles:
                               {typeError}
                             </p>
                           )}
-                        </div>
-
-                        <div
-                          role="group"
-                          aria-labelledby={`import-vibe-label-${row.id}`}
-                          aria-invalid={Boolean(vibeError)}
-                          aria-describedby={
-                            vibeError
-                              ? `import-vibe-error-${row.id}`
-                              : undefined
-                          }
-                          tabIndex={-1}
-                          className={`space-y-2 rounded-lg ${FIELD_FOCUS}`}
-                        >
-                          <div className="flex items-center gap-2 text-label uppercase tracking-widest">
-                            <span
-                              id={`import-vibe-label-${row.id}`}
-                              className={
-                                hasVibeError
-                                  ? 'text-red-200'
-                                  : missingVibe
-                                  ? 'text-amber-200'
-                                  : 'text-stone-400'
-                              }
-                            >
-                              Vibe
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {vibeOptions.map((vibe) => {
-                              const isSelected = row.data.vibe === vibe.id;
-                              return (
-                                <SelectChip
-                                  key={vibe.id}
-                                  onClick={() =>
-                                    updateRowById(row.id, 'vibe', vibe.id)
-                                  }
-                                  selected={isSelected}
-                                  icon={vibe.icon}
-                                >
-                                  {vibe.label}
-                                </SelectChip>
-                              );
-                            })}
-                          </div>
-                          {vibeError && (
-                            <p
-                              id={`import-vibe-error-${row.id}`}
-                              className="text-sm text-red-300"
-                            >
-                              {vibeError}
-                            </p>
-                          )}
-                        </div>
-
-                        <div
-                          role="group"
-                          aria-labelledby={`import-energy-label-${row.id}`}
-                          aria-invalid={Boolean(energyError)}
-                          aria-describedby={
-                            energyError
-                              ? `import-energy-error-${row.id}`
-                              : undefined
-                          }
-                          tabIndex={-1}
-                          className={`space-y-2 rounded-lg ${FIELD_FOCUS}`}
-                        >
-                          <div className="flex items-center gap-2 text-label uppercase tracking-widest">
-                            <span
-                              id={`import-energy-label-${row.id}`}
-                              className={
-                                hasEnergyError
-                                  ? 'text-red-200'
-                                  : missingEnergy
-                                  ? 'text-amber-200'
-                                  : 'text-stone-400'
-                              }
-                            >
-                              Energy
-                            </span>
-                          </div>
-                          {energyError && (
-                            <p
-                              id={`import-energy-error-${row.id}`}
-                              className="text-sm text-red-300"
-                            >
-                              {energyError}
-                            </p>
-                          )}
-                          <div className="flex flex-wrap gap-2">
-                            {energyOptions.map((energy) => {
-                              const isSelected = row.data.energy === energy.id;
-                              return (
-                                <SelectChip
-                                  key={energy.id}
-                                  onClick={() =>
-                                    updateRowById(row.id, 'energy', energy.id)
-                                  }
-                                  selected={isSelected}
-                                  icon={energy.icon}
-                                >
-                                  {energy.label}
-                                </SelectChip>
-                              );
-                            })}
-                          </div>
                         </div>
 
                         <div className="space-y-2">

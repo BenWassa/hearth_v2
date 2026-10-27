@@ -34,9 +34,6 @@ import ModalHeader from './ItemDetailsModal/components/ModalHeader.jsx';
 import ModalContentHeader from './ItemDetailsModal/components/ModalContentHeader.jsx';
 import ShowSeasonsSection from './ItemDetailsModal/components/ShowSeasonsSection.jsx';
 import Dialog from './ui/Dialog.jsx';
-import Button from './ui/Button.jsx';
-import SelectChip from './ui/SelectChip.jsx';
-import { getEnergyStyle } from '../config/energyStyles.js';
 
 const hydratedShowCache = new Map();
 const hydratedShowPromises = new Map();
@@ -144,9 +141,6 @@ const ItemDetailsModal = ({
   const [isSeasonResetConfirmOpen, setIsSeasonResetConfirmOpen] =
     useState(false);
   const [isAddingItem, setIsAddingItem] = useState(false);
-  const [pendingAddItem, setPendingAddItem] = useState(null);
-  const [addVibe, setAddVibe] = useState('');
-  const [addEnergy, setAddEnergy] = useState('');
   const persistedHydrationRef = useRef(new Set());
   const initializedShowRef = useRef(null);
   const seasonScrollRef = useRef(null);
@@ -302,43 +296,11 @@ const ItemDetailsModal = ({
     const existingVibe = String(itemToAdd.vibe || '').trim();
     const existingEnergy = String(itemToAdd.energy || '').trim();
 
-    if (!existingVibe || !existingEnergy) {
-      setPendingAddItem(itemToAdd);
-      setAddVibe(existingVibe);
-      setAddEnergy(existingEnergy);
-      return;
-    }
-
     await addItemWithPreferences(itemToAdd, {
       vibe: existingVibe,
       energy: existingEnergy,
     });
   };
-
-  const handleConfirmAddPreferences = async () => {
-    if (!pendingAddItem || !addVibe || !addEnergy) return;
-    await addItemWithPreferences(pendingAddItem, {
-      vibe: addVibe,
-      energy: addEnergy,
-    });
-    setPendingAddItem(null);
-    setAddVibe('');
-    setAddEnergy('');
-  };
-
-  const handleCancelAddPreferences = () => {
-    if (isAddingItem) return;
-    setPendingAddItem(null);
-    setAddVibe('');
-    setAddEnergy('');
-  };
-
-  useEffect(() => {
-    if (isOpen) return;
-    setPendingAddItem(null);
-    setAddVibe('');
-    setAddEnergy('');
-  }, [isOpen]);
 
   useEffect(() => {
     setExpandedEpisodeId(null);
@@ -1070,104 +1032,6 @@ const ItemDetailsModal = ({
           />
         </div>
       </Dialog>
-
-      {pendingAddItem && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center px-4 pb-[calc(1rem+var(--safe-bottom))] pt-[max(4rem,var(--safe-top))] sm:items-center sm:p-6">
-          <div
-            className="absolute inset-0 bg-stone-950/85"
-            onClick={handleCancelAddPreferences}
-            aria-hidden="true"
-            tabIndex={-1}
-          />
-          <Dialog
-            onClose={handleCancelAddPreferences}
-            aria-labelledby="add-picker-title"
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-stone-800 bg-stone-950 shadow-2xl shadow-black/60"
-          >
-            <div className="border-b border-stone-900 px-5 py-4">
-              <div className="text-label font-bold uppercase tracking-[0.22em] text-amber-400">
-                Add to shelf
-              </div>
-              <h3
-                id="add-picker-title"
-                className="mt-1 font-serif text-2xl leading-tight text-stone-100"
-              >
-                {pendingAddItem.title || 'Untitled movie'}
-              </h3>
-            </div>
-
-            <div className="space-y-5 px-5 py-5">
-              <div>
-                <div className="mb-2 text-label font-bold uppercase tracking-[0.2em] text-stone-400">
-                  Vibe
-                </div>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {VIBES.map((vibe) => {
-                    const VibeIcon = vibe.icon;
-                    const selected = addVibe === vibe.id;
-                    return (
-                      <SelectChip
-                        key={vibe.id}
-                        selected={selected}
-                        icon={VibeIcon}
-                        onClick={() => setAddVibe(vibe.id)}
-                        className="w-full justify-center"
-                      >
-                        {vibe.label}
-                      </SelectChip>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-2 text-label font-bold uppercase tracking-[0.2em] text-stone-400">
-                  Energy
-                </div>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  {ENERGIES.map((energy) => {
-                    const EnergyIcon = energy.icon;
-                    const selected = addEnergy === energy.id;
-                    const energyStyle = getEnergyStyle(energy.id);
-                    return (
-                      <SelectChip
-                        key={energy.id}
-                        selected={selected}
-                        icon={EnergyIcon}
-                        selectedClassName={energyStyle.selected}
-                        onClick={() => setAddEnergy(energy.id)}
-                        className="w-full justify-center"
-                      >
-                        {energy.label}
-                      </SelectChip>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 border-t border-stone-900 p-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCancelAddPreferences}
-                disabled={isAddingItem}
-                className="h-12 py-0 text-sm font-bold"
-              >
-                Cancel
-              </Button>
-              <button
-                type="button"
-                onClick={handleConfirmAddPreferences}
-                disabled={!addVibe || !addEnergy || isAddingItem}
-                className="h-12 rounded-xl bg-amber-600 text-sm font-bold text-stone-950 transition-opacity hover:bg-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isAddingItem ? 'Adding...' : 'Add'}
-              </button>
-            </div>
-          </Dialog>
-        </div>
-      )}
     </div>
   );
 };

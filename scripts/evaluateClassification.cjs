@@ -226,7 +226,8 @@ const run = async () => {
       selectedTitleCount: selected.length,
       attemptedTitleCountThisRun: attemptedTitlesThisRun,
       everAttemptedTitleCount,
-      titlesWithPredictions: real.filter((r) => r.predictions.length > 0).length,
+      titlesWithPredictions: real.filter((r) => r.predictions.length > 0)
+        .length,
       completedTitleCount,
       completedSelectedTitleCount: selected.filter(
         (r) => r.predictions.length === runs,

@@ -9,6 +9,7 @@ import {
 } from '../../components/ItemDetailsModal/utils/showProgress.js';
 import { startOfLocalDay, toLocalDate } from '../../utils/releaseDates.js';
 
+export const QUICK_BITES_MAX_MINUTES = 30;
 const weight = (value) =>
   ({ high: 3, medium: 1, low: 0, unknown: 0 }[value] || 0);
 export const primaryTheme = (item) => {
@@ -106,7 +107,7 @@ export const allocateTonightThemes = (
     if (key) seen.add(key);
     const runtime = nextWatchRuntime(item, now);
     const theme =
-      quickBites && runtime !== null && runtime <= 30
+      quickBites && runtime !== null && runtime <= QUICK_BITES_MAX_MINUTES
         ? 'quick'
         : primaryTheme(item);
     rows[theme].push(item);

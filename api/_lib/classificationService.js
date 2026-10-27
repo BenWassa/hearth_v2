@@ -69,7 +69,11 @@ const createClassificationService = ({
             ? domain.blendClassification(
                 baseline,
                 aiResult.attributes,
-                aiResult.model,
+                {
+                  model: aiResult.model,
+                  promptVersion: aiResult.promptVersion,
+                  inferencePolicyVersion: aiResult.inferencePolicyVersion,
+                },
               )
             : baseline;
         const retryable = !['complete', 'disabled', 'configuration'].includes(

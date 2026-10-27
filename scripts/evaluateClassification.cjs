@@ -261,6 +261,7 @@ const run = async () => {
         selection: report.selection,
         evaluationCounts: report.evaluationCounts,
         rolloutPassed: report.rolloutPassed,
+        ruleExpectedConflicts: report.ruleExpectedConflicts,
         rules: rules.metrics,
         hybrid: hybrid?.metrics || null,
       },

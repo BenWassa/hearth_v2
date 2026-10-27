@@ -85,7 +85,7 @@ The exact five canonical pilot keys are:
 
 ## Verification
 
-GitHub Classification PR QA passes on this branch: 53 unit-test files / 341 unit tests, 35 API tests, lint with zero warnings, touched-file Prettier checks, and the offline 50-real-title evaluator. The offline evaluator correctly records zero provider attempts and keeps rollout false.
+GitHub Classification PR QA passes on this branch: 53 unit-test files / 342 unit tests, 36 API tests, lint with zero warnings, touched-file Prettier checks, and the offline 50-real-title evaluator. The offline evaluator correctly records zero provider attempts and keeps rollout false.
 
 ## Remaining gates
 

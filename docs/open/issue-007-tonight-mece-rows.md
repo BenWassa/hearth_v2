@@ -201,3 +201,25 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 ## Issue #20 integration (2026-10-26)
 
 [Automatic classification implementation](issue-020-implementation-record.md) now supplies independent, versioned viewing facets. `tonightClassification.js` implements scored primary assignment, typed canonical deduplication, exclusion of active/completed shows, and positive finite next-watchable runtime checks. Existing six labels remain; Quick Bites uses <=30 minutes and reserves its titles once. Automatic Comfort is never inferred from a missing tag or Light energy alone. Historic user/import tags stay preserved. These safety/assignment changes support #7, but do not claim completion of its dynamic row composition, activity weighting, taxonomy experiments, or user validation. Rules-only coverage is deliberately sparse; the optional Gemini quality pilot is still gated.
+
+
+## Implementation status (2026-10-27)
+
+**Done (on `feat/tonight-composition`)**
+
+- `TonightView` now renders thematic rails from `allocateTonightThemes` -> `composeTonightRows`, replacing the six hard-coded sections. Each title appears in at most one rail; rows are bounded and ordered by size tier (compact mixed row for 1-5 eligible titles, 2 rows for 6-12, 4 for 13-30, 5 beyond) with a per-tier minimum card count, so no 1-card themed rails.
+- In-row order and row selection use `activityScore` (manual adds and watch events only, not metadata or import churn). The local-date seed breaks ties only, so order is stable within a day.
+- Rows below the tier minimum and unclassified titles fold into one fallback row ("More to Watch"); compact libraries show "Tonight's picks". Both names are placeholders.
+- Intentional empty state ("Nothing queued for tonight", pointing to the Add tab) when there are no eligible unwatched titles. It is suppressed when a show is in progress or hero artwork is present.
+- Hero, Currently Watching, Coming Soon, Worlds (after the first rail), Collections (directly above The Classics, or after the last row), bottom nav and header menu are unchanged in position and behaviour.
+- Integration tests cover: no duplicate titles across rails for the 30-title seed, one compact row for a library of 3, the empty state, and rail ordering.
+
+**Still open**
+
+- Get Hooked / Unwind naming (Option B taxonomy) is not implemented; the six existing labels are kept.
+- Classic TV policy (The Classics remains movies only).
+- Mid-series Quick Bites (next watchable episode runtime) beyond what #20 classification already provides.
+- Quick Bites threshold: 30 (current) vs 35 minutes, and whether it appears automatically or on explicit time intent.
+- Tier thresholds and minimums are UX test parameters, not final policy.
+- Mobile QA at 320 / 390 / 448 CSS px, reduced motion and rail/rewind accessibility have not been done.
+- Final names for the mixed and fallback rows.

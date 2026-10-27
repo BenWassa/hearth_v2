@@ -1,4 +1,6 @@
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
+import { composeTonightRows } from '../domain/media/tonightComposition.js';
+import { activityScore } from '../domain/media/tonightActivity.js';
 import React, {
   Suspense,
   useCallback,
@@ -7,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Armchair, Coffee, Eye, Smile, Clock, Zap } from 'lucide-react';
+import { Armchair, Coffee, Eye, Smile, Clock, Zap, Moon } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
@@ -15,7 +17,6 @@ import WorldsRail from './components/tonight/WorldsRail.jsx';
 import CollectionsBrowseView from './CollectionsBrowseView.jsx';
 import ComingSoonRail from './components/tonight/ComingSoonRail.jsx';
 import HeroCarousel from './components/tonight/HeroCarousel.jsx';
-import { balanceRows } from './components/tonight/sectionBalance.js';
 import SuggestionSection from './components/tonight/SuggestionSection.jsx';
 import TonightHeaderMenu from './components/tonight/TonightHeaderMenu.jsx';
 import {
@@ -61,6 +62,48 @@ const hasHeroLogo = (item) =>
   );
 
 const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
+
+// Presentation for each composed Tonight row key. Titles come from the
+// composition module; this only adds the icon, card size and empty label.
+// `mixed` (compact libraries) and `unknown` (fallback) share a neutral icon.
+const DEFAULT_ROW_CONFIG = {
+  Icon: Moon,
+  size: 'md',
+  emptyLabel: 'Nothing queued right now.',
+};
+const ROW_CONFIG = {
+  comfort: {
+    Icon: Coffee,
+    size: 'md',
+    emptyLabel: 'Nothing light queued right now.',
+  },
+  comedy: { Icon: Smile, size: 'md', emptyLabel: 'No comedies queued up.' },
+  quick: {
+    Icon: Clock,
+    size: 'sm',
+    emptyLabel: 'No short episodes available.',
+  },
+  focused: { Icon: Zap, size: 'lg', emptyLabel: 'No intense watches queued.' },
+  visual: {
+    Icon: Eye,
+    size: 'lg',
+    emptyLabel: 'No visually driven films right now.',
+  },
+  classic: {
+    Icon: Armchair,
+    size: 'lg',
+    emptyLabel: 'No classics queued up.',
+  },
+  mixed: DEFAULT_ROW_CONFIG,
+  unknown: DEFAULT_ROW_CONFIG,
+};
+
+// Local-date seed (YYYYMMDD, changes at local midnight) so row order is stable
+// within a day and only varies between days.
+const getLocalDateSeed = (date = new Date()) =>
+  String(
+    date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate(),
+  );
 
 // Creates a stable daily shuffle that is unique per category (salt)
 const getStableShuffled = (items, saltStr = '') => {
@@ -222,21 +265,16 @@ const TonightView = ({
     });
   };
 
-  const [
-    uniqueComfortWatches,
-    uniqueComedies,
-    uniqueQuickBites,
-    uniqueFocusedWatches,
-    uniqueVisualMovies,
-    uniqueClassicMovies,
-  ] = useMemo(() => {
-    const rows = allocateTonightThemes(unwatched);
-    return balanceRows(
-      ['comfort', 'comedy', 'quick', 'focused', 'visual', 'classic'].map(
-        (key) => getStableShuffled(rows[key], key),
-      ),
-    );
+  // Thematic rows: one primary theme per title, then bounded and ordered by the
+  // composer. Activity only affects in-row order and which rows win slots.
+  const tonight = useMemo(() => {
+    const now = new Date();
+    return composeTonightRows(allocateTonightThemes(unwatched, { now }), {
+      scoreItem: (item) => activityScore(item, { now }),
+      sessionSeed: getLocalDateSeed(now),
+    });
   }, [unwatched]);
+  const tonightRows = tonight.rows;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
@@ -349,15 +387,11 @@ const TonightView = ({
 
   const hasOpenedDetails = useHasBeenTrue(isDetailOpen);
   // Worlds sit after the first suggestion rail so decision content comes first.
+  // The Classics row never anchors them (Collections sits directly above it).
   const worldsAfter =
-    [
-      ['currently', currentlyWatchingShows.length],
-      ['comfort', uniqueComfortWatches.length],
-      ['comedies', uniqueComedies.length],
-      ['quick', uniqueQuickBites.length],
-      ['focused', uniqueFocusedWatches.length],
-      ['visual', uniqueVisualMovies.length],
-    ].find(([, count]) => count > 0)?.[0] || 'top';
+    currentlyWatchingShows.length > 0
+      ? 'currently'
+      : tonightRows.find((row) => row.key !== 'classic')?.key || 'top';
   const worldsRail = (
     <WorldsRail
       collections={collections}
@@ -365,6 +399,22 @@ const TonightView = ({
       onOpenWorld={openWorld}
     />
   );
+
+  const collectionsRail = (
+    <CollectionsRail
+      collections={collections}
+      items={items}
+      onOpenCollection={openCollection}
+      onBrowse={browseCollections}
+    />
+  );
+  const hasClassicRow = tonightRows.some((row) => row.key === 'classic');
+  // Empty state only when there is truly nothing to watch tonight: no themed
+  // rows, nothing in progress and no hero artwork to show.
+  const showEmptyState =
+    tonight.isEmpty &&
+    currentlyWatchingShows.length === 0 &&
+    heroItems.length === 0;
 
   const hasOpenedCollection = useHasBeenTrue(isCollectionOpen);
   const hasOpenedAudit = useHasBeenTrue(isAuditModalOpen);
@@ -468,138 +518,46 @@ const TonightView = ({
                   onOpenDetails={openDetails}
                 />
 
-                {/* --- New Thematic Sections --- */}
+                {/* --- Thematic rows (composed, MECE) --- */}
 
-                {uniqueComfortWatches.length > 0 && (
-                  <SuggestionSection
-                    title="Easy & Comforting"
-                    Icon={Coffee}
-                    size="md"
-                    pool={uniqueComfortWatches}
-                    suggestions={uniqueComfortWatches}
-                    emptyLabel="Nothing light queued right now."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
+                {showEmptyState && (
+                  <div className="text-center py-12 px-6">
+                    <p className="text-stone-300 font-serif text-lg">
+                      Nothing queued for tonight
+                    </p>
+                    <p className="text-stone-400 text-sm mt-2">
+                      Use the Add tab below to put something on the shelf.
+                    </p>
+                  </div>
                 )}
 
-                {worldsAfter === 'comfort' && worldsRail}
+                {tonightRows.map((row) => {
+                  const config = ROW_CONFIG[row.key] || DEFAULT_ROW_CONFIG;
+                  return (
+                    <React.Fragment key={row.key}>
+                      {row.key === 'classic' && collectionsRail}
+                      <SuggestionSection
+                        title={row.title}
+                        Icon={config.Icon}
+                        size={config.size}
+                        pool={row.items}
+                        suggestions={row.items}
+                        emptyLabel={config.emptyLabel}
+                        onToggleStatus={onToggleStatus}
+                        onOpenDetails={openDetails}
+                        layout="rail"
+                        hideScrollbar
+                        showEdgeFade
+                        railPaddingClassName="px-1"
+                        enableRewind
+                        className="shrink-0"
+                      />
+                      {worldsAfter === row.key && worldsRail}
+                    </React.Fragment>
+                  );
+                })}
 
-                {uniqueComedies.length > 0 && (
-                  <SuggestionSection
-                    title="Need a Laugh"
-                    Icon={Smile}
-                    size="md"
-                    pool={uniqueComedies}
-                    suggestions={uniqueComedies}
-                    emptyLabel="No comedies queued up."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
-                )}
-
-                {worldsAfter === 'comedies' && worldsRail}
-
-                {uniqueQuickBites.length > 0 && (
-                  <SuggestionSection
-                    title="Quick Bites"
-                    Icon={Clock}
-                    size="sm"
-                    pool={uniqueQuickBites}
-                    suggestions={uniqueQuickBites}
-                    emptyLabel="No short episodes available."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
-                )}
-
-                {worldsAfter === 'quick' && worldsRail}
-
-                {uniqueFocusedWatches.length > 0 && (
-                  <SuggestionSection
-                    title="Deep Dives"
-                    Icon={Zap}
-                    size="lg"
-                    pool={uniqueFocusedWatches}
-                    suggestions={uniqueFocusedWatches}
-                    emptyLabel="No intense watches queued."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
-                )}
-
-                {worldsAfter === 'focused' && worldsRail}
-
-                {uniqueVisualMovies.length > 0 && (
-                  <SuggestionSection
-                    title="Spectacles"
-                    Icon={Eye}
-                    size="lg"
-                    pool={uniqueVisualMovies}
-                    suggestions={uniqueVisualMovies}
-                    emptyLabel="No visually driven films right now."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
-                )}
-
-                {worldsAfter === 'visual' && worldsRail}
-
-                <CollectionsRail
-                  collections={collections}
-                  items={items}
-                  onOpenCollection={openCollection}
-                  onBrowse={browseCollections}
-                />
-
-                {uniqueClassicMovies.length > 0 && (
-                  <SuggestionSection
-                    title="The Classics"
-                    Icon={Armchair}
-                    size="lg"
-                    pool={uniqueClassicMovies}
-                    suggestions={uniqueClassicMovies}
-                    emptyLabel="No classics queued up."
-                    onToggleStatus={onToggleStatus}
-                    onOpenDetails={openDetails}
-                    layout="rail"
-                    hideScrollbar
-                    showEdgeFade
-                    railPaddingClassName="px-1"
-                    enableRewind
-                    className="shrink-0"
-                  />
-                )}
+                {!hasClassicRow && collectionsRail}
               </>
             )}
           </div>

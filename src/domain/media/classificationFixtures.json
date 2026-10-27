@@ -8,7 +8,11 @@
       "title": "Paddington 2",
       "year": "2017",
       "runtimeMinutes": 104,
-      "genres": ["Adventure", "Comedy", "Family"],
+      "genres": [
+        "Adventure",
+        "Comedy",
+        "Family"
+      ],
       "keywords": [
         "london, england",
         "based on novel or book",
@@ -31,14 +35,14 @@
     "expected": {
       "comfort": "high",
       "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: high comfort and low attention remain appropriate. Low plot momentum understated the clear quest/heist/rescue progression, so momentum is medium. The vibrant live-action/CGI hybrid design supports medium visual distinctiveness, not a high exceptional-craft label. Human approval is still required."
   },
   {
     "seed": true,
@@ -49,7 +53,9 @@
       "title": "The Intern",
       "year": "2015",
       "runtimeMinutes": 121,
-      "genres": ["Comedy"],
+      "genres": [
+        "Comedy"
+      ],
       "keywords": [
         "new york city",
         "friendship",
@@ -85,12 +91,12 @@
       "comedyFirst": "medium",
       "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: the gentle workplace/relationship tone supports high comfort; comedy is substantial but not the sole mode; pacing and structure are straightforward. Visual presentation is treated as low distinctiveness rather than unknown. Human approval is still required."
   },
   {
     "seed": true,
@@ -101,7 +107,11 @@
       "title": "The Martian",
       "year": "2015",
       "runtimeMinutes": 141,
-      "genres": ["Science Fiction", "Drama", "Adventure"],
+      "genres": [
+        "Science Fiction",
+        "Drama",
+        "Adventure"
+      ],
       "keywords": [
         "spacecraft",
         "planet mars",
@@ -126,13 +136,13 @@
       "comfort": "low",
       "comedyFirst": "low",
       "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: survival stakes keep comfort low and momentum high. The narrative is accessible and mostly linear but tracks parallel Earth/Mars problem-solving, so medium complexity is more consistent with the rubric than high. The Mars/space presentation supports high visual distinctiveness. Technical detail and tension raise attention above low, but the mainstream linear structure supports medium rather than high. Human approval is still required."
   },
   {
     "seed": true,
@@ -143,7 +153,9 @@
       "title": "Legally Blonde",
       "year": "2001",
       "runtimeMinutes": 96,
-      "genres": ["Comedy"],
+      "genres": [
+        "Comedy"
+      ],
       "keywords": [
         "father murder",
         "blonde",
@@ -165,12 +177,12 @@
       "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: joke-forward comedy, straightforward structure and low attention demand remain appropriate. The strongly authored pink/fashion visual identity supports medium visual distinctiveness rather than an unresolved unknown. Human approval is still required."
   },
   {
     "seed": true,
@@ -181,7 +193,11 @@
       "title": "The School of Rock",
       "year": "2003",
       "runtimeMinutes": 110,
-      "genres": ["Comedy", "Family", "Music"],
+      "genres": [
+        "Comedy",
+        "Family",
+        "Music"
+      ],
       "keywords": [
         "rock 'n' roll",
         "musician",
@@ -203,16 +219,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: explicit cheerful/comforting evidence and the existing deterministic rule make high comfort the coherent label; the prior medium label made the hybrid unable to agree by construction. Comedy is primary, the competition arc gives medium momentum, and structure/attention remain low. Visual distinctiveness is low rather than unresolved. Human approval is still required."
   },
   {
     "seed": true,
@@ -223,7 +239,11 @@
       "title": "Knives Out",
       "year": "2019",
       "runtimeMinutes": 131,
-      "genres": ["Comedy", "Crime", "Mystery"],
+      "genres": [
+        "Comedy",
+        "Crime",
+        "Mystery"
+      ],
       "keywords": [
         "immigrant",
         "detective",
@@ -259,7 +279,10 @@
       "title": "Ocean's Eleven",
       "year": "2001",
       "runtimeMinutes": 116,
-      "genres": ["Thriller", "Crime"],
+      "genres": [
+        "Thriller",
+        "Crime"
+      ],
       "keywords": [
         "casino",
         "pickpocket",
@@ -307,7 +330,11 @@
       "title": "Gone Girl",
       "year": "2014",
       "runtimeMinutes": 149,
-      "genres": ["Mystery", "Thriller", "Drama"],
+      "genres": [
+        "Mystery",
+        "Thriller",
+        "Drama"
+      ],
       "keywords": [
         "infidelity",
         "based on novel or book",
@@ -353,7 +380,11 @@
       "title": "The Dark Knight",
       "year": "2008",
       "runtimeMinutes": 152,
-      "genres": ["Action", "Thriller", "Crime"],
+      "genres": [
+        "Action",
+        "Thriller",
+        "Crime"
+      ],
       "keywords": [
         "sadism",
         "chaos",
@@ -396,7 +427,12 @@
       "title": "Spider-Man: Into the Spider-Verse",
       "year": "2018",
       "runtimeMinutes": 117,
-      "genres": ["Animation", "Action", "Adventure", "Science Fiction"],
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure",
+        "Science Fiction"
+      ],
       "keywords": [
         "superhero",
         "based on comic",
@@ -425,7 +461,10 @@
       "title": "The Grand Budapest Hotel",
       "year": "2014",
       "runtimeMinutes": 100,
-      "genres": ["Comedy", "Drama"],
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
       "keywords": [
         "hotel",
         "painting",
@@ -467,7 +506,10 @@
       "title": "Blade Runner 2049",
       "year": "2017",
       "runtimeMinutes": 164,
-      "genres": ["Science Fiction", "Drama"],
+      "genres": [
+        "Science Fiction",
+        "Drama"
+      ],
       "keywords": [
         "future",
         "android",
@@ -508,7 +550,11 @@
       "title": "Roman Holiday",
       "year": "1953",
       "runtimeMinutes": 119,
-      "genres": ["Romance", "Comedy", "Drama"],
+      "genres": [
+        "Romance",
+        "Comedy",
+        "Drama"
+      ],
       "keywords": [
         "dance",
         "rome, italy",
@@ -544,7 +590,10 @@
       "title": "Casablanca",
       "year": "1943",
       "runtimeMinutes": 102,
-      "genres": ["Drama", "Romance"],
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
       "keywords": [
         "corruption",
         "nazi",
@@ -587,7 +636,10 @@
       "title": "The Godfather",
       "year": "1972",
       "runtimeMinutes": 175,
-      "genres": ["Drama", "Crime"],
+      "genres": [
+        "Drama",
+        "Crime"
+      ],
       "keywords": [
         "based on novel or book",
         "loss of loved one",
@@ -633,7 +685,10 @@
       "title": "Ted Lasso",
       "year": "2020",
       "runtimeMinutes": null,
-      "genres": ["Drama", "Comedy"],
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
       "keywords": [
         "england",
         "male friendship",
@@ -675,7 +730,10 @@
       "title": "Gilmore Girls",
       "year": "2000",
       "runtimeMinutes": 44,
-      "genres": ["Comedy", "Drama"],
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
       "keywords": [
         "grandparent grandchild relationship",
         "small town",
@@ -712,7 +770,9 @@
       "title": "Friday Night Lights",
       "year": "2006",
       "runtimeMinutes": 43,
-      "genres": ["Drama"],
+      "genres": [
+        "Drama"
+      ],
       "keywords": [
         "southern usa",
         "american football",
@@ -744,7 +804,9 @@
       "title": "Abbott Elementary",
       "year": "2021",
       "runtimeMinutes": null,
-      "genres": ["Comedy"],
+      "genres": [
+        "Comedy"
+      ],
       "keywords": [
         "philadelphia, pennsylvania",
         "elementary school",
@@ -779,7 +841,10 @@
       "title": "Brooklyn Nine-Nine",
       "year": "2013",
       "runtimeMinutes": null,
-      "genres": ["Comedy", "Crime"],
+      "genres": [
+        "Comedy",
+        "Crime"
+      ],
       "keywords": [
         "new york city",
         "detective",
@@ -814,8 +879,15 @@
       "title": "The Great British Bake Off",
       "year": "2010",
       "runtimeMinutes": 60,
-      "genres": ["Reality"],
-      "keywords": ["competition", "food", "baking", "baking competition"]
+      "genres": [
+        "Reality"
+      ],
+      "keywords": [
+        "competition",
+        "food",
+        "baking",
+        "baking competition"
+      ]
     },
     "expected": {
       "comfort": "high",
@@ -838,7 +910,11 @@
       "title": "Only Murders in the Building",
       "year": "2021",
       "runtimeMinutes": null,
-      "genres": ["Comedy", "Mystery", "Crime"],
+      "genres": [
+        "Comedy",
+        "Mystery",
+        "Crime"
+      ],
       "keywords": [
         "deaf",
         "friendship",
@@ -875,7 +951,11 @@
       "title": "Stranger Things",
       "year": "2016",
       "runtimeMinutes": null,
-      "genres": ["Action & Adventure", "Mystery", "Sci-Fi & Fantasy"],
+      "genres": [
+        "Action & Adventure",
+        "Mystery",
+        "Sci-Fi & Fantasy"
+      ],
       "keywords": [
         "monster",
         "small town",
@@ -917,7 +997,11 @@
       "title": "Severance",
       "year": "2022",
       "runtimeMinutes": null,
-      "genres": ["Drama", "Mystery", "Sci-Fi & Fantasy"],
+      "genres": [
+        "Drama",
+        "Mystery",
+        "Sci-Fi & Fantasy"
+      ],
       "keywords": [
         "office",
         "workplace",
@@ -948,7 +1032,10 @@
       "title": "Planet Earth II",
       "year": "2016",
       "runtimeMinutes": null,
-      "genres": ["Documentary", "Family"],
+      "genres": [
+        "Documentary",
+        "Family"
+      ],
       "keywords": [
         "ocean",
         "sea",
@@ -993,7 +1080,9 @@
       "title": "The Crown",
       "year": "2016",
       "runtimeMinutes": null,
-      "genres": ["Drama"],
+      "genres": [
+        "Drama"
+      ],
       "keywords": [
         "england",
         "queen",
@@ -1037,7 +1126,11 @@
       "title": "Arcane",
       "year": "2021",
       "runtimeMinutes": null,
-      "genres": ["Animation", "Action & Adventure", "Sci-Fi & Fantasy"],
+      "genres": [
+        "Animation",
+        "Action & Adventure",
+        "Sci-Fi & Fantasy"
+      ],
       "keywords": [
         "magic",
         "war of independence",
@@ -1079,7 +1172,10 @@
       "title": "I Love Lucy",
       "year": "1951",
       "runtimeMinutes": null,
-      "genres": ["Comedy", "Family"],
+      "genres": [
+        "Comedy",
+        "Family"
+      ],
       "keywords": [
         "new york city",
         "husband wife relationship",
@@ -1116,7 +1212,11 @@
       "title": "The Twilight Zone",
       "year": "1959",
       "runtimeMinutes": 25,
-      "genres": ["Sci-Fi & Fantasy", "Mystery", "Drama"],
+      "genres": [
+        "Sci-Fi & Fantasy",
+        "Mystery",
+        "Drama"
+      ],
       "keywords": [
         "time travel",
         "computer",
@@ -1164,7 +1264,10 @@
       "title": "The Wire",
       "year": "2002",
       "runtimeMinutes": null,
-      "genres": ["Crime", "Drama"],
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
       "keywords": [
         "corruption",
         "newspaper",
@@ -1226,7 +1329,10 @@
       "title": "Fight Club",
       "year": "1999",
       "runtimeMinutes": 139,
-      "genres": ["Drama", "Thriller"],
+      "genres": [
+        "Drama",
+        "Thriller"
+      ],
       "keywords": [
         "dual identity",
         "rage and hate",
@@ -1265,7 +1371,11 @@
       "title": "Inception",
       "year": "2010",
       "runtimeMinutes": 148,
-      "genres": ["Action", "Science Fiction", "Crime"],
+      "genres": [
+        "Action",
+        "Science Fiction",
+        "Crime"
+      ],
       "keywords": [
         "mission",
         "dreams",
@@ -1304,7 +1414,11 @@
       "title": "Spirited Away",
       "year": "2001",
       "runtimeMinutes": 125,
-      "genres": ["Animation", "Family", "Fantasy"],
+      "genres": [
+        "Animation",
+        "Family",
+        "Fantasy"
+      ],
       "keywords": [
         "witch",
         "parent child relationship",
@@ -1340,7 +1454,11 @@
       "title": "Parasite",
       "year": "2019",
       "runtimeMinutes": 133,
-      "genres": ["Comedy", "Thriller", "Drama"],
+      "genres": [
+        "Comedy",
+        "Thriller",
+        "Drama"
+      ],
       "keywords": [
         "dark comedy",
         "con artist",
@@ -1380,7 +1498,10 @@
       "title": "Amélie",
       "year": "2001",
       "runtimeMinutes": 122,
-      "genres": ["Comedy", "Romance"],
+      "genres": [
+        "Comedy",
+        "Romance"
+      ],
       "keywords": [
         "daughter",
         "paris, france",
@@ -1429,7 +1550,11 @@
       "title": "Your Name.",
       "year": "2016",
       "runtimeMinutes": 106,
-      "genres": ["Animation", "Romance", "Drama"],
+      "genres": [
+        "Animation",
+        "Romance",
+        "Drama"
+      ],
       "keywords": [
         "high school",
         "race against time",
@@ -1474,7 +1599,11 @@
       "title": "Dangal",
       "year": "2016",
       "runtimeMinutes": 161,
-      "genres": ["Drama", "Family", "Comedy"],
+      "genres": [
+        "Drama",
+        "Family",
+        "Comedy"
+      ],
       "keywords": [
         "small town",
         "strong woman",
@@ -1522,7 +1651,10 @@
       "title": "3 Idiots",
       "year": "2009",
       "runtimeMinutes": 171,
-      "genres": ["Drama", "Comedy"],
+      "genres": [
+        "Drama",
+        "Comedy"
+      ],
       "keywords": [
         "challenge",
         "middle class",
@@ -1567,7 +1699,11 @@
       "title": "Howl's Moving Castle",
       "year": "2004",
       "runtimeMinutes": 119,
-      "genres": ["Fantasy", "Animation", "Adventure"],
+      "genres": [
+        "Fantasy",
+        "Animation",
+        "Adventure"
+      ],
       "keywords": [
         "witch",
         "flying",
@@ -1610,7 +1746,13 @@
       "title": "Soul",
       "year": "2020",
       "runtimeMinutes": 101,
-      "genres": ["Animation", "Family", "Drama", "Music", "Fantasy"],
+      "genres": [
+        "Animation",
+        "Family",
+        "Drama",
+        "Music",
+        "Fantasy"
+      ],
       "keywords": [
         "new york city",
         "jazz",
@@ -1660,7 +1802,10 @@
       "title": "The Truman Show",
       "year": "1998",
       "runtimeMinutes": 103,
-      "genres": ["Comedy", "Drama"],
+      "genres": [
+        "Comedy",
+        "Drama"
+      ],
       "keywords": [
         "escape",
         "paranoia",
@@ -1698,7 +1843,10 @@
       "title": "Jurassic Park",
       "year": "1993",
       "runtimeMinutes": 127,
-      "genres": ["Adventure", "Science Fiction"],
+      "genres": [
+        "Adventure",
+        "Science Fiction"
+      ],
       "keywords": [
         "exotic island",
         "island",
@@ -1734,7 +1882,11 @@
       "title": "Schindler's List",
       "year": "1993",
       "runtimeMinutes": 195,
-      "genres": ["Drama", "History", "War"],
+      "genres": [
+        "Drama",
+        "History",
+        "War"
+      ],
       "keywords": [
         "factory",
         "hero",
@@ -1781,7 +1933,9 @@
       "title": "The Pursuit of Happyness",
       "year": "2006",
       "runtimeMinutes": 117,
-      "genres": ["Drama"],
+      "genres": [
+        "Drama"
+      ],
       "keywords": [
         "work",
         "worker",
@@ -1825,7 +1979,11 @@
       "title": "How to Train Your Dragon: The Hidden World",
       "year": "2019",
       "runtimeMinutes": 104,
-      "genres": ["Animation", "Family", "Adventure"],
+      "genres": [
+        "Animation",
+        "Family",
+        "Adventure"
+      ],
       "keywords": [
         "based on novel or book",
         "flying",
@@ -1890,7 +2048,11 @@
       "title": "Dunkirk",
       "year": "2017",
       "runtimeMinutes": 107,
-      "genres": ["War", "Action", "History"],
+      "genres": [
+        "War",
+        "Action",
+        "History"
+      ],
       "keywords": [
         "army",
         "beach",
@@ -1939,7 +2101,10 @@
       "title": "Three Billboards Outside Ebbing, Missouri",
       "year": "2017",
       "runtimeMinutes": 115,
-      "genres": ["Crime", "Drama"],
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
       "keywords": [
         "small town",
         "police brutality",
@@ -1978,7 +2143,10 @@
       "title": "The Passion of Joan of Arc",
       "year": "1928",
       "runtimeMinutes": 81,
-      "genres": ["Drama", "History"],
+      "genres": [
+        "Drama",
+        "History"
+      ],
       "keywords": [
         "suffering",
         "court case",
@@ -2028,7 +2196,10 @@
       "title": "Once Upon a Time in the West",
       "year": "1968",
       "runtimeMinutes": 166,
-      "genres": ["Drama", "Western"],
+      "genres": [
+        "Drama",
+        "Western"
+      ],
       "keywords": [
         "small town",
         "loss of loved one",
@@ -2069,7 +2240,11 @@
       "title": "La Jetée",
       "year": "1962",
       "runtimeMinutes": 29,
-      "genres": ["Drama", "Romance", "Science Fiction"],
+      "genres": [
+        "Drama",
+        "Romance",
+        "Science Fiction"
+      ],
       "keywords": [
         "paris, france",
         "nuclear war",

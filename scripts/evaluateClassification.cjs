@@ -11,6 +11,7 @@ const { initializeFirebaseAdmin } = require('../server/firebaseAdmin');
 const {
   realFixtures,
   selectLiveFixtures,
+  findRuleExpectedConflicts,
   representativeValue,
 } = require('./classificationEvaluation.cjs');
 
@@ -192,10 +193,12 @@ const run = async () => {
     : 0;
   const providerAttemptsTotal =
     previousProviderAttempts + providerAttemptsThisRun;
+  const ruleExpectedConflicts = findRuleExpectedConflicts(real);
   const subjective = domain.FACETS.filter((f) => f !== 'curatedClassic');
   const passed =
     live &&
     complete &&
+    ruleExpectedConflicts.length === 0 &&
     fixtures
       .filter((f) => f.input.providerId !== '999999999')
       .every((f) => f.review === 'approved') &&
@@ -243,6 +246,7 @@ const run = async () => {
       providerAttemptsTotal,
     },
     providerAttemptsTotal,
+    ruleExpectedConflicts,
     rules,
     hybrid,
     results,

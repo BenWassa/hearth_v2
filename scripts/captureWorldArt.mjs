@@ -66,13 +66,21 @@ try {
     await page.goto(origin + '/?demo=1&collectionsFixture=25', { waitUntil: 'domcontentloaded' });
     const cards = page.locator('[data-world-id]');
     await cards.first().waitFor({ timeout: 20000 });
-    // Tonight World tiles are text-only: no artwork requests, at least 44px
-    // tall, and no horizontal overflow.
+    // Tonight World tiles are designer banner cards: exactly one decorative
+    // card.webp image, at least 44px tall, and no horizontal overflow.
     for (let index = 0; index < (await cards.count()); index += 1) {
       const card = cards.nth(index);
       await card.scrollIntoViewIfNeeded();
-      if (await card.locator('img').count()) {
-        throw new Error(`World tile ${index} loads an image at ${width}px`);
+      const images = card.locator('img');
+      if ((await images.count()) !== 1) {
+        throw new Error(`World tile ${index} should have one banner image at ${width}px`);
+      }
+      const src = (await images.first().getAttribute('src')) || '';
+      if (!/\/card\.webp$/.test(src)) {
+        throw new Error(`World tile ${index} banner is not card.webp at ${width}px: ${src}`);
+      }
+      if ((await images.first().getAttribute('alt')) !== '') {
+        throw new Error(`World tile ${index} banner must be decorative at ${width}px`);
       }
       const height = await card.evaluate((el) => el.getBoundingClientRect().height);
       if (height < 44) throw new Error(`World tile ${index} under 44px at ${width}px`);

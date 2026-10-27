@@ -1,6 +1,6 @@
 # Issue #11 — world art superhero
 
-- **Status:** Open · scoped, not implemented
+- **Status:** Closed 2026-10-27 · delivered via PR #19 (v3.16.0): covers and designer banner cards on main; portrait heroes and wordmarks intentionally not used (source art archived under the archive/art-worlds-* tags)
 - **Issue:** https://github.com/BenWassa/hearth_v2/issues/11
 - **Date:** 2026-10-26
 - **Parent:** https://github.com/BenWassa/hearth_v2/issues/10

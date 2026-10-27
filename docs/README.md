@@ -17,18 +17,18 @@ The canonical task status is the **GitHub issue**. These files are durable resea
 - When backfilling old issues, preserve what was actually recorded. Distinguish original issue facts from new suggestions and note missing verification evidence.
 - A proposal document does **not** mean the application implementation has changed.
 
-## Current records (2026-10-26)
+## Current records (2026-10-27)
 
 | GitHub issue | Status | Record |
 | --- | --- | --- |
 | [#20 Automatic classification](https://github.com/BenWassa/hearth_v2/issues/20) | Open | [TMDB-first zero-friction Add + optional Gemini](open/issue-020-automatic-classification.md) |
-| [#14 World asset integration](https://github.com/BenWassa/hearth_v2/issues/14) | Open | [Landscape Tonight + direct one-tap hero](open/issue-014-world-art-integration.md) |
-| [#13 Galaxy / magic World art](https://github.com/BenWassa/hearth_v2/issues/13) | Open | [Star Wars / Wizarding World / Ghibli pack](open/issue-013-world-art-galaxy-magic.md) |
-| [#12 Animation World art](https://github.com/BenWassa/hearth_v2/issues/12) | Open | [Pixar / Disney / DreamWorks pack](open/issue-012-world-art-animation.md) |
-| [#11 Superhero World art](https://github.com/BenWassa/hearth_v2/issues/11) | Open | [Marvel / DC pack](open/issue-011-world-art-superhero.md) |
-| [#10 World visual production contract](https://github.com/BenWassa/hearth_v2/issues/10) | Open | [Approved D2 contract and lane coordination](open/issue-010-world-art-direction-d2.md) |
+| [#14 World asset integration](https://github.com/BenWassa/hearth_v2/issues/14) | Closed | [Landscape Tonight + direct one-tap hero](closed/issue-014-world-art-integration.md) |
+| [#13 Galaxy / magic World art](https://github.com/BenWassa/hearth_v2/issues/13) | Closed | [Star Wars / Wizarding World / Ghibli pack](closed/issue-013-world-art-galaxy-magic.md) |
+| [#12 Animation World art](https://github.com/BenWassa/hearth_v2/issues/12) | Closed | [Pixar / Disney / DreamWorks pack](closed/issue-012-world-art-animation.md) |
+| [#11 Superhero World art](https://github.com/BenWassa/hearth_v2/issues/11) | Closed | [Marvel / DC pack](closed/issue-011-world-art-superhero.md) |
+| [#10 World visual production contract](https://github.com/BenWassa/hearth_v2/issues/10) | Closed | [Approved D2 contract and lane coordination](closed/issue-010-world-art-direction-d2.md) |
 | [#7 Tonight: MECE rows](https://github.com/BenWassa/hearth_v2/issues/7) | Open | [Tonight taxonomy and scenario tests](open/issue-007-tonight-mece-rows.md) |
-| [#6 Collections browser](https://github.com/BenWassa/hearth_v2/issues/6) | Open | [Scalable saga navigation](open/issue-006-collections-browser.md) |
+| [#6 Collections browser](https://github.com/BenWassa/hearth_v2/issues/6) | Closed | [Scalable saga navigation](closed/issue-006-collections-browser.md) |
 | [#3 Episode metadata refresh](https://github.com/BenWassa/hearth_v2/issues/3) | Closed | [Historical episode metadata issue](closed/issue-003-episode-release-metadata.md) |
 
 This index is curated, not automatically generated. Future issues should receive records using the same structure.

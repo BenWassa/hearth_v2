@@ -62,6 +62,8 @@ This isolates the remaining problem more clearly: most non-visual agreement is a
 - Removed deprecated `temperature: 0`.
 - Explicit `thinkingLevel: minimal`.
 - Added per-facet JSON Schema descriptions and level anchors.
+- Narrowed deterministic complexity rules: generic `complex` no longer proves narrative complexity; bare nonlinear structure is medium complexity/attention, while stronger signals such as unreliable narrator, mind-bending or time paradox remain high.
+- Added a rollout-blocking hard-rule/fixture consistency check. The current offline fixture has two unresolved conflicts for human review: Planet Earth II comfort (`rules=high`, `fixture=unknown`) and How to Train Your Dragon: The Hidden World comfort (`rules=high`, `fixture=unknown`).
 - Added safe diagnostic reasons for invalid/upstream/timeout outcomes without storing model text.
 - Gemini results carry provider-attempt count plus prompt/policy identity into blend metadata.
 
@@ -74,7 +76,8 @@ No model change is proposed yet. Changing the model now would confound prompt, f
 - Agreement uses the majority value across repeated predictions; stability remains a separate all-runs-equal metric.
 - Output distinguishes total fixtures, real fixtures, selected titles, attempted titles, completed titles and provider attempts.
 - Results preserve safe outcome diagnostics alongside status history.
-- Resume compatibility requires classifier, model, prompt, inference-policy and policy-key identity.
+- Resume compatibility requires classifier, model, prompt, inference-policy, policy-key identity and the exact same title selection.
+- The report lists every non-unknown deterministic rule that conflicts with the fixture label, and rollout cannot pass while any such conflict remains.
 
 The exact five canonical pilot keys are:
 
@@ -86,7 +89,7 @@ GitHub Classification PR QA passes on this branch: 53 unit-test files / 341 unit
 
 ## Remaining gates
 
-1. Obtain explicit human approval or revision of all 50 real fixture labels.
+1. Obtain explicit human approval or revision of all 50 real fixture labels, including resolution of the two remaining hard-rule/fixture comfort conflicts.
 2. Run a new owner-approved five-title v2 pilot using a fresh output file.
 3. Complete all 50 titles with three valid predictions each within approved quotas.
 4. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.

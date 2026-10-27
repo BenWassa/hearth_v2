@@ -55,6 +55,13 @@ const run = async () => {
       throw new Error(
         'Use a fresh output path after changing model/prompt/policy/version',
       );
+    if (
+      Array.isArray(previous.selection?.keys) &&
+      JSON.stringify(previous.selection.keys) !== JSON.stringify(selection.keys)
+    )
+      throw new Error(
+        'Use a fresh output path after changing evaluation selection',
+      );
   }
   const saved = new Map(
     (previous.results || []).map((result) => [result.key, result]),

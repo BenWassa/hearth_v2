@@ -23,19 +23,16 @@ describe('WorldCover', () => {
     return host.querySelector('button');
   };
 
-  it('is named by the World, with decorative lazy art and wordmark', async () => {
+  it('is named by the World, with one decorative lazy card image', async () => {
     const button = await mount(<WorldCover world={world} onOpen={() => {}} />);
     expect(button.getAttribute('aria-label')).toBe('Pixar');
-    const [art, wordmark] = button.querySelectorAll('img');
-    expect(art.getAttribute('src')).toBe('/assets/worlds/pixar/tile.webp');
-    expect(wordmark.getAttribute('src')).toBe(
-      '/assets/worlds/pixar/wordmark.svg',
-    );
-    expect(wordmark.style.width).toBe('73%');
-    [art, wordmark].forEach((img) => {
-      expect(img.getAttribute('alt')).toBe('');
-      expect(img.getAttribute('loading')).toBe('lazy');
-    });
+    const images = button.querySelectorAll('img');
+    // The logo is baked into the card, so there is nothing to overlay.
+    expect(images).toHaveLength(1);
+    const [art] = images;
+    expect(art.getAttribute('src')).toBe('/assets/worlds/pixar/card.webp');
+    expect(art.getAttribute('alt')).toBe('');
+    expect(art.getAttribute('loading')).toBe('lazy');
     expect(button.textContent).toBe('2 sagas');
     const described = document.getElementById(
       button.getAttribute('aria-describedby'),
@@ -43,34 +40,23 @@ describe('WorldCover', () => {
     expect(described.textContent).toBe('2 sagas');
   });
 
-  it('uses the World tile and wordmark fields when present', async () => {
+  it('uses the World card field when present', async () => {
     const button = await mount(
-      <WorldCover
-        world={{ ...world, tile: '/t.webp', wordmark: '/w.svg' }}
-        onOpen={() => {}}
-      />,
+      <WorldCover world={{ ...world, card: '/c.webp' }} onOpen={() => {}} />,
     );
-    const [art, wordmark] = button.querySelectorAll('img');
-    expect(art.getAttribute('src')).toBe('/t.webp');
-    expect(wordmark.getAttribute('src')).toBe('/w.svg');
+    expect(button.querySelector('img').getAttribute('src')).toBe('/c.webp');
   });
 
-  it.each(['tile', 'wordmark'])(
-    'falls back to the serif World name when the %s image fails',
-    async (which) => {
-      const button = await mount(
-        <WorldCover world={world} onOpen={() => {}} />,
-      );
-      const imgs = button.querySelectorAll('img');
-      await act(async () => {
-        imgs[which === 'tile' ? 0 : 1].dispatchEvent(new Event('error'));
-      });
-      expect(button.querySelectorAll('img')).toHaveLength(0);
-      const name = button.querySelector('.font-serif');
-      expect(name.textContent).toBe('Pixar');
-      expect(button.getAttribute('aria-label')).toBe('Pixar');
-    },
-  );
+  it('falls back to the serif World name when the card image fails', async () => {
+    const button = await mount(<WorldCover world={world} onOpen={() => {}} />);
+    await act(async () => {
+      button.querySelector('img').dispatchEvent(new Event('error'));
+    });
+    expect(button.querySelectorAll('img')).toHaveLength(0);
+    const name = button.querySelector('.font-serif');
+    expect(name.textContent).toBe('Pixar');
+    expect(button.getAttribute('aria-label')).toBe('Pixar');
+  });
 
   it('calls onOpen with the click event and focuses the button', async () => {
     const onOpen = vi.fn();

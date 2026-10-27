@@ -29,8 +29,7 @@ describe('approved World membership', () => {
     expect(COLLECTION_WORLDS).toHaveLength(8);
     for (const world of COLLECTION_WORLDS) {
       expect(world.cover).toBe(`/assets/worlds/${world.id}/cover.webp`);
-      expect(world.tile).toBe(`/assets/worlds/${world.id}/tile.webp`);
-      expect(world.wordmark).toBe(`/assets/worlds/${world.id}/wordmark.svg`);
+      expect(world.card).toBe(`/assets/worlds/${world.id}/card.webp`);
     }
   });
   it('represents all approved brand Worlds without corporate or continuity conflation', () => {

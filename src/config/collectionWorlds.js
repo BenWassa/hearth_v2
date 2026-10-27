@@ -27,9 +27,8 @@ export const COLLECTION_WORLDS = worlds.map(([id, name]) => ({
   name,
   // Static artwork. Only the World page header uses `cover`.
   cover: `/assets/worlds/${id}/cover.webp`,
-  // Tonight tile: a 16:9 tonal gradient plus a transparent wordmark.
-  tile: `/assets/worlds/${id}/tile.webp`,
-  wordmark: `/assets/worlds/${id}/wordmark.svg`,
+  // Tonight card: designer banner art with the World's logo baked in.
+  card: `/assets/worlds/${id}/card.webp`,
   collectionIds: Object.values(COLLECTION_CATALOG)
     .filter((entry) => entry.worldId === id)
     .map((entry) => entry.providerId),

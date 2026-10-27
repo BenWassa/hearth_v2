@@ -104,7 +104,7 @@ it('lists Worlds in the fixed brand order whatever the saga activity', async () 
     'dc',
   ]);
   const cell = host.querySelector('ul[role="list"] > li');
-  expect(cell.className).toContain('w-[clamp(7.5rem,calc(50vw-2.6rem),11rem)]');
+  expect(cell.className).toContain('w-[clamp(11rem,56vw,15rem)]');
   expect(cell.style.scrollSnapAlign).toBe('start');
 });
 it('lists every saga plainly: no search, sort, refresh, count or Worlds rail', async () => {
@@ -342,7 +342,7 @@ it('keeps a title when artwork fails, including a World with no sagas', async ()
   ).toContain('Up');
 });
 
-it('renders World tiles as gradient art with a wordmark, named by the World', async () => {
+it('renders World tiles as one banner card, named by the World', async () => {
   const openWorld = vi.fn();
   await mount(
     <WorldsRail
@@ -352,9 +352,9 @@ it('renders World tiles as gradient art with a wordmark, named by the World', as
     />,
   );
   const tile = host.querySelector('[data-world-id="marvel"]');
-  const [art, wordmark] = tile.querySelectorAll('img');
-  expect(art.getAttribute('src')).toMatch(/marvel\/tile\.webp$/);
-  expect(wordmark.getAttribute('src')).toMatch(/marvel\/wordmark\.svg$/);
+  const images = tile.querySelectorAll('img');
+  expect(images).toHaveLength(1);
+  expect(images[0].getAttribute('src')).toMatch(/marvel\/card\.webp$/);
   expect(tile.getAttribute('aria-label')).toBe('Marvel');
   expect(tile.textContent).toMatch(/1 saga/);
   await click(tile);

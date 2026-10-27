@@ -13,7 +13,7 @@ const item = {
 };
 const result = {
   ...classifyMedia(item),
-  pipelineVersion: 'viewing-1',
+  pipelineVersion: 'viewing-2',
   classifiedAt: 1000,
 };
 const storage = () => {

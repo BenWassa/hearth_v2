@@ -1,5 +1,5 @@
 // Public media evidence only. Facets are independent; row allocation is separate.
-export const CLASSIFIER_VERSION = 'viewing-1';
+export const CLASSIFIER_VERSION = 'viewing-2';
 export const FACETS = [
   'comfort',
   'comedyFirst',
@@ -146,9 +146,11 @@ export const validateAttributes = (value) => {
     );
   });
 };
-export const blendClassification = (baseline, attributes, model) => {
+export const blendClassification = (baseline, attributes, enrichment = {}) => {
   if (!validateAttributes(attributes))
     throw new Error('Invalid classification attributes');
+  const metadata =
+    typeof enrichment === 'string' ? { model: enrichment } : enrichment || {};
   const merged = Object.fromEntries(
     FACETS.map((name) => {
       const inferred = attributes[name];
@@ -169,8 +171,13 @@ export const blendClassification = (baseline, attributes, model) => {
   return {
     ...baseline,
     method: 'hybrid',
-    model,
-    promptVersion: 'viewing-prompt-1',
+    model: metadata.model,
+    ...(metadata.promptVersion
+      ? { promptVersion: metadata.promptVersion }
+      : {}),
+    ...(metadata.inferencePolicyVersion
+      ? { inferencePolicyVersion: metadata.inferencePolicyVersion }
+      : {}),
     attributes: merged,
   };
 };

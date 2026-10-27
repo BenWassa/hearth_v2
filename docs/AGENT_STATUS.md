@@ -10,51 +10,25 @@ One shared place for the agents working in this repo at the same time (Claude Co
 4. When you finish, set your State to `DONE`, fill in "Finished", and list anything the other workstream needs to know (new exports, renamed files, tests you could not run).
 5. Do not run `git checkout`, `git stash` or `git reset` on files outside your list.
 
-## Workstream: Worlds (Claude Code)
+## Active workstreams
 
-- **State:** DONE. Brand rail in 1c1593c, designer banner cards in 3932db2.
-- **Goal:** World pages redesign (done and committed in 87df05b), then Tonight Worlds as a single finite horizontal brand rail in fixed order (Pixar, Marvel, Star Wars, Wizarding World, Disney, DreamWorks, DC, Studio Ghibli), adaptive weekly picks retired, plus wordmark width updates and a dev-only layout sandbox.
-- **Owns:**
-  - `src/config/collectionWorlds.js` and `.test.js`
-  - `src/views/components/tonight/WorldsRail.jsx` (renamed from `WorldsGrid.jsx`), `useTonightWorlds.js`, `CollectionsRail.jsx`
-  - `src/components/cards/WorldCover.jsx` and `.test.jsx`
-  - `src/views/CollectionsBrowseView.test.jsx`
-  - `src/dev/` and `worlds-mock.html` (dev-only sandbox, never part of the production build)
-  - `DESIGN.md`, `PRODUCT.md`, `COLLECTIONS_REDESIGN.md` (Worlds and Collections sections only)
-  - `docs/collections/WORLD_PAGE_*.md`
-- **Shared files I also touch (small edits):** `src/views/TonightView.jsx` (the Worlds import and placement only), `src/views/TonightView.test.jsx`.
-- **Finished:** 2026-10-26, rail verified in a clean worktree (lint, prettier, 316 tests, production build, 320 to 1280 px browser check) and committed with only my hunks.
-- **Dev sandbox:** `src/dev/` and `worlds-mock.html` were obsolete once the rail shipped and were moved out of the repo (recoverable copy kept in the Claude session scratchpad, not committed). `Studio Franchise Logo Grid.png` in the repo root is the designer's source sheet; it is untracked and excluded locally via `.git/info/exclude`, so it is never committed.
-- **Notes for others:** `WorldsGrid` was renamed to `WorldsRail`; if you import it, use the new path. Production behavior of the Collections row now depends on `useTonightWorlds`.
+- **Android back navigation (#22, PR #23)** — branch `fix/android-back-navigation`. Owns `src/app/useViewHistory*`, history wiring in `src/app/useAppState.js`. State: IN PROGRESS (findings fix after review; manual Pixel QA pending with the owner).
+- **Gemini pilot quality (#21, PR #24)** — branch `codex/issue-21-gemini-pilot-quality`. Owns the classification evaluator, Gemini classifier, fixtures and `docs/open/issue-021-*`. State: DRAFT, gated on human fixture approval and owner-approved live runs.
+- **Tonight composition (#7)** — branch `feat/tonight-composition`. Owns `src/domain/media/tonightComposition*`, `tonightActivity*`, `tonightClassification*` and the `TonightView.jsx` rewire. State: IN PROGRESS.
 
-## Workstream: Classification and import (Codex, other session)
+## Completed (archived 2026-10-27)
 
-- **State:** DONE and committed in `632f84c`. Optional Gemini rollout remains gated on model configuration, rights review and the live editorial pilot.
-- **Goal:** Implement issue #20: automatic viewing facets, optional server-only Gemini, safe resumable backfill, tag-free add/import, and unique Tonight assignment.
-- **Owns:**
-  - `api/_lib/mappers/mediaMapper.js`, `api/_lib/providerClient.js`, `api/_lib/classificationService.js`, `api/_lib/geminiClassifier.js`, `api/media/classify.js`, `api/__tests__/classification.test.js`
-  - `server/app.js`
-  - `src/app/useAppState.js`, `src/domain/import/importer.js`, `src/domain/media/schema.js`, `src/domain/media/classification.mjs`, `classification.test.js`, `tonightClassification.js`
-  - `src/services/firebase/watchlist.js`, `src/services/mediaApi/classificationQueue.js`
-  - `src/components/ItemDetailsModal.jsx` and `.test.jsx`, `src/importer.test.js`
-  - `src/views/AddView.jsx`, `AddView.integration.test.jsx`, `ImportModal.jsx`, `ImportModal.test.jsx`
-  - `src/views/components/tonight/TonightHeaderMenu.jsx` and `.test.jsx`
-- **Shared files:** `src/views/TonightView.jsx` (classification allocation only). Kept the committed WorldsRail import and placement. No edits to TonightView.test.jsx.
-- **Finished:** 2026-10-26. Implementation commit: `632f84c` (Automate shelf classification and guard data deletion). 353 unit tests + 33 API tests pass, lint zero warnings, production build, Add/details browser checks at 320/390/448 px, graphify updated.
-- **Notes for others:** Additional owned files: classificationQueue.test.js, classificationFixtures.json, scripts/evaluateClassification.cjs, scripts/correctClassification.cjs, docs/open/issue-020-*, issue-007 integration note, public/tmdb-logo.svg, .env.api.example, apphosting.yaml (commented optional configuration), watchlist.test.js, template/useTemplateAppState.js and its worldMetadata regression. Local GEMINI_API_KEY presence verified in ignored .env.local; pilot loader now matches server env-file precedence. No model or enablement flags configured locally. User reports the Firebase key is added. No deployment, production backfill, push, or live Gemini inference call. See docs/open/issue-020-implementation-record.md for scope and remaining external validation. Implementation and scope documents are committed; this status update follows that commit. Leave the other workstream’s dev sandbox and the untracked Studio Franchise Logo Grid.png untouched.
+- Worlds redesign, World pages, saga page and Worlds rail (Claude Code): 87df05b, 1c1593c, 3932db2, shipped in v3.16.0.
+- Classification and import (Codex): 632f84c, shipped in v3.16.0 with Gemini disabled in production.
+- Superseded art PRs #15-#18 and #9 closed 2026-10-27; unused art archived under `archive/art-worlds-*` tags.
 
 ## Shared files (edited by more than one workstream)
 
-| File | Worlds edits | Other edits |
-|---|---|---|
-| `src/views/TonightView.jsx` | Worlds rail import and placement (already committed in 1c1593c); the rest of this file's uncommitted diff is not mine | Classification allocator import and thematic assignment, committed in `632f84c` |
-| `src/views/TonightView.test.jsx` | mock path for the Worlds rail (already committed in 1c1593c) | No classification-workstream changes |
+| File | Notes |
+|---|---|
+| `src/views/TonightView.jsx` | Tonight composition rewire (#7); re-read before editing |
+| `docs/README.md` | issue index; add a row when you add a record |
 
-## Commit log (append when you commit)
+## Notes
 
-- 87df05b Worlds: redesign World pages, saga page, Tonight art tiles (Claude Code)
-- 77de10d Build metadata refresh (Claude Code)
-- 1c1593c Show every World in one finite brand rail on Tonight (Claude Code; staged with `git apply --cached`, other workstream's hunks left unstaged)
-- 3932db2 Use the designer banner cards for Tonight's World tiles (Claude Code; WorldCover now one image, tile and wordmark assets removed)
-
-- 632f84c Classification and Settings: automatic facets, optional Gemini pipeline, safe backfill, tag-free Add/import, unique Tonight placement, Data deletion dropdown, tests and scope records (Codex).
+`Studio Franchise Logo Grid.png` in the repo root is the designer's source sheet; it is untracked and excluded locally, never commit it.

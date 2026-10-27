@@ -1,7 +1,7 @@
-# Issue #10 — world art direction d2
+# Issue #13 — world art galaxy magic
 
-- **Status:** Open · scoped, not implemented
-- **Issue:** https://github.com/BenWassa/hearth_v2/issues/10
+- **Status:** Closed 2026-10-27 · delivered via PR #19 (v3.16.0): covers and designer banner cards on main; portrait heroes and wordmarks intentionally not used (source art archived under the archive/art-worlds-* tags)
+- **Issue:** https://github.com/BenWassa/hearth_v2/issues/13
 - **Date:** 2026-10-26
 - **Parent:** https://github.com/BenWassa/hearth_v2/issues/10
 - **UI implementation baseline:** https://github.com/BenWassa/hearth_v2/pull/8 (open), with https://github.com/BenWassa/hearth_v2/pull/9 (stacked)
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-Approved production contract for Direction D2 World covers, portrait heroes, signature typography, file formats, QA, and parallel integration sequencing.
+Star Wars, Wizarding World, optional Studio Ghibli: original restrained galactic, magical, and natural theme artwork.
 
 ## Approved decision
 
@@ -17,16 +17,16 @@ Approved production contract for Direction D2 World covers, portrait heroes, sig
 
 ## Boundaries and dependencies
 
-No code ownership; coordinates lanes #11–#14 and PR #8/#9. Approved one-tap landscape-World UX supersedes older 2-saga/portrait mockups.
+Own `public/assets/worlds/star-wars/**`, `public/assets/worlds/wizarding-world/**`, `public/assets/worlds/studio-ghibli/**`, `docs/collections/art/other-worlds.md`. No React or shared design files.
 
-Asset lanes #11–#13 can run independently in parallel on separate branches from main. UI lane #14 must inspect and preserve #8/#9 and merge static packs only when verified. Do not self-merge or deploy. The full, up-to-date specification and acceptance criteria remain in [the GitHub issue](https://github.com/BenWassa/hearth_v2/issues/10).
+Asset lanes #11–#13 can run independently in parallel on separate branches from main. UI lane #14 must inspect and preserve #8/#9 and merge static packs only when verified. Do not self-merge or deploy. The full, up-to-date specification and acceptance criteria remain in [the GitHub issue](https://github.com/BenWassa/hearth_v2/issues/13).
 
 ## Acceptance and verification (pending)
 
-- [ ] Art lanes provide eight complete validated asset packs
-- [ ] All final approvals and source/provenance linked
-- [ ] Integration #14 demonstrates 16:9 Tonight and no extra gate
-- [ ] Optional motion held until static review
+- [ ] 3 paired cover/hero/wordmark packs
+- [ ] Studio and saga separation preserved
+- [ ] 390px preview, provenance, file stats
+- [ ] Focused PR, no merges
 
 ## Implementation evidence
 

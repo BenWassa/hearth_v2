@@ -89,16 +89,11 @@ export const classifyMedia = (item = {}) => {
       set('comedyFirst', 'high');
       set('attentionDemand', 'low');
     }
-    if (
-      has(
-        'nonlinear timeline',
-        'nonlinear narrative',
-        'unreliable narrator',
-        'mind-bending',
-        'time paradox',
-        'complex',
-      )
-    ) {
+    if (has('nonlinear timeline', 'nonlinear narrative')) {
+      set('narrativeComplexity', 'medium');
+      set('attentionDemand', 'medium');
+    }
+    if (has('unreliable narrator', 'mind-bending', 'time paradox')) {
       set('narrativeComplexity', 'high');
       set('attentionDemand', 'high');
     }

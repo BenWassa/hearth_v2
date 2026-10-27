@@ -20,16 +20,81 @@ const readHistoryEntry = (state) => {
   };
 };
 
+const PENDING_ROOT_TIMEOUT_MS = 1000;
+
+const rootViewFor = (view) =>
+  view === 'onboarding' ? 'onboarding' : 'tonight';
+
 export const useViewHistory = (initialView) => {
   const [view, setReactView] = useState(() => resolveInitialView(initialView));
   const viewRef = useRef(view);
   const depthRef = useRef(0);
+  // Root view a history.go(-depth) collapse is currently travelling to.
   const pendingRootRef = useRef(null);
+  // Non-root view requested while a collapse was pending; applied afterwards.
+  const queuedViewRef = useRef(null);
+  const pendingTimerRef = useRef(null);
+  const setViewRef = useRef(null);
 
   const commitView = useCallback((nextView) => {
     viewRef.current = nextView;
     setReactView(nextView);
   }, []);
+
+  const clearPendingTimer = useCallback(() => {
+    if (pendingTimerRef.current !== null) {
+      clearTimeout(pendingTimerRef.current);
+      pendingTimerRef.current = null;
+    }
+  }, []);
+
+  // Make the current history entry the Hearth root for `rootView`.
+  const finalizeRoot = useCallback(
+    (rootView) => {
+      clearPendingTimer();
+      pendingRootRef.current = null;
+      depthRef.current = 0;
+      window.history.replaceState(
+        buildHistoryState(window.history.state, rootView, 0),
+        '',
+      );
+      commitView(rootView);
+
+      const queued = queuedViewRef.current;
+      queuedViewRef.current = null;
+      if (queued && rootView !== 'onboarding') setViewRef.current?.(queued);
+    },
+    [clearPendingTimer, commitView],
+  );
+
+  // Walk back to the baseline entry (async) and make it the root. Until the
+  // matching popstate arrives, setView defers/ignores non-root pushes.
+  const collapseToRoot = useCallback(
+    (rootView) => {
+      commitView(rootView);
+
+      if (pendingRootRef.current) {
+        pendingRootRef.current = rootView;
+        return;
+      }
+
+      const depth = depthRef.current;
+      if (depth <= 0) {
+        finalizeRoot(rootView);
+        return;
+      }
+
+      pendingRootRef.current = rootView;
+      // If the browser never delivers the popstate (history already clamped),
+      // settle in place so the pending flag cannot stay stuck.
+      pendingTimerRef.current = setTimeout(() => {
+        pendingTimerRef.current = null;
+        if (pendingRootRef.current) finalizeRoot(pendingRootRef.current);
+      }, PENDING_ROOT_TIMEOUT_MS);
+      window.history.go(-depth);
+    },
+    [commitView, finalizeRoot],
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -37,10 +102,19 @@ export const useViewHistory = (initialView) => {
     const restoredEntry = readHistoryEntry(window.history.state);
     if (restoredEntry) {
       depthRef.current = restoredEntry.depth;
-      commitView(restoredEntry.view);
+      if (
+        viewRef.current === 'onboarding' &&
+        restoredEntry.view !== 'onboarding'
+      ) {
+        // Signed-out start: never surface an authenticated screen from a
+        // previous session's history entry.
+        collapseToRoot('onboarding');
+      } else {
+        commitView(restoredEntry.view);
+      }
     } else {
       const initial = viewRef.current;
-      const rootView = initial === 'onboarding' ? 'onboarding' : 'tonight';
+      const rootView = rootViewFor(initial);
 
       window.history.replaceState(
         buildHistoryState(window.history.state, rootView, 0),
@@ -59,17 +133,24 @@ export const useViewHistory = (initialView) => {
 
     const handlePopState = (event) => {
       const entry = readHistoryEntry(event.state);
-      if (!entry) return;
 
+      // Arrival of an in-flight root collapse (marked or not).
       const pendingRoot = pendingRootRef.current;
       if (pendingRoot) {
-        pendingRootRef.current = null;
-        depthRef.current = 0;
-        window.history.replaceState(
-          buildHistoryState(window.history.state, pendingRoot, 0),
-          '',
-        );
-        commitView(pendingRoot);
+        finalizeRoot(pendingRoot);
+        return;
+      }
+
+      // Entry Hearth did not create: treat it as a fresh root.
+      if (!entry) {
+        finalizeRoot(rootViewFor(viewRef.current));
+        return;
+      }
+
+      // Signed out: a stale/forward entry must not reveal another screen.
+      if (viewRef.current === 'onboarding' && entry.view !== 'onboarding') {
+        depthRef.current = entry.depth;
+        collapseToRoot('onboarding');
         return;
       }
 
@@ -78,8 +159,11 @@ export const useViewHistory = (initialView) => {
     };
 
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [commitView]);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      clearPendingTimer();
+    };
+  }, [clearPendingTimer, collapseToRoot, commitView, finalizeRoot]);
 
   const setView = useCallback(
     (nextValue) => {
@@ -88,27 +172,29 @@ export const useViewHistory = (initialView) => {
           ? nextValue(viewRef.current)
           : nextValue;
 
-      if (!nextView || nextView === viewRef.current) return;
+      if (!nextView) return;
 
       if (typeof window === 'undefined') {
-        commitView(nextView);
+        if (nextView !== viewRef.current) commitView(nextView);
         return;
       }
 
-      if (ROOT_VIEWS.has(nextView)) {
-        if (depthRef.current > 0) {
-          pendingRootRef.current = nextView;
-          commitView(nextView);
-          window.history.go(-depthRef.current);
-          return;
+      // A root collapse is travelling through history. Pushing now would land
+      // on an entry the pending go() then discards, so retarget or defer.
+      if (pendingRootRef.current) {
+        if (ROOT_VIEWS.has(nextView)) {
+          queuedViewRef.current = null;
+          collapseToRoot(nextView);
+        } else if (pendingRootRef.current !== 'onboarding') {
+          queuedViewRef.current = nextView;
         }
+        return;
+      }
 
-        window.history.replaceState(
-          buildHistoryState(window.history.state, nextView, 0),
-          '',
-        );
-        depthRef.current = 0;
-        commitView(nextView);
+      if (nextView === viewRef.current) return;
+
+      if (ROOT_VIEWS.has(nextView)) {
+        collapseToRoot(nextView);
         return;
       }
 
@@ -120,14 +206,24 @@ export const useViewHistory = (initialView) => {
       depthRef.current = nextDepth;
       commitView(nextView);
     },
-    [commitView],
+    [collapseToRoot, commitView],
   );
+  setViewRef.current = setView;
 
   const goBack = useCallback(
     (fallbackView = 'tonight') => {
-      if (typeof window !== 'undefined' && depthRef.current > 0) {
-        window.history.back();
-        return;
+      if (typeof window !== 'undefined') {
+        // A collapse is already walking history back to the root.
+        if (pendingRootRef.current) return;
+
+        // history.state is the source of truth for where we really are.
+        const current = readHistoryEntry(window.history.state);
+        depthRef.current = current ? current.depth : 0;
+
+        if (depthRef.current > 0) {
+          window.history.back();
+          return;
+        }
       }
 
       if (viewRef.current !== fallbackView) {

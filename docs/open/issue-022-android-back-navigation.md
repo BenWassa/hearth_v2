@@ -2,7 +2,7 @@
 
 ## Status
 
-Implementation in progress on `fix/android-back-navigation`.
+Code complete on `fix/android-back-navigation` (draft PR #23) with automated test coverage. Manual Pixel/Android QA is still pending and must be done by the owner; it has not been performed.
 
 ## Problem
 
@@ -25,7 +25,10 @@ A shared `useViewHistory` hook wraps Hearth's existing `view` state:
 - `popstate` synchronizes React state when Android/browser back occurs.
 - Returning programmatically to a root view collapses Hearth's internal history.
 - Restoring a non-root view creates a root entry behind it when no Hearth history state exists.
-- `goBack()` is used by top-level Back/Close controls.
+- `goBack()` is used by top-level Back/Close controls. It reads `history.state` as the source of truth and falls back to the given view when no Hearth entry is behind the current one.
+- While a root collapse (`history.go(-depth)`) is in flight, further pushes are deferred (or dropped when collapsing to Onboarding) and `goBack()` is ignored, so the stack cannot desync. A 1s timeout settles the collapse in place if the browser never delivers the popstate.
+- Signing out collapses to the baseline entry and rewrites it as Onboarding. While Onboarding is showing, any stale or forward Hearth entry reached by Back/Forward is rewritten to Onboarding instead of revealing an authenticated screen. A signed-out start also ignores a restored deep entry.
+- A `popstate` for an entry without the Hearth marker is treated as a fresh root (Tonight, or Onboarding when signed out): depth is reset and the entry is claimed.
 
 This keeps the current architecture and avoids introducing React Router solely for four top-level screens.
 
@@ -37,7 +40,7 @@ This keeps the current architecture and avoids introducing React Router solely f
 - Decision
 - Firebase-backed state
 - Template/demo state
-- Unit coverage for baseline, push, pop, and back delegation
+- Automated coverage (vitest/jsdom, using real `history.back()/forward()/go()`): baseline, push, pop, `goBack` unwinding and depth-0 fallback, collapse to root, restore with Tonight behind, sign-out leaving no stale entry, unmarked popstate fallback, pending-collapse push suppression and the stuck-pending timeout
 
 ## Deferred / follow-up assessment
 

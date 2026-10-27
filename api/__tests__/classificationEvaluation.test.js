@@ -61,7 +61,6 @@ test('classification evaluation uses majority predictions for agreement while le
   assert.equal(representativeValue([prediction('high')], 'comfort'), 'high');
 });
 
-
 test('classification evaluation exposes deterministic-rule conflicts with fixture labels', () => {
   assert.deepEqual(
     findRuleExpectedConflicts([

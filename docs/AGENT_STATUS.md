@@ -12,7 +12,7 @@ One shared place for the agents working in this repo at the same time (Claude Co
 
 ## Workstream: Worlds (Claude Code)
 
-- **State:** DONE for the Tonight Worlds brand rail (committed in 1c1593c). Only the dev sandbox below is left uncommitted.
+- **State:** DONE. Brand rail in 1c1593c, designer banner cards in 3932db2.
 - **Goal:** World pages redesign (done and committed in 87df05b), then Tonight Worlds as a single finite horizontal brand rail in fixed order (Pixar, Marvel, Star Wars, Wizarding World, Disney, DreamWorks, DC, Studio Ghibli), adaptive weekly picks retired, plus wordmark width updates and a dev-only layout sandbox.
 - **Owns:**
   - `src/config/collectionWorlds.js` and `.test.js`
@@ -24,7 +24,7 @@ One shared place for the agents working in this repo at the same time (Claude Co
   - `docs/collections/WORLD_PAGE_*.md`
 - **Shared files I also touch (small edits):** `src/views/TonightView.jsx` (the Worlds import and placement only), `src/views/TonightView.test.jsx`.
 - **Finished:** 2026-10-26, rail verified in a clean worktree (lint, prettier, 316 tests, production build, 320 to 1280 px browser check) and committed with only my hunks.
-- **Still uncommitted and mine:** `src/dev/`, `worlds-mock.html` (layout sandbox, now obsolete because the chosen variant shipped; will be deleted or committed on the user's word).
+- **Dev sandbox:** `src/dev/` and `worlds-mock.html` were obsolete once the rail shipped and were moved out of the repo (recoverable copy kept in the Claude session scratchpad, not committed). `Studio Franchise Logo Grid.png` in the repo root is the designer's source sheet; it is untracked and excluded locally via `.git/info/exclude`, so it is never committed.
 - **Notes for others:** `WorldsGrid` was renamed to `WorldsRail`; if you import it, use the new path. Production behavior of the Collections row now depends on `useTonightWorlds`.
 
 ## Workstream: Classification and import (Codex, other session)
@@ -55,5 +55,6 @@ One shared place for the agents working in this repo at the same time (Claude Co
 - 87df05b Worlds: redesign World pages, saga page, Tonight art tiles (Claude Code)
 - 77de10d Build metadata refresh (Claude Code)
 - 1c1593c Show every World in one finite brand rail on Tonight (Claude Code; staged with `git apply --cached`, other workstream's hunks left unstaged)
+- 3932db2 Use the designer banner cards for Tonight's World tiles (Claude Code; WorldCover now one image, tile and wordmark assets removed)
 
 - 632f84c Classification and Settings: automatic facets, optional Gemini pipeline, safe backfill, tag-free Add/import, unique Tonight placement, Data deletion dropdown, tests and scope records (Codex).

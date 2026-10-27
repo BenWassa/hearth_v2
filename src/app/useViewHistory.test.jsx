@@ -78,11 +78,7 @@ describe('useViewHistory', () => {
     act(() => {
       window.dispatchEvent(
         new PopStateEvent('popstate', {
-          state: __viewHistoryTestUtils.buildHistoryState(
-            {},
-            'tonight',
-            0,
-          ),
+          state: __viewHistoryTestUtils.buildHistoryState({}, 'tonight', 0),
         }),
       );
     });
@@ -94,7 +90,9 @@ describe('useViewHistory', () => {
     renderHarness('tonight');
     act(() => latest.setView('shelf'));
 
-    const backSpy = vi.spyOn(window.history, 'back').mockImplementation(() => {});
+    const backSpy = vi
+      .spyOn(window.history, 'back')
+      .mockImplementation(() => {});
 
     act(() => latest.goBack());
 

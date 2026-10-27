@@ -32,30 +32,18 @@ jobs:
       - run: npm test
       - run: npm run lint:ci
       - name: Check touched-file formatting
-        run: |
-          npx prettier --write \
-            api/_lib/geminiClassifier.js \
-            api/_lib/classificationService.js \
-            api/__tests__/classification.test.js \
-            api/__tests__/classificationEvaluation.test.js \
-            scripts/classificationEvaluation.cjs \
-            scripts/evaluateClassification.cjs \
-            src/domain/media/classification.mjs \
-            src/domain/media/classificationFixtures.json \
-            src/services/mediaApi/classificationQueue.test.js \
-            docs/open/issue-021-gemini-pilot-quality.md \
-            docs/README.md
-          git diff --exit-code -- \
-            api/_lib/geminiClassifier.js \
-            api/_lib/classificationService.js \
-            api/__tests__/classification.test.js \
-            api/__tests__/classificationEvaluation.test.js \
-            scripts/classificationEvaluation.cjs \
-            scripts/evaluateClassification.cjs \
-            src/domain/media/classification.mjs \
-            src/domain/media/classificationFixtures.json \
-            src/services/mediaApi/classificationQueue.test.js \
-            docs/open/issue-021-gemini-pilot-quality.md \
-            docs/README.md
+        run: >
+          npx prettier --check
+          api/_lib/geminiClassifier.js
+          api/_lib/classificationService.js
+          api/__tests__/classification.test.js
+          api/__tests__/classificationEvaluation.test.js
+          scripts/classificationEvaluation.cjs
+          scripts/evaluateClassification.cjs
+          src/domain/media/classification.mjs
+          src/domain/media/classificationFixtures.json
+          src/services/mediaApi/classificationQueue.test.js
+          docs/open/issue-021-gemini-pilot-quality.md
+          docs/README.md
       - name: Run offline classification evaluator
         run: node scripts/evaluateClassification.cjs --out=/tmp/issue21-offline.json

@@ -94,14 +94,25 @@ try {
       path: resolve(out, `tonight-worlds-${width}.png`),
       animations: 'disabled',
     });
-    // The Collections row: every saga plus the neutral All collections tile,
-    // finite (no cloned cards) and scrolled into view for the capture.
+    // The Collections row: every saga not already a World tile above, plus the
+    // neutral All collections tile, finite (no cloned cards) and scrolled into
+    // view for the capture. The All tile shows past three sagas, or whenever
+    // some sagas are left out because their World is a tile in the Worlds rail.
     const rail = page.locator('section[aria-label="Collections"]');
     await rail.scrollIntoViewIfNeeded();
     const railCells = await rail.locator('li').count();
     const cardCount = await rail.locator('[data-saga-card]').count();
     const hasAllTile = (await rail.locator('[data-all-collections]').count()) > 0;
-    if (railCells !== cardCount + (hasAllTile ? 1 : 0) || hasAllTile !== cardCount > 3) {
+    const worldTileCount = await cards.count();
+    const sagaIds = await rail
+      .locator('[data-saga-card]')
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-saga-card')));
+    if (
+      railCells !== cardCount + (hasAllTile ? 1 : 0) ||
+      new Set(sagaIds).size !== sagaIds.length ||
+      (cardCount > 3 && !hasAllTile) ||
+      (worldTileCount > 0 && !hasAllTile)
+    ) {
       throw new Error(`Collections rail has unexpected cells at ${width}px`);
     }
     if (hasAllTile && !(await rail.locator('li').last().locator('[data-all-collections]').count())) {
@@ -143,18 +154,39 @@ try {
       });
       const valid = await image.evaluate((img) => img.naturalWidth > 0);
       if (!valid) throw new Error(`Hero failed to load: ${id}`);
+      // The cover artwork carries the World name, so the live h1 is
+      // screen-reader text (it names the dialog and takes focus). It must still
+      // exist with the World's name, and the artwork itself must be visibly
+      // sized. Only if the art were missing would the h1 have to be on screen.
       const title = await hero.locator('h1').evaluate((node) => {
         const bounds = node.getBoundingClientRect();
         return { text: node.textContent.trim(), height: bounds.height };
       });
-      if (title.height < 20) {
-        throw new Error(`World title not visibly readable: ${id} at ${width}px`);
+      if (!title.text) throw new Error(`World has no accessible title: ${id} at ${width}px`);
+      const artHeight = await image.evaluate((img) => img.getBoundingClientRect().height);
+      if (artHeight < 100) {
+        throw new Error(`World hero artwork too short: ${id} at ${width}px (${artHeight})`);
       }
-      const contentVisible = (await page.locator('[data-saga-shelf]').count())
-        + (await page.locator('[aria-label="Other films"] button').count())
-        + (await page.locator('[aria-label="Shorts & specials"] button').count())
-        + (await page.locator('[aria-label="TV series"] button').count());
+      const dialogNamed = await page.evaluate(
+        () => document.querySelector('#collections-heading')?.textContent.trim() || '',
+      );
+      if (dialogNamed !== title.text) {
+        throw new Error(`World heading not exposed for ${id} at ${width}px`);
+      }
+      // Directly browsable content: poster shelves (saga shelves, Other films,
+      // Shorts & specials, TV series) and the saga tile index for the rest.
+      const contentVisible = await page
+        .locator('[data-shelf] li button, [data-saga-index] li button')
+        .count();
       if (!contentVisible) throw new Error(`No directly browsable content in ${id}`);
+      const shortControls = await page
+        .locator('[data-shelf] > div button, [aria-label="Back to Tonight"]')
+        .evaluateAll((nodes) =>
+          nodes.filter((node) => node.getBoundingClientRect().height < 44).length,
+        );
+      if (shortControls) {
+        throw new Error(`World controls under 44px in ${id} at ${width}px`);
+      }
       const worldWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       if (worldWidth > width + 1) {
         throw new Error(`World page horizontally overflows: ${id} at ${width}px`);

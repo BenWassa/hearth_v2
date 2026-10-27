@@ -21,6 +21,7 @@ The canonical task status is the **GitHub issue**. These files are durable resea
 
 | GitHub issue | Status | Record |
 | --- | --- | --- |
+| [#20 Automatic classification](https://github.com/BenWassa/hearth_v2/issues/20) | Open | [TMDB-first zero-friction Add + optional Gemini](open/issue-020-automatic-classification.md) |
 | [#14 World asset integration](https://github.com/BenWassa/hearth_v2/issues/14) | Open | [Landscape Tonight + direct one-tap hero](open/issue-014-world-art-integration.md) |
 | [#13 Galaxy / magic World art](https://github.com/BenWassa/hearth_v2/issues/13) | Open | [Star Wars / Wizarding World / Ghibli pack](open/issue-013-world-art-galaxy-magic.md) |
 | [#12 Animation World art](https://github.com/BenWassa/hearth_v2/issues/12) | Open | [Pixar / Disney / DreamWorks pack](open/issue-012-world-art-animation.md) |

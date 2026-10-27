@@ -20,7 +20,9 @@ const selectLiveFixtures = (fixtures = [], args = []) => {
     if (!keys.length) throw new Error('--keys requires at least one key');
     if (new Set(keys).size !== keys.length)
       throw new Error('--keys contains duplicate keys');
-    const byKey = new Map(real.map((fixture) => [fixtureKey(fixture), fixture]));
+    const byKey = new Map(
+      real.map((fixture) => [fixtureKey(fixture), fixture]),
+    );
     const unknown = keys.filter((key) => !byKey.has(key));
     if (unknown.length)
       throw new Error(`Unknown evaluation key(s): ${unknown.join(', ')}`);

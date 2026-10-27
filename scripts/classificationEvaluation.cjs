@@ -53,6 +53,23 @@ const selectLiveFixtures = (fixtures = [], args = []) => {
   };
 };
 
+const findRuleExpectedConflicts = (results = []) =>
+  results.flatMap((result) =>
+    Object.entries(result.rules || {})
+      .filter(
+        ([name, signal]) =>
+          signal?.value &&
+          signal.value !== 'unknown' &&
+          result.expected?.[name] !== signal.value,
+      )
+      .map(([facet, signal]) => ({
+        key: result.key,
+        facet,
+        rule: signal.value,
+        expected: result.expected?.[facet] ?? null,
+      })),
+  );
+
 const representativeValue = (predictions = [], facet) => {
   if (!predictions.length) return null;
   const values = predictions
@@ -73,5 +90,6 @@ module.exports = {
   fixtureKey,
   realFixtures,
   selectLiveFixtures,
+  findRuleExpectedConflicts,
   representativeValue,
 };

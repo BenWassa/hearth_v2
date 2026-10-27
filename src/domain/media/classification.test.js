@@ -63,8 +63,9 @@ describe('automatic viewing classification', () => {
     expect(nonlinear.narrativeComplexity.value).toBe('medium');
     expect(nonlinear.attentionDemand.value).toBe('medium');
 
-    const paradox = classifyMedia(movie({ keywords: ['time paradox'] }))
-      .attributes;
+    const paradox = classifyMedia(
+      movie({ keywords: ['time paradox'] }),
+    ).attributes;
     expect(paradox.narrativeComplexity.value).toBe('high');
     expect(paradox.attentionDemand.value).toBe('high');
 

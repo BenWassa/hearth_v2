@@ -9,6 +9,7 @@ on:
       - 'scripts/classificationEvaluation.cjs'
       - 'scripts/evaluateClassification.cjs'
       - 'src/domain/media/classification.mjs'
+      - 'src/domain/media/classification.test.js'
       - 'src/domain/media/classificationFixtures.json'
       - 'src/services/mediaApi/classificationQueue.test.js'
       - 'docs/open/issue-021-gemini-pilot-quality.md'
@@ -41,6 +42,7 @@ jobs:
           scripts/classificationEvaluation.cjs
           scripts/evaluateClassification.cjs
           src/domain/media/classification.mjs
+          src/domain/media/classification.test.js
           src/domain/media/classificationFixtures.json
           src/services/mediaApi/classificationQueue.test.js
           docs/open/issue-021-gemini-pilot-quality.md

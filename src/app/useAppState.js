@@ -413,11 +413,22 @@ export const useAppState = () => {
           mediaId: original.mediaId || original.id,
           classification,
         });
+      },
+      onBatchResult: (results) => {
         if (!active) return;
+        const classifications = new Map(
+          results.map(({ item, classification }) => [item.id, classification]),
+        );
         setItems((current) =>
           current.map((item) =>
-            item.id === original.id
-              ? { ...item, media: { ...item.media, classification } }
+            classifications.has(item.id)
+              ? {
+                  ...item,
+                  media: {
+                    ...item.media,
+                    classification: classifications.get(item.id),
+                  },
+                }
               : item,
           ),
         );

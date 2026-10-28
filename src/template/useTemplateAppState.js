@@ -476,9 +476,8 @@ export const useTemplateAppState = () => {
       : buildTemplateSeedItems()
     ).map((item) => normalizeTemplateItem(item, item.id, item.createdAt)),
   );
-  const { view, setView, goBack } = useViewHistory('tonight', {
-    canRestore: authResolved ? Boolean(authUser) : undefined,
-  });
+  // The demo holds no private screens, so restored history is always allowed.
+  const { view, setView, goBack } = useViewHistory('tonight');
   const [decisionResult, setDecisionResult] = useState(null);
   const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);

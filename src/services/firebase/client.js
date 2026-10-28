@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { debugLog } from '../../utils/debugLog.js';
 
 let app = null;
 let auth = null;
@@ -26,11 +27,11 @@ const loadFirebaseConfig = () => {
       typeof window !== 'undefined' && window.__firebase_config
         ? window.__firebase_config
         : {};
-    console.log(
+    debugLog(
       'Firebase config loaded:',
       Object.keys(firebaseConfig).length > 0 ? 'present' : 'missing',
     );
-    console.log('Config details:', {
+    debugLog('Config details:', {
       hasApiKey: !!firebaseConfig?.apiKey,
       hasProjectId: !!firebaseConfig?.projectId,
       apiKeyLength: firebaseConfig?.apiKey?.length,
@@ -57,7 +58,7 @@ const loadFirebaseConfig = () => {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
-      console.log('Firebase initialized successfully');
+      debugLog('Firebase initialized successfully');
     } catch (err) {
       console.warn(
         'Firebase initialization failed; continuing without firestore for tests:',
@@ -68,7 +69,7 @@ const loadFirebaseConfig = () => {
       db = null;
     }
   } else {
-    console.log('No Firebase config found, running in offline mode');
+    debugLog('No Firebase config found, running in offline mode');
   }
 
   return { app, auth, db };
@@ -88,7 +89,7 @@ export const initializeFirebase = (onReady) => {
       const result = loadFirebaseConfig();
       if (onReady) onReady(result);
     } else {
-      console.log('Firebase config still not loaded, running in offline mode');
+      debugLog('Firebase config still not loaded, running in offline mode');
       if (onReady) onReady({ app, auth, db });
     }
   }, 500);

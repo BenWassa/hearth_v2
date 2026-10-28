@@ -25,6 +25,7 @@ import {
 } from '../config/constants.js';
 import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
+import { debugLog } from '../utils/debugLog.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
 import {
   getShowWatchStatus,
@@ -78,9 +79,9 @@ const MANUAL_METADATA_REFRESH_MIN_INTERVAL_MS = 750;
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
-  console.info('[auto-show-refresh]', ...args);
+  debugLog('[auto-show-refresh]', ...args);
 const logAiringShowRefresh = (...args) =>
-  console.info('[airing-show-refresh]', ...args);
+  debugLog('[airing-show-refresh]', ...args);
 const logBackgroundAudit = (...args) =>
   console.info('[metadata-audit]', ...args);
 
@@ -422,9 +423,20 @@ export const useAppState = () => {
           ),
         );
       },
-      onProgress: (progress) => {
-        if (progress.processed || progress.failed)
-          console.info('[classification-backfill]', progress);
+      onProgress: ({ processed, failed, pending }) => {
+        if (failed > 0) {
+          console.info(
+            `[classification-backfill] ${processed} processed, ${failed} failed, ${pending} pending`,
+          );
+        } else if (pending === 0) {
+          console.info(
+            `[classification-backfill] complete: ${processed} processed`,
+          );
+        } else if (processed > 0 && processed % 25 === 0) {
+          console.info(
+            `[classification-backfill] ${processed} processed, ${pending} pending`,
+          );
+        }
       },
     });
     return () => {

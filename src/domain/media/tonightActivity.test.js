@@ -29,6 +29,18 @@ describe('activityScore', () => {
     expect(recent).toBeGreaterThan(0);
   });
 
+  it.each([undefined, 'seed', 'legacy', 'unknown', 'import'])(
+    'does not score a recent add with origin %s',
+    (additionOrigin) => {
+      expect(
+        activityScore(
+          { additionOrigin, createdAt: '2026-10-26T12:00:00.000Z' },
+          { now },
+        ),
+      ).toBe(0);
+    },
+  );
+
   it('scores a recent watch event higher than an old one', () => {
     const recent = activityScore(
       {

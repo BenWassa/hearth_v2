@@ -43,7 +43,7 @@ export const activityScore = (item, { now = new Date() } = {}) => {
   const watchTimestamp = isWatched
     ? userState.markedWatchedAt ?? item.markedWatchedAt
     : null;
-  const isManualAdd = item.additionOrigin !== 'import';
+  const isManualAdd = item.additionOrigin === 'manual';
   const addTimestamp = isManualAdd ? item.createdAt ?? item.addedAt : null;
 
   return (

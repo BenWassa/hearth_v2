@@ -215,6 +215,23 @@ describe('composeTonightRows ordering and determinism', () => {
     expect(result.rows[0].key).toBe('visual');
   });
 
+  it('chooses row slots by visible strength after the 12 card cap', () => {
+    // Whole-group sums would be comfort 20 vs comedy 18 (comfort first); the
+    // 8 hidden comfort cards must not count, so visible 12 vs 18 puts comedy first.
+    const allocated = {
+      comfort: make('comfort', 20),
+      comedy: make('comedy', 6),
+    };
+    const scoreItem = (item) => (item.id.startsWith('comfort') ? 1 : 3);
+
+    const result = composeTonightRows(allocated, { scoreItem });
+
+    expect(result.rows.map((row) => row.key)).toEqual(['comedy', 'comfort']);
+    expect(result.rows.find((row) => row.key === 'comfort').items).toHaveLength(
+      12,
+    );
+  });
+
   it('sorts items inside a row by score before the seeded order', () => {
     const allocated = allocate({ comfort: 6 });
     const scoreItem = (item) => (item.id === 'comfort-4' ? 5 : 0);

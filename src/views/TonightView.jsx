@@ -267,13 +267,14 @@ const TonightView = ({
 
   // Thematic rows: one primary theme per title, then bounded and ordered by the
   // composer. Activity only affects in-row order and which rows win slots.
+  const tonightDateSeed = getLocalDateSeed();
   const tonight = useMemo(() => {
     const now = new Date();
     return composeTonightRows(allocateTonightThemes(unwatched, { now }), {
       scoreItem: (item) => activityScore(item, { now }),
-      sessionSeed: getLocalDateSeed(now),
+      sessionSeed: tonightDateSeed,
     });
-  }, [unwatched]);
+  }, [unwatched, tonightDateSeed]);
   const tonightRows = tonight.rows;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -99,11 +99,12 @@ const rankItems = (items, scoreItem, seed) => {
 
 const buildRow = (key, title, items, scoreItem, seed) => {
   const ranked = rankItems(items, scoreItem, seed);
+  const visible = ranked.slice(0, MAX_ROW_ITEMS);
   return {
     key,
     title,
-    items: ranked.slice(0, MAX_ROW_ITEMS).map(({ item }) => item),
-    strength: ranked.reduce((sum, { score }) => sum + score, 0),
+    items: visible.map(({ item }) => item),
+    strength: visible.reduce((sum, { score }) => sum + score, 0),
     size: ranked.length,
   };
 };

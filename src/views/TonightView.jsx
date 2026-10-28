@@ -19,6 +19,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
+import ShelfEmptyState from './components/ShelfEmptyState.jsx';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
 import WorldsRail from './components/tonight/WorldsRail.jsx';
@@ -466,7 +467,11 @@ const TonightView = ({
           {/* Clears the fixed header, which itself sits below the cutout. */}
           <div className="h-[calc(68px+var(--safe-top))]" />
 
-          <div className="px-3 sm:px-4 pt-2 pb-24 flex flex-col gap-5">
+          <div
+            className={`${
+              showEmptyState ? 'px-4 sm:px-5' : 'px-3 sm:px-4'
+            } pt-2 pb-24 flex flex-col gap-5`}
+          >
             {showImportBanner && (
               <div className="rounded-xl border border-amber-800/40 bg-amber-900/10 px-2 py-1.5 space-y-0.5">
                 <div className="text-sm text-amber-200 tabular-nums">
@@ -534,14 +539,24 @@ const TonightView = ({
                 {/* --- Thematic rows (composed, MECE) --- */}
 
                 {showEmptyState && (
-                  <div className="text-center py-12 px-6">
-                    <p className="text-stone-300 font-serif text-lg">
-                      Nothing queued for tonight
-                    </p>
-                    <p className="text-stone-400 text-sm mt-2">
-                      Use the Add tab below to put something on the shelf.
-                    </p>
-                  </div>
+                  <ShelfEmptyState
+                    title={
+                      items.length === 0
+                        ? 'Add something to watch'
+                        : 'Nothing unwatched right now'
+                    }
+                    description={
+                      items.length === 0
+                        ? 'Your movies and shows will appear here.'
+                        : 'Add a movie or show to your Library.'
+                    }
+                    action={
+                      items.length === 0
+                        ? 'Add your first title'
+                        : 'Add something to watch'
+                    }
+                    onAction={onAdd}
+                  />
                 )}
 
                 {tonightRows.map((row) => {

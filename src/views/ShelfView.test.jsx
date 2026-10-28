@@ -105,6 +105,7 @@ it('bulk removal copy, transient live status, selection clearing and Memories vi
   const props = {
     items: [{ id: 'one', title: 'One', type: 'movie', status: 'unwatched' }],
     onBulkDelete: async () => [{ itemId: 'one', status: 'removed' }],
+    removedItems: [{ id: 'older', title: 'Older', removedAt: Date.now() }],
     onOpenRemoved: vi.fn(),
     onBack: vi.fn(),
   };

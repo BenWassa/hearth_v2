@@ -280,8 +280,8 @@ describe('TonightView thematic rows', () => {
 
     expect(thematicSections(mounted.container)).toHaveLength(0);
     const text = mounted.container.textContent;
-    expect(text).toContain('Nothing queued for tonight');
-    expect(text).toContain('Add tab');
+    expect(text).toContain('Add something to watch');
+    expect(text).toContain('Add your first title');
 
     await cleanupTonight(mounted);
   });

@@ -1,3 +1,4 @@
+import ShelfEmptyState from './components/ShelfEmptyState.jsx';
 import RecentlyRemoved from './RecentlyRemoved.jsx';
 import React, {
   Suspense,
@@ -11,7 +12,6 @@ import {
   BookOpen,
   Eye,
   Film,
-  Heart,
   Moon,
   Plus,
   Search,
@@ -150,6 +150,11 @@ const ShelfView = ({
   const [showMovies, setShowMovies] = useState(true);
   const [showShows, setShowShows] = useState(true);
   const [viewTab, setViewTab] = useState('library'); // 'library' or 'memories'
+
+  const hasTabItems =
+    viewTab === 'memories'
+      ? watched.length > 0
+      : items.some((item) => item.status !== 'watched');
 
   const selectedCount = selectedIds.size;
   const isSelectionBusy = isBulkDeleting || isBulkMarking;
@@ -509,94 +514,96 @@ const ShelfView = ({
         )}
 
         {/* Sort + Type Filter Bar */}
-        <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
-          {/* Sort pill group */}
-          <div
-            className="flex gap-2 shrink-0"
-            role="group"
-            aria-label="Sort by"
-          >
-            {[
-              ['vibe', 'Vibe'],
-              ['energy', 'Energy'],
-              ['alphabetical', 'A–Z'],
-            ].map(([id, label]) => (
+        {hasTabItems && (
+          <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
+            {/* Sort pill group */}
+            <div
+              className="flex gap-2 shrink-0"
+              role="group"
+              aria-label="Sort by"
+            >
+              {[
+                ['vibe', 'Vibe'],
+                ['energy', 'Energy'],
+                ['alphabetical', 'A–Z'],
+              ].map(([id, label]) => (
+                <button
+                  key={id}
+                  onClick={() => setSortBy(id)}
+                  className={`${SORT_BUTTON_BASE} ${
+                    sortBy === id ? SORT_ACTIVE : SORT_INACTIVE
+                  }`}
+                  aria-pressed={sortBy === id}
+                  type="button"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-stone-800 shrink-0" />
+
+            {/* Type Filter Buttons */}
+            <div
+              className="flex gap-2 shrink-0"
+              role="group"
+              aria-label="Filter by type"
+            >
               <button
-                key={id}
-                onClick={() => setSortBy(id)}
-                className={`${SORT_BUTTON_BASE} ${
-                  sortBy === id ? SORT_ACTIVE : SORT_INACTIVE
+                onClick={() => {
+                  // If clicking movies: if movies are only one shown, reset to both. If both shown, show only movies
+                  if (showMovies && !showShows) {
+                    // Movies only - reset to both
+                    setShowMovies(true);
+                    setShowShows(true);
+                  } else {
+                    // Either both shown or movies not shown - focus on movies only
+                    setShowMovies(true);
+                    setShowShows(false);
+                  }
+                }}
+                className={`${FILTER_BUTTON_BASE} ${
+                  showMovies && !showShows
+                    ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
+                    : SORT_INACTIVE
                 }`}
-                aria-pressed={sortBy === id}
+                aria-pressed={showMovies && !showShows}
                 type="button"
               >
-                {label}
+                <Film className="w-4 h-4" />
+                Movies
               </button>
-            ))}
+              <button
+                onClick={() => {
+                  // If clicking shows: if shows are only one shown, reset to both. If both shown, show only shows
+                  if (showShows && !showMovies) {
+                    // Shows only - reset to both
+                    setShowMovies(true);
+                    setShowShows(true);
+                  } else {
+                    // Either both shown or shows not shown - focus on shows only
+                    setShowMovies(false);
+                    setShowShows(true);
+                  }
+                }}
+                className={`${FILTER_BUTTON_BASE} ${
+                  showShows && !showMovies
+                    ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
+                    : SORT_INACTIVE
+                }`}
+                aria-pressed={showShows && !showMovies}
+                type="button"
+              >
+                <Tv className="w-4 h-4" />
+                Shows
+              </button>
+            </div>
           </div>
-
-          {/* Divider */}
-          <div className="w-px h-5 bg-stone-800 shrink-0" />
-
-          {/* Type Filter Buttons */}
-          <div
-            className="flex gap-2 shrink-0"
-            role="group"
-            aria-label="Filter by type"
-          >
-            <button
-              onClick={() => {
-                // If clicking movies: if movies are only one shown, reset to both. If both shown, show only movies
-                if (showMovies && !showShows) {
-                  // Movies only - reset to both
-                  setShowMovies(true);
-                  setShowShows(true);
-                } else {
-                  // Either both shown or movies not shown - focus on movies only
-                  setShowMovies(true);
-                  setShowShows(false);
-                }
-              }}
-              className={`${FILTER_BUTTON_BASE} ${
-                showMovies && !showShows
-                  ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
-                  : SORT_INACTIVE
-              }`}
-              aria-pressed={showMovies && !showShows}
-              type="button"
-            >
-              <Film className="w-4 h-4" />
-              Movies
-            </button>
-            <button
-              onClick={() => {
-                // If clicking shows: if shows are only one shown, reset to both. If both shown, show only shows
-                if (showShows && !showMovies) {
-                  // Shows only - reset to both
-                  setShowMovies(true);
-                  setShowShows(true);
-                } else {
-                  // Either both shown or shows not shown - focus on shows only
-                  setShowMovies(false);
-                  setShowShows(true);
-                }
-              }}
-              className={`${FILTER_BUTTON_BASE} ${
-                showShows && !showMovies
-                  ? 'bg-stone-800 text-stone-200 ring-1 ring-stone-700'
-                  : SORT_INACTIVE
-              }`}
-              aria-pressed={showShows && !showMovies}
-              type="button"
-            >
-              <Tv className="w-4 h-4" />
-              Shows
-            </button>
-          </div>
-        </div>
+        )}
       </div>
       {/* ── End sticky header block ── */}
-      {viewTab === 'library' && (
+      {viewTab === 'library' && (removedItems.length > 0 || removalMessage) && (
         <div className="px-4 text-sm text-stone-300">
           <p
             role="status"
@@ -616,7 +623,11 @@ const ShelfView = ({
         </div>
       )}
 
-      <div className={`px-2 sm:px-3 pt-2 pb-40 ${contentGapClassName}`}>
+      <div
+        className={`${
+          hasTabItems ? 'px-2 sm:px-3' : 'px-4 sm:px-5'
+        } pt-2 pb-40 ${contentGapClassName}`}
+      >
         {viewTab === 'library' && (
           <>
             {isSearching ? (
@@ -638,18 +649,38 @@ const ShelfView = ({
             ) : (
               <>
                 {items.length === 0 ? (
-                  <div className="text-center py-16 px-6">
-                    <p className="text-stone-300 font-serif text-lg">
-                      Your shelf is empty
-                    </p>
-                    <p className="text-stone-400 text-sm mt-2">
-                      Use the Add tab below to put the first title on it.
-                    </p>
-                  </div>
+                  <ShelfEmptyState
+                    title="Your Library is empty"
+                    description="Keep the movies and shows you want to watch here."
+                    action="Add your first title"
+                    onAction={onAdd}
+                  />
                 ) : libraryItems.length === 0 ? (
-                  <div className="text-sm text-stone-400 text-center py-12">
-                    Nothing is waiting on the shelf right now.
-                  </div>
+                  <ShelfEmptyState
+                    title={
+                      watched.length === items.length
+                        ? 'Everything is watched'
+                        : 'No titles match these filters.'
+                    }
+                    description={
+                      watched.length === items.length
+                        ? 'Your watched titles are in Memories.'
+                        : 'Try showing both movies and shows to see the rest of your shelf.'
+                    }
+                    action={
+                      watched.length === items.length
+                        ? 'Add something to watch'
+                        : 'Show all titles'
+                    }
+                    onAction={
+                      watched.length === items.length
+                        ? onAdd
+                        : () => {
+                            setShowMovies(true);
+                            setShowShows(true);
+                          }
+                    }
+                  />
                 ) : (
                   renderGroups(itemsByVibe)
                 )}
@@ -675,17 +706,16 @@ const ShelfView = ({
                 </div>
               )
             ) : watched.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-stone-900 rounded-full flex items-center justify-center mx-auto mb-4 text-stone-700">
-                  <Heart className="w-8 h-8" />
-                </div>
-                <p className="text-stone-400 font-serif text-lg">
-                  No memories yet
-                </p>
-                <p className="text-stone-400 text-sm mt-2">
-                  When you finish watching something, it'll appear here
-                </p>
-              </div>
+              <ShelfEmptyState
+                title="Nothing watched yet"
+                description="Titles you mark as watched will appear here."
+                action={
+                  items.length === 0 ? 'Add your first title' : 'Go to Library'
+                }
+                onAction={
+                  items.length === 0 ? onAdd : () => setViewTab('library')
+                }
+              />
             ) : watchedFiltered.length === 0 ? (
               <div className="text-sm text-stone-400 text-center py-12">
                 No memories match the current filters.

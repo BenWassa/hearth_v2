@@ -96,7 +96,7 @@ Local verification on 2026-10-28 passed: `npm run format:check`, `npm run lint:c
 1. Preserve approved status for all 50 real fixture labels under the recorded owner delegation.
 2. Run a new owner-approved five-title v2 pilot using a fresh output file.
 3. Complete all 50 titles with three valid predictions each within approved quotas.
-4. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.
+4. Meet >=80% majority-of-three agreement with the key, >=75% single-run agreement and <=35% unknown on every subjective facet (stability bar replaced 2026-10-28, see Decision below; all-runs-equal stability is still reported for information).
 5. Confirm metadata-sharing permission, account-specific provider quota and production billing/smoke behavior.
 6. Keep production Gemini disabled until all gates pass.
 
@@ -135,7 +135,10 @@ Raw report: `issue-021-gemini-pilot-v2-2026-10-28.json`.
 Four of five films completed three valid predictions. Agreement and unknown rate are close to the bars on five films; repeat stability is far below the 95% bar on every aspect.
 
 ### Finding: repeat stability
-The model gives a different answer on a repeat run in 20% to 60% of cases. Public references suggest sampling controls (temperature, top-p, top-k) are not reliable levers on this model family, and the production request sets none, so stability cannot simply be forced. A stored label is computed once per title and cached for 30 days, so what matters operationally is whether that one label matches the key and whether a majority of three runs does. Proposed replacement for the stability gate (owner decision pending): majority-of-three agreement with the key at least 80% per aspect, single-run agreement at least 75%.
+The model gives a different answer on a repeat run in 20% to 60% of cases. Public references suggest sampling controls (temperature, top-p, top-k) are not reliable levers on this model family, and the production request sets none, so stability cannot simply be forced. A stored label is computed once per title and cached for 30 days, so what matters operationally is whether that one label matches the key and whether a majority of three runs does. Replacement for the stability gate (**approved by the owner 2026-10-28**, implemented in the evaluator): majority-of-three agreement with the key at least 80% per aspect, single-run agreement at least 75%; all-runs-equal stability stays in the report as information only.
 
 ### Quota
 The 50-title three-run evaluation needs about 170 provider calls: about 9 UTC days at a cap of 20, or 2 days at a cap of 100 (the hard ceiling in code), subject to the actual Google quota (owner to confirm).
+
+### Decision: daily call limit (2026-10-28)
+The owner approved raising the daily Gemini call limit for the testing phase only (hard ceiling in code stays 100; the evaluator reads `GEMINI_DAILY_REQUEST_LIMIT`). Production Gemini stays disabled and the default stays 20. Once the evaluation passes and the owner approves enabling, the limit goes back down to a small daily number.

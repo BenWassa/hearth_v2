@@ -165,7 +165,14 @@ const run = async () => {
     const totals = Object.fromEntries(
       domain.FACETS.map((name) => [
         name,
-        { agreement: 0, evaluated: 0, unknown: 0, stable: 0 },
+        {
+          agreement: 0,
+          evaluated: 0,
+          unknown: 0,
+          stable: 0,
+          singleRuns: 0,
+          singleRunHits: 0,
+        },
       ]),
     );
     for (const result of results.filter((r) => !r.synthetic)) {
@@ -179,6 +186,11 @@ const run = async () => {
         totals[name].evaluated++;
         totals[name].agreement += expected === predicted ? 1 : 0;
         totals[name].unknown += predicted === 'unknown' ? 1 : 0;
+        // Single-run agreement: every individual prediction against the key.
+        for (const p of predictions) {
+          totals[name].singleRuns++;
+          totals[name].singleRunHits += p[name].value === expected ? 1 : 0;
+        }
         totals[name].stable +=
           predictions.length === expectedRuns &&
           predictions.every((p) => p[name].value === predicted)
@@ -193,6 +205,10 @@ const run = async () => {
           count: t.evaluated,
           agreement: t.evaluated ? t.agreement / t.evaluated : null,
           unavailableRate: t.evaluated ? t.unknown / t.evaluated : null,
+          singleRunAgreement: t.singleRuns
+            ? t.singleRunHits / t.singleRuns
+            : null,
+          // Informational: how often all repeat runs gave the same answer.
           stability: t.evaluated ? t.stable / t.evaluated : null,
         },
       ]),
@@ -234,7 +250,7 @@ const run = async () => {
       (f) =>
         hybrid.metrics[f].agreement >= 0.8 &&
         hybrid.metrics[f].unavailableRate <= 0.35 &&
-        hybrid.metrics[f].stability >= 0.95,
+        hybrid.metrics[f].singleRunAgreement >= 0.75,
     );
   const report = {
     version: domain.CLASSIFIER_VERSION,
@@ -247,7 +263,7 @@ const run = async () => {
     thresholds: {
       agreement: 0.8,
       unavailableRate: 0.35,
-      stability: 0.95,
+      singleRunAgreement: 0.75,
       approvedHumanFixture: true,
     },
     rolloutPassed: Boolean(passed),

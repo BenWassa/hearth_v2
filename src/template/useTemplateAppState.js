@@ -16,6 +16,7 @@ import { createRequestPacer } from '../services/mediaApi/requestPacer.js';
 import { buildMetadataAuditReport as buildSharedMetadataAuditReport } from '../domain/media/metadata.js';
 import { initializeFirebase } from '../services/firebase/client.js';
 import { logMetadataAuditSummary } from '../app/metadataAuditConsole.js';
+import { useViewHistory } from '../app/useViewHistory.js';
 import {
   signInAnonymousUser,
   signOutUser,
@@ -475,7 +476,8 @@ export const useTemplateAppState = () => {
       : buildTemplateSeedItems()
     ).map((item) => normalizeTemplateItem(item, item.id, item.createdAt)),
   );
-  const [view, setView] = useState('tonight');
+  // The demo holds no private screens, so restored history is always allowed.
+  const { view, setView, goBack } = useViewHistory('tonight');
   const [decisionResult, setDecisionResult] = useState(null);
   const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);
@@ -828,6 +830,7 @@ export const useTemplateAppState = () => {
     handleDeleteAll,
     handleDelete,
     handleExportItems,
+    goBack,
     handleImportItems,
     handleMarkWatched,
     handleMetadataAudit,

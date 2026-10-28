@@ -11,6 +11,7 @@ import {
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
 import TextArea from '../components/ui/TextArea.jsx';
+import { buildMediaId } from '../domain/media/schema.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { useMediaSearch } from './hooks/useMediaSearch.js';
 
@@ -77,7 +78,19 @@ const SearchResultSkeleton = ({ count = 3 }) => (
   </>
 );
 
-const AddView = ({ onBack, onSubmit }) => {
+const AddView = ({ onBack, onSubmit, items = [] }) => {
+  // Mirror the save guard: provider identity only, never title similarity.
+  const isOnShelf = (result) => {
+    if (!result?.provider || !result?.providerId) return false;
+    const mediaId = buildMediaId(result);
+    return items.some(
+      (item) =>
+        item.mediaId === mediaId ||
+        (String(item.source?.provider || '').toLowerCase() ===
+          String(result.provider).toLowerCase() &&
+          String(item.source?.providerId || '') === String(result.providerId)),
+    );
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [type, setType] = useState('movie');
   const [note, setNote] = useState('');
@@ -103,6 +116,8 @@ const AddView = ({ onBack, onSubmit }) => {
   const resultsScrollRef = useRef(null);
   const loadMoreSentinelRef = useRef(null);
   const loadMoreRef = useRef(loadMore);
+
+  const selectedOnShelf = isOnShelf(selectedResult);
 
   const selectedPoster =
     enrichedPayload?.media?.poster ||
@@ -212,6 +227,7 @@ const AddView = ({ onBack, onSubmit }) => {
   };
 
   const handleSubmit = () => {
+    if (selectedOnShelf) return;
     if (!selectedResult) {
       setSubmitError(
         'Pick a movie or show from the search results before saving.',
@@ -394,6 +410,11 @@ const AddView = ({ onBack, onSubmit }) => {
                                   </div>
                                   <MediaTypeBadge type={result.type} />
                                 </div>
+                                {isOnShelf(result) && (
+                                  <p className="mt-1 text-sm text-stone-300">
+                                    On your shelf
+                                  </p>
+                                )}
                                 {index === 0 || result.year ? (
                                   <div className="mt-1 text-label font-semibold uppercase tracking-[0.14em] text-stone-400">
                                     {[
@@ -483,6 +504,15 @@ const AddView = ({ onBack, onSubmit }) => {
                     <div className="mt-1 truncate text-sm font-medium text-stone-100">
                       {selectedTitle}
                     </div>
+                    {selectedOnShelf && (
+                      <p
+                        id="add-owned-note"
+                        role="status"
+                        className="mt-2 text-sm text-stone-300"
+                      >
+                        This title is already on your shelf.
+                      </p>
+                    )}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <MediaTypeBadge type={type} selected />
                       {selectedYear ? (
@@ -548,15 +578,26 @@ const AddView = ({ onBack, onSubmit }) => {
         <Button
           onClick={handleSubmit}
           disabled={
+            selectedOnShelf ||
             !searchQuery.trim() ||
             isEnriching ||
             !selectedResult ||
             !enrichedPayload?.source?.providerId
           }
           className="w-full"
-          aria-describedby={!selectedResult ? 'add-submit-hint' : undefined}
+          aria-describedby={
+            selectedOnShelf
+              ? 'add-owned-note'
+              : !selectedResult
+              ? 'add-submit-hint'
+              : undefined
+          }
         >
-          {isEnriching ? 'Loading Metadata...' : 'Add to Shelf'}
+          {selectedOnShelf
+            ? 'On your shelf'
+            : isEnriching
+            ? 'Loading Metadata...'
+            : 'Add to Shelf'}
         </Button>
       </div>
     </div>

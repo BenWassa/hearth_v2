@@ -52,6 +52,7 @@ export function HearthAppView({ appState }) {
     handleDeleteAll,
     handleDelete,
     handleExportItems,
+    goBack,
     handleImportItems,
     handleLoadUserSpaces,
     handleMarkWatched,
@@ -246,13 +247,13 @@ export function HearthAppView({ appState }) {
               onDelete={handleDelete}
               onBulkDelete={handleBulkDelete}
               isBulkDeleting={isBulkDeleting}
-              onBack={() => setView('tonight')}
+              onBack={goBack}
             />
           )}
 
           {view === 'add' && (
             <AddView
-              onBack={() => setView('tonight')}
+              onBack={goBack}
               onSubmit={handleAddItem}
               allowManualEntry={isTemplateMode}
             />
@@ -262,7 +263,7 @@ export function HearthAppView({ appState }) {
             <DecisionView
               isDeciding={isDeciding}
               result={decisionResult}
-              onClose={() => setView('tonight')}
+              onClose={goBack}
               onReroll={() =>
                 startDecision(
                   contextItems.filter((item) => item.id !== decisionResult?.id),

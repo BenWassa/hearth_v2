@@ -32,6 +32,7 @@ import {
   isShowFullyWatched,
 } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
+import { useViewHistory } from './useViewHistory.js';
 import { logMetadataAuditSummary } from './metadataAuditConsole.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
@@ -414,11 +415,22 @@ export const useAppState = () => {
           mediaId: original.mediaId || original.id,
           classification,
         });
+      },
+      onBatchResult: (results) => {
         if (!active) return;
+        const classifications = new Map(
+          results.map(({ item, classification }) => [item.id, classification]),
+        );
         setItems((current) =>
           current.map((item) =>
-            item.id === original.id
-              ? { ...item, media: { ...item.media, classification } }
+            classifications.has(item.id)
+              ? {
+                  ...item,
+                  media: {
+                    ...item.media,
+                    classification: classifications.get(item.id),
+                  },
+                }
               : item,
           ),
         );
@@ -446,7 +458,9 @@ export const useAppState = () => {
   }, [user, db, spaceId]);
 
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState(getInitialView);
+  const { view, setView, goBack } = useViewHistory(getInitialView, {
+    canRestore: authResolved ? Boolean(user) : undefined,
+  });
   const [decisionResult, setDecisionResult] = useState(null);
   const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);
@@ -2255,6 +2269,7 @@ export const useAppState = () => {
     handleDeleteAll,
     handleDelete,
     handleExportItems,
+    goBack,
     handleImportItems,
     handleMarkWatched,
     handleMetadataAudit,

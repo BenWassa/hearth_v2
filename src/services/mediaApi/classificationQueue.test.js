@@ -31,7 +31,11 @@ describe('classification pending queue', () => {
     vi.unstubAllGlobals();
   });
   it('processes canonical titles once, preserves personal data and skips cached work across sessions', async () => {
-    const request = vi.fn().mockResolvedValue(result);
+    const request = vi
+      .fn()
+      .mockResolvedValue([
+        { id: '603', type: 'movie', ok: true, data: result },
+      ]);
     const onResult = vi.fn();
     const store = storage();
     const args = {
@@ -46,8 +50,7 @@ describe('classification pending queue', () => {
     stop();
     expect(request).toHaveBeenCalledOnce();
     expect(request.mock.calls[0][0]).toMatchObject({
-      id: '603',
-      type: 'movie',
+      items: [{ id: '603', type: 'movie' }],
       token: 'token',
     });
     expect(request.mock.calls[0][0]).not.toHaveProperty('note');
@@ -71,7 +74,9 @@ describe('classification pending queue', () => {
     await vi.advanceTimersByTimeAsync(60 * 60000);
     expect(request).toHaveBeenCalledTimes(3);
     stop();
-    request.mockResolvedValue(result);
+    request.mockResolvedValue([
+      { id: '603', type: 'movie', ok: true, data: result },
+    ]);
     stop = startClassificationBackfill(args);
     await vi.advanceTimersByTimeAsync(1001);
     stop();
@@ -96,7 +101,7 @@ describe('classification pending queue', () => {
     });
     await vi.advanceTimersByTimeAsync(1000);
     stop();
-    finish(result);
+    finish([{ id: '603', type: 'movie', ok: true, data: result }]);
     await Promise.resolve();
     expect(onResult).not.toHaveBeenCalled();
     expect(request.mock.calls[0][0].signal.aborted).toBe(true);
@@ -119,7 +124,9 @@ describe('classification pending queue', () => {
 it('reclassifies when public source evidence changes, without waiting for cache age', async () => {
   vi.useFakeTimers();
   let items = [item];
-  const request = vi.fn().mockResolvedValue(result);
+  const request = vi
+    .fn()
+    .mockResolvedValue([{ id: '603', type: 'movie', ok: true, data: result }]);
   const stop = startClassificationBackfill({
     getItems: () => items,
     getToken: async () => 'token',
@@ -136,5 +143,128 @@ it('reclassifies when public source evidence changes, without waiting for cache 
   } finally {
     stop();
     vi.useRealTimers();
+  }
+});
+
+it('batches ten, isolates failures, coalesces results and counts only unfinished titles', async () => {
+  vi.useFakeTimers();
+  const titles = Array.from({ length: 12 }, (_, i) => ({
+    ...item,
+    id: `tmdb:${i + 1}`,
+    source: { provider: 'tmdb', providerId: String(i + 1) },
+  }));
+  titles.push({
+    ...item,
+    source: { provider: 'tmdb', providerId: '99' },
+    media: { classification: result },
+  });
+  const request = vi.fn(async ({ items }) =>
+    items.map(({ id, type }) =>
+      id === '2'
+        ? { id, type, ok: false, code: 'UNAVAILABLE' }
+        : { id, type, ok: true, data: { ...result, key: `tmdb:movie:${id}` } },
+    ),
+  );
+  const onBatchResult = vi.fn();
+  const onProgress = vi.fn();
+  const onResult = vi.fn();
+  const stop = startClassificationBackfill({
+    getItems: () => titles,
+    getToken: async () => 'token',
+    request,
+    onResult,
+    onBatchResult,
+    onProgress,
+    storage: storage(),
+  });
+  try {
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(request.mock.calls[0][0].items).toHaveLength(10);
+    expect(onResult).toHaveBeenCalledTimes(9);
+    expect(onBatchResult).toHaveBeenCalledOnce();
+    expect(onBatchResult.mock.calls[0][0]).toHaveLength(9);
+    expect(onProgress).toHaveBeenLastCalledWith({
+      processed: 9,
+      failed: 1,
+      pending: 3,
+    });
+    await vi.advanceTimersByTimeAsync(1200);
+    expect(request.mock.calls[1][0].items).toHaveLength(2);
+    expect(onProgress).toHaveBeenLastCalledWith({
+      processed: 11,
+      failed: 1,
+      pending: 1,
+    });
+    await vi.advanceTimersByTimeAsync(60 * 60000);
+    expect(
+      request.mock.calls.filter(([args]) =>
+        args.items.some(({ id }) => id === '2'),
+      ),
+    ).toHaveLength(3);
+    expect(onProgress).toHaveBeenLastCalledWith({
+      processed: 11,
+      failed: 3,
+      pending: 1,
+    });
+  } finally {
+    stop();
+    vi.useRealTimers();
+  }
+});
+
+it('bounds persistence concurrency and sends only batch identities', async () => {
+  vi.useFakeTimers();
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ ok: true, data: [] }),
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  const { requestClassificationBatch } = await import(
+    './classificationQueue.js'
+  );
+  await requestClassificationBatch({
+    items: [{ id: '603', type: 'movie', note: 'private' }],
+    token: 'token',
+  });
+  expect(fetchMock.mock.calls[0][0]).toBe('/api/media/classify-batch');
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+    items: [{ id: '603', type: 'movie' }],
+  });
+  let active = 0;
+  let peak = 0;
+  const releases = [];
+  const titles = Array.from({ length: 10 }, (_, i) => ({
+    ...item,
+    source: { provider: 'tmdb', providerId: String(i + 1) },
+  }));
+  const stop = startClassificationBackfill({
+    getItems: () => titles,
+    getToken: async () => 'token',
+    storage: storage(),
+    request: async ({ items }) =>
+      items.map(({ id, type }) => ({
+        id,
+        type,
+        ok: true,
+        data: { ...result, key: `tmdb:movie:${id}` },
+      })),
+    onResult: async () => {
+      peak = Math.max(peak, ++active);
+      await new Promise((resolve) => releases.push(resolve));
+      active--;
+    },
+  });
+  try {
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(active).toBe(3);
+    for (let i = 0; i < 10; i++) {
+      releases.shift()();
+      await vi.advanceTimersByTimeAsync(0);
+    }
+    expect(peak).toBe(3);
+  } finally {
+    stop();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
   }
 });

@@ -2,7 +2,10 @@ import {
   startClassificationBackfill,
   requestClassification,
 } from './classificationQueue.js';
-import { classifyMedia } from '../../domain/media/classification.mjs';
+import {
+  CLASSIFIER_VERSION,
+  classifyMedia,
+} from '../../domain/media/classification.mjs';
 const item = {
   id: 'tmdb:603',
   source: { provider: 'tmdb', providerId: '603' },
@@ -13,7 +16,7 @@ const item = {
 };
 const result = {
   ...classifyMedia(item),
-  pipelineVersion: 'viewing-1',
+  pipelineVersion: 'viewing-2',
   classifiedAt: 1000,
 };
 const storage = () => {
@@ -320,7 +323,7 @@ it('isolates whole-batch 429 and timeout failures with persisted 15-minute retri
     for (let id = 1; id <= 20; id++) {
       expect(state(id)).toMatchObject({
         completed: false,
-        version: 'viewing-1',
+        version: CLASSIFIER_VERSION,
         retryAt: startedAt + (id <= 10 ? 1000 : 2200) + 15 * 60000,
       });
       expect(typeof state(id).signature).toBe('string');

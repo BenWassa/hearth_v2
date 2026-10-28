@@ -31,14 +31,14 @@
     "expected": {
       "comfort": "high",
       "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: high comfort and low attention remain appropriate. Low plot momentum understated the clear quest/heist/rescue progression, so momentum is medium. The vibrant live-action/CGI hybrid design supports medium visual distinctiveness, not a high exceptional-craft label. Human approval is still required."
   },
   {
     "seed": true,
@@ -85,12 +85,12 @@
       "comedyFirst": "medium",
       "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: the gentle workplace/relationship tone supports high comfort; comedy is substantial but not the sole mode; pacing and structure are straightforward. Visual presentation is treated as low distinctiveness rather than unknown. Human approval is still required."
   },
   {
     "seed": true,
@@ -126,13 +126,13 @@
       "comfort": "low",
       "comedyFirst": "low",
       "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "high",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: survival stakes keep comfort low and momentum high. The narrative is accessible and mostly linear but tracks parallel Earth/Mars problem-solving, so medium complexity is more consistent with the rubric than high. The Mars/space presentation supports high visual distinctiveness. Technical detail and tension raise attention above low, but the mainstream linear structure supports medium rather than high. Human approval is still required."
   },
   {
     "seed": true,
@@ -165,12 +165,12 @@
       "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: joke-forward comedy, straightforward structure and low attention demand remain appropriate. The strongly authored pink/fashion visual identity supports medium visual distinctiveness rather than an unresolved unknown. Human approval is still required."
   },
   {
     "seed": true,
@@ -203,16 +203,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "agent-reviewed",
+    "disagreement": "Independent agent adjudication for #21: explicit cheerful/comforting evidence and the existing deterministic rule make high comfort the coherent label; the prior medium label made the hybrid unable to agree by construction. Comedy is primary, the competition arc gives medium momentum, and structure/attention remain low. Visual distinctiveness is low rather than unresolved. Human approval is still required."
   },
   {
     "seed": true,

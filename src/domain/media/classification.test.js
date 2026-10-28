@@ -56,6 +56,23 @@ describe('automatic viewing classification', () => {
       classificationRevision(movie({ keywords: ['heist', 'sitcom'] })),
     ).toBe(classificationRevision(movie({ keywords: ['sitcom', 'heist'] })));
   });
+  it('uses bounded complexity signals without treating generic complex as narrative proof', () => {
+    const nonlinear = classifyMedia(
+      movie({ keywords: ['nonlinear timeline'] }),
+    ).attributes;
+    expect(nonlinear.narrativeComplexity.value).toBe('medium');
+    expect(nonlinear.attentionDemand.value).toBe('medium');
+
+    const paradox = classifyMedia(
+      movie({ keywords: ['time paradox'] }),
+    ).attributes;
+    expect(paradox.narrativeComplexity.value).toBe('high');
+    expect(paradox.attentionDemand.value).toBe('high');
+
+    const generic = classifyMedia(movie({ keywords: ['complex'] })).attributes;
+    expect(generic.narrativeComplexity.value).toBe('unknown');
+    expect(generic.attentionDemand.value).toBe('unknown');
+  });
   it('keeps unknowns unknown and refuses genre, age and animation shortcuts', () => {
     for (const input of [
       {},

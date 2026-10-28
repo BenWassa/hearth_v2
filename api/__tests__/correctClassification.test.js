@@ -41,6 +41,9 @@ test('correction defaults to dry-run without opening Firestore or writing', asyn
 });
 for (const value of ['high', 'unknown']) {
   test(`apply conditionally writes only named facet and audit fields (${value})`, async () => {
+    const { CLASSIFIER_VERSION } = await import(
+      '../../src/domain/media/classification.mjs'
+    );
     for (const records of [
       { 'tmdb:movie:603': matching },
       { 'tmdb:603': matching, 'tmdb:movie:603': { ...matching, type: 'show' } },
@@ -58,7 +61,7 @@ for (const value of ['high', 'unknown']) {
       assert.deepEqual(db.writes[0].fields, {
         'media.classificationOverride.attributes.comfort': value,
         'media.classificationOverride.reason': 'Reviewed',
-        'media.classificationOverride.version': 'viewing-1',
+        'media.classificationOverride.version': CLASSIFIER_VERSION,
         'media.classificationOverride.correctedAt':
           db.writes[0].fields['media.classificationOverride.correctedAt'],
       });

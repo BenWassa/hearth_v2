@@ -1,0 +1,51 @@
+name: Classification PR QA
+
+on:
+  pull_request:
+    paths:
+      - 'api/_lib/geminiClassifier.js'
+      - 'api/_lib/classificationService.js'
+      - 'api/__tests__/classification*.test.js'
+      - 'scripts/classificationEvaluation.cjs'
+      - 'scripts/evaluateClassification.cjs'
+      - 'src/domain/media/classification.mjs'
+      - 'src/domain/media/classification.test.js'
+      - 'src/domain/media/classificationFixtures.json'
+      - 'src/services/mediaApi/classificationQueue.test.js'
+      - 'docs/open/issue-021-gemini-pilot-quality.md'
+      - '.github/workflows/classification-pr-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  classification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint:ci
+      - name: Check touched-file formatting
+        run: >
+          npx prettier --check
+          api/_lib/geminiClassifier.js
+          api/_lib/classificationService.js
+          api/__tests__/classification.test.js
+          api/__tests__/classificationEvaluation.test.js
+          scripts/classificationEvaluation.cjs
+          scripts/evaluateClassification.cjs
+          src/domain/media/classification.mjs
+          src/domain/media/classification.test.js
+          src/domain/media/classificationFixtures.json
+          src/services/mediaApi/classificationQueue.test.js
+          docs/open/issue-021-gemini-pilot-quality.md
+          docs/README.md
+      - name: Run offline classification evaluator
+        run: node scripts/evaluateClassification.cjs --out=/tmp/issue21-offline.json

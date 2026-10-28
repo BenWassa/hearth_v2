@@ -5,27 +5,56 @@ const path = require('node:path');
 const fixtures = require('../src/domain/media/classificationFixtures.json');
 const gemini = require('../api/_lib/geminiClassifier');
 const {
-  createClassificationService,
-} = require('../api/_lib/classificationService');
-const { initializeFirebaseAdmin } = require('../server/firebaseAdmin');
+  buildGeminiDryRun,
+  realFixtures,
+  selectLiveFixtures,
+  findRuleExpectedConflicts,
+  representativeValue,
+} = require('./classificationEvaluation.cjs');
 
 const run = async () => {
+  if (process.argv.includes('--dry-run')) {
+    if (!process.argv.includes('--gemini'))
+      throw new Error('--dry-run requires --gemini');
+    const report = await buildGeminiDryRun(fixtures, process.argv.slice(2));
+    const json = JSON.stringify(report, null, 2) + '\n';
+    const output = process.argv
+      .find((arg) => arg.startsWith('--out='))
+      ?.slice(6);
+    if (output) {
+      const destination = path.resolve(output);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.writeFileSync(destination, json);
+    } else {
+      console.log(json);
+    }
+    console.log(
+      `Gemini dry-run: ${report.plan.titlesSelected.join(', ')}; ${
+        report.plan.totalPredictions
+      } predictions (${report.plan.predictionsPerTitle}/title); estimated ${
+        report.plan.estimatedProviderAttempts
+      } attempts; daily cap ${report.plan.dailyCap}; estimated UTC days: ${
+        report.plan.utcDaysNeededEstimate ?? 'cannot complete'
+      }. No call was made.`,
+    );
+    return;
+  }
   const domain = await import('../src/domain/media/classification.mjs');
   const live = process.argv.includes('--gemini');
   const out = path.resolve(
     process.argv.find((a) => a.startsWith('--out='))?.slice(6) ||
       'docs/open/issue-020-evaluation.json',
   );
-  const limit = Math.min(
-    fixtures.length,
-    Math.max(
-      1,
-      Number(
-        process.argv.find((a) => a.startsWith('--limit='))?.slice(8) ||
-          fixtures.length,
-      ),
-    ),
-  );
+  const selection = live
+    ? selectLiveFixtures(fixtures, process.argv.slice(2))
+    : {
+        mode: 'all-real',
+        keys: realFixtures(fixtures).map(
+          (fixture) => domain.classifyMedia(fixture.input).key,
+        ),
+        fixtures: realFixtures(fixtures),
+      };
+  const selectedKeys = new Set(selection.keys);
   const runs = live ? 3 : 1;
   if (live) {
     // Match the local server: shell variables win, then local/API/base files.
@@ -33,7 +62,7 @@ const run = async () => {
       require('dotenv').config({ path: envFile, override: false, quiet: true });
     }
     if (!gemini.enabled()) throw new Error('Missing pilot configuration');
-    initializeFirebaseAdmin();
+    require('../server/firebaseAdmin').initializeFirebaseAdmin();
   }
   let previous = {};
   if (live && fs.existsSync(out)) {
@@ -43,18 +72,34 @@ const run = async () => {
       previous.model &&
       (previous.model !== process.env.GEMINI_MODEL ||
         previous.version !== domain.CLASSIFIER_VERSION ||
-        previous.promptVersion !== gemini.PROMPT_VERSION)
+        previous.promptVersion !== gemini.PROMPT_VERSION ||
+        previous.inferencePolicyVersion !== gemini.INFERENCE_POLICY_VERSION ||
+        previous.policyKey !== gemini.policyKey())
     )
       throw new Error(
-        'Use a fresh output path after changing model/prompt/version',
+        'Use a fresh output path after changing model/prompt/policy/version',
+      );
+    if (
+      Array.isArray(previous.selection?.keys) &&
+      JSON.stringify(previous.selection.keys) !== JSON.stringify(selection.keys)
+    )
+      throw new Error(
+        'Use a fresh output path after changing evaluation selection',
       );
   }
   const saved = new Map(
     (previous.results || []).map((result) => [result.key, result]),
   );
-  const budget = createClassificationService();
+  const budget =
+    require('../api/_lib/classificationService').createClassificationService();
   let exhausted = false;
-  let attemptedTitles = 0;
+  let attemptedTitlesThisRun = 0;
+  let providerAttemptsThisRun = 0;
+  const reserveAttempt = async () => {
+    const reserved = await budget.reserveAttempt();
+    if (reserved) providerAttemptsThisRun += 1;
+    return reserved;
+  };
   const results = [];
   for (const fixture of fixtures) {
     const baseline = domain.classifyMedia(fixture.input);
@@ -65,19 +110,25 @@ const run = async () => {
       ? (prior?.predictions || []).slice()
       : [baseline.attributes];
     const statuses = live ? (prior?.statuses || []).slice() : ['disabled'];
+    const outcomes = live ? (prior?.outcomes || []).slice() : [];
     const synthetic = fixture.input.providerId === '999999999';
     if (
       live &&
       !synthetic &&
+      selectedKeys.has(baseline.key) &&
       !exhausted &&
-      predictions.length < runs &&
-      attemptedTitles < limit
+      predictions.length < runs
     ) {
-      attemptedTitles++;
+      attemptedTitlesThisRun++;
       while (predictions.length < runs) {
         const response = await gemini.infer({
           input: domain.normalizeClassificationInput(fixture.input),
-          reserveAttempt: budget.reserveAttempt,
+          reserveAttempt,
+        });
+        outcomes.push({
+          status: response.status,
+          reason: response.reason || null,
+          providerAttempts: response.providerAttempts || 0,
         });
         if (response.status !== 'complete') {
           exhausted = ['budget', 'quota'].includes(response.status);
@@ -85,11 +136,11 @@ const run = async () => {
           break;
         }
         predictions.push(
-          domain.blendClassification(
-            baseline,
-            response.attributes,
-            response.model,
-          ).attributes,
+          domain.blendClassification(baseline, response.attributes, {
+            model: response.model,
+            promptVersion: response.promptVersion,
+            inferencePolicyVersion: response.inferencePolicyVersion,
+          }).attributes,
         );
         statuses.push(response.status);
       }
@@ -99,6 +150,7 @@ const run = async () => {
       sourceRevision: baseline.sourceRevision,
       synthetic,
       statuses,
+      outcomes,
       rules: baseline.attributes,
       predictions,
       expected: fixture.expected,
@@ -120,7 +172,7 @@ const run = async () => {
       if (!predictions.length) continue;
       for (const name of domain.FACETS) {
         const expected = result.expected[name];
-        const predicted = predictions[0][name].value;
+        const predicted = representativeValue(predictions, name);
         const cell = `${expected} -> ${predicted}`;
         matrices[name][cell] = (matrices[name][cell] || 0) + 1;
         totals[name].evaluated++;
@@ -149,12 +201,28 @@ const run = async () => {
   const rules = summarize((r) => [r.rules], 1);
   const hybrid = live ? summarize((r) => r.predictions) : null;
   const real = results.filter((r) => !r.synthetic);
+  const selected = real.filter((r) => selectedKeys.has(r.key));
   const complete =
     real.length >= 50 && real.every((r) => r.predictions.length === runs);
+  const completedTitleCount = real.filter(
+    (r) => r.predictions.length === runs,
+  ).length;
+  const everAttemptedTitleCount = real.filter((r) =>
+    (r.statuses || []).some((status) => status !== 'disabled'),
+  ).length;
+  const previousProviderAttempts = Number.isInteger(
+    previous.providerAttemptsTotal,
+  )
+    ? previous.providerAttemptsTotal
+    : 0;
+  const providerAttemptsTotal =
+    previousProviderAttempts + providerAttemptsThisRun;
+  const ruleExpectedConflicts = findRuleExpectedConflicts(real);
   const subjective = domain.FACETS.filter((f) => f !== 'curatedClassic');
   const passed =
     live &&
     complete &&
+    ruleExpectedConflicts.length === 0 &&
     fixtures
       .filter((f) => f.input.providerId !== '999999999')
       .every((f) => f.review === 'approved') &&
@@ -167,6 +235,8 @@ const run = async () => {
   const report = {
     version: domain.CLASSIFIER_VERSION,
     promptVersion: gemini.PROMPT_VERSION,
+    inferencePolicyVersion: gemini.INFERENCE_POLICY_VERSION,
+    policyKey: live ? gemini.policyKey() : 'rules',
     model: live ? process.env.GEMINI_MODEL : null,
     mode: live ? 'rules+gemini' : 'rules',
     runsPerTitle: runs,
@@ -178,7 +248,29 @@ const run = async () => {
     },
     rolloutPassed: Boolean(passed),
     liveEvaluationComplete: live && complete,
-    fixtureReview: 'provisional until independent reviewers approve',
+    fixtureReview:
+      'agent-reviewed pilot labels remain human-unapproved; all rollout labels require explicit independent human approval',
+    selection: {
+      mode: selection.mode,
+      keys: selection.keys,
+    },
+    evaluationCounts: {
+      fixtureCount: fixtures.length,
+      realFixtureCount: real.length,
+      selectedTitleCount: selected.length,
+      attemptedTitleCountThisRun: attemptedTitlesThisRun,
+      everAttemptedTitleCount,
+      titlesWithPredictions: real.filter((r) => r.predictions.length > 0)
+        .length,
+      completedTitleCount,
+      completedSelectedTitleCount: selected.filter(
+        (r) => r.predictions.length === runs,
+      ).length,
+      providerAttemptsThisRun,
+      providerAttemptsTotal,
+    },
+    providerAttemptsTotal,
+    ruleExpectedConflicts,
     rules,
     hybrid,
     results,
@@ -190,8 +282,10 @@ const run = async () => {
       {
         out,
         mode: report.mode,
-        titles: real.length,
+        selection: report.selection,
+        evaluationCounts: report.evaluationCounts,
         rolloutPassed: report.rolloutPassed,
+        ruleExpectedConflicts: report.ruleExpectedConflicts,
         rules: rules.metrics,
         hybrid: hybrid?.metrics || null,
       },

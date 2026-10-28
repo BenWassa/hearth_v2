@@ -323,7 +323,7 @@ describe('Get Hooked', () => {
     expect(attributes.attentionDemand.value).toBe('unknown');
     expect(primaryTheme(item)).toBe('hooked');
   });
-  it.each(['complex', 'graphic violence'])(
+  it.each(['mind-bending', 'graphic violence'])(
     'keeps rules-only high momentum with %s in Deep Dives',
     (keyword) => {
       expect(primaryTheme(movie(72, { keywords: ['heist', keyword] }))).toBe(

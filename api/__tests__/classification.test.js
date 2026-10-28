@@ -180,7 +180,7 @@ test('leases recover after process exit and partial metadata failures do not poi
   assert.equal(
     (await service.classify({ id: '603', type: 'movie', appId: 'app' }))
       .version,
-    'viewing-1',
+    'viewing-2',
   );
   const broken = createClassificationService({
     db: () => fakeDb(),
@@ -250,10 +250,21 @@ test('Gemini is opt-in and projects only public fields, never credentials in URL
       assert.equal(options.headers['x-goog-api-key'], 'fake-key');
       for (const value of ['secret', uid, 'licensed synopsis', 'private'])
         assert.equal(options.body.includes(value), false);
+      const generationConfig = JSON.parse(options.body).generationConfig;
       assert.equal(
-        JSON.parse(options.body).generationConfig.responseJsonSchema
-          .additionalProperties,
+        generationConfig.responseJsonSchema.additionalProperties,
         false,
+      );
+      assert.equal('temperature' in generationConfig, false);
+      assert.equal('topP' in generationConfig, false);
+      assert.equal('topK' in generationConfig, false);
+      assert.deepEqual(generationConfig.thinkingConfig, {
+        thinkingLevel: 'minimal',
+      });
+      assert.match(
+        generationConfig.responseJsonSchema.properties.visualDistinctiveness
+          .description,
+        /visual craft/i,
       );
       return {
         ok: true,
@@ -269,6 +280,10 @@ test('Gemini is opt-in and projects only public fields, never credentials in URL
     },
   });
   assert.equal(result.status, 'complete');
+  assert.equal(result.providerAttempts, 1);
+  assert.equal(result.promptVersion, 'viewing-prompt-2');
+  assert.equal(result.inferencePolicyVersion, 'gemini-policy-2');
+  assert.match(gemini.policyKey(), /viewing-prompt-2:gemini-policy-2$/);
   assert.equal(count, 1);
 });
 test('Gemini quota, budget, invalid JSON, semantic errors, timeout and retry exhaustion fall back', async () => {
@@ -312,6 +327,8 @@ test('Gemini quota, budget, invalid JSON, semantic errors, timeout and retry exh
     });
     assert.equal(result.status, expected);
     assert.ok(attempts <= 2);
+    assert.equal(result.providerAttempts, attempts);
+    if (expected === 'invalid') assert.ok(result.reason);
   }
   assert.equal(
     (await gemini.infer({ input: movie, reserveAttempt: async () => false }))

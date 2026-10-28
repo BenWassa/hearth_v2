@@ -32,9 +32,14 @@ export const requestClassificationBatch = async ({ items, token, signal }) => {
       items: items.map(({ id, type }) => ({ id, type })),
     }),
   });
+  // Check status before parsing: a missing Express route returns HTML.
+  if (!response.ok) {
+    const error = new Error('Classification unavailable');
+    error.status = response.status;
+    throw error;
+  }
   const payload = await response.json();
-  if (!response.ok || !payload.ok)
-    throw new Error('Classification unavailable');
+  if (!payload.ok) throw new Error('Classification unavailable');
   return payload.data;
 };
 
@@ -60,6 +65,7 @@ export const startClassificationBackfill = ({
   const sessionState = new Map();
   let processed = 0;
   let failed = 0;
+  let lastProgress;
   const read = (key) => {
     if (sessionState.has(key)) return sessionState.get(key);
     try {
@@ -120,12 +126,18 @@ export const startClassificationBackfill = ({
         );
       })
       .slice(0, 10);
-    const progress = () =>
-      onProgress({
+    const progress = () => {
+      const state = {
         processed,
         failed,
         pending: candidates.filter(needsWork).length,
-      });
+      };
+      const signature = JSON.stringify(state);
+      if (signature !== lastProgress) {
+        lastProgress = signature;
+        onProgress(state);
+      }
+    };
     if (!batch.length) {
       progress();
       timer = schedule(tick, 30000);
@@ -148,7 +160,13 @@ export const startClassificationBackfill = ({
         signal: controller.signal,
       });
       if (!Array.isArray(results)) results = [];
-    } catch {
+    } catch (error) {
+      // A missing route affects the entire queue, not individual titles.
+      // Retry after a reload once the backend has been updated/restarted.
+      if (error.status === 404 || error.status === 405) {
+        progress();
+        return;
+      }
       results = [];
     }
     if (stopped) return;

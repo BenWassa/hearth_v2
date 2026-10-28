@@ -110,3 +110,32 @@ node scripts/evaluateClassification.cjs --gemini --dry-run --limit=5 --out=/tmp/
 This needs no enablement variables or API key and makes zero network calls. It does not read credentials, dotenv files, Firestore or the daily budget. The JSON shows each selected real title's production allowlisted metadata projection, exact shared production request body (system/user prompts, schema and generation config), model from `GEMINI_MODEL` or a labelled placeholder, and placeholder authentication. Temperature is explicitly documented as omitted by production; thinking level is `minimal`. Without `--out`, JSON prints to stdout; with it, stdout contains a short plan summary.
 
 The plan uses three predictions per title and estimates attempts as `ceil(predictions × 17 / 15)` from the observed pilot. Estimated UTC days are `ceil(estimated attempts / daily cap)`, assuming the full cap is available each day; existing usage is never inspected. The shared production cap defaults to 20, clamps integer values to 0–100, and fails closed to 0 for invalid values. A zero cap reports no completion estimate. These estimates do not guarantee retry counts or completion. No call is made by this command; live calls still require owner approval.
+
+## 2026-10-28 update: answer key review and v2 pilot
+
+### Answer key (fixture labels)
+The 50 real fixtures were re-labelled by three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus). Each saw only the film details and the production rubric, never an earlier label or any model output. Majority wins; the single three-way split (Jurassic Park, attention demand) resolves to the middle level. The owner delegated approval and the lead agent spot-checked recognisable titles.
+
+- 231 of 306 labels unanimous; 305 of 306 have a majority.
+- Reviewer agreement with the final key: Codex 87%, Claude Sonnet 91%, Claude Opus 97%. The old provisional labels matched on only 149 of 306 (they used "unknown" for 24% of cells; the key uses it for 2%).
+- Rule consistency: only contradictions two or more levels apart block rollout. Three one-step differences are listed in the offline report and do not block.
+
+### v2 pilot (5 films, three predictions each, 14 provider calls of the 20-call daily cap)
+Raw report: `issue-021-gemini-pilot-v2-2026-10-28.json`.
+
+| Aspect | Agreement with key | Unknown | Same answer in all three runs |
+| --- | --- | --- | --- |
+| Comfort | 100% | 0% | 80% |
+| Comedy first | 60% | 0% | 80% |
+| Plot momentum | 80% | 0% | 80% |
+| Narrative complexity | 80% | 0% | 80% |
+| Visual distinctiveness | 60% | 20% | 40% |
+| Attention demand | 100% | 0% | 80% |
+
+Four of five films completed three valid predictions. Agreement and unknown rate are close to the bars on five films; repeat stability is far below the 95% bar on every aspect.
+
+### Finding: repeat stability
+The model gives a different answer on a repeat run in 20% to 60% of cases. Public references suggest sampling controls (temperature, top-p, top-k) are not reliable levers on this model family, and the production request sets none, so stability cannot simply be forced. A stored label is computed once per title and cached for 30 days, so what matters operationally is whether that one label matches the key and whether a majority of three runs does. Proposed replacement for the stability gate (owner decision pending): majority-of-three agreement with the key at least 80% per aspect, single-run agreement at least 75%.
+
+### Quota
+The 50-title three-run evaluation needs about 170 provider calls: about 9 UTC days at a cap of 20, or 2 days at a cap of 100 (the hard ceiling in code), subject to the actual Google quota (owner to confirm).

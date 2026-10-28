@@ -73,6 +73,63 @@ describe('HeroCarousel', () => {
     await cleanupDom(mounted);
   });
 
+  it('bounds arrow keys and swipes at both ends while dots reach every title', async () => {
+    const mounted = await renderIntoDom(
+      <HeroCarousel
+        items={[
+          { id: '1', title: 'One' },
+          { id: '2', title: 'Two' },
+          { id: '3', title: 'Three' },
+        ]}
+      />,
+    );
+    const group = mounted.container.querySelector('[role="group"]');
+    const current = () =>
+      mounted.container
+        .querySelector('[aria-current="true"]')
+        .getAttribute('aria-label');
+    const key = async (key) =>
+      act(async () => {
+        group.dispatchEvent(
+          new KeyboardEvent('keydown', { key, bubbles: true }),
+        );
+      });
+    const swipe = async (start, end) => {
+      await act(async () => {
+        dispatchTouch(group, 'touchstart', { x: start, y: 10 });
+      });
+      await act(async () => {
+        dispatchTouch(group, 'touchmove', { x: end, y: 10 });
+      });
+      await act(async () => {
+        dispatchTouch(group, 'touchend', { x: end, y: 10 });
+      });
+    };
+    await key('ArrowLeft');
+    await swipe(50, 150);
+    expect(current()).toBe('Show slide 1 of 3');
+    await key('ArrowRight');
+    expect(current()).toBe('Show slide 2 of 3');
+    await swipe(150, 50);
+    expect(current()).toBe('Show slide 3 of 3');
+    await key('ArrowRight');
+    await swipe(150, 50);
+    expect(current()).toBe('Show slide 3 of 3');
+    await key('ArrowLeft');
+    expect(current()).toBe('Show slide 2 of 3');
+    for (let index = 1; index <= 3; index++) {
+      const dot = mounted.container.querySelector(
+        `[aria-label="Show slide ${index} of 3"]`,
+      );
+      expect(dot.className).toContain('min-h-11 min-w-11');
+      await act(async () => {
+        dot.click();
+      });
+      expect(current()).toBe(`Show slide ${index} of 3`);
+    }
+    await cleanupDom(mounted);
+  });
+
   it('uses logo art when available and shows no title text fallback on image failure', async () => {
     const mounted = await renderIntoDom(
       <HeroCarousel
@@ -104,7 +161,7 @@ describe('HeroCarousel', () => {
     await cleanupDom(mounted);
   });
 
-  it('auto-advances every 6 seconds and opens currently active item', async () => {
+  it('stays on the first title after time passes and opens it', async () => {
     vi.useFakeTimers();
     const onOpenDetails = vi.fn();
 
@@ -131,7 +188,7 @@ describe('HeroCarousel', () => {
     );
 
     await act(async () => {
-      vi.advanceTimersByTime(6000);
+      vi.advanceTimersByTime(60000);
     });
 
     const heroButton = mounted.container.querySelector(
@@ -142,7 +199,7 @@ describe('HeroCarousel', () => {
     });
 
     expect(onOpenDetails).toHaveBeenCalledTimes(1);
-    expect(onOpenDetails.mock.calls[0][0].title).toBe('Movie Two');
+    expect(onOpenDetails.mock.calls[0][0].title).toBe('Movie One');
 
     await cleanupDom(mounted);
   });
@@ -235,7 +292,7 @@ describe('HeroCarousel', () => {
     await cleanupDom(mounted);
   });
   it.each(['focusin', 'pointerdown', 'touchstart'])(
-    'stops autoplay permanently after %s',
+    'stays on the current slide after %s',
     async (type) => {
       vi.useFakeTimers();
       const items = [
@@ -268,7 +325,7 @@ describe('HeroCarousel', () => {
     },
   );
 
-  it('disables autoplay and slide transitions under reduced motion while allowing pagination', async () => {
+  it('disables slide transitions under reduced motion while allowing pagination', async () => {
     vi.useFakeTimers();
     vi.stubGlobal(
       'matchMedia',

@@ -236,7 +236,7 @@ Soft and tactile: generous radii, a physical press, warm hover shifts. Use share
 
 ### Tonight Hero (signature)
 
-A carousel of cinematic backdrops fills the top of the Tonight view, vignetted into Shell Black, with a title logo when available and a large details target. Horizontal rails of poster cards sit beneath it. Every rail and shelf is finite and bounded: owned titles only, no looping, no autoplay, no infinite scroll, no auto-advancing. This is the one place the artwork is allowed to be large and loud. Keep the current rail contents and primary action behavior; visual cleanup does not change what titles are shown or what an action does. Automatic slide changes stop after interaction and are disabled for reduced motion.
+A carousel of cinematic backdrops fills the top of the Tonight view, vignetted into Shell Black, with a title logo when available and a large details target. Horizontal rails of poster cards sit beneath it. Every rail and shelf is finite and bounded: owned titles only, no looping, no autoplay, no infinite scroll, no auto-advancing. This is the one place the artwork is allowed to be large and loud. Keep the current rail contents and primary action behavior; visual cleanup does not change what titles are shown or what an action does. Slide changes are manual and bounded at the first and last titles.
 
 ### Motion
 

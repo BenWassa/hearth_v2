@@ -564,7 +564,6 @@ const TonightView = ({
                         hideScrollbar
                         showEdgeFade
                         railPaddingClassName="px-1"
-                        enableRewind
                         className="shrink-0"
                       />
                       {worldsAfter === row.key && worldsRail}

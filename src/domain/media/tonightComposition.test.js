@@ -185,16 +185,20 @@ describe('composeTonightRows skew and fallback', () => {
     const result = composeTonightRows(
       allocate({ comedy: 8, comfort: 4, visual: 1, unknown: 0 }),
     );
-    expect(result.rows.map((r) => r.key)).toEqual(['comedy', 'comfort']);
+    expect(result.rows.map((r) => r.key)).toEqual(['comfort', 'comedy']);
   });
 
-  it('keeps a visual-heavy library led by Spectacles', () => {
+  it('keeps Spectacles in fixed order in a visual-heavy library', () => {
     const result = composeTonightRows(
       allocate({ visual: 15, comfort: 3, comedy: 3 }),
     );
-    expect(result.rows[0].key).toBe('visual');
-    expect(result.rows[0].title).toBe('Spectacles');
-    expect(result.rows[0].items).toHaveLength(MAX_ROW_ITEMS);
+    expect(result.rows.map((row) => row.key)).toEqual([
+      'comfort',
+      'comedy',
+      'visual',
+    ]);
+    expect(result.rows[2].title).toBe('Spectacles');
+    expect(result.rows[2].items).toHaveLength(MAX_ROW_ITEMS);
     expectInvariants(result);
   });
 
@@ -233,11 +237,11 @@ describe('composeTonightRows skew and fallback', () => {
 describe('composeTonightRows ordering and determinism', () => {
   const counts = { comfort: 4, comedy: 4, focused: 4, visual: 4 };
 
-  it('orders equal-strength rows by count then default order', () => {
+  it('selects equal-strength rows by count then displays them in fixed order', () => {
     const result = composeTonightRows(
       allocate({ visual: 5, comfort: 3, comedy: 3 }),
     );
-    expect(result.rows.map((r) => r.key)).toEqual(['visual', 'comfort']);
+    expect(result.rows.map((r) => r.key)).toEqual(['comfort', 'visual']);
     const equal = composeTonightRows(allocate(counts));
     expect(equal.rows.map((r) => r.key)).toEqual([
       'comfort',
@@ -247,27 +251,57 @@ describe('composeTonightRows ordering and determinism', () => {
     ]);
   });
 
-  it('lets scoreItem change row order', () => {
+  it('keeps display order when scoreItem favors a later theme', () => {
     const scoreItem = (item) => (item.id.startsWith('visual') ? 10 : 1);
     const result = composeTonightRows(allocate(counts), { scoreItem });
-    expect(result.rows[0].key).toBe('visual');
+    expect(result.rows.map((row) => row.key)).toEqual([
+      'comfort',
+      'comedy',
+      'focused',
+      'visual',
+    ]);
   });
 
   it('chooses row slots by visible strength after the 12 card cap', () => {
-    // Whole-group sums would be comfort 20 vs comedy 18 (comfort first); the
-    // 8 hidden comfort cards must not count, so visible 12 vs 18 puts comedy first.
+    // Whole-group sums favor comfort (20 vs 18), but visible strength favors
+    // comedy (18 vs 12). Only comedy wins the unreserved small-tier slot.
     const allocated = {
       comfort: make('comfort', 20),
       comedy: make('comedy', 6),
+      classic: make('classic', 2),
     };
     const scoreItem = (item) => (item.id.startsWith('comfort') ? 1 : 3);
 
-    const result = composeTonightRows(allocated, { scoreItem });
+    const result = composeTonightRows(allocated, {
+      scoreItem,
+      eligibleCount: 12,
+    });
 
-    expect(result.rows.map((row) => row.key)).toEqual(['comedy', 'comfort']);
-    expect(result.rows.find((row) => row.key === 'comfort').items).toHaveLength(
-      12,
-    );
+    expect(result.rows.map((row) => row.key)).toEqual(['comedy', 'classic']);
+  });
+
+  it('displays all themes in fixed order regardless of activity and library skew', () => {
+    const expected = [
+      'comfort',
+      'comedy',
+      'quick',
+      'hooked',
+      'focused',
+      'visual',
+      'classic',
+    ];
+    for (const favored of expected) {
+      const counts = Object.fromEntries(
+        expected.map((key) => [key, key === favored ? 30 : 3]),
+      );
+      for (const scoreItem of [
+        () => 0,
+        (item) => (item.id.startsWith(favored) ? 100 : 1),
+      ]) {
+        const result = composeTonightRows(allocate(counts), { scoreItem });
+        expect(result.rows.map((row) => row.key)).toEqual(expected);
+      }
+    }
   });
 
   it('sorts items inside a row by score before the seeded order', () => {
@@ -341,7 +375,7 @@ describe('stableOrder', () => {
 });
 
 describe('approved row slots', () => {
-  it('reserves Classics by displacing the weakest mood, with Quick Bites extra and ranked by strength', () => {
+  it('reserves Classics by displacing the weakest mood, with Quick Bites extra and displayed in fixed order', () => {
     const result = composeTonightRows(
       allocate({
         comfort: 4,
@@ -362,9 +396,9 @@ describe('approved row slots', () => {
       },
     );
     expect(result.rows.map((r) => r.key)).toEqual([
-      'quick',
       'comfort',
       'comedy',
+      'quick',
       'hooked',
       'focused',
       'classic',

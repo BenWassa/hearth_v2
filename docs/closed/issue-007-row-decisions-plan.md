@@ -64,13 +64,15 @@ Implemented the approved extra Quick Bites slot, guaranteed qualifying Classics 
 
 With six mood themes, the lead agent decided to raise the 13–30 tier from 4 to 5 mood/fallback rows and the 31+ tier from 5 to 6. The cap is a tunable UX parameter, awaiting owner confirmation. The 1–5 compact tier, 6–12 limit of 2 mood/fallback rows, all minimums, 12-card cap, guaranteed qualifying Classics slot and extra Quick Bites row remain unchanged.
 
-The 30-title demo renders these rows in strength order:
+Selected thematic rows keep the fixed display order: Easy & Comforting, Need a Laugh, Quick Bites, Get Hooked, Deep Dives, Spectacles, The Classics. Strength only decides which rows appear when more themes qualify than the tier allows; it does not reorder displayed rows. Also on the shelf stays last, and Tonight's picks stays alone for compact libraries.
+
+The 30-title demo renders these rows in fixed order:
 
 | Row               | Count |
 | ----------------- | ----: |
 | Easy & Comforting |     7 |
-| Spectacles        |     5 |
+| Need a Laugh      |     3 |
 | Quick Bites       |     4 |
 | Deep Dives        |     4 |
+| Spectacles        |     5 |
 | The Classics      |     4 |
-| Need a Laugh      |     3 |

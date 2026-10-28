@@ -184,11 +184,11 @@ describe('TonightView thematic rows', () => {
       ]),
     ).toEqual([
       ['Easy & Comforting', 7],
-      ['Spectacles', 5],
+      ['Need a Laugh', 3],
       ['Quick Bites', 4],
       ['Deep Dives', 4],
+      ['Spectacles', 5],
       ['The Classics', 4],
-      ['Need a Laugh', 3],
     ]);
     const ids = sections.flatMap((section) =>
       [...section.querySelectorAll('[data-item-id]')].map((node) =>

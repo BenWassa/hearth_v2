@@ -2,12 +2,23 @@
 // allocateTonightThemes (each canonical title in exactly one array) and returns
 // the bounded, ordered rows the page should render. No React, no I/O.
 
-// Default tie-break order, also the order rows are considered.
+// Selection tie-break and allocation traversal order (preserves item ordering).
 const THEME_ORDER = [
   'comfort',
   'comedy',
   'hooked',
   'quick',
+  'focused',
+  'visual',
+  'classic',
+];
+
+// Display order is independent of strength, size and selection tie-breaks.
+const DISPLAY_ORDER = [
+  'comfort',
+  'comedy',
+  'quick',
+  'hooked',
   'focused',
   'visual',
   'classic',
@@ -125,6 +136,9 @@ const publicRow = ({ key, title, items }) => ({ key, title, items });
  *
  * Tiers (TONIGHT_TIERS): 0 -> empty; 1-5 -> one compact mixed row; 6-12 -> up to
  * 2 rows of >=2; 13-30 -> up to 5 rows of >=3; 31+ -> up to 6 rows of >=3.
+ * Strength (then size and selection tie-break order) selects rows when the tier
+ * is full; it never controls display order. Selected themes always display as
+ * comfort, comedy, quick, hooked, focused, visual, classic; fallback stays last.
  * Quick Bites is an extra optional row; qualifying Classics always gets a mood slot.
  * Thematic rows below the tier minimum are merged with `unknown` titles into
  * one fallback row, shown only if it meets the minimum and a slot is free.
@@ -196,7 +210,9 @@ export const composeTonightRows = (
   if (classic && !rows.includes(classic)) rows[rows.length - 1] = classic;
   const quick = themed.find((row) => row.key === 'quick');
   if (quick) rows.push(quick);
-  rows.sort(byStrength);
+  rows.sort(
+    (a, b) => DISPLAY_ORDER.indexOf(a.key) - DISPLAY_ORDER.indexOf(b.key),
+  );
   if (
     rows.filter((row) => row.key !== 'quick').length < tier.maxRows &&
     fallbackPool.length >= tier.minItems

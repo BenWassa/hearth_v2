@@ -14,7 +14,7 @@ import {
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { createRequestPacer } from '../services/mediaApi/requestPacer.js';
 import { buildMetadataAuditReport as buildSharedMetadataAuditReport } from '../domain/media/metadata.js';
-import { initializeFirebase } from '../services/firebase/client.js';
+import { initializeFirebase } from '../services/firebase/authClient.js';
 import { logMetadataAuditSummary } from '../app/metadataAuditConsole.js';
 import { useViewHistory } from '../app/useViewHistory.js';
 import {

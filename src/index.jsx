@@ -1,14 +1,15 @@
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App, { AppLoadingScreen } from './App';
+import { AppLoadingScreen } from './App';
 import { isTemplateMode } from './app/useConfiguredAppState.js';
 
-// Template mode (and its seed library JSON) is a separate chunk, only fetched
-// when the demo/template flag is set.
-const TemplateApp = isTemplateMode
-  ? lazy(() => import('./template/TemplateApp.jsx'))
-  : null;
+// Only the selected route is loaded; Firebase stays outside the shell.
+const App = lazy(() =>
+  isTemplateMode
+    ? import('./template/TemplateApp.jsx')
+    : import('./app/FirebaseApp.jsx'),
+);
 
 if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
   window.__vite_import_meta_env__ = import.meta.env || {};
@@ -16,13 +17,9 @@ if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {TemplateApp ? (
-      <Suspense fallback={<AppLoadingScreen />}>
-        <TemplateApp />
-      </Suspense>
-    ) : (
+    <Suspense fallback={<AppLoadingScreen />}>
       <App />
-    )}
+    </Suspense>
   </React.StrictMode>,
 );
 

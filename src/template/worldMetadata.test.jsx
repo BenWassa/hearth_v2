@@ -9,7 +9,7 @@ vi.mock('./seedLibrary.js', () => ({
   TEMPLATE_SPACE_ID: 'synthetic-template',
   TEMPLATE_SPACE_NAME: 'Synthetic',
 }));
-vi.mock('../services/firebase/client.js', () => ({
+vi.mock('../services/firebase/authClient.js', () => ({
   initializeFirebase: (onReady) => onReady?.({ auth: null, db: null }),
 }));
 vi.mock('../services/firebase/auth.js', () => ({

@@ -435,7 +435,9 @@ export const useAppState = () => {
   }, [user, db, spaceId]);
 
   const [loading, setLoading] = useState(true);
-  const { view, setView, goBack } = useViewHistory(getInitialView);
+  const { view, setView, goBack } = useViewHistory(getInitialView, {
+    canRestore: authResolved ? Boolean(user) : undefined,
+  });
   const [decisionResult, setDecisionResult] = useState(null);
   const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);

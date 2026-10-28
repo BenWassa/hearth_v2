@@ -8,17 +8,34 @@ let latest;
 let root;
 let container;
 
-function Harness({ initialView = 'tonight' }) {
-  latest = useViewHistory(initialView);
-  return null;
+function Harness({
+  initialView = 'tonight',
+  canRestore,
+  deferRestore = false,
+}) {
+  latest = useViewHistory(
+    initialView,
+    deferRestore ? { canRestore } : undefined,
+  );
+  return <div data-testid="view">{latest.view}</div>;
 }
 
-const renderHarness = (initialView = 'tonight') => {
+const renderHarness = (
+  initialView = 'tonight',
+  canRestore,
+  deferRestore = false,
+) => {
   container = document.createElement('div');
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root.render(<Harness initialView={initialView} />);
+    root.render(
+      <Harness
+        initialView={initialView}
+        canRestore={canRestore}
+        deferRestore={deferRestore}
+      />,
+    );
   });
 };
 
@@ -214,6 +231,48 @@ describe('useViewHistory', () => {
     expect(currentEntry()).toEqual({ view: 'tonight', depth: 0 });
   });
 
+  it('never renders a restored Shelf entry after auth resolves signed out', async () => {
+    window.history.replaceState(buildHistoryState(null, 'tonight', 0), '');
+    window.history.pushState(buildHistoryState(null, 'shelf', 1), '');
+
+    renderHarness('tonight', undefined, true);
+    expect(container.querySelector('[data-testid="view"]').textContent).toBe(
+      'tonight',
+    );
+
+    act(() =>
+      root.render(
+        <Harness initialView="tonight" canRestore={false} deferRestore />,
+      ),
+    );
+
+    expect(container.querySelector('[data-testid="view"]').textContent).toBe(
+      'onboarding',
+    );
+    expect(latest.view).toBe('onboarding');
+    expect(currentEntry()).toEqual({ view: 'onboarding', depth: 0 });
+    await traverse(() => window.history.back());
+    expect(latest.view).toBe('onboarding');
+  });
+
+  it('applies a restored entry after auth resolves signed in', () => {
+    window.history.replaceState(buildHistoryState(null, 'tonight', 0), '');
+    window.history.pushState(buildHistoryState(null, 'shelf', 1), '');
+
+    renderHarness('tonight', undefined, true);
+    expect(latest.view).toBe('tonight');
+
+    act(() =>
+      root.render(<Harness initialView="tonight" canRestore deferRestore />),
+    );
+
+    expect(container.querySelector('[data-testid="view"]').textContent).toBe(
+      'shelf',
+    );
+    expect(latest.view).toBe('shelf');
+    expect(currentEntry()).toEqual({ view: 'shelf', depth: 1 });
+  });
+
   it('sign-out from a pushed screen leaves no navigable Hearth entry', async () => {
     // A stale authenticated entry sits before the baseline.
     window.history.replaceState(buildHistoryState(null, 'tonight', 0), '');
@@ -253,10 +312,12 @@ describe('useViewHistory', () => {
     window.history.replaceState(buildHistoryState(null, 'tonight', 0), '');
     window.history.pushState(buildHistoryState(null, 'shelf', 1), '');
 
-    renderHarness('onboarding');
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    });
+    renderHarness('tonight', undefined, true);
+    act(() =>
+      root.render(
+        <Harness initialView="tonight" canRestore={false} deferRestore />,
+      ),
+    );
 
     expect(latest.view).toBe('onboarding');
     expect(currentEntry()).toEqual({ view: 'onboarding', depth: 0 });

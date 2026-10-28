@@ -25,7 +25,8 @@ const PENDING_ROOT_TIMEOUT_MS = 1000;
 const rootViewFor = (view) =>
   view === 'onboarding' ? 'onboarding' : 'tonight';
 
-export const useViewHistory = (initialView) => {
+export const useViewHistory = (initialView, options) => {
+  const canRestore = options ? options.canRestore : true;
   const [view, setReactView] = useState(() => resolveInitialView(initialView));
   const viewRef = useRef(view);
   const depthRef = useRef(0);
@@ -35,6 +36,9 @@ export const useViewHistory = (initialView) => {
   const queuedViewRef = useRef(null);
   const pendingTimerRef = useRef(null);
   const setViewRef = useRef(null);
+  const initializedRef = useRef(false);
+  const canRestoreRef = useRef(canRestore);
+  canRestoreRef.current = canRestore;
 
   const commitView = useCallback((nextView) => {
     viewRef.current = nextView;
@@ -99,36 +103,46 @@ export const useViewHistory = (initialView) => {
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
-    const restoredEntry = readHistoryEntry(window.history.state);
-    if (restoredEntry) {
-      depthRef.current = restoredEntry.depth;
-      if (
-        viewRef.current === 'onboarding' &&
-        restoredEntry.view !== 'onboarding'
-      ) {
-        // Signed-out start: never surface an authenticated screen from a
-        // previous session's history entry.
-        collapseToRoot('onboarding');
-      } else {
-        commitView(restoredEntry.view);
-      }
-    } else {
-      const initial = viewRef.current;
-      const rootView = rootViewFor(initial);
-
-      window.history.replaceState(
-        buildHistoryState(window.history.state, rootView, 0),
-        '',
-      );
-      depthRef.current = 0;
-
-      if (initial !== rootView) {
-        window.history.pushState(
-          buildHistoryState(window.history.state, initial, 1),
+    // Do not apply a browser-restored authenticated route until the app has
+    // resolved authentication. The visible initial screen can remain mounted
+    // while this gate is closed.
+    if (typeof canRestore === 'boolean' && !initializedRef.current) {
+      const restoredEntry = readHistoryEntry(window.history.state);
+      if (!canRestore) {
+        // Authentication has resolved signed out. Replace any stale
+        // authenticated route with a single Onboarding baseline.
+        depthRef.current = 0;
+        window.history.replaceState(
+          buildHistoryState(window.history.state, 'onboarding', 0),
           '',
         );
-        depthRef.current = 1;
+        commitView('onboarding');
+      } else if (restoredEntry) {
+        depthRef.current = restoredEntry.depth;
+        if (restoredEntry.view !== 'onboarding') {
+          commitView(restoredEntry.view);
+        } else if (restoredEntry.view === 'onboarding') {
+          commitView('onboarding');
+        }
+      } else {
+        const initial = viewRef.current;
+        const rootView = rootViewFor(initial);
+
+        window.history.replaceState(
+          buildHistoryState(window.history.state, rootView, 0),
+          '',
+        );
+        depthRef.current = 0;
+
+        if (initial !== rootView) {
+          window.history.pushState(
+            buildHistoryState(window.history.state, initial, 1),
+            '',
+          );
+          depthRef.current = 1;
+        }
       }
+      initializedRef.current = true;
     }
 
     const handlePopState = (event) => {
@@ -148,6 +162,12 @@ export const useViewHistory = (initialView) => {
       }
 
       // Signed out: a stale/forward entry must not reveal another screen.
+      if (canRestoreRef.current === false && entry.view !== 'onboarding') {
+        depthRef.current = entry.depth;
+        collapseToRoot('onboarding');
+        return;
+      }
+
       if (viewRef.current === 'onboarding' && entry.view !== 'onboarding') {
         depthRef.current = entry.depth;
         collapseToRoot('onboarding');
@@ -163,7 +183,7 @@ export const useViewHistory = (initialView) => {
       window.removeEventListener('popstate', handlePopState);
       clearPendingTimer();
     };
-  }, [clearPendingTimer, collapseToRoot, commitView, finalizeRoot]);
+  }, [canRestore, clearPendingTimer, collapseToRoot, commitView, finalizeRoot]);
 
   const setView = useCallback(
     (nextValue) => {

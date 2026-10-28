@@ -268,3 +268,83 @@ it('bounds persistence concurrency and sends only batch identities', async () =>
     vi.unstubAllGlobals();
   }
 });
+
+it('isolates whole-batch 429 and timeout failures with persisted 15-minute retries and a three-attempt cap', async () => {
+  vi.useFakeTimers();
+  const startedAt = Date.now();
+  const titles = Array.from({ length: 21 }, (_, index) => ({
+    ...item,
+    source: { provider: 'tmdb', providerId: String(index + 1) },
+  }));
+  const store = storage();
+  const onResult = vi.fn();
+  const fetchMock = vi.fn(async (_url, options) => {
+    const { items } = JSON.parse(options.body);
+    if (items.some(({ id }) => Number(id) <= 10)) {
+      return {
+        ok: false,
+        status: 429,
+        json: async () => ({ ok: false, error: { code: 'RATE_LIMITED' } }),
+      };
+    }
+    if (items.some(({ id }) => Number(id) <= 20)) {
+      throw new DOMException('Request timed out', 'TimeoutError');
+    }
+    return {
+      ok: true,
+      json: async () => ({
+        ok: true,
+        data: items.map(({ id, type }) => ({
+          id,
+          type,
+          ok: true,
+          data: { ...result, key: `tmdb:movie:${id}` },
+        })),
+      }),
+    };
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  const stop = startClassificationBackfill({
+    getItems: () => titles,
+    getToken: async () => 'stub',
+    onResult,
+    storage: store,
+  });
+  const state = (id) =>
+    JSON.parse(store.getItem(`hearth:classification:default:tmdb:movie:${id}`));
+  try {
+    await vi.advanceTimersByTimeAsync(3400);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(onResult).toHaveBeenCalledOnce();
+    expect(onResult.mock.calls[0][0]).toBe(titles[20]);
+    for (let id = 1; id <= 20; id++) {
+      expect(state(id)).toMatchObject({
+        completed: false,
+        version: 'viewing-1',
+        retryAt: startedAt + (id <= 10 ? 1000 : 2200) + 15 * 60000,
+      });
+      expect(typeof state(id).signature).toBe('string');
+    }
+    expect(state(21).completed).toBe(true);
+    await vi.advanceTimersByTimeAsync(15 * 60000 - 3401);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    await vi.advanceTimersByTimeAsync(60 * 60000);
+    const attempts = new Map();
+    for (const [url, options] of fetchMock.mock.calls) {
+      expect(url).toBe('/api/media/classify-batch');
+      for (const { id } of JSON.parse(options.body).items)
+        attempts.set(id, (attempts.get(id) || 0) + 1);
+    }
+    for (let id = 1; id <= 20; id++) {
+      expect(attempts.get(String(id))).toBe(3);
+      expect(state(id).completed).toBe(false);
+      expect(state(id).retryAt).toBeGreaterThan(startedAt + 30 * 60000);
+    }
+    expect(attempts.get('21')).toBe(1);
+    expect(onResult).toHaveBeenCalledOnce();
+  } finally {
+    stop();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  }
+});

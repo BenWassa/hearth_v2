@@ -121,6 +121,36 @@ describe('automatic viewing classification', () => {
       ),
     ).toThrow();
   });
+  it('keeps classification independent of Tonight placement and library mix', () => {
+    const item = movie({
+      runtimeMinutes: 22,
+      keywords: ['heartwarming', 'sitcom', 'visually stunning'],
+    });
+    item.media = {
+      classification: classifyMedia(item),
+      classificationOverride: { attributes: { comfort: 'unknown' } },
+    };
+    const baseline = structuredClone(classifyMedia(item));
+    const effective = structuredClone(getEffectiveClassification(item));
+    const assertUnchanged = () => {
+      expect(classifyMedia(item)).toEqual(baseline);
+      expect(getEffectiveClassification(item)).toEqual(effective);
+    };
+    expect(allocateTonightThemes([item]).quick).toEqual([item]);
+    assertUnchanged();
+    expect(
+      allocateTonightThemes([movie({ providerId: '99' }), item], {
+        quickBites: false,
+      }).visual,
+    ).toContain(item);
+    assertUnchanged();
+    expect(
+      Object.values(
+        allocateTonightThemes([{ ...item, id: 'first' }, item]),
+      ).flat(),
+    ).not.toContain(item);
+    assertUnchanged();
+  });
   it('preserves manual/imported/unknown-origin tags and progress through v2 normalization', () => {
     const input = {
       schemaVersion: 2,

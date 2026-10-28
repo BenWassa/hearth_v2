@@ -2,6 +2,41 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { vi } from 'vitest';
 import AddView from './AddView';
+import { useAppState } from '../app/useAppState.js';
+import {
+  subscribeWatchlist,
+  addWatchlistItem,
+} from '../services/firebase/watchlist.js';
+
+vi.mock('../services/firebase/client.js', () => ({
+  getAppId: () => 'test',
+  initializeFirebase: (onReady) => {
+    const client = { auth: { app: {} }, db: {} };
+    onReady(client);
+    return client;
+  },
+}));
+vi.mock('../config/access.js', () => ({ isWhitelistedUid: () => true }));
+vi.mock('../services/firebase/auth.js', () => ({
+  subscribeToAuth: (_auth, callback) => {
+    callback({ uid: 'test' });
+    return () => {};
+  },
+  isAnonymousAuthUser: () => false,
+  signInUser: vi.fn(),
+  signInWithGoogle: vi.fn(),
+  signOutUser: vi.fn(),
+}));
+vi.mock('../services/firebase/watchlist.js');
+vi.mock('../services/firebase/spaces.js', () => ({
+  fetchUserSpaces: async () => [],
+  fetchSpace: async () => ({ name: 'Test' }),
+  joinSpace: vi.fn(),
+  createOrJoinSpaceByName: vi.fn(),
+}));
+vi.mock('../services/mediaApi/classificationQueue.js', () => ({
+  startClassificationBackfill: () => () => {},
+}));
 import { useMediaSearch } from './hooks/useMediaSearch';
 import { getMediaDetails } from '../services/mediaApi/client';
 
@@ -140,6 +175,128 @@ describe('AddView integration', () => {
     expect(mounted.container.textContent).not.toContain('Energy');
 
     await cleanupDom(mounted);
+  });
+
+  it.each([
+    { source: { provider: 'TMDB', providerId: 123 } },
+    { mediaId: 'tmdb:123' },
+  ])('marks and disables an owned result by identity: %j', async (owned) => {
+    const result = makeSearchResult('123', 'Spirited Away');
+    useMediaSearch.mockReturnValue(
+      makeSearchState({ results: [result], hasQuery: true }),
+    );
+    getMediaDetails.mockResolvedValue(result);
+    const onSubmit = vi.fn();
+    const mounted = await renderIntoDom(
+      <AddView items={[owned]} onSubmit={onSubmit} />,
+    );
+    const resultButton = [...mounted.container.querySelectorAll('button')].find(
+      (button) => button.textContent.includes(result.title),
+    );
+    expect(resultButton.textContent).toContain('On your shelf');
+    await act(async () => {
+      resultButton.click();
+    });
+    const note = mounted.container.querySelector('#add-owned-note');
+    expect(note.textContent).toBe('This title is already on your shelf.');
+    const submit = [...mounted.container.querySelectorAll('button')].find(
+      (button) => button.textContent === 'On your shelf',
+    );
+    expect(submit.disabled).toBe(true);
+    expect(submit.getAttribute('aria-describedby')).toBe(note.id);
+    await act(async () => {
+      submit.click();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    await cleanupDom(mounted);
+  });
+
+  it.each(['A different title', 'Spirited Away'])(
+    'adds an unowned identity with title %s',
+    async (title) => {
+      const result = makeSearchResult('456', title);
+      useMediaSearch.mockReturnValue(
+        makeSearchState({ results: [result], hasQuery: true }),
+      );
+      getMediaDetails.mockResolvedValue(result);
+      const onSubmit = vi.fn();
+      const mounted = await renderIntoDom(
+        <AddView
+          items={[
+            {
+              source: { provider: 'tmdb', providerId: '123' },
+              title: 'Spirited Away',
+            },
+          ]}
+          onSubmit={onSubmit}
+        />,
+      );
+      await act(async () => {
+        [...mounted.container.querySelectorAll('button')]
+          .find((button) => button.textContent.includes(title))
+          .click();
+      });
+      // The mocked search state supplies results without typing into the input.
+      await act(async () => {
+        const input = mounted.container.querySelector('input');
+        Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value',
+        ).set.call(input, title);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await act(async () => {
+        [...mounted.container.querySelectorAll('button')]
+          .find((button) => button.textContent.includes(title))
+          .click();
+      });
+      const submit = [...mounted.container.querySelectorAll('button')].find(
+        (button) => button.textContent === 'Add to Shelf',
+      );
+      expect(submit.disabled).toBe(false);
+      await act(async () => {
+        submit.click();
+      });
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+      expect(onSubmit.mock.calls[0][0].source.providerId).toBe('456');
+      await cleanupDom(mounted);
+    },
+  );
+
+  it('keeps the save-time guard when view feedback has a stale shelf', async () => {
+    localStorage.setItem('hearth_space_id', 'test-space');
+    subscribeWatchlist.mockImplementation(({ onNext }) => {
+      onNext({
+        docs: [
+          {
+            id: 'owned',
+            data: () => ({
+              source: { provider: 'tmdb', providerId: '123' },
+              title: 'Spirited Away',
+              type: 'movie',
+            }),
+          },
+        ],
+      });
+      return () => {};
+    });
+    addWatchlistItem.mockClear();
+    let state;
+    const Harness = () => {
+      state = useAppState();
+      return null;
+    };
+    const mounted = await renderIntoDom(<Harness />);
+    await act(async () => {
+      await state.handleAddItem({
+        source: { provider: 'tmdb', providerId: '123' },
+        media: { type: 'movie', title: 'Spirited Away' },
+      });
+    });
+    expect(addWatchlistItem).not.toHaveBeenCalled();
+    expect(JSON.stringify(state)).toContain('already on your shelf');
+    await cleanupDom(mounted);
+    localStorage.clear();
   });
 
   it('renders all loaded search results in the scroll list', async () => {

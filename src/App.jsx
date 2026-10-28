@@ -253,6 +253,7 @@ export function HearthAppView({ appState }) {
 
           {view === 'add' && (
             <AddView
+              items={items}
               onBack={goBack}
               onSubmit={handleAddItem}
               allowManualEntry={isTemplateMode}

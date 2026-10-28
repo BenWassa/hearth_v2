@@ -6,6 +6,8 @@ import { useAppState } from './app/useAppState.js';
 import { lazyWithPrefetch, prefetchOnIdle } from './app/lazyWithPrefetch.js';
 import OnboardingView from './views/OnboardingView.jsx';
 import TonightView from './views/TonightView.jsx';
+import RecentlyRemovedNotice from './components/RecentlyRemovedNotice.jsx';
+import { isRecentlyRemovedNotice } from './app/recentlyRemovedNotice.js';
 
 // Non-first-paint views and modals ship as separate chunks. Tonight and the
 // shell stay eager. Chunks are prefetched on idle after first render so a tap
@@ -48,6 +50,9 @@ export function HearthAppView({ appState }) {
     errorMessage,
     handleAddItem,
     handleBulkDelete,
+    removedItems,
+    handleRestoreRemoved,
+    handlePurgeRemoved,
     handleCreateSpace,
     handleDeleteAll,
     handleDelete,
@@ -151,6 +156,14 @@ export function HearthAppView({ appState }) {
             {errorMessage}
           </div>
         )}
+        <RecentlyRemovedNotice
+          message={
+            !newVersionAvailable && isRecentlyRemovedNotice(updateMessage)
+              ? updateMessage
+              : ''
+          }
+          onDismiss={dismissUpdate}
+        />
         {newVersionAvailable ? (
           <div className="mx-4 mt-4 mb-2">
             <div className="bg-stone-900 border border-stone-700 rounded-lg p-4 shadow-lg">
@@ -186,7 +199,8 @@ export function HearthAppView({ appState }) {
             </div>
           </div>
         ) : (
-          updateMessage && (
+          updateMessage &&
+          !isRecentlyRemovedNotice(updateMessage) && (
             <div className="px-6 pt-2 text-xs text-stone-300">
               {updateMessage}
             </div>
@@ -238,7 +252,7 @@ export function HearthAppView({ appState }) {
         )}
 
         <Suspense fallback={null}>
-          {view === 'shelf' && (
+          {(view === 'shelf' || view === 'recently-removed') && (
             <ShelfView
               items={items}
               onAdd={() => setView('add')}
@@ -246,6 +260,11 @@ export function HearthAppView({ appState }) {
               onUpdate={handleUpdateItem}
               onDelete={handleDelete}
               onBulkDelete={handleBulkDelete}
+              showRemoved={view === 'recently-removed'}
+              onOpenRemoved={() => setView('recently-removed')}
+              removedItems={removedItems}
+              onRestoreRemoved={handleRestoreRemoved}
+              onPurgeRemoved={handlePurgeRemoved}
               isBulkDeleting={isBulkDeleting}
               onBack={goBack}
             />
@@ -253,6 +272,7 @@ export function HearthAppView({ appState }) {
 
           {view === 'add' && (
             <AddView
+              removedItems={removedItems}
               items={items}
               onBack={goBack}
               onSubmit={handleAddItem}

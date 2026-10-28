@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { APP_VERSION, BUILD_ID } from '../version';
+import { isRecentlyRemovedNotice } from './recentlyRemovedNotice.js';
 import { isProductionBuild } from '../utils/env.js';
 
 export const useVersionUpdates = () => {
@@ -25,9 +26,12 @@ export const useVersionUpdates = () => {
     (message) => {
       if (newVersionAvailable) return;
       setUpdateMessage(message);
-      setTimeout(() => {
-        setUpdateMessage((prev) => (prev === message ? '' : prev));
-      }, 3500);
+      setTimeout(
+        () => {
+          setUpdateMessage((prev) => (prev === message ? '' : prev));
+        },
+        isRecentlyRemovedNotice(message) ? 6000 : 3500,
+      );
     },
     [newVersionAvailable],
   );

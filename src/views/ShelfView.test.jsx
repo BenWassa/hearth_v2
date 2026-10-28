@@ -5,8 +5,10 @@ import ShelfView from './ShelfView.jsx';
 import { classifyMedia } from '../domain/media/classification.mjs';
 
 vi.mock('../components/cards/PosterCard.jsx', () => ({
-  default: ({ item }) => (
-    <div data-testid={`card-${item.id}`}>{item.title}</div>
+  default: ({ item, onSelect }) => (
+    <button data-testid={`card-${item.id}`} onClick={onSelect}>
+      {item.title}
+    </button>
   ),
 }));
 vi.mock('../components/ItemDetailsModal.jsx', () => ({ default: () => null }));
@@ -93,4 +95,80 @@ describe('ShelfView grouping', () => {
 
     await cleanupShelf(mounted);
   });
+});
+
+it('bulk removal copy, transient live status, selection clearing and Memories visibility', async () => {
+  vi.useFakeTimers();
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const root = createRoot(container);
+  const props = {
+    items: [{ id: 'one', title: 'One', type: 'movie', status: 'unwatched' }],
+    onBulkDelete: async () => [{ itemId: 'one', status: 'removed' }],
+    onOpenRemoved: vi.fn(),
+    onBack: vi.fn(),
+  };
+  const click = async (label) => {
+    const button = [...container.querySelectorAll('button')].find(
+      (el) => el.textContent.trim() === label,
+    );
+    expect(button, label).toBeTruthy();
+    await act(async () => button.click());
+  };
+  const remove = async () => {
+    await click('Select');
+    await act(async () =>
+      container.querySelector('[data-testid="card-one"]').click(),
+    );
+    await click('Delete');
+    expect(container.textContent).toContain('Remove Selected Titles?');
+    expect(container.textContent).toContain(
+      'You can restore them from Recently removed for 24 hours.',
+    );
+    expect(container.textContent).toContain('Cancel');
+    await click('Remove Selected');
+  };
+  try {
+    await act(async () => root.render(<ShelfView {...props} />));
+    const link = [...container.querySelectorAll('button')].find(
+      (el) => el.textContent.trim() === 'Recently removed',
+    );
+    expect(link.className).toContain('!pl-0');
+    await click('Recently removed');
+    expect(props.onOpenRemoved).toHaveBeenCalledOnce();
+    await remove();
+    const status = container.querySelector('[role="status"]');
+    expect(status.getAttribute('aria-live')).toBe('polite');
+    expect(status.className).toContain('min-h-8');
+    expect(status.textContent).toContain(
+      '1 title removed. Restore within 24 hours.',
+    );
+    await act(async () => vi.advanceTimersByTime(8000));
+    expect(status.textContent).toBe('');
+    await remove();
+    await click('Select');
+    expect(status.textContent).toBe('');
+    await click('Done');
+    await remove();
+    await act(async () =>
+      root.render(
+        <ShelfView
+          {...props}
+          showRemoved
+          removedItems={[{ id: 'one', title: 'One', removedAt: Date.now() }]}
+          onRestoreRemoved={async () => ({ status: 'restored' })}
+          onPurgeRemoved={async () => []}
+        />,
+      ),
+    );
+    await click('Restore');
+    await act(async () => root.render(<ShelfView {...props} />));
+    expect(container.querySelector('[role="status"]').textContent).toBe('');
+    await click('Memories');
+    expect(container.textContent).not.toContain('Recently removed');
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    vi.useRealTimers();
+  }
 });

@@ -7,6 +7,9 @@
     "apphosting": {
       "port": 5002,
       "rootDirectory": "."
+    },
+    "firestore": {
+      "port": 8181
     }
   }
 }

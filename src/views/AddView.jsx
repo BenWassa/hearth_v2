@@ -78,12 +78,12 @@ const SearchResultSkeleton = ({ count = 3 }) => (
   </>
 );
 
-const AddView = ({ onBack, onSubmit, items = [] }) => {
+const AddView = ({ onBack, onSubmit, items = [], removedItems = [] }) => {
   // Mirror the save guard: provider identity only, never title similarity.
-  const isOnShelf = (result) => {
+  const matchesResult = (result, entries) => {
     if (!result?.provider || !result?.providerId) return false;
     const mediaId = buildMediaId(result);
-    return items.some(
+    return entries.some(
       (item) =>
         item.mediaId === mediaId ||
         (String(item.source?.provider || '').toLowerCase() ===
@@ -91,6 +91,8 @@ const AddView = ({ onBack, onSubmit, items = [] }) => {
           String(item.source?.providerId || '') === String(result.providerId)),
     );
   };
+  const isOnShelf = (result) => matchesResult(result, items);
+  const isRecentlyRemoved = (result) => matchesResult(result, removedItems);
   const [searchQuery, setSearchQuery] = useState('');
   const [type, setType] = useState('movie');
   const [note, setNote] = useState('');
@@ -415,6 +417,12 @@ const AddView = ({ onBack, onSubmit, items = [] }) => {
                                     On your shelf
                                   </p>
                                 )}
+                                {!isOnShelf(result) &&
+                                  isRecentlyRemoved(result) && (
+                                    <p className="mt-1 text-sm text-stone-300">
+                                      In Recently removed, adding brings it back
+                                    </p>
+                                  )}
                                 {index === 0 || result.year ? (
                                   <div className="mt-1 text-label font-semibold uppercase tracking-[0.14em] text-stone-400">
                                     {[

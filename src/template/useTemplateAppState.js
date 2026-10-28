@@ -1,3 +1,11 @@
+import { isRecentlyRemovedNotice } from '../app/recentlyRemovedNotice.js';
+import { buildImportDedupeKey } from '../domain/import/importer.js';
+import {
+  isRemoved,
+  isExpired,
+  isPurgeable,
+  clearedRemovalMarkers,
+} from '../domain/watchlist/removal.js';
 import { tagProvenance } from '../domain/media/classification.mjs';
 import {
   getExplicitWorldMetadata,
@@ -461,7 +469,7 @@ const applyTemplateUpdates = (currentItem, updates) => {
 export const useTemplateAppState = () => {
   const [authResolved, setAuthResolved] = useState(false);
   const [authUser, setAuthUser] = useState(null);
-  const [items, setItems] = useState(() =>
+  const [allItems, setItems] = useState(() =>
     (new URLSearchParams(window.location.search).has('collectionsFixture')
       ? buildCollectionFixture({
           count: Number(
@@ -476,6 +484,45 @@ export const useTemplateAppState = () => {
       : buildTemplateSeedItems()
     ).map((item) => normalizeTemplateItem(item, item.id, item.createdAt)),
   );
+  const items = useMemo(
+    () => allItems.filter((item) => !isRemoved(item)),
+    [allItems],
+  );
+  const removedItems = useMemo(() => allItems.filter(isRemoved), [allItems]);
+  const handlePurgeRemoved = async () => {
+    const results = removedItems.map((item) => ({
+      itemId: item.id,
+      status: isPurgeable(item) ? 'purged' : 'skipped',
+    }));
+    setItems((current) => current.filter((item) => !isPurgeable(item)));
+    return results;
+  };
+  const handleRestoreRemoved = async (id) => {
+    const item = allItems.find((entry) => entry.id === id);
+    const status = !item
+      ? 'missing'
+      : !isRemoved(item)
+      ? 'conflict'
+      : isExpired(item)
+      ? 'expired'
+      : items.some(
+          (entry) => buildImportDedupeKey(entry) === buildImportDedupeKey(item),
+        )
+      ? 'conflict'
+      : 'restored';
+    if (status === 'restored')
+      setItems((current) =>
+        current.map((entry) =>
+          entry.id === id
+            ? {
+                ...entry,
+                ...clearedRemovalMarkers,
+              }
+            : entry,
+        ),
+      );
+    return { itemId: id, status };
+  };
   // The demo holds no private screens, so restored history is always allowed.
   const { view, setView, goBack } = useViewHistory('tonight');
   const [decisionResult, setDecisionResult] = useState(null);
@@ -565,7 +612,10 @@ export const useTemplateAppState = () => {
   const notifyUpdate = useCallback((message) => {
     setUpdateMessage(message);
     if (updateTimerRef.current) clearTimeout(updateTimerRef.current);
-    updateTimerRef.current = setTimeout(() => setUpdateMessage(''), 4000);
+    updateTimerRef.current = setTimeout(
+      () => setUpdateMessage(''),
+      isRecentlyRemovedNotice(message) ? 6000 : 4000,
+    );
   }, []);
 
   const createItemId = () => {
@@ -581,19 +631,31 @@ export const useTemplateAppState = () => {
       Date.now(),
     );
 
-    const duplicateExists = items.some((existing) => {
-      return (
-        asString(existing.title).toLowerCase() ===
-          asString(normalized.title).toLowerCase() &&
-        normalizeType(existing.type) === normalizeType(normalized.type) &&
-        asString(existing.year) === asString(normalized.year)
-      );
-    });
+    const equivalent = (entry) =>
+      buildImportDedupeKey(entry) === buildImportDedupeKey(normalized);
+    const duplicateExists = items.some(equivalent);
     if (duplicateExists) {
       notifyError('That title is already on your shelf.');
       return;
     }
 
+    const retained = removedItems.find(equivalent);
+    if (retained) {
+      const result = await handleRestoreRemoved(retained.id);
+      if (result.status === 'restored') {
+        if (!retained.note?.trim() && normalized.note?.trim())
+          setItems((current) =>
+            current.map((entry) =>
+              entry.id === retained.id
+                ? { ...entry, note: normalized.note }
+                : entry,
+            ),
+          );
+        setView('tonight');
+        notifyUpdate(`Brought back ${retained.title} from Recently removed.`);
+      } else notifyError('This title is no longer available to restore.');
+      return;
+    }
     setItems((current) => [normalized, ...current]);
     setView('tonight');
     notifyUpdate('Title added to shelf.');
@@ -752,7 +814,7 @@ export const useTemplateAppState = () => {
       !window.confirm(
         `Delete ${ids.length} item${
           ids.length === 1 ? '' : 's'
-        }? This cannot be undone.`,
+        }? You can restore them from Recently removed for 24 hours.`,
       )
     ) {
       return false;
@@ -760,8 +822,24 @@ export const useTemplateAppState = () => {
     setIsBulkDeleting(true);
     try {
       const idSet = new Set(ids);
-      setItems((current) => current.filter((item) => !idSet.has(item.id)));
-      return true;
+      const removedAt = Date.now();
+      setItems((current) =>
+        current.map((item) =>
+          idSet.has(item.id) && !isRemoved(item)
+            ? {
+                ...item,
+                removedAt,
+                removedBy: 'demo',
+              }
+            : item,
+        ),
+      );
+      return ids.map((itemId) => ({
+        itemId,
+        status: items.some((item) => item.id === itemId)
+          ? 'removed'
+          : 'missing',
+      }));
     } finally {
       setIsBulkDeleting(false);
     }
@@ -826,6 +904,9 @@ export const useTemplateAppState = () => {
     errorMessage,
     handleAddItem,
     handleBulkDelete,
+    removedItems,
+    handleRestoreRemoved,
+    handlePurgeRemoved,
     handleCreateSpace: async () => {},
     handleDeleteAll,
     handleDelete,

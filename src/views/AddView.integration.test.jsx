@@ -90,6 +90,29 @@ describe('AddView integration', () => {
     getMediaDetails.mockReset();
   });
 
+  it('hints that adding a removed title brings it back before selecting', async () => {
+    const result = makeSearchResult('123');
+    useMediaSearch.mockReturnValue(
+      makeSearchState({ results: [result], hasQuery: true }),
+    );
+    const mounted = await renderIntoDom(
+      <AddView
+        items={[]}
+        removedItems={[
+          {
+            mediaId: 'tmdb:movie:123',
+            source: { provider: 'tmdb', providerId: '123' },
+          },
+        ]}
+      />,
+    );
+    expect(mounted.container.textContent).toContain(
+      'In Recently removed, adding brings it back',
+    );
+    expect(getMediaDetails).not.toHaveBeenCalled();
+    await cleanupDom(mounted);
+  });
+
   it('submits enriched v2 payload when a search result is selected', async () => {
     useMediaSearch.mockReturnValue(
       makeSearchState({
@@ -262,6 +285,44 @@ describe('AddView integration', () => {
       await cleanupDom(mounted);
     },
   );
+
+  it('returns to Tonight with a named message after re-adding a removed title', async () => {
+    localStorage.setItem('hearth_space_id', 'test-space');
+    subscribeWatchlist.mockImplementation(({ onNext, onRemoved }) => {
+      onNext({ docs: [] });
+      onRemoved?.([
+        {
+          id: 'tmdb:movie:123',
+          title: 'Spirited Away',
+          removedAt: Date.now(),
+          source: { provider: 'tmdb', providerId: '123' },
+        },
+      ]);
+      return () => {};
+    });
+    addWatchlistItem.mockResolvedValue({ status: 'restored' });
+    let state;
+    function Harness() {
+      state = useAppState();
+      return null;
+    }
+    const mounted = await renderIntoDom(<Harness />);
+    await act(async () => state.setView('add'));
+    await act(async () =>
+      state.handleAddItem({
+        source: { provider: 'tmdb', providerId: '123' },
+        media: { type: 'movie', title: 'Spirited Away' },
+        note: 'Our note',
+      }),
+    );
+    expect(state.view).toBe('tonight');
+    expect(state.updateMessage).toBe(
+      'Brought back Spirited Away from Recently removed.',
+    );
+    expect(addWatchlistItem.mock.calls.at(-1)[0].payload.note).toBe('Our note');
+    await cleanupDom(mounted);
+    localStorage.clear();
+  });
 
   it('keeps the save-time guard when view feedback has a stale shelf', async () => {
     localStorage.setItem('hearth_space_id', 'test-space');

@@ -1,4 +1,11 @@
 import {
+  isRemoved,
+  isExpired,
+  isPurgeable,
+  clearedRemovalMarkers,
+  perTitle,
+} from '../../domain/watchlist/removal.js';
+import {
   canonicalMediaKey,
   tagProvenance,
 } from '../../domain/media/classification.mjs';
@@ -7,6 +14,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   runTransaction,
@@ -337,46 +345,67 @@ const isCatalogUpdateKey = (key) =>
   key.startsWith('showData.') ||
   Object.prototype.hasOwnProperty.call(CATALOG_PATH_ALIASES, key);
 
-export const subscribeWatchlist = ({ db, appId, spaceId, onNext, onError }) => {
+export const subscribeWatchlist = ({
+  db,
+  appId,
+  spaceId,
+  onNext,
+  onError,
+  onRemoved,
+}) => {
   const q = query(
     collection(db, 'artifacts', appId, 'spaces', spaceId, 'watchlist_items'),
   );
   let snapshotGeneration = 0;
-  return onSnapshot(
+  const unsubscribe = onSnapshot(
     q,
     (snapshot) => {
       const generation = snapshotGeneration + 1;
       snapshotGeneration = generation;
       Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const watchData = docSnap.data();
-          const mediaId = asString(watchData.mediaId || docSnap.id);
-          let catalogData = {};
-          if (mediaId) {
-            try {
-              const catalogSnapshot = await getDoc(
-                getCatalogDocRef(db, appId, mediaId),
-              );
-              if (catalogSnapshot.exists()) {
-                catalogData = catalogSnapshot.data();
+        snapshot.docs
+          .filter(
+            (entry) => !isRemoved(entry.data({ serverTimestamps: 'estimate' })),
+          )
+          .map(async (docSnap) => {
+            const watchData = docSnap.data({ serverTimestamps: 'estimate' });
+            const mediaId = asString(watchData.mediaId || docSnap.id);
+            let catalogData = {};
+            if (mediaId) {
+              try {
+                const catalogSnapshot = await getDoc(
+                  getCatalogDocRef(db, appId, mediaId),
+                );
+                if (catalogSnapshot.exists()) {
+                  catalogData = catalogSnapshot.data();
+                }
+              } catch (err) {
+                console.warn('Failed to load catalog data for watchlist item', {
+                  mediaId,
+                  err,
+                });
               }
-            } catch (err) {
-              console.warn('Failed to load catalog data for watchlist item', {
-                mediaId,
-                err,
-              });
             }
-          }
-          const merged = mergeWatchlistWithCatalog(watchData, catalogData);
-          return {
-            id: docSnap.id,
-            data: () => merged,
-          };
-        }),
+            const merged = mergeWatchlistWithCatalog(watchData, catalogData);
+            return {
+              id: docSnap.id,
+              data: () => merged,
+            };
+          }),
       )
         .then((docs) => {
           if (generation !== snapshotGeneration) return;
           onNext({ docs });
+          const removed = snapshot.docs
+            .filter((entry) =>
+              isRemoved(entry.data({ serverTimestamps: 'estimate' })),
+            )
+            .map((entry) => ({
+              id: entry.id,
+              ...entry.data({ serverTimestamps: 'estimate' }).removedItem,
+              ...entry.data({ serverTimestamps: 'estimate' }),
+            }));
+          if (onRemoved) onRemoved(removed);
         })
         .catch((err) => {
           if (onError) onError(err);
@@ -384,6 +413,10 @@ export const subscribeWatchlist = ({ db, appId, spaceId, onNext, onError }) => {
     },
     onError,
   );
+  return () => {
+    snapshotGeneration += 1;
+    unsubscribe();
+  };
 };
 
 export const addWatchlistItem = async ({ db, appId, spaceId, payload }) => {
@@ -391,11 +424,32 @@ export const addWatchlistItem = async ({ db, appId, spaceId, payload }) => {
   const watchRef = getWatchlistDocRef(db, appId, spaceId, mediaId);
   const mediaRef = getCatalogDocRef(db, appId, mediaId);
 
-  const batch = writeBatch(db);
-  batch.set(mediaRef, buildCatalogPayload(payload, mediaId), { merge: true });
-  batch.set(watchRef, buildWatchlistPayload(payload, mediaId));
-  await batch.commit();
-  return watchRef;
+  const status = await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(watchRef);
+    const current = snapshot.data();
+    if (snapshot.exists() && isRemoved(current)) {
+      if (isExpired(current)) throw new Error('Restore window has expired');
+      const updates = { ...clearedRemovalMarkers };
+      const retainedNote = current.userState?.note || current.note;
+      if (
+        payload.additionOrigin === 'manual' &&
+        !retainedNote?.trim() &&
+        payload.note?.trim()
+      ) {
+        updates.note = payload.note;
+        updates['userState.note'] = payload.note;
+      }
+      transaction.update(watchRef, updates);
+      return 'restored';
+    }
+    if (snapshot.exists()) return 'exists';
+    transaction.set(mediaRef, buildCatalogPayload(payload, mediaId), {
+      merge: true,
+    });
+    transaction.set(watchRef, buildWatchlistPayload(payload, mediaId));
+    return 'added';
+  });
+  return { id: mediaId, status };
 };
 
 export const updateWatchlistStatus = async ({
@@ -543,18 +597,78 @@ export const deleteWatchlistItem = async ({ db, appId, spaceId, itemId }) => {
   return deleteDoc(getWatchlistDocRef(db, appId, spaceId, itemId));
 };
 
+// Retain permanent deletion for the separate space-wipe path.
 export const bulkDeleteWatchlistItems = async ({
   db,
   appId,
   spaceId,
   itemIds,
-}) => {
-  return Promise.all(
+}) =>
+  Promise.all(
     itemIds.map((itemId) =>
       deleteDoc(getWatchlistDocRef(db, appId, spaceId, itemId)),
     ),
   );
-};
+
+export const removeWatchlistItems = ({
+  db,
+  appId,
+  spaceId,
+  itemIds,
+  removedBy,
+}) =>
+  perTitle(itemIds, (itemId) =>
+    runTransaction(db, async (transaction) => {
+      const ref = getWatchlistDocRef(db, appId, spaceId, itemId);
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) return 'missing';
+      const current = snapshot.data();
+      if (isRemoved(current)) return 'conflict';
+      const catalog = await transaction.get(
+        getCatalogDocRef(db, appId, current.mediaId || itemId),
+      );
+      transaction.update(ref, {
+        removedAt: serverTimestamp(),
+        removedBy,
+        removedItem: mergeWatchlistWithCatalog(
+          current,
+          catalog.exists() ? catalog.data() : {},
+        ),
+      });
+      return 'removed';
+    }),
+  );
+
+export const restoreWatchlistItems = ({ db, appId, spaceId, itemIds }) =>
+  perTitle(itemIds, (itemId) =>
+    runTransaction(db, async (transaction) => {
+      const ref = getWatchlistDocRef(db, appId, spaceId, itemId);
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) return 'missing';
+      const current = snapshot.data();
+      if (!isRemoved(current)) return 'conflict';
+      if (isExpired(current)) return 'expired';
+      transaction.update(ref, clearedRemovalMarkers);
+      return 'restored';
+    }),
+  );
+
+export const purgeRemovedWatchlistItems = ({ db, appId, spaceId, itemIds }) =>
+  perTitle(itemIds, (itemId) =>
+    runTransaction(db, async (transaction) => {
+      const ref = getWatchlistDocRef(db, appId, spaceId, itemId);
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) return 'missing';
+      if (
+        snapshot.metadata?.hasPendingWrites ||
+        !snapshot.data()?.removedAt ||
+        !isPurgeable(snapshot.data())
+      )
+        return 'skipped';
+      transaction.delete(ref);
+      return 'purged';
+    }),
+  );
 
 // Conditional, facet-only enrichment. update() interprets field paths correctly
 // and never advances the household activity timestamp or overwrites progress.
@@ -572,5 +686,17 @@ export const persistCatalogClassification = async ({
     const existing = current.media?.classification;
     if (existing?.classifiedAt >= classification.classifiedAt) return;
     transaction.update(ref, { 'media.classification': classification });
+  });
+};
+
+export const wipeWatchlist = async ({ db, appId, spaceId }) => {
+  const snapshot = await getDocs(
+    collection(db, 'artifacts', appId, 'spaces', spaceId, 'watchlist_items'),
+  );
+  return bulkDeleteWatchlistItems({
+    db,
+    appId,
+    spaceId,
+    itemIds: snapshot.docs.map((entry) => entry.id),
   });
 };

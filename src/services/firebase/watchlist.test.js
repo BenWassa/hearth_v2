@@ -1,6 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const runTransactionMock = vi.fn();
+beforeEach(() => {
+  runTransactionMock.mockImplementation(async (_db, action) => {
+    const batch = writeBatchMock();
+    return action({
+      get: async () => ({ exists: () => false, data: () => undefined }),
+      set: (...args) => batch.set(...args),
+    });
+  });
+});
 const onSnapshotMock = vi.fn();
 const getDocMock = vi.fn();
 const writeBatchMock = vi.fn();
@@ -15,6 +24,7 @@ vi.mock('firebase/firestore', () => ({
   deleteDoc: vi.fn(),
   doc: docMock,
   getDoc: getDocMock,
+  getDocs: vi.fn(),
   onSnapshot: onSnapshotMock,
   query: queryMock,
   serverTimestamp: serverTimestampMock,
@@ -150,7 +160,7 @@ describe('addWatchlistItem', () => {
     vi.clearAllMocks();
   });
 
-  it('overwrites the watchlist document instead of merge-writing stale progress back in', async () => {
+  it('creates a fresh watchlist document inside a transaction', async () => {
     const set = vi.fn();
     const commit = vi.fn().mockResolvedValue(undefined);
     writeBatchMock.mockReturnValue({ set, commit });
@@ -172,7 +182,7 @@ describe('addWatchlistItem', () => {
     expect(set).toHaveBeenCalledTimes(2);
     expect(set.mock.calls[0][2]).toEqual({ merge: true });
     expect(set.mock.calls[1][2]).toBeUndefined();
-    expect(commit).toHaveBeenCalledTimes(1);
+    expect(commit).not.toHaveBeenCalled();
   });
 
   it('persists collection metadata in the catalog document', async () => {
@@ -479,4 +489,238 @@ describe('persistCatalogClassification', () => {
     });
     expect(set.mock.calls[0][1].media).not.toHaveProperty('classification');
   });
+});
+
+describe('Recently removed', () => {
+  let records;
+  let catalog;
+  let transaction;
+  const args = { db: 'db', appId: 'app', spaceId: 'space' };
+  beforeEach(() => {
+    vi.clearAllMocks();
+    records = new Map([
+      [
+        'one',
+        {
+          mediaId: 'one',
+          title: 'One',
+          status: 'watching',
+          userState: { note: 'Keep this', episodeProgress: { 1: [1, 2] } },
+        },
+      ],
+      ['two', { mediaId: 'two', title: 'Two' }],
+    ]);
+    catalog = {
+      media: { title: 'One', classification: { primary: 'comfort' } },
+    };
+    serverTimestampMock.mockImplementation(() => Date.now());
+    transaction = {
+      get: vi.fn(async (ref) => {
+        const id = ref.args.at(-1);
+        if (id === 'failure') throw new Error('offline');
+        const data = ref.args.includes('media_catalog')
+          ? catalog
+          : records.get(id);
+        return { exists: () => Boolean(data), data: () => data };
+      }),
+      update: vi.fn((ref, updates) =>
+        records.set(ref.args.at(-1), {
+          ...records.get(ref.args.at(-1)),
+          ...updates,
+        }),
+      ),
+      delete: vi.fn((ref) => records.delete(ref.args.at(-1))),
+    };
+    runTransactionMock.mockImplementation(async (_db, action) =>
+      action(transaction),
+    );
+  });
+  it('removes and restores intact household data with per-title failures', async () => {
+    const { removeWatchlistItems, restoreWatchlistItems } = await loadModule();
+    const original = structuredClone(records.get('one'));
+    const results = await removeWatchlistItems({
+      ...args,
+      itemIds: ['one', 'failure', 'two'],
+      removedBy: 'member-a',
+    });
+    expect(results.map((entry) => entry.status)).toEqual([
+      'removed',
+      'failed',
+      'removed',
+    ]);
+    expect(records.get('one').removedBy).toBe('member-a');
+    expect(records.get('one').userState).toEqual(original.userState);
+    expect(await restoreWatchlistItems({ ...args, itemIds: ['one'] })).toEqual([
+      { itemId: 'one', status: 'restored' },
+    ]);
+    expect(records.get('one')).toMatchObject({ ...original, removedAt: null });
+  });
+  it('preserves changed household data and rejects missing or expired titles', async () => {
+    const { removeWatchlistItems, restoreWatchlistItems } = await loadModule();
+    await removeWatchlistItems({
+      ...args,
+      itemIds: ['one', 'two'],
+      removedBy: 'a',
+    });
+    records.get('one').userState.note = 'Newer note';
+    records.get('two').removedAt = Date.now() - 24 * 60 * 60 * 1000;
+    transaction.update.mockClear();
+    expect(
+      (
+        await restoreWatchlistItems({
+          ...args,
+          itemIds: ['one', 'two', 'missing'],
+        })
+      ).map((entry) => entry.status),
+    ).toEqual(['restored', 'expired', 'missing']);
+    expect(transaction.update).toHaveBeenCalledTimes(1);
+    expect(records.get('one').userState.note).toBe('Newer note');
+  });
+  it('ignores newer catalog changes, including classification', async () => {
+    const { removeWatchlistItems, restoreWatchlistItems } = await loadModule();
+    await removeWatchlistItems({ ...args, itemIds: ['one'], removedBy: 'a' });
+    catalog.media.classification = { primary: 'spectacle' };
+    expect(
+      (await restoreWatchlistItems({ ...args, itemIds: ['one'] }))[0].status,
+    ).toBe('restored');
+  });
+  it('purges only expired markers and tolerates partial failure and another member purging', async () => {
+    const { removeWatchlistItems, purgeRemovedWatchlistItems } =
+      await loadModule();
+    await removeWatchlistItems({
+      ...args,
+      itemIds: ['one', 'two'],
+      removedBy: 'a',
+    });
+    records.get('one').removedAt = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    expect(
+      (
+        await purgeRemovedWatchlistItems({
+          ...args,
+          itemIds: ['one', 'two', 'failure'],
+        })
+      ).map((entry) => entry.status),
+    ).toEqual(['purged', 'skipped', 'failed']);
+    expect(records.has('one')).toBe(false);
+    expect(
+      (await purgeRemovedWatchlistItems({ ...args, itemIds: ['one'] }))[0]
+        .status,
+    ).toBe('missing');
+    records.get('two').removedAt = null;
+    expect(
+      (await purgeRemovedWatchlistItems({ ...args, itemIds: ['two'] }))[0]
+        .status,
+    ).toBe('skipped');
+  });
+  it.each(['', '   ', 'Keep this'])(
+    'manual re-add fills only an empty retained note (%s)',
+    async (note) => {
+      const { removeWatchlistItems, addWatchlistItem } = await loadModule();
+      records.get('one').userState.note = note;
+      await removeWatchlistItems({ ...args, itemIds: ['one'], removedBy: 'a' });
+      await addWatchlistItem({
+        ...args,
+        payload: { mediaId: 'one', additionOrigin: 'manual', note: 'New note' },
+      });
+      const updates = transaction.update.mock.calls.at(-1)[1];
+      if (note.trim()) expect(updates).not.toHaveProperty('userState.note');
+      else {
+        expect(updates.note).toBe('New note');
+        expect(updates['userState.note']).toBe('New note');
+      }
+    },
+  );
+  it.each(['manual', 'import'])(
+    're-add %s restores current household state',
+    async (additionOrigin) => {
+      const { removeWatchlistItems, addWatchlistItem } = await loadModule();
+      await removeWatchlistItems({ ...args, itemIds: ['one'], removedBy: 'a' });
+      records.get('one').addedBy = 'original';
+      records.get('one').userState.note = 'Current note';
+      transaction.update.mockClear();
+      const result = await addWatchlistItem({
+        ...args,
+        payload: {
+          mediaId: 'one',
+          title: 'Replacement',
+          additionOrigin,
+          addedBy: 'other',
+        },
+      });
+      expect(result.status).toBe('restored');
+      expect(records.get('one')).toMatchObject({
+        title: 'One',
+        addedBy: 'original',
+        userState: { note: 'Current note' },
+        removedAt: null,
+      });
+      expect(transaction.update.mock.calls[0][1]).not.toHaveProperty(
+        'userState',
+      );
+    },
+  );
+  it('does not purge before seven days or when timestamp is pending', async () => {
+    const { purgeRemovedWatchlistItems } = await loadModule();
+    records.get('one').removedAt = Date.now() - 6 * 86400000;
+    expect(
+      (await purgeRemovedWatchlistItems({ ...args, itemIds: ['one'] }))[0]
+        .status,
+    ).toBe('skipped');
+    transaction.get.mockResolvedValueOnce({
+      exists: () => true,
+      data: () => ({ removedAt: Date.now() - 8 * 86400000 }),
+      metadata: { hasPendingWrites: true },
+    });
+    expect(
+      (await purgeRemovedWatchlistItems({ ...args, itemIds: ['one'] }))[0]
+        .status,
+    ).toBe('skipped');
+    expect(transaction.delete).not.toHaveBeenCalled();
+  });
+  it('excludes removed and expired titles at the shared subscription boundary before catalog reads', async () => {
+    let handler;
+    onSnapshotMock.mockImplementation((_query, next) => {
+      handler = next;
+      return vi.fn();
+    });
+    getDocMock.mockResolvedValue({ exists: () => true, data: () => catalog });
+    const { subscribeWatchlist } = await loadModule();
+    const onNext = vi.fn();
+    const onRemoved = vi.fn();
+    subscribeWatchlist({ ...args, onNext, onRemoved });
+    handler({
+      docs: [
+        { id: 'active', data: () => ({ mediaId: 'active' }) },
+        {
+          id: 'removed',
+          data: () => ({
+            removedAt: Date.now(),
+            removedItem: { title: 'Removed' },
+          }),
+        },
+        { id: 'expired', data: () => ({ removedAt: 1 }) },
+      ],
+    });
+    await vi.waitFor(() => expect(onNext).toHaveBeenCalled());
+    expect(onNext.mock.calls[0][0].docs.map((entry) => entry.id)).toEqual([
+      'active',
+    ]);
+    expect(getDocMock).toHaveBeenCalledTimes(1);
+    expect(onRemoved.mock.calls[0][0].map((entry) => entry.id)).toEqual([
+      'removed',
+      'expired',
+    ]);
+  });
+});
+
+it('wipe enumerates and deletes active and removed documents', async () => {
+  const firestore = await import('firebase/firestore');
+  firestore.getDocs.mockResolvedValue({
+    docs: [{ id: 'active' }, { id: 'removed' }],
+  });
+  const { wipeWatchlist } = await loadModule();
+  await wipeWatchlist({ db: 'db', appId: 'app', spaceId: 'space' });
+  expect(
+    firestore.deleteDoc.mock.calls.slice(-2).map(([ref]) => ref.args.at(-1)),
+  ).toEqual(['active', 'removed']);
 });

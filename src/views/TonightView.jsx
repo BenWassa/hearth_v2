@@ -112,8 +112,8 @@ const ROW_CONFIG = {
   unknown: DEFAULT_ROW_CONFIG,
 };
 
-// Local-date seed (YYYYMMDD, changes at local midnight) so row order is stable
-// within a day and only varies between days.
+// Local-date seed (YYYYMMDD, changes at local midnight) for equal-score item
+// ordering within rows. Thematic row display order stays fixed.
 const getLocalDateSeed = (date = new Date()) =>
   String(
     date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate(),

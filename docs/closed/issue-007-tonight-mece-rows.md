@@ -119,7 +119,7 @@ Suggested pure pipeline (exact signatures subject to implementation):
 3. `scorePrimaryCategories(item, attributes)`: one suitability score per candidate; no irreversible `if/else` relying solely on genre.
 4. `assignPrimaryCategory(item, scored)`: return one primary category (or explicitly internal `other/unknown`). Manual user vibe/energy metadata should remain meaningful, not overwritten.
 5. `buildRowCandidates(assignments, secondaryAttributes)`: if Quick Bites activated, reserve eligible items once; score each item within its primary category.
-6. `selectTonightRows(candidates, recentActions, constraints)`: choose visible category set and order, preserving distinctness and variety.
+6. `selectTonightRows(candidates, recentActions, constraints)`: choose the visible category set, preserving fixed display order, distinctness and variety.
 7. `allocateUniqueCards(rows)`: maintain a global set of canonical title IDs (including duplicate provider IDs when needed), cap each visible row, and ensure no card is placed twice.
 8. Presentation consumes a row model; `TonightView.jsx` should not own all category-domain rules.
 
@@ -143,7 +143,7 @@ Candidate row utility can account for (a) number of good matches, (b) category-f
 
 Allow `Currently Watching` to lead when active; do not mix `watching` series into unwatched thematic rails. `Coming Soon` remains informational, not a primary mood. Coordinate Collections placement with #6 so feature/index navigation doesn't overwhelm selection.
 
-Stable ordering: keep the row arrangement and item order stable during active session/day unless the user changes relevant watchlist state. Any date-seeded shuffle should only break otherwise equal relevance.
+Selected thematic rows keep the fixed display order: Easy & Comforting, Need a Laugh, Quick Bites, Get Hooked, Deep Dives, Spectacles, The Classics. Strength only decides which rows appear when more themes qualify than the tier allows; it does not reorder displayed rows. Also on the shelf stays last, and Tonight's picks stays alone for compact libraries. Item order stays stable during an active session/day unless the user changes relevant watchlist state. Any date-seeded shuffle should only break otherwise equal relevance.
 
 ## Scenario test matrix
 
@@ -206,7 +206,7 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 Implemented on `codex/tonight-fixes` for draft PR #26, including all owner-approved decisions in [the investigation and plan](issue-007-row-decisions-plan.md).
 
 - Tonight consumes `allocateTonightThemes` -> `composeTonightRows`, with unique canonical placements, activity scoring and deterministic daily ties.
-- Compact libraries (1–5) show "Tonight's picks". The existing mood caps (2 for 6–12, 4 for 13–30, 5 for 31+) and tier minimums remain. Quick Bites is extra when it meets the minimum, ordered with moods by strength. Qualifying Classics displaces the weakest mood if needed. Every row remains capped at 12 cards.
+- Compact libraries (1–5) show "Tonight's picks". The existing mood caps (2 for 6–12, 4 for 13–30, 5 for 31+) and tier minimums remain. Quick Bites is extra when it meets the minimum, displayed in fixed thematic order. Qualifying Classics displaces the weakest mood if needed. Every row remains capped at 12 cards.
 - Need a Laugh accepts a bounded weak signal only with unknown comedyFirst, a non-automatic easy/comfort vibe and first-listed raw Comedy genre. Known facets retain their meaning. Honest demo keywords exercise deterministic classification; classifier and version remain unchanged.
 - Get Hooked requires high plot momentum and known low/medium complexity and attention. High complexity or attention stays in Deep Dives. Easy & Comforting is unchanged; no Unwind row.
 - Classic TV qualifies through intentional legacy classic tags or curatedClassic overrides, never age alone.

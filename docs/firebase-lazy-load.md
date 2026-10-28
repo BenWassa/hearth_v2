@@ -37,11 +37,15 @@ After:
 
 ## Import graph verification
 
-Parsed emitted JS using es-module-lexer. The entry's entire static dependency closure contains no Firebase. The template route's static dependency closure includes Auth/common Firebase and no Firestore; ?demo=1 selects only this route. Template seed data still costs ~1.18 MB raw and remains outside the initial shell. Browser requests and real persisted sessions could not be exercised in this sandbox.
+Browser QA of the earlier build found that the demo still fetched FirebaseApp and Firestore (241,933 bytes). Its static closure alone did not prove request isolation: both dynamic imports shared one lazy callback, and Vite combined their preload dependencies. The route condition now selects between two separate lazy callbacks, preserving the selected component and Suspense fallback.
+
+Rebuilt with the six synthetic FIREBASE_* values above. Inspected the emitted entry `index-Cc7l-z1k.js` and resolved each import call's own `__vite__mapDeps` indices against its filename table. The template list contains neither FirebaseApp nor vendor-firebase-firestore; the real-app list contains FirebaseApp, Firestore, Auth and common Firebase. The shared filename table still contains both routes, but only the selected call's indices are preloaded. This is emitted-code verification; browser network timing and persisted sessions were not re-tested.
+
+Parsed static imports recursively with es-module-lexer. The shell static closure contains no Firebase. The template static closure contains Auth/common Firebase and excludes FirebaseApp/Firestore. Template seed data remains outside the initial shell.
 
 Shell static closure:
 
-- index-Ds59fyA3.js
+- index-Cc7l-z1k.js
 - rolldown-runtime-DF2fYuay.js
 - vendor-react-4g-36B_S.js
 - vendor-lucide-DVVIXEFy.js
@@ -49,17 +53,46 @@ Shell static closure:
 
 Template static closure:
 
-- TemplateApp-IvE97IEp.js
+- TemplateApp-iR8Q7kWW.js
 - rolldown-runtime-DF2fYuay.js
 - vendor-react-4g-36B_S.js
 - constants-DHbmz1Rv.js
 - vendor-lucide-DVVIXEFy.js
-- index-Ds59fyA3.js
+- index-Cc7l-z1k.js
 - metadata-Cn2lvJRh.js
 - requestPacer-Buzs1RNQ.js
 - vendor-firebase-BLd9QWpj.js
 - vendor-firebase-auth-CMtNxf_6.js
 - client-CjJIsJ75.js
+
+Template preload list (`__vite__mapDeps([19, 1, 20, 21, 3, 22, 5, 2, 6, 8])`):
+
+- TemplateApp-iR8Q7kWW.js
+- rolldown-runtime-DF2fYuay.js
+- vendor-firebase-BLd9QWpj.js
+- vendor-firebase-auth-CMtNxf_6.js
+- vendor-react-4g-36B_S.js
+- requestPacer-Buzs1RNQ.js
+- constants-DHbmz1Rv.js
+- vendor-lucide-DVVIXEFy.js
+- metadata-Cn2lvJRh.js
+- client-CjJIsJ75.js
+
+Real-app preload list (`__vite__mapDeps([23, 1, 20, 24, 21, 3, 22, 5, 2, 17, 6, 8, 7])`):
+
+- FirebaseApp-CRUK3KeC.js
+- rolldown-runtime-DF2fYuay.js
+- vendor-firebase-BLd9QWpj.js
+- vendor-firebase-firestore-B5VzRZmk.js
+- vendor-firebase-auth-CMtNxf_6.js
+- vendor-react-4g-36B_S.js
+- requestPacer-Buzs1RNQ.js
+- constants-DHbmz1Rv.js
+- vendor-lucide-DVVIXEFy.js
+- importer-Cy6ohQMS.js
+- metadata-Cn2lvJRh.js
+- client-CjJIsJ75.js
+- showData-CtzykTe5.js
 
 ## Before: every emitted JS/CSS chunk
 
@@ -87,7 +120,7 @@ Template static closure:
 | vendor-lucide-DVVIXEFy.js | 8443 | 3189 |
 | vendor-react-4g-36B_S.js | 139883 | 44790 |
 
-## After: every emitted JS/CSS chunk
+## Earlier build: every emitted JS/CSS chunk (before preload correction)
 
 | Chunk | Raw bytes | Gzip bytes |
 |---|---:|---:|

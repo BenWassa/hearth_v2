@@ -5,11 +5,9 @@ import { AppLoadingScreen } from './App';
 import { isTemplateMode } from './app/useConfiguredAppState.js';
 
 // Only the selected route is loaded; Firebase stays outside the shell.
-const App = lazy(() =>
-  isTemplateMode
-    ? import('./template/TemplateApp.jsx')
-    : import('./app/FirebaseApp.jsx'),
-);
+const App = isTemplateMode
+  ? lazy(() => import('./template/TemplateApp.jsx'))
+  : lazy(() => import('./app/FirebaseApp.jsx'));
 
 if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
   window.__vite_import_meta_env__ = import.meta.env || {};

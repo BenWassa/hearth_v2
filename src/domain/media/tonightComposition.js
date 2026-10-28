@@ -130,7 +130,8 @@ const publicRow = ({ key, title, items }) => ({ key, title, items });
  * @param {number} [options.eligibleCount] Eligible unwatched titles; picks the
  *   size tier. Defaults to the number of distinct titles in `allocated`.
  * @param {(item: object) => number} [options.scoreItem] Utility per title;
- *   drives row strength and in-row order. Defaults to 0 (all equal).
+ *   drives row strength and in-row order. Defaults to 0 (all equal), as used
+ *   by Tonight so items follow only the daily seeded shuffle.
  * @param {string} [options.sessionSeed] Breaks ties between equal scores only.
  * @returns {{ rows: {key: string, title: string, items: object[]}[], isEmpty: boolean }}
  *

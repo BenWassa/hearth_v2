@@ -1,4 +1,4 @@
-# Issue #7 — Tonight: MECE thematic rows and activity-aware selection
+# Issue #7 — Tonight: MECE thematic rows and daily shuffled titles
 
 - **Status:** Closed 2026-10-28 — delivered via #26; mood-row cap of 5/6 awaits owner confirmation.
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/7
@@ -143,7 +143,7 @@ Candidate row utility can account for (a) number of good matches, (b) category-f
 
 Allow `Currently Watching` to lead when active; do not mix `watching` series into unwatched thematic rails. `Coming Soon` remains informational, not a primary mood. Coordinate Collections placement with #6 so feature/index navigation doesn't overwhelm selection.
 
-Selected thematic rows keep the fixed display order: Easy & Comforting, Need a Laugh, Quick Bites, Get Hooked, Deep Dives, Spectacles, The Classics. Strength only decides which rows appear when more themes qualify than the tier allows; it does not reorder displayed rows. Also on the shelf stays last, and Tonight's picks stays alone for compact libraries. Item order stays stable during an active session/day unless the user changes relevant watchlist state. Any date-seeded shuffle should only break otherwise equal relevance.
+Selected thematic rows keep the fixed display order: Easy & Comforting, Need a Laugh, Quick Bites, Get Hooked, Deep Dives, Spectacles, The Classics. Strength only decides which rows appear when more themes qualify than the tier allows; it does not reorder displayed rows. Also on the shelf stays last, and Tonight's picks stays alone for compact libraries. Item order stays stable during an active session/day unless the user changes relevant watchlist state. Within every row, titles use only the daily seeded shuffle (`stableOrder` with the session seed), without a recency or activity boost.
 
 ## Scenario test matrix
 
@@ -164,8 +164,8 @@ Selected thematic rows keep the fixed display order: Easy & Comforting, Need a L
 | Series episode variance | first ep 24m, next ep 55m                  | Quick Bites reflects next watchable episode                   |
 | Active TV               | 3 partially watched series                 | Currently Watching contains them, mood pool excludes          |
 | Completed TV            | all released episodes watched              | does not return to unwatched theme selection                  |
-| New addition            | one freshly deliberately added title       | moderate recency benefit; stable visible rows                 |
-| Edit-only               | metadata refresh or import timestamp churn | no false “recently watched” boost                             |
+| New addition            | one freshly deliberately added title       | daily seeded order; no recency benefit                        |
+| Edit-only               | metadata refresh or import timestamp churn | daily seeded order unchanged by timestamps                    |
 | Date change             | repeated open on same day / following day  | stable same-session; only controlled variation                |
 | Classic TV policy       | I Love Lucy, Twilight Zone                 | explicit, tested inclusion/exclusion policy                   |
 | User override           | customized vibe or energy                  | visible category change only when intended                    |
@@ -205,7 +205,7 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 
 Implemented on `codex/tonight-fixes` for draft PR #26, including all owner-approved decisions in [the investigation and plan](issue-007-row-decisions-plan.md).
 
-- Tonight consumes `allocateTonightThemes` -> `composeTonightRows`, with unique canonical placements, activity scoring and deterministic daily ties.
+- Tonight consumes `allocateTonightThemes` -> `composeTonightRows`, with unique canonical placements and daily seeded item ordering. The view uses equal scores; manual additions and watch timestamps do not boost titles.
 - Compact libraries (1–5) show "Tonight's picks". The existing mood caps (2 for 6–12, 4 for 13–30, 5 for 31+) and tier minimums remain. Quick Bites is extra when it meets the minimum, displayed in fixed thematic order. Qualifying Classics displaces the weakest mood if needed. Every row remains capped at 12 cards.
 - Need a Laugh accepts a bounded weak signal only with unknown comedyFirst, a non-automatic easy/comfort vibe and first-listed raw Comedy genre. Known facets retain their meaning. Honest demo keywords exercise deterministic classification; classifier and version remain unchanged.
 - Get Hooked requires high plot momentum and known low/medium complexity and attention. High complexity or attention stays in Deep Dives. Easy & Comforting is unchanged; no Unwind row.
@@ -213,3 +213,7 @@ Implemented on `codex/tonight-fixes` for draft PR #26, including all owner-appro
 - Quick Bites keeps the 30-minute threshold and excludes started shows from all mood rows. Undersized themes and unknown titles fold into "Also on the shelf" when a fallback slot is available.
 - Hero, Currently Watching, Coming Soon, Worlds and Collections retain their roles. Hero may repeat a rail title because it is navigation.
 - Regression tests cover approved slots, classification boundaries, classic TV, Shelf grouping, demo composition and unique placements. Final product/user validation remains separate from this implementation.
+
+## Daily shuffle restoration (2026-10-28)
+
+PR #26 introduced activity weighting that the owner did not request. Removed the activity-score wiring and unused module. Titles in every composed row now follow `stableOrder` with the local-date session seed only. Row selection rules, fixed display order, tiers, caps and classification remain unchanged. Earlier activity-aware proposals above are historical, not current ordering policy.

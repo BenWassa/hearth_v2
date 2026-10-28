@@ -2,6 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { vi } from 'vitest';
 import TonightView from './TonightView.jsx';
+import { stableOrder } from '../domain/media/tonightComposition.js';
 import { buildTemplateSeedItems } from '../template/seedLibrary.js';
 
 vi.mock('./components/tonight/HeroCarousel.jsx', () => ({
@@ -160,6 +161,34 @@ describe('TonightView thematic rows', () => {
     [
       ...container.querySelectorAll('[data-testid="suggestion-section"]'),
     ].filter((node) => node.getAttribute('data-title') !== CURRENTLY_WATCHING);
+
+  it('uses the daily shuffle even when a title was just manually added', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 9, 28, 12));
+    const items = Array.from({ length: 5 }, (_, index) => ({
+      id: `shuffle-${index}`,
+      title: `Shuffle ${index}`,
+      type: 'movie',
+      status: 'unwatched',
+      additionOrigin: 'manual',
+      createdAt: '2020-01-01',
+    }));
+    const expected = stableOrder(items, '20261028');
+    expected.at(-1).createdAt = new Date().toISOString();
+    const mounted = await renderTonight(items);
+    try {
+      const ids = () =>
+        [
+          ...thematicSections(mounted.container)[0].querySelectorAll(
+            '[data-item-id]',
+          ),
+        ].map((node) => node.dataset.itemId);
+      expect(ids()).toEqual(expected.map(({ id }) => id));
+    } finally {
+      await cleanupTonight(mounted);
+      vi.useRealTimers();
+    }
+  });
 
   it('renders the capped demo row set with substantial rails and no duplicates', async () => {
     const seed = buildTemplateSeedItems();

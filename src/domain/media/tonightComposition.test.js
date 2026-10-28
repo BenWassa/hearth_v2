@@ -280,7 +280,7 @@ describe('composeTonightRows ordering and determinism', () => {
     expect(result.rows.map((row) => row.key)).toEqual(['comedy', 'classic']);
   });
 
-  it('displays all themes in fixed order regardless of activity and library skew', () => {
+  it('displays all themes in fixed order regardless of optional scores and library skew', () => {
     const expected = [
       'comfort',
       'comedy',
@@ -302,6 +302,41 @@ describe('composeTonightRows ordering and determinism', () => {
         expect(result.rows.map((row) => row.key)).toEqual(expected);
       }
     }
+  });
+
+  it.each([
+    { comfort: 3, comedy: 2 },
+    { comfort: 15, comedy: 4, quick: 3, unknown: 3, visual: 1 },
+  ])('uses only seeded order by default in every row for %j', (counts) => {
+    const allocated = allocate(counts);
+    Object.values(allocated)
+      .flat()
+      .forEach((item, index) => {
+        item.additionOrigin = 'manual';
+        item.createdAt = index % 2 ? '2026-10-28' : '2020-01-01';
+        item.markedWatchedAt = '2026-10-28';
+      });
+    const a = composeTonightRows(allocated, { sessionSeed: '20261028' });
+    const b = composeTonightRows(allocated, { sessionSeed: '20261029' });
+    for (const row of a.rows) {
+      const pool =
+        row.key === 'mixed'
+          ? Object.values(allocated).flat()
+          : row.key === 'unknown'
+          ? [...allocated.unknown, ...allocated.visual]
+          : allocated[row.key];
+      expect(row.items).toEqual(stableOrder(pool, '20261028').slice(0, 12));
+      expect(b.rows.find(({ key }) => key === row.key).items).toEqual(
+        stableOrder(pool, '20261029').slice(0, 12),
+      );
+    }
+    expect(a).toEqual(
+      composeTonightRows(allocated, {
+        scoreItem: () => 0,
+        sessionSeed: '20261028',
+      }),
+    );
+    expect(b.rows).not.toEqual(a.rows);
   });
 
   it('sorts items inside a row by score before the seeded order', () => {

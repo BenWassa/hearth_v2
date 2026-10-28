@@ -1,3 +1,4 @@
+import { getEffectiveClassification } from './classification.mjs';
 import { buildTemplateSeedItems } from '../../template/seedLibrary.js';
 import { composeTonightRows } from './tonightComposition.js';
 import {
@@ -315,10 +316,22 @@ describe('Get Hooked', () => {
       ).toBe('focused');
     },
   );
-  it('requires known accessible demand and high momentum', () => {
-    expect(
-      primaryTheme(movie(72, override({ plotMomentum: 'high' }))),
-    ).not.toBe('hooked');
+  it('accepts rules-only high momentum with unknown complexity and demand', () => {
+    const item = movie(72, { keywords: ['heist'] });
+    const { attributes } = getEffectiveClassification(item);
+    expect(attributes.narrativeComplexity.value).toBe('unknown');
+    expect(attributes.attentionDemand.value).toBe('unknown');
+    expect(primaryTheme(item)).toBe('hooked');
+  });
+  it.each(['complex', 'graphic violence'])(
+    'keeps rules-only high momentum with %s in Deep Dives',
+    (keyword) => {
+      expect(primaryTheme(movie(72, { keywords: ['heist', keyword] }))).toBe(
+        'focused',
+      );
+    },
+  );
+  it('requires high momentum', () => {
     expect(
       primaryTheme(
         movie(
@@ -343,23 +356,37 @@ describe('Get Hooked', () => {
 });
 
 describe('realistic demo seed', () => {
-  it('offers comedy and preserves five substantial rows without duplicates', () => {
+  it('qualifies comedy and hooked while selecting five mood rows plus Quick Bites', () => {
     const items = buildTemplateSeedItems();
     const allocated = allocateTonightThemes(items, { now: NOW });
-    expect(allocated.comedy.length).toBeGreaterThan(0);
+    expect(items).toHaveLength(30);
+    expect(allocated.comedy).toHaveLength(3);
+    expect(allocated.hooked).toHaveLength(3);
+    expect(allocated.focused).toHaveLength(4);
+    const ids = Object.values(allocated)
+      .flat()
+      .map((item) => item.id);
+    expect(new Set(ids).size).toBe(30);
     expect(
       composeTonightRows(allocated)
         .rows.map((r) => r.key)
         .sort(),
-    ).toEqual(['classic', 'comfort', 'focused', 'quick', 'visual']);
+    ).toEqual(['classic', 'comedy', 'comfort', 'focused', 'quick', 'visual']);
     expect(Object.values(allocated).flat()).toHaveLength(30);
   });
   it.each([
     ['Paddington 2', 'comfort'],
     ['Legally Blonde', 'comedy'],
     ['School of Rock', 'comedy'],
-    ['Knives Out', 'focused'],
-    ['Only Murders in the Building', 'focused'],
+    ['Knives Out', 'hooked'],
+    ['Only Murders in the Building', 'hooked'],
+    ["Ocean's Eleven", 'hooked'],
+    ['The Grand Budapest Hotel', 'comedy'],
+    ['The Intern', 'comfort'],
+    ['Gone Girl', 'focused'],
+    ['The Dark Knight', 'focused'],
+    ['Stranger Things', 'focused'],
+    ['Severance', 'focused'],
   ])('%s has one plausible home', (title, theme) => {
     const item = buildTemplateSeedItems().find(
       (entry) => entry.title === title,

@@ -16,8 +16,8 @@ export const primaryTheme = (item) => {
   const { attributes: a } = getEffectiveClassification(item);
   const accessibleMomentum =
     a.plotMomentum.value === 'high' &&
-    ['low', 'medium'].includes(a.narrativeComplexity.value) &&
-    ['low', 'medium'].includes(a.attentionDemand.value);
+    a.narrativeComplexity.value !== 'high' &&
+    a.attentionDemand.value !== 'high';
   const scores = {
     hooked: accessibleMomentum ? 10 : 0,
     comfort: weight(a.comfort.value) * 2 - weight(a.attentionDemand.value),

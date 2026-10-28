@@ -1,6 +1,6 @@
 # Issue #7: why rows look wrong, and a plan for the open decisions
 
-- **Status:** Implemented on `codex/tonight-fixes` (draft PR #26). Owner approved all recommendations.
+- **Status:** Implemented on `codex/tonight-fixes` (draft PR #26). Owner approved the earlier recommendations; the updated mood-row caps are awaiting owner confirmation.
 - **Issue:** https://github.com/BenWassa/hearth_v2/issues/7 · **PR:** #26 (draft)
 - **Date:** 2026-10-27
 - **Method:** traced `primaryTheme` over the 30-title demo seed and over the 51 classification fixtures, once with the deterministic rules only (what production has today, Gemini is off) and once with the reviewed fixture labels (what a fully classified library would look like). Browser QA at 320, 390 and 448 px passed every assertion.
@@ -45,7 +45,7 @@ The 13 to 30 tier allows 4 rows. The demo produces five: Easy & Comforting (10),
 | **Classic TV**                  | Two demo shows are tagged classic by the household (I Love Lucy, The Twilight Zone) and currently fall into "More to Watch". The film-first rule was a default, not a decision.                                                                                                                                                                                             | **Allow classic TV when the household or maintainer marked it classic** (legacy vibe or curated flag). Do not infer classics from age.                                           |
 | **Mid-series Quick Bites**      | A started show already sits in Currently Watching. Letting it into Quick Bites would show it twice or pull it out of Currently Watching.                                                                                                                                                                                                                                    | **No.** Quick Bites stays unstarted shows and short films.                                                                                                                       |
 | **30 vs 35 minutes**            | The threshold is one named constant. 30 means "fits a half-hour slot" and keeps most sitcoms; 35 starts admitting dramedies.                                                                                                                                                                                                                                                | **Keep 30.** Revisit with real runtimes once more of the shelf has TMDB data.                                                                                                    |
-| **Tier boundaries**             | QA found no sparse rails and no overflow at 320, 390, 448. 1 to 5 titles gives one compact row, 6 to 12 up to 2 rows, 13 to 30 up to 4, 31+ up to 5.                                                                                                                                                                                                                        | **Keep**, with the slot change in Part 2.                                                                                                                                        |
+| **Tier boundaries**             | QA found no sparse rails and no overflow at 320, 390, 448. 1 to 5 titles gives one compact row, 6 to 12 up to 2 rows, 13 to 30 up to 5 mood/fallback rows, 31+ up to 6; Quick Bites is extra.                                                                                                                                                                               | **Keep boundaries and minimums; raise mood-row caps to 5 and 6**, with the slot change in Part 2.                                                                                |
 | **Hero repeating a rail title** | The hero draws from all unwatched titles, so a title can appear in the hero and a rail. This was already true before #26.                                                                                                                                                                                                                                                   | Keep as is (the hero is navigation, not a mood row); document it. Revisit only if it bothers you in use.                                                                         |
 | **Titles beyond 12 in a row**   | Rows are capped at 12; the rest stay on the Shelf.                                                                                                                                                                                                                                                                                                                          | Keep. It matches PRODUCT.md "calm, finite".                                                                                                                                      |
 
@@ -58,4 +58,19 @@ The 13 to 30 tier allows 4 rows. The demo produces five: Easy & Comforting (10),
 
 ## Implementation record (2026-10-27)
 
-Implemented the approved extra Quick Bites slot, guaranteed qualifying Classics slot, bounded first-genre comedy signal, honest demo keywords, Get Hooked theme, explicitly curated classic TV, and neutral fallback title "Also on the shelf". Easy & Comforting and Tonight's picks remain. Tiers, minimums, 12-card cap, deduplication, 30-minute threshold and exclusion of started shows remain. Get Hooked requires high momentum and known low/medium complexity and attention; unknown demand does not qualify. Hero may repeat a rail title because it remains navigation. Classifier and version are unchanged.
+Implemented the approved extra Quick Bites slot, guaranteed qualifying Classics slot, bounded first-genre comedy signal, honest demo keywords, Get Hooked theme, explicitly curated classic TV, and neutral fallback title "Also on the shelf". Easy & Comforting and Tonight's picks remain. Tier boundaries, minimums, 12-card cap, deduplication, 30-minute threshold and exclusion of started shows remain. Get Hooked requires high momentum with neither complexity nor attention high; unknown facets qualify as not-high. The demo now qualifies three Get Hooked and three Need a Laugh titles; the updated five-mood-row cap selects Easy & Comforting (7), Spectacles (5), Deep Dives (4), The Classics (4), and Need a Laugh (3), with Quick Bites (4) extra. Get Hooked (3) loses the equal-strength tie to Need a Laugh in the default theme order. Hero may repeat a rail title because it remains navigation. Classifier and version are unchanged.
+
+### Mood-row cap adjustment
+
+With six mood themes, the lead agent decided to raise the 13–30 tier from 4 to 5 mood/fallback rows and the 31+ tier from 5 to 6. The cap is a tunable UX parameter, awaiting owner confirmation. The 1–5 compact tier, 6–12 limit of 2 mood/fallback rows, all minimums, 12-card cap, guaranteed qualifying Classics slot and extra Quick Bites row remain unchanged.
+
+The 30-title demo renders these rows in strength order:
+
+| Row               | Count |
+| ----------------- | ----: |
+| Easy & Comforting |     7 |
+| Spectacles        |     5 |
+| Quick Bites       |     4 |
+| Deep Dives        |     4 |
+| The Classics      |     4 |
+| Need a Laugh      |     3 |

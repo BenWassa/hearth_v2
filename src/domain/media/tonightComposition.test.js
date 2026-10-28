@@ -7,7 +7,15 @@ import {
   TONIGHT_TIERS,
 } from './tonightComposition.js';
 
-const THEMES = ['comfort', 'comedy', 'quick', 'focused', 'visual', 'classic'];
+const THEMES = [
+  'comfort',
+  'comedy',
+  'hooked',
+  'quick',
+  'focused',
+  'visual',
+  'classic',
+];
 
 const make = (prefix, n) =>
   Array.from({ length: n }, (_, i) => ({ id: `${prefix}-${i}` }));
@@ -16,6 +24,7 @@ const allocate = (counts) => {
   const rows = {
     comfort: [],
     comedy: [],
+    hooked: [],
     quick: [],
     focused: [],
     visual: [],
@@ -28,7 +37,7 @@ const allocate = (counts) => {
   return rows;
 };
 
-// Spreads n titles round-robin over the six themes.
+// Spreads n titles round-robin over the six mood themes plus Quick Bites.
 const spread = (n) => {
   const counts = {};
   for (let i = 0; i < n; i += 1) {
@@ -75,7 +84,16 @@ describe('composeTonightRows sizes', () => {
   });
 
   it('shows up to 2 rows of >=2 for 12 titles', () => {
-    const result = composeTonightRows(spread(12));
+    const result = composeTonightRows(
+      allocate({
+        comfort: 2,
+        comedy: 2,
+        hooked: 2,
+        focused: 2,
+        visual: 2,
+        classic: 2,
+      }),
+    );
     expect(
       result.rows.filter((r) => r.key !== 'quick').length,
     ).toBeLessThanOrEqual(2);
@@ -83,29 +101,37 @@ describe('composeTonightRows sizes', () => {
     expectInvariants(result);
   });
 
-  it('shows up to 4 rows of >=3 for 30 titles', () => {
+  it('shows up to 5 rows of >=3 for 30 titles', () => {
     const result = composeTonightRows(
-      allocate({ comfort: 6, comedy: 6, focused: 6, visual: 6, classic: 6 }),
+      allocate({
+        comfort: 5,
+        comedy: 5,
+        hooked: 5,
+        focused: 5,
+        visual: 5,
+        classic: 5,
+      }),
     );
-    expect(result.rows).toHaveLength(4);
+    expect(result.rows).toHaveLength(5);
     result.rows.forEach((r) =>
       expect(r.items.length).toBeGreaterThanOrEqual(3),
     );
     expectInvariants(result);
   });
 
-  it('shows up to 5 rows of >=3 and caps cards for 50+ titles', () => {
+  it('shows up to 6 rows of >=3 and caps cards for 50+ titles', () => {
     const result = composeTonightRows(
       allocate({
         comfort: 20,
         comedy: 10,
+        hooked: 6,
         quick: 8,
         focused: 7,
         visual: 5,
         classic: 4,
       }),
     );
-    expect(result.rows).toHaveLength(6);
+    expect(result.rows).toHaveLength(7);
     expect(result.rows[0].items).toHaveLength(MAX_ROW_ITEMS);
     expectInvariants(result);
   });
@@ -122,6 +148,8 @@ describe('composeTonightRows sizes', () => {
   });
 
   it('exposes tunable tiers', () => {
+    expect(TONIGHT_TIERS.map((t) => t.maxRows)).toEqual([0, 1, 2, 5, 6]);
+    expect(TONIGHT_TIERS.map((t) => t.minItems)).toEqual([0, 1, 2, 3, 3]);
     expect(TONIGHT_TIERS.map((t) => t.maxEligible)).toEqual([
       0,
       5,
@@ -175,20 +203,21 @@ describe('composeTonightRows skew and fallback', () => {
       allocate({
         comfort: 3,
         comedy: 3,
+        hooked: 3,
         quick: 3,
         focused: 3,
         visual: 3,
         unknown: 4,
       }),
     );
-    expect(result.rows).toHaveLength(5);
+    expect(result.rows).toHaveLength(6);
     expect(result.rows.map((r) => r.key)).not.toContain('unknown');
   });
 
   it('never strands everything: all-singletons fall back to one row', () => {
-    const result = composeTonightRows(spread(6));
+    const result = composeTonightRows(spread(7));
     expect(result.rows.map((r) => r.key)).toEqual(['unknown']);
-    expect(result.rows[0].items).toHaveLength(6);
+    expect(result.rows[0].items).toHaveLength(7);
   });
 
   it('drops a title that appears in two allocated rows', () => {
@@ -317,6 +346,7 @@ describe('approved row slots', () => {
       allocate({
         comfort: 4,
         comedy: 4,
+        hooked: 4,
         focused: 4,
         visual: 4,
         classic: 3,
@@ -335,6 +365,7 @@ describe('approved row slots', () => {
       'quick',
       'comfort',
       'comedy',
+      'hooked',
       'focused',
       'classic',
     ]);

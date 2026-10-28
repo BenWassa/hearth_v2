@@ -39,10 +39,10 @@ export const TONIGHT_TIERS = Object.freeze([
   Object.freeze({ maxEligible: 0, maxRows: 0, minItems: 0, compact: false }),
   Object.freeze({ maxEligible: 5, maxRows: 1, minItems: 1, compact: true }),
   Object.freeze({ maxEligible: 12, maxRows: 2, minItems: 2, compact: false }),
-  Object.freeze({ maxEligible: 30, maxRows: 4, minItems: 3, compact: false }),
+  Object.freeze({ maxEligible: 30, maxRows: 5, minItems: 3, compact: false }),
   Object.freeze({
     maxEligible: Infinity,
-    maxRows: 5,
+    maxRows: 6,
     minItems: 3,
     compact: false,
   }),
@@ -124,7 +124,7 @@ const publicRow = ({ key, title, items }) => ({ key, title, items });
  * @returns {{ rows: {key: string, title: string, items: object[]}[], isEmpty: boolean }}
  *
  * Tiers (TONIGHT_TIERS): 0 -> empty; 1-5 -> one compact mixed row; 6-12 -> up to
- * 2 rows of >=2; 13-30 -> up to 4 rows of >=3; 31+ -> up to 5 rows of >=3.
+ * 2 rows of >=2; 13-30 -> up to 5 rows of >=3; 31+ -> up to 6 rows of >=3.
  * Quick Bites is an extra optional row; qualifying Classics always gets a mood slot.
  * Thematic rows below the tier minimum are merged with `unknown` titles into
  * one fallback row, shown only if it meets the minimum and a slot is free.

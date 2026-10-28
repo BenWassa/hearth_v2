@@ -161,7 +161,7 @@ describe('TonightView thematic rows', () => {
       ...container.querySelectorAll('[data-testid="suggestion-section"]'),
     ].filter((node) => node.getAttribute('data-title') !== CURRENTLY_WATCHING);
 
-  it('never shows a title twice across thematic rails for the 30-title seed', async () => {
+  it('renders the capped demo row set with substantial rails and no duplicates', async () => {
     const seed = buildTemplateSeedItems();
     expect(seed).toHaveLength(30);
     const mounted = await renderTonight(seed);
@@ -172,9 +172,23 @@ describe('TonightView thematic rows', () => {
     ).toEqual([
       'Deep Dives',
       'Easy & Comforting',
+      'Need a Laugh',
       'Quick Bites',
       'Spectacles',
       'The Classics',
+    ]);
+    expect(
+      sections.map((section) => [
+        section.getAttribute('data-title'),
+        section.querySelectorAll('[data-item-id]').length,
+      ]),
+    ).toEqual([
+      ['Easy & Comforting', 7],
+      ['Spectacles', 5],
+      ['Quick Bites', 4],
+      ['Deep Dives', 4],
+      ['The Classics', 4],
+      ['Need a Laugh', 3],
     ]);
     const ids = sections.flatMap((section) =>
       [...section.querySelectorAll('[data-item-id]')].map((node) =>

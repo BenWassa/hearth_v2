@@ -1,3 +1,4 @@
+import { isExpired } from '../domain/watchlist/removal.js';
 import { classificationRevision } from '../domain/media/classification.mjs';
 import { startClassificationBackfill } from '../services/mediaApi/classificationQueue.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -51,7 +52,10 @@ import {
 import {
   addWatchlistItem,
   persistCatalogClassification,
-  bulkDeleteWatchlistItems,
+  wipeWatchlist,
+  removeWatchlistItems,
+  restoreWatchlistItems,
+  purgeRemovedWatchlistItems,
   deleteWatchlistItem,
   subscribeWatchlist,
   updateWatchlistItem,
@@ -467,6 +471,7 @@ export const useAppState = () => {
   const [contextItems, setContextItems] = useState([]);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [removedItems, setRemovedItems] = useState([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [isWipingSpace, setIsWipingSpace] = useState(false);
   const [isMetadataRepairing, setIsMetadataRepairing] = useState(false);
@@ -732,14 +737,32 @@ export const useAppState = () => {
         console.log('Firebase not available, using local storage only');
         setLoading(false);
       }
+      setRemovedItems([]);
       return;
     }
 
+    setRemovedItems([]);
     setLoading(true);
     const unsubscribe = subscribeWatchlist({
       db,
       appId,
       spaceId,
+      onRemoved: (removed) => {
+        setRemovedItems(removed);
+        const expired = removed.filter((item) => isExpired(item));
+        if (expired.length)
+          purgeRemovedWatchlistItems({
+            db,
+            appId,
+            spaceId,
+            itemIds: expired.map((item) => item.id),
+          }).then((results) => {
+            if (results.some((result) => result.status === 'failed'))
+              notifyError(
+                'Some expired titles could not be cleared. Open Recently removed to try again.',
+              );
+          });
+      },
       onNext: (snapshot) => {
         const fetchedItems = snapshot.docs.map((docSnap) =>
           adaptWatchlistItem({
@@ -855,6 +878,13 @@ export const useAppState = () => {
       );
       if (hasProviderIdentity) {
         const duplicateExists = items.some((existingItem) => {
+          if (
+            removedItems.some(
+              (removed) =>
+                buildImportDedupeKey(removed) === buildImportDedupeKey(payload),
+            )
+          )
+            return false;
           if (payload.mediaId && existingItem?.mediaId === payload.mediaId) {
             return true;
           }
@@ -882,12 +912,14 @@ export const useAppState = () => {
         }
       }
 
-      await addWatchlistItem({
+      const added = await addWatchlistItem({
         db,
         appId,
         spaceId,
         payload: { ...payload, additionOrigin: 'manual' },
       });
+      if (added.status === 'restored')
+        notifyUpdate(`Brought back ${payload.title} from Recently removed.`);
       setView('tonight');
     } catch (err) {
       console.error('Error adding item:', err);
@@ -1189,12 +1221,14 @@ export const useAppState = () => {
           user.uid,
         );
 
-        await addWatchlistItem({
+        const added = await addWatchlistItem({
           db,
           appId,
           spaceId,
           payload: { ...payload, additionOrigin: 'import' },
         });
+        if (added.status === 'restored')
+          notifyUpdate(`Brought back ${payload.title} from Recently removed.`);
         importedCount += 1;
 
         const previewId = payload.mediaId || `${index}`;
@@ -2171,21 +2205,21 @@ export const useAppState = () => {
       !window.confirm(
         `Delete ${ids.length} item${
           ids.length === 1 ? '' : 's'
-        }? This cannot be undone.`,
+        }? You can restore them from Recently removed for 24 hours.`,
       )
     ) {
       return false;
     }
     setIsBulkDeleting(true);
     try {
-      await bulkDeleteWatchlistItems({
+      const results = await removeWatchlistItems({
         db,
         appId,
         spaceId,
         itemIds: ids,
+        removedBy: user.uid,
       });
-      setView('tonight');
-      return true;
+      return results;
     } catch (err) {
       console.error('Error deleting items:', err);
       notifyError("Couldn't remove items. Try again.");
@@ -2195,24 +2229,36 @@ export const useAppState = () => {
     }
   };
 
+  const handleRestoreRemoved = async (id) => {
+    const [result] = await restoreWatchlistItems({
+      db,
+      appId,
+      spaceId,
+      itemIds: [id],
+    });
+    return result;
+  };
+  const handlePurgeRemoved = async () => {
+    if (!db || !spaceId) return [];
+    return purgeRemovedWatchlistItems({
+      db,
+      appId,
+      spaceId,
+      itemIds: removedItems.map((item) => item.id),
+    });
+  };
+
   const handleDeleteAll = async () => {
     if (!db || !spaceId) {
       notifyError('Database not available. Please check your connection.');
       return false;
     }
 
-    const itemIds = items.map((item) => item.id).filter(Boolean);
     setIsWipingSpace(true);
 
     try {
-      if (itemIds.length > 0) {
-        await bulkDeleteWatchlistItems({
-          db,
-          appId,
-          spaceId,
-          itemIds,
-        });
-      }
+      await wipeWatchlist({ db, appId, spaceId });
+      setRemovedItems([]);
 
       clearSpaceTrayCache(spaceId);
       setItems([]);
@@ -2265,6 +2311,9 @@ export const useAppState = () => {
     errorMessage,
     handleAddItem,
     handleBulkDelete,
+    removedItems,
+    handleRestoreRemoved,
+    handlePurgeRemoved,
     handleCreateSpace,
     handleDeleteAll,
     handleDelete,

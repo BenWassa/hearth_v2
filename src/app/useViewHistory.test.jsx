@@ -77,6 +77,18 @@ describe('useViewHistory', () => {
     vi.restoreAllMocks();
   });
 
+  it('returns from Recently removed to Shelf with system and explicit back', async () => {
+    renderHarness();
+    act(() => latest.setView('shelf'));
+    act(() => latest.setView('recently-removed'));
+    expect(currentEntry()).toEqual({ view: 'recently-removed', depth: 2 });
+    await traverse(() => window.history.back());
+    expect(latest.view).toBe('shelf');
+    act(() => latest.setView('recently-removed'));
+    await traverse(() => latest.goBack('shelf'));
+    expect(latest.view).toBe('shelf');
+  });
+
   it('establishes Tonight as the baseline and pushes top-level screens', () => {
     renderHarness('tonight');
 

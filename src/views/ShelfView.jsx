@@ -1,3 +1,4 @@
+import RecentlyRemoved from './RecentlyRemoved.jsx';
 import React, {
   Suspense,
   useCallback,
@@ -60,7 +61,7 @@ const BulkDeleteDialog = ({ count, isDeleting, onCancel, onConfirm }) => {
               id="bulk-delete-title"
               className="text-lg font-serif text-stone-100"
             >
-              Delete Selected Titles?
+              Remove Selected Titles?
             </h3>
           </div>
           <IconButton
@@ -76,7 +77,8 @@ const BulkDeleteDialog = ({ count, isDeleting, onCancel, onConfirm }) => {
           <span className="font-medium">
             {count} selected title{count === 1 ? '' : 's'}
           </span>{' '}
-          from your shelf.
+          from your shelf. You can restore them from Recently removed for 24
+          hours.
         </p>
         <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
           <Button
@@ -95,7 +97,7 @@ const BulkDeleteDialog = ({ count, isDeleting, onCancel, onConfirm }) => {
             type="button"
             className="min-h-11"
           >
-            {isDeleting ? 'Deleting...' : 'Delete Selected'}
+            {isDeleting ? 'Removing...' : 'Remove Selected'}
           </Button>
         </div>
       </div>
@@ -119,8 +121,19 @@ const ShelfView = ({
   onDelete,
   onBulkDelete,
   isBulkDeleting = false,
+  removedItems = [],
+  onRestoreRemoved,
+  onPurgeRemoved,
   onBack,
+  showRemoved = false,
+  onOpenRemoved,
 }) => {
+  const [removalMessage, setRemovalMessage] = useState('');
+  useEffect(() => {
+    if (!removalMessage) return;
+    const timer = setTimeout(() => setRemovalMessage(''), 8000);
+    return () => clearTimeout(timer);
+  }, [removalMessage]);
   const watched = useMemo(
     () => items.filter((i) => i.status === 'watched'),
     [items],
@@ -146,6 +159,7 @@ const ShelfView = ({
   );
   const isSearching = normalizedQuery.length > 0;
   const toggleSelectionMode = () => {
+    setRemovalMessage('');
     setSelectionMode((prev) => {
       if (prev) {
         setSelectedIds(new Set());
@@ -155,6 +169,7 @@ const ShelfView = ({
   };
 
   const toggleSelected = useCallback((id) => {
+    setRemovalMessage('');
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -189,7 +204,26 @@ const ShelfView = ({
     const didDelete = await onBulkDelete(Array.from(selectedIds), {
       skipConfirm: true,
     });
-    if (didDelete) {
+    if (Array.isArray(didDelete)) {
+      const count = didDelete.filter(
+        (result) => result.status === 'removed',
+      ).length;
+      const failures = didDelete.length - count;
+      setRemovalMessage(
+        `${count} title${count === 1 ? '' : 's'} removed.${
+          failures ? ` ${failures} could not be removed. Try again.` : ''
+        }`,
+      );
+      setSelectedIds(
+        new Set(
+          didDelete
+            .filter((result) => result.status !== 'removed')
+            .map((result) => result.itemId),
+        ),
+      );
+      setSelectionMode(failures > 0);
+      setIsBulkDeleteConfirmOpen(false);
+    } else if (didDelete) {
       setSelectedIds(new Set());
       setSelectionMode(false);
       setIsBulkDeleteConfirmOpen(false);
@@ -368,11 +402,24 @@ const ShelfView = ({
 
   useEffect(() => prefetchOnIdle([ItemDetailsModal]), []);
 
+  if (showRemoved)
+    return (
+      <RecentlyRemoved
+        items={removedItems}
+        onRestore={(id) => {
+          setRemovalMessage('');
+          return onRestoreRemoved(id);
+        }}
+        onPurge={onPurgeRemoved}
+        onBack={() => onBack('shelf')}
+      />
+    );
+
   return (
     <div className="flex-1 flex flex-col">
       {/* ── Sticky header block: tabs-as-title + filter bar ── */}
       <div className="sticky top-0 z-20">
-        {/* Tabs row — doubles as the page header */}
+        {/* Tabs row, doubles as the page header */}
         <header className="px-4 sm:px-5 pt-[calc(1rem+var(--safe-top))] bg-shell border-b border-stone-800/60 flex items-end justify-between">
           <div className="flex gap-6">
             <button
@@ -433,7 +480,7 @@ const ShelfView = ({
           </div>
         </header>
 
-        {/* Search input — expands below header when open */}
+        {/* Search input, expands below header when open */}
         {isSearchOpen && (
           <div className="px-4 sm:px-5 py-2.5 bg-stone-950 border-b border-stone-800/60">
             <div className="flex items-center gap-2.5 bg-stone-900/70 border border-stone-700/60 rounded-xl px-3 focus-within:border-amber-500/40 transition-opacity">
@@ -549,6 +596,25 @@ const ShelfView = ({
         </div>
       </div>
       {/* ── End sticky header block ── */}
+      {viewTab === 'library' && (
+        <div className="px-4 text-sm text-stone-300">
+          <p
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="min-h-8 pt-3"
+          >
+            {removalMessage && `${removalMessage} Restore within 24 hours.`}
+          </p>
+          <Button
+            variant="ghost"
+            className="min-h-11 !pl-0 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+            onClick={onOpenRemoved}
+          >
+            Recently removed
+          </Button>
+        </div>
+      )}
 
       <div className={`px-2 sm:px-3 pt-2 pb-40 ${contentGapClassName}`}>
         {viewTab === 'library' && (

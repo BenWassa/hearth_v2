@@ -1,7 +1,7 @@
 # Issue #7: why rows look wrong, and a plan for the open decisions
 
-- **Status:** Implemented on `codex/tonight-fixes` (draft PR #26). Owner approved the earlier recommendations; the updated mood-row caps are awaiting owner confirmation.
-- **Issue:** https://github.com/BenWassa/hearth_v2/issues/7 · **PR:** #26 (draft)
+- **Status:** Closed 2026-10-28 — delivered via #26; mood-row cap of 5/6 awaits owner confirmation.
+- **Issue:** https://github.com/BenWassa/hearth_v2/issues/7 · **PR:** #26 (merged)
 - **Date:** 2026-10-27
 - **Method:** traced `primaryTheme` over the 30-title demo seed and over the 51 classification fixtures, once with the deterministic rules only (what production has today, Gemini is off) and once with the reviewed fixture labels (what a fully classified library would look like). Browser QA at 320, 390 and 448 px passed every assertion.
 

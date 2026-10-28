@@ -1,30 +1,30 @@
 # Issue #20 — Automatic title classification, zero-friction Add
 
-- **Status:** Open — research and implementation plan; not implemented
+- **Status:** Open — implemented; rollout/closure gated on #21 (2026-10-28). Original research and plan retained below.
 - **Implementation record:** [issue-020-implementation-record.md](issue-020-implementation-record.md) describes what was built (this document is the original research and plan).
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/20
 - **Research date:** 2026-10-26
-- **Related:** [Tonight MECE categories #7](https://github.com/BenWassa/hearth_v2/issues/7), [#7 research record](issue-007-tonight-mece-rows.md), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [Technical overview](../TECHNICAL_OVERVIEW.md)
+- **Related:** [Tonight MECE categories #7](https://github.com/BenWassa/hearth_v2/issues/7), [#7 research record](../closed/issue-007-tonight-mece-rows.md), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [Technical overview](../TECHNICAL_OVERVIEW.md)
 - **Relevant areas:** `src/views/AddView.jsx`; `src/config/constants.js`; `src/views/TonightView.jsx`; `src/domain/media/{schema,adapters}.js`; `src/services/firebase/watchlist.js`; `api/_lib/{providerClient,mappers/mediaMapper}.js`; `src/app/useAppState.js`; Firebase security rules and App Hosting runtime.
 
 ## Product objective
 
-Hearth currently requires users to decide what a movie *is* before they have watched it: Vibe (Comfort, Easy, Gripping, Visual, Classic) and Energy (Light, Balanced, Focused) are configured in the Add screen and persist as user state. That is avoidable decision friction. Users should select a TMDB result and add it without classification questions. Inference must not become an opaque recommendation engine or a high-maintenance public taxonomy.
+Hearth currently requires users to decide what a movie _is_ before they have watched it: Vibe (Comfort, Easy, Gripping, Visual, Classic) and Energy (Light, Balanced, Focused) are configured in the Add screen and persist as user state. That is avoidable decision friction. Users should select a TMDB result and add it without classification questions. Inference must not become an opaque recommendation engine or a high-maintenance public taxonomy.
 
 **Recommended direction: hybrid metadata + rules + optional Gemini semantic inference**; classifications persist as reusable, versioned metadata; rare incorrect classifications are corrected manually outside the UI, never via a user-facing edit control. No automatic AI calls should prevent a successful Add.
 
 ### What is fact versus subjective interpretation?
 
-| Attribute | Reliable automatic source | Caveat |
-| --- | --- | --- |
-| TMDB title ID, media type, genres, runtime, release year, overview | TMDB details | Facts can be absent, stale or different across TV episodes |
-| Short watch unit / Quick Bites eligibility | Validated **movie** runtime or next watchable episode runtime | TV average/first episode runtime is not always the next episode; `null <= 35` bug in old Tonight logic |
-| Comedy-first, comforting, gripping, narrative complexity | Heuristics + LLM reading synopsis/keywords | Qualitative judgments, cannot be inferred accurately from genre alone |
-| Visual distinctiveness / spectacle | Keyword hints + LLM + small curated fixture | Cinematography cannot be conclusively assessed from synopsis, budget or poster |
-| Focus requirement | Heuristics + LLM estimate | Complex != dark, intense != hard to follow; different viewers have different experiences |
-| Classic | Curated editorial evidence; conditional film year/recognized identity hints | Age and popularity are *insufficient* to qualify |
-| "Currently Watching", watched/unwatched | User episode/action state | **Never** AI-generated |
-| User preference or user correction | Explicit user input, if provided | **Never** replaced by inference |
+| Attribute                                                          | Reliable automatic source                                                   | Caveat                                                                                                 |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| TMDB title ID, media type, genres, runtime, release year, overview | TMDB details                                                                | Facts can be absent, stale or different across TV episodes                                             |
+| Short watch unit / Quick Bites eligibility                         | Validated **movie** runtime or next watchable episode runtime               | TV average/first episode runtime is not always the next episode; `null <= 35` bug in old Tonight logic |
+| Comedy-first, comforting, gripping, narrative complexity           | Heuristics + LLM reading synopsis/keywords                                  | Qualitative judgments, cannot be inferred accurately from genre alone                                  |
+| Visual distinctiveness / spectacle                                 | Keyword hints + LLM + small curated fixture                                 | Cinematography cannot be conclusively assessed from synopsis, budget or poster                         |
+| Focus requirement                                                  | Heuristics + LLM estimate                                                   | Complex != dark, intense != hard to follow; different viewers have different experiences               |
+| Classic                                                            | Curated editorial evidence; conditional film year/recognized identity hints | Age and popularity are _insufficient_ to qualify                                                       |
+| "Currently Watching", watched/unwatched                            | User episode/action state                                                   | **Never** AI-generated                                                                                 |
+| User preference or user correction                                 | Explicit user input, if provided                                            | **Never** replaced by inference                                                                        |
 
 ## Repository audit and consequences
 
@@ -38,15 +38,15 @@ Hearth currently requires users to decide what a movie *is* before they have wat
 
 ## External-source evaluation — free-only requirement
 
-| Source | Terms/limits (checked Oct 26, 2026) | Quality and decision |
-| --- | --- | --- |
-| TMDB developer API | Non-commercial use is free with logo attribution. Old 40 requests/10 seconds limit was disabled in 2019; current protective rate is roughly 40 requests/second, adjustable; handle 429/Retry-After. | **Primary.** Keep server-side; extend detail call with `keywords`, optionally TV `content_ratings`. No dedicated mood/focus property. |
-| Gemini API free tier | Some supported model input/output tokens free; *live* RPM/TPM/RPD, model access vary by project and can change. JSON Schema structured outputs are supported. **Unpaid requests/outputs can be used for Google product development/human review.** | **Optional** subjective classification. No private notes, identities, whole household list or viewing history. Review provider-data redistribution permissions before sending TMDB synopsis/keywords as prompts. |
-| OMDb | Official free key at 1,000 calls/day, CC BY-NC restrictions on its website. | Fallback only; largely duplicates TMDB facts and does not answer attention/visual questions. |
-| Wikidata | Queryable CC0 data; respect endpoint usage policy. | Possible curated films, external IDs and known facts, not nuanced mood inference. |
-| IMDb bulk datasets | Limited personal non-commercial files, explicit attribution and no IMDb scraping. | Not worth nightly updates, data matching and legal maintenance for mood inference. |
-| TMDB user reviews | Movie reviews endpoint exists but reviews are variable and may be unavailable; third-party prose rights. | **Skip by default**. No external review scraping or large copyrighted text in LLM prompts. |
-| YouTube trailers | YouTube API quota/terms; analysis of audiovisual content adds complexity and dependence. | Out of scope: neither necessary nor safely free at scale. |
+| Source               | Terms/limits (checked Oct 26, 2026)                                                                                                                                                                                                                | Quality and decision                                                                                                                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TMDB developer API   | Non-commercial use is free with logo attribution. Old 40 requests/10 seconds limit was disabled in 2019; current protective rate is roughly 40 requests/second, adjustable; handle 429/Retry-After.                                                | **Primary.** Keep server-side; extend detail call with `keywords`, optionally TV `content_ratings`. No dedicated mood/focus property.                                                                            |
+| Gemini API free tier | Some supported model input/output tokens free; _live_ RPM/TPM/RPD, model access vary by project and can change. JSON Schema structured outputs are supported. **Unpaid requests/outputs can be used for Google product development/human review.** | **Optional** subjective classification. No private notes, identities, whole household list or viewing history. Review provider-data redistribution permissions before sending TMDB synopsis/keywords as prompts. |
+| OMDb                 | Official free key at 1,000 calls/day, CC BY-NC restrictions on its website.                                                                                                                                                                        | Fallback only; largely duplicates TMDB facts and does not answer attention/visual questions.                                                                                                                     |
+| Wikidata             | Queryable CC0 data; respect endpoint usage policy.                                                                                                                                                                                                 | Possible curated films, external IDs and known facts, not nuanced mood inference.                                                                                                                                |
+| IMDb bulk datasets   | Limited personal non-commercial files, explicit attribution and no IMDb scraping.                                                                                                                                                                  | Not worth nightly updates, data matching and legal maintenance for mood inference.                                                                                                                               |
+| TMDB user reviews    | Movie reviews endpoint exists but reviews are variable and may be unavailable; third-party prose rights.                                                                                                                                           | **Skip by default**. No external review scraping or large copyrighted text in LLM prompts.                                                                                                                       |
+| YouTube trailers     | YouTube API quota/terms; analysis of audiovisual content adds complexity and dependence.                                                                                                                                                           | Out of scope: neither necessary nor safely free at scale.                                                                                                                                                        |
 
 **Primary verification:**
 
@@ -76,6 +76,7 @@ Pros: quick classification of language-rich titles, fewer editorial heuristics. 
 **Output**: versioned object containing `comfort`, `comedyFirst`, `plotMomentum`, `narrativeComplexity`, `visualDistinctiveness`, `attentionDemand` each in `low | medium | high | unknown`; optional `classicEvidence` as `yes | no | unknown`; bounded evidence keywords and `uncertainFields` list. Validate object with independent app-side schema, never assume syntactically valid JSON is semantically correct. Avoid a 0–100 fake precision score. Protect against injected instructions in TMDB summaries/keywords: treat all metadata as untrusted data, not as agent commands.
 
 **Contract invariants**:
+
 1. Shared media-level inferred attributes are stored by `provider:type:id`, `classifierVersion`, `modelId` if applicable, `updatedAt`, `sourceRevision` and `provenance`. No raw secrets/private prompts.
 2. Factual runtime/genre/identity are never overwritten by AI output.
 3. Unknown remains unknown; no blank string coerced to `Comfort`.
@@ -85,18 +86,18 @@ Pros: quick classification of language-rich titles, fewer editorial heuristics. 
 
 ### Concrete mapping examples, not model ground truth
 
-| Title | Multiple valid facets | Suggested Tonight candidate |
-| --- | --- | --- |
-| Paddington 2 | gentle + funny + approachable | Easy & Comforting |
-| Legally Blonde | comedy-first + accessible | Need a Laugh |
-| Ocean's Eleven | plot momentum + accessible | Get Hooked (#7 proposed label) |
-| Severance | focused + intricate | Deep Dives |
-| Spider-Man: Into the Spider-Verse | visual distinctiveness + playful energy | Spectacles |
-| Blade Runner 2049 | visual achievement + attention-heavy | Spectacles, not duplicated Deep Dives |
-| Roman Holiday | warm + funny + curated classic | Classics |
+| Title                                     | Multiple valid facets                     | Suggested Tonight candidate                |
+| ----------------------------------------- | ----------------------------------------- | ------------------------------------------ |
+| Paddington 2                              | gentle + funny + approachable             | Easy & Comforting                          |
+| Legally Blonde                            | comedy-first + accessible                 | Need a Laugh                               |
+| Ocean's Eleven                            | plot momentum + accessible                | Get Hooked (#7 proposed label)             |
+| Severance                                 | focused + intricate                       | Deep Dives                                 |
+| Spider-Man: Into the Spider-Verse         | visual distinctiveness + playful energy   | Spectacles                                 |
+| Blade Runner 2049                         | visual achievement + attention-heavy      | Spectacles, not duplicated Deep Dives      |
+| Roman Holiday                             | warm + funny + curated classic            | Classics                                   |
 | Unknown independent film with no overview | genres and date may exist; mood uncertain | General Shelf/unknown, never false comfort |
 
-These are *editorial examples*; validate with annotated reviewers, not by assuming a model's judgments are authoritative.
+These are _editorial examples_; validate with annotated reviewers, not by assuming a model's judgments are authoritative.
 
 ## Proposed execution architecture
 
@@ -132,7 +133,7 @@ Tonight MECE selector (#7), Decision filters and Shelf cards
 ## Evaluation and deployment gates
 
 1. Annotate >=50 diverse representative titles (the existing 30 seed + 20 varied new) across film/TV, genres, sparse metadata and tricky boundaries. Record two human labels for disagreement where possible.
-2. Compare deterministic-only vs Gemini-assisted with per-attribute exact/adjacent agreement, hard category confusion, abstention rate, version repeatability, row usefulness and user corrections. Define acceptance thresholds before pilot; *do not quote accuracy without measurement*.
+2. Compare deterministic-only vs Gemini-assisted with per-attribute exact/adjacent agreement, hard category confusion, abstention rate, version repeatability, row usefulness and user corrections. Define acceptance thresholds before pilot; _do not quote accuracy without measurement_.
 3. Test factual fidelity, empty keyword/overview, multilingual titles, adult/mature handling, timeouts/rate limits, parse failures, malformed model output, duplicate add across spaces, long-running/cancelled tasks, and cached model upgrades.
 4. Compare before/after Add taps: no mandatory Vibe/Energy UI and no regression in save success/time. Include 320px/390px/448px portrait QA.
 5. Implement #7 cross-row de-duplication separately; test attention versus gripping, comedy-first versus genre membership, and next-episode runtime.

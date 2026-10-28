@@ -1,6 +1,6 @@
 # Issue #7 — Tonight: MECE thematic rows and activity-aware selection
 
-- **Status:** Approved row decisions implemented on `codex/tonight-fixes` (draft PR #26); final product validation remains.
+- **Status:** Closed 2026-10-28 — delivered via #26; mood-row cap of 5/6 awaits owner confirmation.
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/7
 - **Last reviewed:** 2026-10-25
 - **Related:** [Collections scalability #6](https://github.com/BenWassa/hearth_v2/issues/6), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [OTHER_UPGRADES.md](../../OTHER_UPGRADES.md)
@@ -199,7 +199,7 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 
 ## Issue #20 integration (2026-10-26)
 
-[Automatic classification implementation](issue-020-implementation-record.md) now supplies independent, versioned viewing facets. `tonightClassification.js` implements scored primary assignment, typed canonical deduplication, exclusion of active/completed shows, and positive finite next-watchable runtime checks. Existing six labels remain; Quick Bites uses <=30 minutes and reserves its titles once. Automatic Comfort is never inferred from a missing tag or Light energy alone. Historic user/import tags stay preserved. These safety/assignment changes support #7, but do not claim completion of its dynamic row composition, activity weighting, taxonomy experiments, or user validation. Rules-only coverage is deliberately sparse; the optional Gemini quality pilot is still gated.
+[Automatic classification implementation](../open/issue-020-implementation-record.md) now supplies independent, versioned viewing facets. `tonightClassification.js` implements scored primary assignment, typed canonical deduplication, exclusion of active/completed shows, and positive finite next-watchable runtime checks. Existing six labels remain; Quick Bites uses <=30 minutes and reserves its titles once. Automatic Comfort is never inferred from a missing tag or Light energy alone. Historic user/import tags stay preserved. These safety/assignment changes support #7, but do not claim completion of its dynamic row composition, activity weighting, taxonomy experiments, or user validation. Rules-only coverage is deliberately sparse; the optional Gemini quality pilot is still gated.
 
 ## Implementation status (2026-10-27)
 

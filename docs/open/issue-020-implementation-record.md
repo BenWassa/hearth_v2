@@ -3,7 +3,7 @@
 Status: implementation complete locally; optional Gemini rollout is gated on credentials, independent editorial review, live evaluation, and metadata-sharing permission. Do not close or move to `docs/closed/` until those checks pass.
 
 Issue: https://github.com/BenWassa/hearth_v2/issues/20
-Companion: [Tonight allocation #7](issue-007-tonight-mece-rows.md)
+Companion: [Tonight allocation #7](../closed/issue-007-tonight-mece-rows.md)
 Implementation authorized by the user on 2026-10-26. The earlier research-only restriction no longer applies to this work.
 
 ## Product scope and decisions

@@ -2,7 +2,10 @@
 
 ## Status
 
-Code complete on `fix/android-back-navigation` (draft PR #23) with automated test coverage. Manual Pixel/Android QA is still pending and must be done by the owner; it has not been performed.
+Open as of 2026-10-28 — implemented via merged PR #23 with automated test coverage. Issue #22 stays open until the owner completes manual Pixel/Android QA; it has not been performed.
+
+- **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/22
+- **PR:** https://github.com/BenWassa/hearth_v2/pull/23
 
 ## Problem
 

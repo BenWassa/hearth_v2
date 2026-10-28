@@ -1,6 +1,5 @@
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
 import { composeTonightRows } from '../domain/media/tonightComposition.js';
-import { activityScore } from '../domain/media/tonightActivity.js';
 import React, {
   Suspense,
   useCallback,
@@ -112,8 +111,8 @@ const ROW_CONFIG = {
   unknown: DEFAULT_ROW_CONFIG,
 };
 
-// Local-date seed (YYYYMMDD, changes at local midnight) for equal-score item
-// ordering within rows. Thematic row display order stays fixed.
+// Local-date seed (YYYYMMDD, changes at local midnight) for daily shuffled
+// item ordering within rows. Thematic row display order stays fixed.
 const getLocalDateSeed = (date = new Date()) =>
   String(
     date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate(),
@@ -280,12 +279,11 @@ const TonightView = ({
   };
 
   // Thematic rows: one primary theme per title, then bounded and ordered by the
-  // composer. Activity only affects in-row order and which rows win slots.
+  // composer. Items within every row use only the daily seeded shuffle.
   const tonightDateSeed = getLocalDateSeed();
   const tonight = useMemo(() => {
     const now = new Date();
     return composeTonightRows(allocateTonightThemes(unwatched, { now }), {
-      scoreItem: (item) => activityScore(item, { now }),
       sessionSeed: tonightDateSeed,
     });
   }, [unwatched, tonightDateSeed]);

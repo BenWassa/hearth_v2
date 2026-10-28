@@ -76,3 +76,7 @@ The 30-title demo renders these rows in fixed order:
 | Deep Dives        |     4 |
 | Spectacles        |     5 |
 | The Classics      |     4 |
+
+## Daily shuffle restoration (2026-10-28)
+
+Titles within every composed row use only `stableOrder` with the daily session seed. Newly added titles receive no activity or recency boost. Tonight uses the composer’s default equal scores; row selection rules, fixed display order, caps and tiers remain unchanged. Activity-score references in the investigation above describe the earlier implementation.

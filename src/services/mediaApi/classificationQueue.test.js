@@ -351,3 +351,43 @@ it('isolates whole-batch 429 and timeout failures with persisted 15-minute retri
     vi.unstubAllGlobals();
   }
 });
+
+it.each([404, 405])(
+  'pauses the whole queue on HTTP %s without parsing HTML or failing titles',
+  async (status) => {
+    vi.useFakeTimers();
+    const json = vi.fn().mockRejectedValue(new SyntaxError('HTML response'));
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status, json });
+    vi.stubGlobal('fetch', fetchMock);
+    const store = storage();
+    const onProgress = vi.fn();
+    const stop = startClassificationBackfill({
+      getItems: () =>
+        Array.from({ length: 25 }, (_, i) => ({
+          ...item,
+          source: { provider: 'tmdb', providerId: String(i + 1) },
+        })),
+      getToken: async () => 'token',
+      onResult: vi.fn(),
+      onProgress,
+      storage: store,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(60 * 60000);
+      expect(fetchMock).toHaveBeenCalledOnce();
+      expect(json).not.toHaveBeenCalled();
+      expect(onProgress).toHaveBeenCalledExactlyOnceWith({
+        processed: 0,
+        failed: 0,
+        pending: 25,
+      });
+      expect(
+        store.getItem('hearth:classification:default:tmdb:movie:1'),
+      ).toBeUndefined();
+    } finally {
+      stop();
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+    }
+  },
+);

@@ -3,7 +3,7 @@
 Status: implementation complete locally; optional Gemini rollout is gated on credentials, independent editorial review, live evaluation, and metadata-sharing permission. Do not close or move to `docs/closed/` until those checks pass.
 
 Issue: https://github.com/BenWassa/hearth_v2/issues/20
-Companion: [Tonight allocation #7](issue-007-tonight-mece-rows.md)
+Companion: [Tonight allocation #7](../closed/issue-007-tonight-mece-rows.md)
 Implementation authorized by the user on 2026-10-26. The earlier research-only restriction no longer applies to this work.
 
 ## Product scope and decisions
@@ -26,8 +26,10 @@ Keep the six existing Tonight labels in this issue. A pure scored allocator give
 - `POST /api/media/classify`: verified, non-anonymous Firebase ID token plus the existing approved-user allowlist; existing backend rate limiter; strict body containing only `{ id, type }`; `no-store` responses. No client-provided synopsis, notes, identity or history is accepted for inference.
 - `api/_lib/classificationService.js`: in-process promise deduplication, Firestore transaction lease, source-hash/version/policy cache, conditional facet-only catalog writes and shared daily budget.
 - `api/_lib/geminiClassifier.js`: direct REST API, strict JSON Schema/enums, runtime semantic validation, no tools/search, default 5-second timeout (hard maximum 10 seconds), at most two attempts on 5xx. Quota/timeout/invalid response/budget failure returns the baseline. Every provider attempt, including a retry, first reserves a persisted daily budget unit.
-- `src/services/mediaApi/classificationQueue.js`: one title at a time; 1.2-second spacing; three attempts per canonical title per open session; 15-minute transport/persistence retry delay. It polls for newly added/imported titles. The saved shelf is the durable pending-work source; browser retry markers are scoped to app/space. Navigation/unmount aborts the active request and suppresses late results. Storage failure does not prevent the current session from progressing.
+- `src/services/mediaApi/classificationQueue.js`: batches up to 10 canonical titles per request through `/api/media/classify-batch`; 1.2-second spacing between batches; three attempts per canonical title per open session; 15-minute transport/persistence retry delay. It polls for newly added/imported titles. The saved shelf is the durable pending-work source; browser retry markers are scoped to app/space. Navigation/unmount aborts the active request and suppresses late results. Storage failure does not prevent the current session from progressing.
 - `persistCatalogClassification`: conditional transaction using actual field-path updates, no activity timestamp update. Repeated additions cannot overwrite cached enrichment with a baseline. Shared spaces retain their own historical tags and progress.
+
+Shelf auto-groups titles from automatic classification while preserving stronger historical/manual tags. Operational browser console logs are gated by the `hearth:debug` flag.
 
 ## Cache, revision and failure policy
 
@@ -57,14 +59,14 @@ Grant the selected App Hosting backend access using the CLI's backend prompt or 
 
 Controls:
 
-| Variable | Default / policy |
-| --- | --- |
-| `GEMINI_API_KEY` | absent, server only; `GEMINI_API` alias accepted |
-| `GEMINI_MODEL` | absent; select a currently available structured-output model with a verified free tier in AI Studio |
-| `GEMINI_CLASSIFICATION_ENABLED` | false; explicit pilot/rollout decision |
-| `GEMINI_METADATA_SHARING_APPROVED` | false; explicit review of TMDB reuse permission |
-| `GEMINI_DAILY_REQUEST_LIMIT` | 20 provider attempts/day, transactional across instances; 0 disables calls; hard ceiling 100 |
-| `GEMINI_TIMEOUT_MS` | 5000; bounded 100–10000 |
+| Variable                           | Default / policy                                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `GEMINI_API_KEY`                   | absent, server only; `GEMINI_API` alias accepted                                                    |
+| `GEMINI_MODEL`                     | absent; select a currently available structured-output model with a verified free tier in AI Studio |
+| `GEMINI_CLASSIFICATION_ENABLED`    | false; explicit pilot/rollout decision                                                              |
+| `GEMINI_METADATA_SHARING_APPROVED` | false; explicit review of TMDB reuse permission                                                     |
+| `GEMINI_DAILY_REQUEST_LIMIT`       | 20 provider attempts/day, transactional across instances; 0 disables calls; hard ceiling 100        |
+| `GEMINI_TIMEOUT_MS`                | 5000; bounded 100–10000                                                                             |
 
 A key alone does not enable inference. No paid tier is activated by code. Provider availability/prices/quotas must be confirmed in the actual AI Studio project before selecting a model.
 
@@ -107,14 +109,14 @@ Current [offline evidence](issue-020-evaluation.json): deterministic but sparse 
 
 The owner approved a bounded five-title live pilot, including sharing the public metadata projection described above. The [saved report](issue-020-gemini-pilot-2026-10-27.json) used `gemini-3.5-flash-lite`, confirmed available to the configured key through the models API. The five titles were Paddington 2, The Intern, The Martian, Legally Blonde and The School of Rock. Each completed three valid predictions. Seventeen provider attempts were counted in the shared daily budget (limit 20), including one invalid response and one timeout; both incomplete titles completed on a bounded resume. The runner's report contains all 50 real fixture records, but only these five received live predictions.
 
-| Subjective facet | Agreement with provisional labels | Stable across three predictions | Unknown rate |
-| --- | --- | --- | --- |
-| Comfort | 80% | 80% | 0% |
-| Comedy first | 100% | 100% | 0% |
-| Plot momentum | 60% | 60% | 0% |
-| Narrative complexity | 80% | 100% | 0% |
-| Visual distinctiveness | 40% | 20% | 40% |
-| Attention demand | 80% | 80% | 0% |
+| Subjective facet       | Agreement with provisional labels | Stable across three predictions | Unknown rate |
+| ---------------------- | --------------------------------- | ------------------------------- | ------------ |
+| Comfort                | 80%                               | 80%                             | 0%           |
+| Comedy first           | 100%                              | 100%                            | 0%           |
+| Plot momentum          | 60%                               | 60%                             | 0%           |
+| Narrative complexity   | 80%                               | 100%                            | 0%           |
+| Visual distinctiveness | 40%                               | 20%                             | 40%          |
+| Attention demand       | 80%                               | 80%                             | 0%           |
 
 This small sample does not satisfy the rollout thresholds or substitute for the required reviewed 50-title evaluation. Labels remain provisional; the observed disagreements need editorial adjudication alongside prompt/model review. Production enablement flags and model remain unset. The pilot flags were scoped to the local runner process; no household/catalog classification was written by the evaluator, only the shared operational budget counter. App Hosting secret access was repaired separately, and the existing 3.16.0 release was confirmed live with build `3.16.0-20261027105016-fb57043` and a healthy API.
 
@@ -126,7 +128,7 @@ No in-app correction/reset controls. A developer with existing Firebase Admin cr
 node scripts/correctClassification.cjs --id=603 --type=movie --facet=visualDistinctiveness --value=high --reason="Reviewed visual craft"
 ```
 
-Add `--apply` only after reviewing the plan. It conditionally updates existing matching catalog documents, changes only the named facet override and its audit fields, and leaves generated cache, personal tags, activity and progress intact. `--value=unknown` forces an explicit abstention. Corrections are shared editorial metadata; avoid personal data in the reason. Reload the catalog-backed shelf to display a correction. Remove an override field only through the controlled Admin workflow when intending to restore automatic evidence.
+The owner decides who may run `--apply`; possessing Admin credentials alone is not authorization. Add `--apply` only after reviewing the plan and receiving that owner authorization. It conditionally updates existing matching catalog documents, changes only the named facet override and its audit fields, and leaves generated cache, personal tags, activity and progress intact. `--value=unknown` forces an explicit abstention. Corrections are shared editorial metadata; avoid personal data in the reason. Reload the catalog-backed shelf to display a correction. Remove an override field only through the controlled Admin workflow when intending to restore automatic evidence.
 
 ## Verification
 

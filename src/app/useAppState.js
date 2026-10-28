@@ -25,12 +25,14 @@ import {
 } from '../config/constants.js';
 import { isWhitelistedUid } from '../config/access.js';
 import { toMillis } from '../utils/time.js';
+import { debugLog } from '../utils/debugLog.js';
 import { getJoinSpaceId, clearJoinParam } from '../utils/url.js';
 import {
   getShowWatchStatus,
   isShowFullyWatched,
 } from '../components/ItemDetailsModal/utils/showProgress.js';
 import { useVersionUpdates } from './useVersionUpdates.js';
+import { useViewHistory } from './useViewHistory.js';
 import { logMetadataAuditSummary } from './metadataAuditConsole.js';
 import { getAppId, initializeFirebase } from '../services/firebase/client.js';
 import {
@@ -78,9 +80,9 @@ const MANUAL_METADATA_REFRESH_MIN_INTERVAL_MS = 750;
 const ACCESS_BLOCKED_MESSAGE =
   'This account is not approved for the main app. Redirecting to demo mode.';
 const logAutoShowRefresh = (...args) =>
-  console.info('[auto-show-refresh]', ...args);
+  debugLog('[auto-show-refresh]', ...args);
 const logAiringShowRefresh = (...args) =>
-  console.info('[airing-show-refresh]', ...args);
+  debugLog('[airing-show-refresh]', ...args);
 const logBackgroundAudit = (...args) =>
   console.info('[metadata-audit]', ...args);
 
@@ -413,18 +415,40 @@ export const useAppState = () => {
           mediaId: original.mediaId || original.id,
           classification,
         });
+      },
+      onBatchResult: (results) => {
         if (!active) return;
+        const classifications = new Map(
+          results.map(({ item, classification }) => [item.id, classification]),
+        );
         setItems((current) =>
           current.map((item) =>
-            item.id === original.id
-              ? { ...item, media: { ...item.media, classification } }
+            classifications.has(item.id)
+              ? {
+                  ...item,
+                  media: {
+                    ...item.media,
+                    classification: classifications.get(item.id),
+                  },
+                }
               : item,
           ),
         );
       },
-      onProgress: (progress) => {
-        if (progress.processed || progress.failed)
-          console.info('[classification-backfill]', progress);
+      onProgress: ({ processed, failed, pending }) => {
+        if (failed > 0) {
+          console.info(
+            `[classification-backfill] ${processed} processed, ${failed} failed, ${pending} pending`,
+          );
+        } else if (pending === 0) {
+          console.info(
+            `[classification-backfill] complete: ${processed} processed`,
+          );
+        } else if (processed > 0 && processed % 25 === 0) {
+          console.info(
+            `[classification-backfill] ${processed} processed, ${pending} pending`,
+          );
+        }
       },
     });
     return () => {
@@ -434,7 +458,9 @@ export const useAppState = () => {
   }, [user, db, spaceId]);
 
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState(getInitialView);
+  const { view, setView, goBack } = useViewHistory(getInitialView, {
+    canRestore: authResolved ? Boolean(user) : undefined,
+  });
   const [decisionResult, setDecisionResult] = useState(null);
   const [decisionContext, setDecisionContext] = useState(null);
   const [isDeciding, setIsDeciding] = useState(false);
@@ -2243,6 +2269,7 @@ export const useAppState = () => {
     handleDeleteAll,
     handleDelete,
     handleExportItems,
+    goBack,
     handleImportItems,
     handleMarkWatched,
     handleMetadataAudit,

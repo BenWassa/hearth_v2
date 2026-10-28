@@ -1,11 +1,19 @@
 // Developer-only correction workflow. Dry-run unless --apply is supplied.
-const {
-  initializeFirebaseAdmin,
-  getAdminDb,
-} = require('../server/firebaseAdmin');
-const arg = (name) =>
-  process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
-(async () => {
+async function runCorrection({
+  argv = process.argv.slice(2),
+  appId: defaultAppId = process.env.APP_ID || 'hearth-default',
+  getDb = () => {
+    const {
+      initializeFirebaseAdmin,
+      getAdminDb,
+    } = require('../server/firebaseAdmin');
+    initializeFirebaseAdmin();
+    return getAdminDb();
+  },
+  log = console.log,
+} = {}) {
+  const arg = (name) =>
+    argv.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
   const domain = await import('../src/domain/media/classification.mjs');
   const id = arg('id');
   const type = arg('type');
@@ -23,7 +31,7 @@ const arg = (name) =>
     throw new Error(
       'Supply --id, --type=movie|show, --facet, --value=unknown|low|medium|high and --reason (1–200 chars).',
     );
-  const appId = arg('app') || process.env.APP_ID || 'hearth-default';
+  const appId = arg('app') || defaultAppId;
   if (!/^[a-zA-Z0-9_-]{1,100}$/.test(appId)) throw new Error('Invalid app id');
   const key = `tmdb:${type === 'show' ? 'tv' : 'movie'}:${id}`;
   const correction = {
@@ -32,16 +40,15 @@ const arg = (name) =>
     reason,
     version: domain.CLASSIFIER_VERSION,
   };
-  console.log(
+  log(
     JSON.stringify(
-      { appId, key, correction, apply: process.argv.includes('--apply') },
+      { appId, key, correction, apply: argv.includes('--apply') },
       null,
       2,
     ),
   );
-  if (!process.argv.includes('--apply')) return;
-  initializeFirebaseAdmin();
-  const db = getAdminDb();
+  if (!argv.includes('--apply')) return;
+  const db = getDb();
   let updated = 0;
   for (const mediaId of [key, `tmdb:${id}`]) {
     await db.runTransaction(async (tx) => {
@@ -59,12 +66,17 @@ const arg = (name) =>
     });
   }
   if (!updated) throw new Error('No matching existing catalog record');
-  console.log(`Corrected ${updated} catalog record(s).`);
-})().catch((error) => {
-  console.error(
-    error.code
-      ? 'Catalog correction failed; check admin credentials and project access.'
-      : error.message,
-  );
-  process.exitCode = 1;
-});
+  log(`Corrected ${updated} catalog record(s).`);
+}
+
+module.exports = { runCorrection };
+
+if (require.main === module)
+  runCorrection().catch((error) => {
+    console.error(
+      error.code
+        ? 'Catalog correction failed; check admin credentials and project access.'
+        : error.message,
+    );
+    process.exitCode = 1;
+  });

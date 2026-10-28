@@ -3,9 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { vi } from 'vitest';
 import SuggestionSection from './SuggestionSection';
 
-vi.mock('../../../components/cards/ItemCard.js', () => {
-  return function MockItemCard({ item }) {
-    return <div data-testid={`item-${item.id}`}>{item.title}</div>;
+vi.mock('../../../components/cards/ItemCard.jsx', () => {
+  return {
+    default: function MockItemCard({ item }) {
+      return <div data-testid={`item-${item.id}`}>{item.title}</div>;
+    },
   };
 });
 
@@ -26,7 +28,7 @@ const cleanupDom = async ({ container, root }) => {
   container.remove();
 };
 
-describe('SuggestionSection rewind', () => {
+describe('SuggestionSection finite rail', () => {
   beforeAll(() => {
     global.IS_REACT_ACT_ENVIRONMENT = true;
   });
@@ -39,7 +41,7 @@ describe('SuggestionSection rewind', () => {
     }));
   });
 
-  it('rewinds to start when scrolled to the end and rewind is enabled', async () => {
+  it('renders each title once and keeps the native scroll position at the end', async () => {
     vi.useFakeTimers();
     const mounted = await renderIntoDom(
       <SuggestionSection
@@ -55,7 +57,6 @@ describe('SuggestionSection rewind', () => {
         onToggleStatus={() => {}}
         onOpenDetails={() => {}}
         layout="rail"
-        enableRewind
       />,
     );
 
@@ -93,13 +94,16 @@ describe('SuggestionSection rewind', () => {
 
     await act(async () => {
       rail.dispatchEvent(new Event('scroll', { bubbles: true }));
-      // Scroll measuring is batched per frame and schedules a follow-up frame
-      // to restore snapping, so flush until the queue is empty.
+      // Flush the batched edge-state measurement.
       while (animationCallbacks.length) animationCallbacks.shift()();
     });
 
-    expect(rail.scrollLeft).toBe(0);
-    expect(rail.style.scrollSnapType).toBe('');
+    expect(rail.scrollLeft).toBe(240);
+    expect(
+      mounted.container.querySelectorAll('[data-testid^="item-"]'),
+    ).toHaveLength(3);
+    expect(mounted.container.querySelector('[inert]')).toBeNull();
+    expect(rail.style.scrollSnapType).toBe('x mandatory');
 
     await cleanupDom(mounted);
     window.requestAnimationFrame = originalRequestAnimationFrame;

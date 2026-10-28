@@ -20,6 +20,24 @@ export const requestClassification = async ({ id, type, token, signal }) => {
   return payload.data;
 };
 
+export const requestClassificationBatch = async ({ items, token, signal }) => {
+  const response = await fetch('/api/media/classify-batch', {
+    method: 'POST',
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      items: items.map(({ id, type }) => ({ id, type })),
+    }),
+  });
+  const payload = await response.json();
+  if (!response.ok || !payload.ok)
+    throw new Error('Classification unavailable');
+  return payload.data;
+};
+
 // The shelf is the durable pending queue: a missing/old classification is work.
 // Local storage contains only canonical IDs, revisions and retry bookkeeping.
 export const startClassificationBackfill = ({
@@ -27,8 +45,9 @@ export const startClassificationBackfill = ({
   scope = 'default',
   getToken,
   onResult,
+  onBatchResult = () => {},
   onProgress = () => {},
-  request = requestClassification,
+  request = requestClassificationBatch,
   storage = globalThis.localStorage,
   now = Date.now,
   schedule = setTimeout,
@@ -38,9 +57,11 @@ export const startClassificationBackfill = ({
   let timer;
   const controller = new AbortController();
   const attempted = new Map();
+  const sessionState = new Map();
   let processed = 0;
   let failed = 0;
   const read = (key) => {
+    if (sessionState.has(key)) return sessionState.get(key);
     try {
       return JSON.parse(storage?.getItem(key) || '{}');
     } catch {
@@ -48,6 +69,7 @@ export const startClassificationBackfill = ({
     }
   };
   const save = (key, value) => {
+    sessionState.set(key, value);
     try {
       storage?.setItem(key, JSON.stringify(value));
     } catch {
@@ -56,73 +78,130 @@ export const startClassificationBackfill = ({
   };
   const tick = async () => {
     if (stopped) return;
-    const candidates = getItems().filter((item) => canonicalMediaKey(item));
-    const item = candidates.find((item) => {
+    const unique = new Map();
+    for (const item of getItems()) {
       const key = canonicalMediaKey(item);
-      if ((attempted.get(key) || 0) >= 3) return false;
+      if (key && !unique.has(key)) unique.set(key, item);
+    }
+    const candidates = [...unique.values()];
+    const needsWork = (item) => {
       const c = item.media?.classification;
-      const state = read(`hearth:classification:${scope}:${key}`);
-      const signature = classificationRevision(item);
-      if (
+      const state = read(
+        `hearth:classification:${scope}:${canonicalMediaKey(item)}`,
+      );
+      const matches =
         state.version === CLASSIFIER_VERSION &&
-        state.signature === signature &&
-        state.retryAt > now()
+        state.signature === classificationRevision(item);
+      if (matches && state.completed && state.retryAt > now()) return false;
+      if (
+        c?.pipelineVersion &&
+        c.version === CLASSIFIER_VERSION &&
+        !c.retryAfter &&
+        !state.completed &&
+        !state.retryAt
       )
         return false;
-      return (
-        !c?.pipelineVersion ||
-        c.version !== CLASSIFIER_VERSION ||
-        (c.retryAfter && c.retryAfter <= now()) ||
-        !state.completed ||
-        state.signature !== signature ||
-        state.version !== CLASSIFIER_VERSION ||
-        state.retryAt <= now()
-      );
-    });
-    if (!item) {
+      return true;
+    };
+    const batch = candidates
+      .filter((item) => {
+        if (
+          !needsWork(item) ||
+          (attempted.get(canonicalMediaKey(item)) || 0) >= 3
+        )
+          return false;
+        const state = read(
+          `hearth:classification:${scope}:${canonicalMediaKey(item)}`,
+        );
+        return !(
+          state.version === CLASSIFIER_VERSION &&
+          state.signature === classificationRevision(item) &&
+          state.retryAt > now()
+        );
+      })
+      .slice(0, 10);
+    const progress = () =>
+      onProgress({
+        processed,
+        failed,
+        pending: candidates.filter(needsWork).length,
+      });
+    if (!batch.length) {
+      progress();
       timer = schedule(tick, 30000);
       return;
     }
-    const key = canonicalMediaKey(item);
-    attempted.set(key, (attempted.get(key) || 0) + 1);
-    const storageKey = `hearth:classification:${scope}:${key}`;
-    const signature = classificationRevision(item);
+    batch.forEach((item) => {
+      const key = canonicalMediaKey(item);
+      attempted.set(key, (attempted.get(key) || 0) + 1);
+    });
+    let results;
     try {
       const token = await getToken();
       if (stopped) return;
-      const result = await request({
-        id: String(item.source?.providerId || item.providerId),
-        type: item.media?.type || item.type,
+      results = await request({
+        items: batch.map((item) => ({
+          id: String(item.source?.providerId || item.providerId),
+          type: item.media?.type || item.type,
+        })),
         token,
         signal: controller.signal,
       });
-      if (stopped) return;
-      if (result.version !== CLASSIFIER_VERSION || result.key !== key)
-        throw new Error('Classification identity mismatch');
-      await onResult(item, result);
-      save(storageKey, {
-        version: CLASSIFIER_VERSION,
-        signature,
-        completed: true,
-        retryAt: result.retryAfter || now() + 30 * 86400000,
-      });
-      processed += 1;
+      if (!Array.isArray(results)) results = [];
     } catch {
-      if (stopped) return;
-      failed += 1;
-      save(storageKey, {
-        version: CLASSIFIER_VERSION,
-        signature,
-        completed: false,
-        retryAt: now() + 15 * 60000,
-      });
+      results = [];
     }
     if (stopped) return;
-    onProgress({
-      processed,
-      failed,
-      pending: Math.max(0, candidates.length - attempted.size),
-    });
+    const completed = [];
+    let next = 0;
+    await Promise.all(
+      Array.from({ length: Math.min(3, batch.length) }, async () => {
+        while (!stopped && next < batch.length) {
+          const item = batch[next++];
+          const key = canonicalMediaKey(item);
+          const storageKey = `hearth:classification:${scope}:${key}`;
+          const signature = classificationRevision(item);
+          try {
+            const entry = results.find(
+              (entry) =>
+                entry.id ===
+                  String(item.source?.providerId || item.providerId) &&
+                entry.type === (item.media?.type || item.type),
+            );
+            const result = entry?.data;
+            if (
+              !entry?.ok ||
+              result?.version !== CLASSIFIER_VERSION ||
+              result.key !== key
+            )
+              throw new Error('Classification unavailable');
+            await onResult(item, result);
+            if (stopped) return;
+            save(storageKey, {
+              version: CLASSIFIER_VERSION,
+              signature,
+              completed: true,
+              retryAt: result.retryAfter || now() + 30 * 86400000,
+            });
+            completed.push({ item, classification: result });
+            processed += 1;
+          } catch {
+            if (stopped) return;
+            failed += 1;
+            save(storageKey, {
+              version: CLASSIFIER_VERSION,
+              signature,
+              completed: false,
+              retryAt: now() + 15 * 60000,
+            });
+          }
+        }
+      }),
+    );
+    if (stopped) return;
+    if (completed.length) await onBatchResult(completed);
+    if (stopped) return;
+    progress();
     timer = schedule(tick, 1200);
   };
   timer = schedule(tick, 1000);

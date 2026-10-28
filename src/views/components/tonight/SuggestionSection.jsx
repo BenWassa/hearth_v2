@@ -2,9 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Moon } from 'lucide-react';
 import ItemCard from '../../../components/cards/ItemCard.jsx';
 
-// How many cards to clone at the end to create the seamless loop illusion
-const CLONE_COUNT = 6;
-
 const SuggestionSection = ({
   title,
   suggestions,
@@ -15,7 +12,6 @@ const SuggestionSection = ({
   hideScrollbar = false,
   showEdgeFade = false,
   railPaddingClassName = '',
-  enableRewind = false,
   className = '',
   Icon,
   size = 'md',
@@ -23,11 +19,8 @@ const SuggestionSection = ({
   const isRail = layout === 'rail';
   const railRef = useRef(null);
   const scrollFrameRef = useRef(null);
-  const restoreSnapFrameRef = useRef(null);
-  const teleportFrameRef = useRef(null);
-  const isPointerDownRef = useRef(false);
   const [atStart, setAtStart] = useState(true);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [atEnd, setAtEnd] = useState(false);
 
   // Map sizes to specific width clamps
   const sizeStyles = {
@@ -36,20 +29,6 @@ const SuggestionSection = ({
     lg: 'w-[clamp(8.5rem,18vw,12rem)]', // Wider, feature size
   };
   const activeWidthClass = sizeStyles[size] || sizeStyles.md;
-
-  useEffect(() => {
-    if (
-      typeof window === 'undefined' ||
-      typeof window.matchMedia !== 'function'
-    ) {
-      return undefined;
-    }
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setPrefersReducedMotion(Boolean(mq.matches));
-    sync();
-    mq.addEventListener?.('change', sync);
-    return () => mq.removeEventListener?.('change', sync);
-  }, []);
 
   const itemsWithPickCard = suggestions;
   const toggleActions = useMemo(
@@ -63,63 +42,19 @@ const SuggestionSection = ({
     [suggestions, onToggleStatus],
   );
 
-  // For looping rails we clone the first N cards at the end.
-  // When the user scrolls into the clone zone we silently jump back
-  // to the equivalent real position — no visible snap, seamless loop.
-  const loopEnabled =
-    enableRewind && !prefersReducedMotion && itemsWithPickCard.length > 2;
-  const clones = loopEnabled ? itemsWithPickCard.slice(0, CLONE_COUNT) : [];
-
   const updateEdgeState = () => {
     const rail = railRef.current;
     if (!rail) return;
     setAtStart(rail.scrollLeft <= 2);
-  };
-
-  const measureScroll = () => {
-    updateEdgeState();
-    if (!loopEnabled) return;
-    if (isPointerDownRef.current) return; // wait until finger lifts
-
-    const rail = railRef.current;
-    if (!rail) return;
-
-    // The real content ends at scrollWidth - (clones * cardWidth).
-    // We measure one card's rendered width from the first child.
-    const firstCard = rail.querySelector('[data-rail-card]');
-    if (!firstCard) return;
-    const cardWidth = firstCard.offsetWidth + 10; // +gap (gap-2.5 = 10px)
-    const realContentWidth = cardWidth * itemsWithPickCard.length;
-
-    if (rail.scrollLeft >= realContentWidth) {
-      // Cancel any pending frame so we don't double-fire
-      if (teleportFrameRef.current)
-        cancelAnimationFrame(teleportFrameRef.current);
-      teleportFrameRef.current = requestAnimationFrame(() => {
-        const overshoot = rail.scrollLeft - realContentWidth;
-        // Disable scroll-snap temporarily so the instant jump doesn't animate
-        rail.style.scrollSnapType = 'none';
-        rail.scrollLeft = overshoot;
-        // Re-enable on next frame
-        restoreSnapFrameRef.current = requestAnimationFrame(() => {
-          rail.style.scrollSnapType = '';
-        });
-      });
-    }
+    setAtEnd(rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2);
   };
 
   const handleScroll = () => {
     if (scrollFrameRef.current !== null) return;
     scrollFrameRef.current = requestAnimationFrame(() => {
       scrollFrameRef.current = null;
-      measureScroll();
+      updateEdgeState();
     });
-  };
-
-  const handlePointerUp = () => {
-    isPointerDownRef.current = false;
-    // Check loop condition once finger lifts (in case scroll settled in clone zone)
-    handleScroll();
   };
 
   useEffect(() => {
@@ -129,9 +64,6 @@ const SuggestionSection = ({
   useEffect(() => {
     return () => {
       cancelAnimationFrame(scrollFrameRef.current);
-      cancelAnimationFrame(restoreSnapFrameRef.current);
-      if (teleportFrameRef.current)
-        cancelAnimationFrame(teleportFrameRef.current);
     };
   }, []);
 
@@ -148,6 +80,9 @@ const SuggestionSection = ({
           <div className={`relative ${railPaddingClassName}`}>
             <div
               ref={railRef}
+              tabIndex={0}
+              role="region"
+              aria-label={title}
               className={`pb-1 overflow-x-auto overflow-y-hidden ${
                 hideScrollbar ? 'no-scrollbar' : 'custom-scrollbar'
               }`}
@@ -156,36 +91,11 @@ const SuggestionSection = ({
                 WebkitOverflowScrolling: 'touch',
               }}
               onScroll={handleScroll}
-              onPointerDown={() => {
-                isPointerDownRef.current = true;
-              }}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={() => {
-                isPointerDownRef.current = false;
-              }}
             >
               <div className="flex gap-2.5 min-w-max">
-                {itemsWithPickCard.map((item, index) => (
+                {itemsWithPickCard.map((item) => (
                   <div
                     key={item.id}
-                    data-rail-card={index === 0 ? 'true' : undefined}
-                    className={`${activeWidthClass} shrink-0`}
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <ItemCard
-                      item={item}
-                      onToggle={toggleActions.get(item.id)}
-                      minimal={false}
-                      onOpenDetails={onOpenDetails}
-                    />
-                  </div>
-                ))}
-                {/* Clone zone — invisible to the user, triggers seamless teleport */}
-                {clones.map((item, i) => (
-                  <div
-                    key={`clone-${item.id}-${i}`}
-                    aria-hidden="true"
-                    inert=""
                     className={`${activeWidthClass} shrink-0`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
@@ -205,8 +115,10 @@ const SuggestionSection = ({
                   className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-stone-950/90 to-transparent transition-opacity duration-300"
                   style={{ opacity: atStart ? 0 : 1 }}
                 />
-                {/* Right fade always visible on looping rails — there's always more content */}
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-stone-950/90 to-transparent" />
+                <div
+                  className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-stone-950/90 to-transparent"
+                  style={{ opacity: atEnd ? 0 : 1 }}
+                />
               </>
             )}
           </div>

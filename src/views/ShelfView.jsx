@@ -29,6 +29,11 @@ import {
 import Button from '../components/ui/Button.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
 import Dialog from '../components/ui/Dialog.jsx';
+import {
+  FALLBACK_SHELF_GROUP,
+  getEffectiveShelfEnergy,
+  getEffectiveShelfVibe,
+} from '../domain/media/shelfGroups.js';
 
 const ItemDetailsModal = lazyWithPrefetch(() =>
   import('../components/ItemDetailsModal.jsx'),
@@ -116,8 +121,6 @@ const ShelfView = ({
   isBulkDeleting = false,
   onBack,
 }) => {
-  const FALLBACK_VIBE_GROUP = 'ungrouped';
-  const FALLBACK_ENERGY_GROUP = 'ungrouped';
   const watched = useMemo(
     () => items.filter((i) => i.status === 'watched'),
     [items],
@@ -256,11 +259,11 @@ const ShelfView = ({
       );
     } else if (sortBy === 'energy') {
       ENERGIES.forEach((e) => (groups[e.id] = []));
-      groups[FALLBACK_ENERGY_GROUP] = [];
+      groups[FALLBACK_SHELF_GROUP] = [];
 
       backlog.forEach((item) => {
-        const energyId = item.energy || FALLBACK_ENERGY_GROUP;
-        const targetGroup = groups[energyId] ? energyId : FALLBACK_ENERGY_GROUP;
+        const energyId = getEffectiveShelfEnergy(item);
+        const targetGroup = groups[energyId] ? energyId : FALLBACK_SHELF_GROUP;
         groups[targetGroup].push(item);
       });
 
@@ -269,11 +272,11 @@ const ShelfView = ({
       });
     } else {
       VIBES.forEach((v) => (groups[v.id] = []));
-      groups[FALLBACK_VIBE_GROUP] = [];
+      groups[FALLBACK_SHELF_GROUP] = [];
 
       backlog.forEach((item) => {
-        const vibeId = item.vibe || FALLBACK_VIBE_GROUP;
-        const targetGroup = groups[vibeId] ? vibeId : FALLBACK_VIBE_GROUP;
+        const vibeId = getEffectiveShelfVibe(item);
+        const targetGroup = groups[vibeId] ? vibeId : FALLBACK_SHELF_GROUP;
         groups[targetGroup].push(item);
       });
 

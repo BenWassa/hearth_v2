@@ -12,8 +12,7 @@
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-merge": "^3.4.0",
-    "three": "^0.167.1"
+    "tailwind-merge": "^3.4.0"
   },
   "scripts": {
     "setup": "node scripts/setupFirebaseConfig.js",
@@ -24,6 +23,7 @@
     "start": "vite",
     "start:apphosting": "node server/index.js",
     "template:media-map": "node scripts/generateTemplateMediaMap.mjs",
+    "audit:collection-catalog": "node scripts/auditCollectionCatalog.mjs",
     "prebuild": "node scripts/setupFirebaseConfig.js --require-env && node scripts/versioning.js check && node scripts/versioning.js generate",
     "build": "vite build",
     "preview": "vite preview",

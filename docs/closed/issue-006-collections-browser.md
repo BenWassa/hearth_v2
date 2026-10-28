@@ -1,6 +1,6 @@
 # Issue #6 — Collections: scalable saga browser
 
-- **Status:** Open, implementation in PR #8 pending review and merge
+- **Status:** Closed · delivered in PR #8 and PR #19 (v3.16.0)
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/6
 - **Backfilled:** 2026-10-25
 - **Related product documents:** [COLLECTIONS_REDESIGN.md](../../COLLECTIONS_REDESIGN.md), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md)

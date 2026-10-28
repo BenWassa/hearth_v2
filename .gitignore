@@ -21,8 +21,16 @@ ui-debug.log
 
 # Local agent/workflow artifacts
 .claude/
+!.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/release/
+.claude/skills/release/*
+!.claude/skills/release/SKILL.md
 .claude.code-vscode
 .codex/
 graphify-out/
 
 /_archive/
+world-art-browser-evidence/

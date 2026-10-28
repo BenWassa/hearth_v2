@@ -39,7 +39,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     () =>
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
   );
-  const userInteractedRef = useRef(false);
   const [logoFailed, setLogoFailed] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -48,7 +47,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
   const touchStartYRef = useRef(null);
   const gestureAxisRef = useRef(null);
   const suppressNextClickRef = useRef(false);
-  const autoAdvanceRef = useRef(null);
   const containerRef = useRef(null);
 
   // Measure container width so pixel-perfect translation works on all screen sizes
@@ -63,11 +61,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     return () => ro.disconnect();
   }, []);
 
-  const stopAutoAdvance = useCallback(() => {
-    userInteractedRef.current = true;
-    window.clearInterval(autoAdvanceRef.current);
-  }, []);
-
   useEffect(() => {
     const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     if (!media) return;
@@ -77,19 +70,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     return () => media.removeEventListener?.('change', sync);
   }, []);
 
-  const resetAutoAdvance = useCallback(() => {
-    if (autoAdvanceRef.current) window.clearInterval(autoAdvanceRef.current);
-    if (
-      safeItems.length <= 1 ||
-      userInteractedRef.current ||
-      prefersReducedMotion
-    )
-      return;
-    autoAdvanceRef.current = window.setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % safeItems.length);
-    }, 6000);
-  }, [safeItems.length, prefersReducedMotion]);
-
   useEffect(() => {
     setCurrentIndex(0);
   }, [safeItems.length]);
@@ -98,22 +78,13 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
     setLogoFailed(false);
   }, [currentIndex]);
 
-  useEffect(() => {
-    resetAutoAdvance();
-    return () => window.clearInterval(autoAdvanceRef.current);
-  }, [resetAutoAdvance]);
-
-  const handleTouchStart = useCallback(
-    (e) => {
-      const touch = e.targetTouches[0];
-      touchStartXRef.current = touch.clientX;
-      touchStartYRef.current = touch.clientY;
-      gestureAxisRef.current = null;
-      setDragOffset(0);
-      stopAutoAdvance();
-    },
-    [stopAutoAdvance],
-  );
+  const handleTouchStart = useCallback((e) => {
+    const touch = e.targetTouches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    gestureAxisRef.current = null;
+    setDragOffset(0);
+  }, []);
 
   const handleTouchMove = useCallback(
     (e) => {
@@ -213,10 +184,6 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       ref={containerRef}
       className="relative w-full aspect-video bg-stone-900 overflow-hidden rounded-2xl select-none"
       style={{ touchAction: 'pan-y' }}
-      onPointerDownCapture={stopAutoAdvance}
-      onClickCapture={stopAutoAdvance}
-      onFocusCapture={stopAutoAdvance}
-      onKeyDownCapture={stopAutoAdvance}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -224,9 +191,11 @@ const HeroCarousel = ({ items = [], onOpenDetails }) => {
       role="group"
       onKeyDown={(event) => {
         if (event.key === 'ArrowLeft') {
+          event.preventDefault();
           setCurrentIndex((prev) => Math.max(prev - 1, 0));
         }
         if (event.key === 'ArrowRight') {
+          event.preventDefault();
           setCurrentIndex((prev) => Math.min(prev + 1, safeItems.length - 1));
         }
       }}

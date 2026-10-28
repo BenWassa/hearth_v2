@@ -30,15 +30,15 @@
     },
     "expected": {
       "comfort": "high",
-      "comedyFirst": "medium",
+      "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "medium",
+      "visualDistinctiveness": "high",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "agent-reviewed",
-    "disagreement": "Independent agent adjudication for #21: high comfort and low attention remain appropriate. Low plot momentum understated the clear quest/heist/rescue progression, so momentum is medium. The vibrant live-action/CGI hybrid design supports medium visual distinctiveness, not a high exceptional-craft label. Human approval is still required."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -83,14 +83,14 @@
     "expected": {
       "comfort": "high",
       "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
       "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "agent-reviewed",
-    "disagreement": "Independent agent adjudication for #21: the gentle workplace/relationship tone supports high comfort; comedy is substantial but not the sole mode; pacing and structure are straightforward. Visual presentation is treated as low distinctiveness rather than unknown. Human approval is still required."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -123,16 +123,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
+      "comfort": "medium",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "high",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "agent-reviewed",
-    "disagreement": "Independent agent adjudication for #21: survival stakes keep comfort low and momentum high. The narrative is accessible and mostly linear but tracks parallel Earth/Mars problem-solving, so medium complexity is more consistent with the rubric than high. The Mars/space presentation supports high visual distinctiveness. Technical detail and tension raise attention above low, but the mainstream linear structure supports medium rather than high. Human approval is still required."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -161,16 +161,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
       "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "medium",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "agent-reviewed",
-    "disagreement": "Independent agent adjudication for #21: joke-forward comedy, straightforward structure and low attention demand remain appropriate. The strongly authored pink/fashion visual identity supports medium visual distinctiveness rather than an unresolved unknown. Human approval is still required."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -211,8 +211,8 @@
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "agent-reviewed",
-    "disagreement": "Independent agent adjudication for #21: explicit cheerful/comforting evidence and the existing deterministic rule make high comfort the coherent label; the prior medium label made the hybrid unable to agree by construction. Comedy is primary, the competition arc gives medium momentum, and structure/attention remain low. Visual distinctiveness is low rather than unresolved. Human approval is still required."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -239,16 +239,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
+      "comfort": "medium",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "high",
+      "visualDistinctiveness": "medium",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -287,16 +287,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
+      "comfort": "medium",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -337,12 +337,12 @@
       "comedyFirst": "low",
       "plotMomentum": "high",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -379,13 +379,13 @@
       "comfort": "low",
       "comedyFirst": "low",
       "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -405,16 +405,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
+      "comfort": "medium",
+      "comedyFirst": "medium",
+      "plotMomentum": "high",
       "narrativeComplexity": "medium",
       "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -447,16 +447,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
+      "comfort": "medium",
+      "comedyFirst": "high",
+      "plotMomentum": "high",
       "narrativeComplexity": "medium",
       "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -488,16 +488,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "low",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
       "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -524,16 +524,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "high",
+      "comedyFirst": "medium",
       "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "low",
+      "attentionDemand": "low",
       "curatedClassic": "high"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -567,16 +567,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "medium",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "high"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -613,16 +613,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "low",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "high",
       "curatedClassic": "high"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -656,15 +656,15 @@
     },
     "expected": {
       "comfort": "high",
-      "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "comedyFirst": "high",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -696,12 +696,12 @@
       "comedyFirst": "medium",
       "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -724,16 +724,16 @@
       ]
     },
     "expected": {
-      "comfort": "high",
-      "comedyFirst": "medium",
-      "plotMomentum": "low",
-      "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "low",
+      "comfort": "medium",
+      "comedyFirst": "low",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "medium",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -759,16 +759,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
-      "plotMomentum": "medium",
+      "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -794,16 +794,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
-      "plotMomentum": "medium",
+      "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -820,14 +820,14 @@
     "expected": {
       "comfort": "high",
       "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -855,16 +855,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
+      "comfort": "medium",
+      "comedyFirst": "high",
       "plotMomentum": "high",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -897,16 +897,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
+      "comfort": "medium",
       "comedyFirst": "low",
       "plotMomentum": "high",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -929,15 +929,15 @@
     },
     "expected": {
       "comfort": "low",
-      "comedyFirst": "low",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "high",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -973,16 +973,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
+      "comfort": "high",
+      "comedyFirst": "low",
+      "plotMomentum": "low",
+      "narrativeComplexity": "low",
       "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -1017,16 +1017,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "medium",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "high",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -1059,16 +1059,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
       "narrativeComplexity": "medium",
       "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -1096,16 +1096,16 @@
       ]
     },
     "expected": {
-      "comfort": "medium",
+      "comfort": "high",
       "comedyFirst": "high",
-      "plotMomentum": "medium",
+      "plotMomentum": "low",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -1144,16 +1144,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
+      "comfort": "medium",
       "comedyFirst": "low",
-      "plotMomentum": "high",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": true,
@@ -1208,14 +1208,14 @@
     "expected": {
       "comfort": "low",
       "comedyFirst": "low",
-      "plotMomentum": "high",
+      "plotMomentum": "medium",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Primary motive and facet strengths require independent human review; seed manual tags are not truth."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1246,15 +1246,15 @@
     },
     "expected": {
       "comfort": "low",
-      "comedyFirst": "low",
-      "plotMomentum": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "medium",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "high",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1288,12 +1288,12 @@
       "comedyFirst": "low",
       "plotMomentum": "high",
       "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "high",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1320,16 +1320,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "medium",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
+      "narrativeComplexity": "low",
       "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1361,15 +1361,15 @@
     },
     "expected": {
       "comfort": "low",
-      "comedyFirst": "low",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1412,13 +1412,13 @@
       "comfort": "high",
       "comedyFirst": "medium",
       "plotMomentum": "low",
-      "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "low",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1454,16 +1454,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
+      "comfort": "medium",
+      "comedyFirst": "medium",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
       "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1502,16 +1502,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
+      "comfort": "medium",
+      "comedyFirst": "medium",
       "plotMomentum": "high",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "low",
+      "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1550,13 +1550,13 @@
       "comfort": "medium",
       "comedyFirst": "high",
       "plotMomentum": "medium",
-      "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1590,16 +1590,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "medium",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
       "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1640,16 +1640,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "high",
+      "comedyFirst": "medium",
       "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
+      "narrativeComplexity": "low",
       "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1678,16 +1678,16 @@
       ]
     },
     "expected": {
-      "comfort": "low",
-      "comedyFirst": "low",
-      "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "high",
+      "comfort": "medium",
+      "comedyFirst": "medium",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "medium",
+      "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1714,16 +1714,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "high",
+      "comfort": "medium",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "medium",
       "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1763,14 +1763,14 @@
     "expected": {
       "comfort": "low",
       "comedyFirst": "low",
-      "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "high",
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1805,16 +1805,16 @@
       ]
     },
     "expected": {
-      "comfort": "high",
-      "comedyFirst": "medium",
-      "plotMomentum": "low",
+      "comfort": "medium",
+      "comedyFirst": "low",
+      "plotMomentum": "medium",
       "narrativeComplexity": "low",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "low",
       "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1870,16 +1870,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "comfort": "medium",
+      "comedyFirst": "medium",
+      "plotMomentum": "high",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "medium",
+      "attentionDemand": "low",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1919,16 +1919,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
-      "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
+      "comfort": "low",
+      "comedyFirst": "low",
+      "plotMomentum": "high",
+      "narrativeComplexity": "high",
       "visualDistinctiveness": "high",
-      "attentionDemand": "medium",
+      "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -1959,15 +1959,15 @@
     },
     "expected": {
       "comfort": "low",
-      "comedyFirst": "low",
-      "plotMomentum": "high",
-      "narrativeComplexity": "high",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "high",
+      "comedyFirst": "medium",
+      "plotMomentum": "medium",
+      "narrativeComplexity": "medium",
+      "visualDistinctiveness": "low",
+      "attentionDemand": "medium",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -2008,16 +2008,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "low",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
-      "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
-      "attentionDemand": "medium",
+      "narrativeComplexity": "low",
+      "visualDistinctiveness": "high",
+      "attentionDemand": "high",
       "curatedClassic": "high"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -2049,16 +2049,16 @@
       ]
     },
     "expected": {
-      "comfort": "unknown",
-      "comedyFirst": "unknown",
+      "comfort": "low",
+      "comedyFirst": "low",
       "plotMomentum": "medium",
       "narrativeComplexity": "medium",
-      "visualDistinctiveness": "unknown",
+      "visualDistinctiveness": "high",
       "attentionDemand": "medium",
       "curatedClassic": "high"
     },
-    "review": "provisional",
-    "disagreement": "Borderline genre/motive; no production title lookup. Synthetic final item tests missing evidence."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,
@@ -2090,8 +2090,8 @@
       "attentionDemand": "high",
       "curatedClassic": "unknown"
     },
-    "review": "provisional",
-    "disagreement": "Short experimental film: visual distinctiveness and narrative complexity can both be high. Classic status remains maintainer controlled."
+    "review": "approved",
+    "disagreement": "Labels set by majority of three independent blind reviewers (Codex gpt-6.1-sol, Claude Sonnet, Claude Opus), none shown any prior label or model output; lead spot check 2026-10-28; approval delegated by the owner on 2026-10-28. Three-way splits resolve to the middle level."
   },
   {
     "seed": false,

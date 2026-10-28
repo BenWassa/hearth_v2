@@ -17,11 +17,7 @@ const createClassificationService = ({
     const store = db();
     const day = new Date(now()).toISOString().slice(0, 10);
     const ref = store.doc(`classification_budgets/${day}`);
-    const maximum = Number(process.env.GEMINI_DAILY_REQUEST_LIMIT || 20);
-    // Hard ceiling: includes retries and all backend instances. Fail closed.
-    const limit = Number.isInteger(maximum)
-      ? Math.min(Math.max(maximum, 0), 100)
-      : 0;
+    const limit = gemini.dailyRequestLimit();
     return store.runTransaction(async (tx) => {
       const snapshot = await tx.get(ref);
       const count = snapshot.data()?.count || 0;

@@ -95,3 +95,14 @@ GitHub Classification PR QA passes on this branch: 53 unit-test files / 342 unit
 4. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.
 5. Confirm metadata-sharing permission, account-specific provider quota and production billing/smoke behavior.
 6. Keep production Gemini disabled until all gates pass.
+
+## Preview before approving live calls
+
+```sh
+node scripts/evaluateClassification.cjs --gemini --dry-run --limit=5 --out=/tmp/gemini-preview.json
+# Or select exact canonical keys with --keys=tmdb:movie:346648,tmdb:movie:257211
+```
+
+This needs no enablement variables or API key and makes zero network calls. It does not read credentials, dotenv files, Firestore or the daily budget. The JSON shows each selected real title's production allowlisted metadata projection, exact shared production request body (system/user prompts, schema and generation config), model from `GEMINI_MODEL` or a labelled placeholder, and placeholder authentication. Temperature is explicitly documented as omitted by production; thinking level is `minimal`. Without `--out`, JSON prints to stdout; with it, stdout contains a short plan summary.
+
+The plan uses three predictions per title and estimates attempts as `ceil(predictions × 17 / 15)` from the observed pilot. Estimated UTC days are `ceil(estimated attempts / daily cap)`, assuming the full cap is available each day; existing usage is never inspected. The shared production cap defaults to 20, clamps integer values to 0–100, and fails closed to 0 for invalid values. A zero cap reports no completion estimate. These estimates do not guarantee retry counts or completion. No call is made by this command; live calls still require owner approval.

@@ -93,3 +93,52 @@ module.exports = {
   findRuleExpectedConflicts,
   representativeValue,
 };
+
+// No enablement check, credential access, provider calls or budget reservations.
+const buildGeminiDryRun = async (fixtures, args = []) => {
+  const domain = await import('../src/domain/media/classification.mjs');
+  const gemini = require('../api/_lib/geminiClassifier');
+  const selection = selectLiveFixtures(fixtures, args);
+  const model = process.env.GEMINI_MODEL || '<GEMINI_MODEL: not configured>';
+  const predictionsPerTitle = 3;
+  const totalPredictions = selection.fixtures.length * predictionsPerTitle;
+  const estimatedProviderAttempts = Math.ceil((totalPredictions * 17) / 15);
+  const dailyCap = gemini.dailyRequestLimit();
+  return {
+    mode: 'gemini-dry-run',
+    statement: 'No call was made. No daily budget was read or reserved.',
+    selection: { mode: selection.mode, keys: selection.keys },
+    plan: {
+      titlesSelected: selection.fixtures.map((fixture) => fixture.input.title),
+      predictionsPerTitle,
+      totalPredictions,
+      estimatedProviderAttempts,
+      estimateBasis:
+        'Estimate: observed 17 provider attempts per 15 predictions; rounded up. Not a guarantee or retry maximum.',
+      dailyCap,
+      dailyCapHardCeiling: 100,
+      utcDaysNeededEstimate:
+        dailyCap > 0 ? Math.ceil(estimatedProviderAttempts / dailyCap) : null,
+      schedulingAssumption:
+        'Full daily cap available each UTC day; existing budget usage is not inspected. Zero cap prevents completion.',
+    },
+    requests: selection.fixtures.map((fixture, index) => {
+      const input = domain.normalizeClassificationInput(fixture.input);
+      return {
+        key: selection.keys[index],
+        model,
+        publicMetadata: gemini.projectPublicMetadata(input),
+        method: 'POST',
+        url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': '<credential supplied only for live calls>',
+        },
+        body: gemini.buildRequestBody(input, domain.FACETS, domain.LEVELS),
+        temperaturePolicy:
+          'Temperature omitted from the production request (model default; deprecated/ignored for Gemini 3.5 Flash-Lite).',
+      };
+    }),
+  };
+};
+module.exports.buildGeminiDryRun = buildGeminiDryRun;

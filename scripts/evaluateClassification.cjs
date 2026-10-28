@@ -5,10 +5,7 @@ const path = require('node:path');
 const fixtures = require('../src/domain/media/classificationFixtures.json');
 const gemini = require('../api/_lib/geminiClassifier');
 const {
-  createClassificationService,
-} = require('../api/_lib/classificationService');
-const { initializeFirebaseAdmin } = require('../server/firebaseAdmin');
-const {
+  buildGeminiDryRun,
   realFixtures,
   selectLiveFixtures,
   findRuleExpectedConflicts,
@@ -16,6 +13,32 @@ const {
 } = require('./classificationEvaluation.cjs');
 
 const run = async () => {
+  if (process.argv.includes('--dry-run')) {
+    if (!process.argv.includes('--gemini'))
+      throw new Error('--dry-run requires --gemini');
+    const report = await buildGeminiDryRun(fixtures, process.argv.slice(2));
+    const json = JSON.stringify(report, null, 2) + '\n';
+    const output = process.argv
+      .find((arg) => arg.startsWith('--out='))
+      ?.slice(6);
+    if (output) {
+      const destination = path.resolve(output);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.writeFileSync(destination, json);
+    } else {
+      console.log(json);
+    }
+    console.log(
+      `Gemini dry-run: ${report.plan.titlesSelected.join(', ')}; ${
+        report.plan.totalPredictions
+      } predictions (${report.plan.predictionsPerTitle}/title); estimated ${
+        report.plan.estimatedProviderAttempts
+      } attempts; daily cap ${report.plan.dailyCap}; estimated UTC days: ${
+        report.plan.utcDaysNeededEstimate ?? 'cannot complete'
+      }. No call was made.`,
+    );
+    return;
+  }
   const domain = await import('../src/domain/media/classification.mjs');
   const live = process.argv.includes('--gemini');
   const out = path.resolve(
@@ -39,7 +62,7 @@ const run = async () => {
       require('dotenv').config({ path: envFile, override: false, quiet: true });
     }
     if (!gemini.enabled()) throw new Error('Missing pilot configuration');
-    initializeFirebaseAdmin();
+    require('../server/firebaseAdmin').initializeFirebaseAdmin();
   }
   let previous = {};
   if (live && fs.existsSync(out)) {
@@ -67,7 +90,8 @@ const run = async () => {
   const saved = new Map(
     (previous.results || []).map((result) => [result.key, result]),
   );
-  const budget = createClassificationService();
+  const budget =
+    require('../api/_lib/classificationService').createClassificationService();
   let exhausted = false;
   let attemptedTitlesThisRun = 0;
   let providerAttemptsThisRun = 0;

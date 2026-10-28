@@ -1,6 +1,6 @@
 # Issue #7 — Tonight: MECE thematic rows and activity-aware selection
 
-- **Status:** Open — planning / validation (no application code changed by this document)
+- **Status:** Approved row decisions implemented on `codex/tonight-fixes` (draft PR #26); final product validation remains.
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/7
 - **Last reviewed:** 2026-10-25
 - **Related:** [Collections scalability #6](https://github.com/BenWassa/hearth_v2/issues/6), [PRODUCT.md](../../PRODUCT.md), [DESIGN.md](../../DESIGN.md), [OTHER_UPGRADES.md](../../OTHER_UPGRADES.md)
@@ -21,14 +21,14 @@ The algorithm must distinguish:
 
 ## Current code audit (main on 2026-10-25)
 
-| Row | Current predicate | Distinctness defect |
-| --- | --- | --- |
-| Easy & Comforting | `vibe === 'comfort' || energy === 'light'` | Light action, comedy, or thriller is not necessarily comforting |
-| Need a Laugh | `genres` contains Comedy and vibe is not gripping/visual | Genre membership is weaker than comedy-first intent; collides with comfort |
-| Quick Bites | `type === 'show' && (runtimeMinutes <= 35 || runtime <= 35)` | A null runtime qualifies in JavaScript; duration dimension competes with mood |
-| Deep Dives | `energy === 'focused' || vibe === 'gripping'` | Gripping but accessible != complex/deep; focused visual content also qualifies |
-| Spectacles | `type === 'movie' && vibe === 'visual'` | Excludes qualifying TV; can also be focused |
-| The Classics | `type === 'movie' && vibe === 'classic'` | Coherent but excludes classic TV by design |
+| Row               | Current predicate                                        | Distinctness defect                                                        |
+| ----------------- | -------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------ |
+| Easy & Comforting | `vibe === 'comfort'                                      |                                                                            | energy === 'light'`  | Light action, comedy, or thriller is not necessarily comforting                |
+| Need a Laugh      | `genres` contains Comedy and vibe is not gripping/visual | Genre membership is weaker than comedy-first intent; collides with comfort |
+| Quick Bites       | `type === 'show' && (runtimeMinutes <= 35                |                                                                            | runtime <= 35)`      | A null runtime qualifies in JavaScript; duration dimension competes with mood  |
+| Deep Dives        | `energy === 'focused'                                    |                                                                            | vibe === 'gripping'` | Gripping but accessible != complex/deep; focused visual content also qualifies |
+| Spectacles        | `type === 'movie' && vibe === 'visual'`                  | Excludes qualifying TV; can also be focused                                |
+| The Classics      | `type === 'movie' && vibe === 'classic'`                 | Coherent but excludes classic TV by design                                 |
 
 Current `balanceRows(rows)` caps each independent row to a computed average of total row sizes. It **does not deduplicate**. Daily category-salted shuffling masks repeated order but does not model usefulness. Thematic JSX ordering is fixed. `Currently Watching` already sorts by modified timestamp, while theme rows do not.
 
@@ -36,14 +36,14 @@ Current `balanceRows(rows)` caps each independent row to a computed average of t
 
 Using the 30 **declared** titles in `src/template/seedLibrary.js` (15 films, 15 shows), retaining their declared `null` TV runtime before mapped media enrichment:
 
-| Raw pool | Size |
-| --- | ---: |
-| Easy & Comforting | 14 |
-| Need a Laugh | 6 |
-| Quick Bites | 15 |
-| Deep Dives | 14 |
-| Spectacles | 3 |
-| The Classics | 3 |
+| Raw pool                 |   Size |
+| ------------------------ | -----: |
+| Easy & Comforting        |     14 |
+| Need a Laugh             |      6 |
+| Quick Bites              |     15 |
+| Deep Dives               |     14 |
+| Spectacles               |      3 |
+| The Classics             |      3 |
 | **Total raw placements** | **55** |
 
 - **22/30 titles** match at least two raw predicates.
@@ -53,20 +53,20 @@ Using the 30 **declared** titles in `src/template/seedLibrary.js` (15 films, 15 
 
 ### Overlap cases worth regression tests
 
-| Title | Raw matches before enrichment | Proposed primary category | Why |
-| --- | --- | --- | --- |
-| Paddington 2 | Comfort + Laugh | Easy & Comforting | Gentle warmth drives selection |
-| The Intern | Comfort + Laugh | Easy & Comforting | More heartwarming than comedy-first |
-| Legally Blonde | Comfort + Laugh | Need a Laugh | Light comedy-first |
-| Knives Out | Laugh + Deep | Deep Dives | Mystery and close attention dominate; test vs Get Hooked |
-| The Martian | Comfort + Deep | Deep Dives | Sustained engagement overrides comfort tag |
-| Ocean's Eleven | Comfort + Deep | Get Hooked | Playful, accessible plot-driven watch |
-| Spider-Man: Into the Spider-Verse | Comfort + Spectacles | Spectacles | Animation is a defining reason |
-| Blade Runner 2049 | Deep + Spectacles | Spectacles | Exceptional visual craft outweighs attention demand |
-| Roman Holiday | Comfort + Laugh + Classics | The Classics | Curatorial classic selection |
-| The Godfather | Deep + Classics | The Classics | Primary Classics identity |
-| Friday Night Lights | Comfort + Deep + potentially Quick | Easy & Comforting | Human drama; runtime must be validated |
-| Only Murders in the Building | Comfort + Deep + potentially Quick | Get Hooked (test) | Accessible mystery, lighter than Deep Dives |
+| Title                             | Raw matches before enrichment      | Proposed primary category | Why                                                      |
+| --------------------------------- | ---------------------------------- | ------------------------- | -------------------------------------------------------- |
+| Paddington 2                      | Comfort + Laugh                    | Easy & Comforting         | Gentle warmth drives selection                           |
+| The Intern                        | Comfort + Laugh                    | Easy & Comforting         | More heartwarming than comedy-first                      |
+| Legally Blonde                    | Comfort + Laugh                    | Need a Laugh              | Light comedy-first                                       |
+| Knives Out                        | Laugh + Deep                       | Deep Dives                | Mystery and close attention dominate; test vs Get Hooked |
+| The Martian                       | Comfort + Deep                     | Deep Dives                | Sustained engagement overrides comfort tag               |
+| Ocean's Eleven                    | Comfort + Deep                     | Get Hooked                | Playful, accessible plot-driven watch                    |
+| Spider-Man: Into the Spider-Verse | Comfort + Spectacles               | Spectacles                | Animation is a defining reason                           |
+| Blade Runner 2049                 | Deep + Spectacles                  | Spectacles                | Exceptional visual craft outweighs attention demand      |
+| Roman Holiday                     | Comfort + Laugh + Classics         | The Classics              | Curatorial classic selection                             |
+| The Godfather                     | Deep + Classics                    | The Classics              | Primary Classics identity                                |
+| Friday Night Lights               | Comfort + Deep + potentially Quick | Easy & Comforting         | Human drama; runtime must be validated                   |
+| Only Murders in the Building      | Comfort + Deep + potentially Quick | Get Hooked (test)         | Accessible mystery, lighter than Deep Dives              |
 
 These placements are **research hypotheses**, not hard-coded definitive editorial truths. Validate borderline titles using representative user studies / a reviewer-maintained fixture.
 
@@ -78,14 +78,14 @@ These placements are **research hypotheses**, not hard-coded definitive editoria
 
 ### Preferred Option B: operational definitions
 
-| Primary | Include if the principal reason to choose is… | Avoid if… |
-| --- | --- | --- |
-| Easy & Comforting | warm, gentle, familiar, low-friction, reassuring | primarily joke-forward or intense |
-| Need a Laugh | light/comedy-first experience | merely contains comedic moments; comedy-drama requiring deep focus |
-| Get Hooked | easy-to-enter momentum, mystery, accessible excitement | genuinely complex/attention-heavy or visual craft is the point |
-| Deep Dives | demanding, intense, intricate, thoughtful immersion | accessible action excitement without significant attention demand |
-| Spectacles | exceptional visuals, cinematography, animation, nature, scale | merely a big-budget film without visual distinctiveness |
-| The Classics | intentionally curated classic films | just older without classic/curatorial fit |
+| Primary           | Include if the principal reason to choose is…                 | Avoid if…                                                          |
+| ----------------- | ------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Easy & Comforting | warm, gentle, familiar, low-friction, reassuring              | primarily joke-forward or intense                                  |
+| Need a Laugh      | light/comedy-first experience                                 | merely contains comedic moments; comedy-drama requiring deep focus |
+| Get Hooked        | easy-to-enter momentum, mystery, accessible excitement        | genuinely complex/attention-heavy or visual craft is the point     |
+| Deep Dives        | demanding, intense, intricate, thoughtful immersion           | accessible action excitement without significant attention demand  |
+| Spectacles        | exceptional visuals, cinematography, animation, nature, scale | merely a big-budget film without visual distinctiveness            |
+| The Classics      | intentionally curated classic films                           | just older without classic/curatorial fit                          |
 
 ### Proposed assignment of the full 30-item seed
 
@@ -131,15 +131,15 @@ Canonical identity: prefer stable local watchlist ID; ensure duplicate catalog e
 
 These numbers are **UX test parameters**, not a final policy:
 
-| Eligible unwatched shelf | Example Tonight composition |
-| --- | --- |
-| 0 | empty-state action to add/import; no ghost rails |
-| 1–5 | compact mixed selection or single coherent row; no 1-card carousel farm |
-| 6–12 | up to 2 strong rows where each has >=2 distinct items |
-| 13–30 | up to 3–4 distinctive rows where each has >=3 distinct items |
-| 31–50+ | up to 4–5 rows, capped cards with clear Shelf escape path |
+| Eligible unwatched shelf | Example Tonight composition                                             |
+| ------------------------ | ----------------------------------------------------------------------- |
+| 0                        | empty-state action to add/import; no ghost rails                        |
+| 1–5                      | compact mixed selection or single coherent row; no 1-card carousel farm |
+| 6–12                     | up to 2 strong rows where each has >=2 distinct items                   |
+| 13–30                    | up to 3–4 distinctive rows where each has >=3 distinct items            |
+| 31–50+                   | up to 4–5 rows, capped cards with clear Shelf escape path               |
 
-Candidate row utility can account for (a) number of good matches, (b) category-fit scores, (c) diversity and minimal repetition, (d) strong *deliberate* recent title additions, (e) confirmed watched-event recency, (f) stable row order and presentation. **Do not rank by raw updatedAt as viewing recency**; normal edits and metadata enrichment can modify it.
+Candidate row utility can account for (a) number of good matches, (b) category-fit scores, (c) diversity and minimal repetition, (d) strong _deliberate_ recent title additions, (e) confirmed watched-event recency, (f) stable row order and presentation. **Do not rank by raw updatedAt as viewing recency**; normal edits and metadata enrichment can modify it.
 
 Allow `Currently Watching` to lead when active; do not mix `watching` series into unwatched thematic rails. `Coming Soon` remains informational, not a primary mood. Coordinate Collections placement with #6 so feature/index navigation doesn't overwhelm selection.
 
@@ -147,29 +147,29 @@ Stable ordering: keep the row arrangement and item order stable during active se
 
 ## Scenario test matrix
 
-| Scenario | Setup | Expected |
-| --- | --- | --- |
-| Empty | 0 entries | useful add/import state, zero empty mood rails |
-| Single | 1 unwatched title | title discoverable without pointless category carousel |
-| Small mixed | 5 mixed films/shows | compact composition with no duplicated items |
-| Mid-sized | 12 titles across six moods | no weak 1-item rails; sensible coverage |
-| Base seed | 30 declared seed items | compare exact categories and 30 unique primary assignments |
-| Large balanced | 50+ entries and 25+ collections | bounded Tonight; all Shelf entries reachable |
-| Comedy-heavy | 20 sitcoms and comedy films | Laugh stays strong; no artificial near-duplicate Comfort rail |
-| Comfort-heavy | comfort drama plus light comedy | distinguish primary motive, suppress duplicate |
-| Plot/complex mix | mystery, thrillers, dense dramas | Get Hooked vs Deep Dives demonstrably different |
-| Visual-heavy | animation, nature docs, large films and TV | Spectacles works for both media types |
-| Short episode | 22-minute next episode | eligible for contextual Quick Bites, once |
-| Runtime invalid | null, undefined, 0, -5, NaN, blank | not Quick Bites |
-| Series episode variance | first ep 24m, next ep 55m | Quick Bites reflects next watchable episode |
-| Active TV | 3 partially watched series | Currently Watching contains them, mood pool excludes |
-| Completed TV | all released episodes watched | does not return to unwatched theme selection |
-| New addition | one freshly deliberately added title | moderate recency benefit; stable visible rows |
-| Edit-only | metadata refresh or import timestamp churn | no false “recently watched” boost |
-| Date change | repeated open on same day / following day | stable same-session; only controlled variation |
-| Classic TV policy | I Love Lucy, Twilight Zone | explicit, tested inclusion/exclusion policy |
-| User override | customized vibe or energy | visible category change only when intended |
-| Limited metadata | missing genre/runtime/vibe | safe fallback; not falsely classified |
+| Scenario                | Setup                                      | Expected                                                      |
+| ----------------------- | ------------------------------------------ | ------------------------------------------------------------- |
+| Empty                   | 0 entries                                  | useful add/import state, zero empty mood rails                |
+| Single                  | 1 unwatched title                          | title discoverable without pointless category carousel        |
+| Small mixed             | 5 mixed films/shows                        | compact composition with no duplicated items                  |
+| Mid-sized               | 12 titles across six moods                 | no weak 1-item rails; sensible coverage                       |
+| Base seed               | 30 declared seed items                     | compare exact categories and 30 unique primary assignments    |
+| Large balanced          | 50+ entries and 25+ collections            | bounded Tonight; all Shelf entries reachable                  |
+| Comedy-heavy            | 20 sitcoms and comedy films                | Laugh stays strong; no artificial near-duplicate Comfort rail |
+| Comfort-heavy           | comfort drama plus light comedy            | distinguish primary motive, suppress duplicate                |
+| Plot/complex mix        | mystery, thrillers, dense dramas           | Get Hooked vs Deep Dives demonstrably different               |
+| Visual-heavy            | animation, nature docs, large films and TV | Spectacles works for both media types                         |
+| Short episode           | 22-minute next episode                     | eligible for contextual Quick Bites, once                     |
+| Runtime invalid         | null, undefined, 0, -5, NaN, blank         | not Quick Bites                                               |
+| Series episode variance | first ep 24m, next ep 55m                  | Quick Bites reflects next watchable episode                   |
+| Active TV               | 3 partially watched series                 | Currently Watching contains them, mood pool excludes          |
+| Completed TV            | all released episodes watched              | does not return to unwatched theme selection                  |
+| New addition            | one freshly deliberately added title       | moderate recency benefit; stable visible rows                 |
+| Edit-only               | metadata refresh or import timestamp churn | no false “recently watched” boost                             |
+| Date change             | repeated open on same day / following day  | stable same-session; only controlled variation                |
+| Classic TV policy       | I Love Lucy, Twilight Zone                 | explicit, tested inclusion/exclusion policy                   |
+| User override           | customized vibe or energy                  | visible category change only when intended                    |
+| Limited metadata        | missing genre/runtime/vibe                 | safe fallback; not falsely classified                         |
 
 Add unit tests for selector eligibility, classifier ties, runtime validation, allocation invariants, and dynamic composition; add Tonight component/integration tests with a mocked but realistic row renderer. Test responsive at 320/390/448 CSS px, reduced motion, card accessibility, and rewind/cloning behavior (clones are presentation only, not logical duplicate recommendations).
 
@@ -179,7 +179,7 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 2. **Pure domain selection:** separate classification from UI; define category contract, scoring, tie-breaks, and fixtures; keep current user-facing tags usable.
 3. **Dynamic page composition:** meaningful row utility, minimum counts, card caps, stable order; unify global allocation and row count logic.
 4. **Activity-aware tuning:** use real event timestamps if captured, not metadata-derived recency. Avoid introducing a tracking system merely for novelty.
-5. **Product validation and cleanup:** compare taxonomy A/B/C with seed and skewed libraries; update copy/design and relevant PRODUCT/DESIGN docs *only on accepted decisions*; visual/a11y QA.
+5. **Product validation and cleanup:** compare taxonomy A/B/C with seed and skewed libraries; update copy/design and relevant PRODUCT/DESIGN docs _only on accepted decisions_; visual/a11y QA.
 
 ## Explicit unresolved decisions
 
@@ -197,7 +197,19 @@ Add unit tests for selector eligibility, classifier ties, runtime validation, al
 - The Tonight selection clearly reduces choices without burying unique saved titles.
 - When completed, move this file (preserving history via git) from `docs/open/` to `docs/closed/`, update status and link in the issue.
 
-
 ## Issue #20 integration (2026-10-26)
 
 [Automatic classification implementation](issue-020-implementation-record.md) now supplies independent, versioned viewing facets. `tonightClassification.js` implements scored primary assignment, typed canonical deduplication, exclusion of active/completed shows, and positive finite next-watchable runtime checks. Existing six labels remain; Quick Bites uses <=30 minutes and reserves its titles once. Automatic Comfort is never inferred from a missing tag or Light energy alone. Historic user/import tags stay preserved. These safety/assignment changes support #7, but do not claim completion of its dynamic row composition, activity weighting, taxonomy experiments, or user validation. Rules-only coverage is deliberately sparse; the optional Gemini quality pilot is still gated.
+
+## Implementation status (2026-10-27)
+
+Implemented on `codex/tonight-fixes` for draft PR #26, including all owner-approved decisions in [the investigation and plan](issue-007-row-decisions-plan.md).
+
+- Tonight consumes `allocateTonightThemes` -> `composeTonightRows`, with unique canonical placements, activity scoring and deterministic daily ties.
+- Compact libraries (1–5) show "Tonight's picks". The existing mood caps (2 for 6–12, 4 for 13–30, 5 for 31+) and tier minimums remain. Quick Bites is extra when it meets the minimum, ordered with moods by strength. Qualifying Classics displaces the weakest mood if needed. Every row remains capped at 12 cards.
+- Need a Laugh accepts a bounded weak signal only with unknown comedyFirst, a non-automatic easy/comfort vibe and first-listed raw Comedy genre. Known facets retain their meaning. Honest demo keywords exercise deterministic classification; classifier and version remain unchanged.
+- Get Hooked requires high plot momentum and known low/medium complexity and attention. High complexity or attention stays in Deep Dives. Easy & Comforting is unchanged; no Unwind row.
+- Classic TV qualifies through intentional legacy classic tags or curatedClassic overrides, never age alone.
+- Quick Bites keeps the 30-minute threshold and excludes started shows from all mood rows. Undersized themes and unknown titles fold into "Also on the shelf" when a fallback slot is available.
+- Hero, Currently Watching, Coming Soon, Worlds and Collections retain their roles. Hero may repeat a rail title because it is navigation.
+- Regression tests cover approved slots, classification boundaries, classic TV, Shelf grouping, demo composition and unique placements. Final product/user validation remains separate from this implementation.

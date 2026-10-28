@@ -2,6 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { vi } from 'vitest';
 import TonightView from './TonightView.jsx';
+import { buildTemplateSeedItems } from '../template/seedLibrary.js';
 
 vi.mock('./components/tonight/HeroCarousel.jsx', () => ({
   default: () => <div data-testid="hero-carousel" />,
@@ -15,8 +16,20 @@ vi.mock('./components/tonight/WorldsRail.jsx', () => ({
   default: () => <div data-testid="worlds-rail" />,
 }));
 
+// Renders title and card ids so tests can assert row membership.
 vi.mock('./components/tonight/SuggestionSection.jsx', () => ({
-  default: ({ title }) => <section>{title}</section>,
+  default: ({ title, suggestions = [] }) => (
+    <section data-testid="suggestion-section" data-title={title}>
+      {title}
+      <ul>
+        {suggestions.map((item) => (
+          <li key={item.id} data-item-id={item.id}>
+            {item.title}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ),
 }));
 
 vi.mock('./components/tonight/TonightHeaderMenu.jsx', () => ({
@@ -132,6 +145,133 @@ describe('TonightView coming soon row', () => {
     ]);
 
     expect(mounted.container.textContent).not.toContain('Coming Soon');
+
+    await cleanupTonight(mounted);
+  });
+});
+
+describe('TonightView thematic rows', () => {
+  beforeAll(() => {
+    global.IS_REACT_ACT_ENVIRONMENT = true;
+  });
+
+  const CURRENTLY_WATCHING = 'Currently Watching';
+  const thematicSections = (container) =>
+    [
+      ...container.querySelectorAll('[data-testid="suggestion-section"]'),
+    ].filter((node) => node.getAttribute('data-title') !== CURRENTLY_WATCHING);
+
+  it('renders the capped demo row set with substantial rails and no duplicates', async () => {
+    const seed = buildTemplateSeedItems();
+    expect(seed).toHaveLength(30);
+    const mounted = await renderTonight(seed);
+
+    const sections = thematicSections(mounted.container);
+    expect(
+      sections.map((section) => section.getAttribute('data-title')).sort(),
+    ).toEqual([
+      'Deep Dives',
+      'Easy & Comforting',
+      'Need a Laugh',
+      'Quick Bites',
+      'Spectacles',
+      'The Classics',
+    ]);
+    expect(
+      sections.map((section) => [
+        section.getAttribute('data-title'),
+        section.querySelectorAll('[data-item-id]').length,
+      ]),
+    ).toEqual([
+      ['Easy & Comforting', 7],
+      ['Spectacles', 5],
+      ['Quick Bites', 4],
+      ['Deep Dives', 4],
+      ['The Classics', 4],
+      ['Need a Laugh', 3],
+    ]);
+    const ids = sections.flatMap((section) =>
+      [...section.querySelectorAll('[data-item-id]')].map((node) =>
+        node.getAttribute('data-item-id'),
+      ),
+    );
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
+    sections.forEach((section) => {
+      expect(
+        section.querySelectorAll('[data-item-id]').length,
+      ).toBeGreaterThanOrEqual(3);
+    });
+    expect(mounted.container.textContent).not.toContain(
+      'Nothing queued for tonight',
+    );
+
+    await cleanupTonight(mounted);
+  });
+
+  it('keeps the Worlds rail after the first rail and Collections above The Classics', async () => {
+    const mounted = await renderTonight(buildTemplateSeedItems());
+    const html = mounted.container.innerHTML;
+    const first = thematicSections(mounted.container)[0];
+    const worlds = mounted.container.querySelector(
+      '[data-testid="worlds-rail"]',
+    );
+    const collections = mounted.container.querySelector(
+      '[data-testid="collections-rail"]',
+    );
+    expect(html).toContain('worlds-rail');
+    expect(
+      first.compareDocumentPosition(worlds) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const classics = thematicSections(mounted.container).find(
+      (node) => node.getAttribute('data-title') === 'The Classics',
+    );
+    if (classics) {
+      expect(
+        collections.compareDocumentPosition(classics) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+    await cleanupTonight(mounted);
+  });
+
+  it('shows one compact row and no 1-card themed rails for a library of 3', async () => {
+    const mounted = await renderTonight(buildTemplateSeedItems().slice(0, 3));
+
+    const sections = thematicSections(mounted.container);
+    expect(sections).toHaveLength(1);
+    expect(sections[0].getAttribute('data-title')).toBe("Tonight's picks");
+    expect(sections[0].querySelectorAll('[data-item-id]')).toHaveLength(3);
+
+    await cleanupTonight(mounted);
+  });
+
+  it('shows a calm empty state pointing to Add for an empty library', async () => {
+    const mounted = await renderTonight([]);
+
+    expect(thematicSections(mounted.container)).toHaveLength(0);
+    const text = mounted.container.textContent;
+    expect(text).toContain('Nothing queued for tonight');
+    expect(text).toContain('Add tab');
+
+    await cleanupTonight(mounted);
+  });
+
+  it('omits the empty state when a show is in progress', async () => {
+    const mounted = await renderTonight([
+      {
+        id: 'show-1',
+        type: 'show',
+        status: 'watching',
+        title: 'The North Road',
+        seasons: [],
+      },
+    ]);
+
+    expect(mounted.container.textContent).toContain(CURRENTLY_WATCHING);
+    expect(mounted.container.textContent).not.toContain(
+      'Nothing queued for tonight',
+    );
 
     await cleanupTonight(mounted);
   });

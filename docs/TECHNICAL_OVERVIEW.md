@@ -151,3 +151,11 @@ Tonight derives deduplicated feature rollups, applies the pure editorial/default
 The shared household-preference backend (`collection_preferences/{provider:collectionId}`, `useCollectionPreferences`, its Firestore rules and emulator tests) is dormant: no UI uses it and the app opens no listener for it, so Collections never waits on preferences. Source rules were never deployed.
 
 Activity uses explicit manual addition origin and transactional movie watch timestamps, never metadata/import freshness. Unknown historical dates remain unknown. Tonight has no provider-count fan-out. On-demand collection details hydrate at concurrency three, distinguish unknown provider format from verified features, and never fall back from a missing movie to an unrelated TV ID. See [Collections](../COLLECTIONS_REDESIGN.md) for policy, validation and release prerequisites.
+
+## Classification
+
+TMDB detail requests append keywords; normalized public facts feed the deterministic independent-facet classifier. Add saves without waiting for optional Gemini inference. The active browser backfills missing or stale titles in batches of up to 10 through authenticated `/api/media/classify-batch`, with three attempts per title per session and 15-minute failure retry bookkeeping. Closing the app pauses pending work until a later session. The server validates, caches and deduplicates inference, with leases and a shared daily model-attempt budget.
+
+Generated facets live in the shared catalog; historical/manual tags and facet-only admin overrides retain precedence. Shelf auto-groups from effective classification. Tonight allocation consumes those facets without changing them. Operational console logs are behind `hearth:debug`.
+
+Maintainers can preview a correction with `node scripts/correctClassification.cjs --id=603 --type=movie --facet=comfort --value=unknown --reason="Editorial review"`. Dry-run is the default and does not open Firestore. The owner decides who may use `--apply`; authorized application conditionally updates only the named facet override and audit fields on matching existing catalog records. See the [implementation record](open/issue-020-implementation-record.md) for rollout gates and the correction workflow.

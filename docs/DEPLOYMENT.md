@@ -1,9 +1,11 @@
 # Firebase App Hosting Deployment Runbook
 
 ## Scope
+
 Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*` backend routes.
 
 ## Preconditions
+
 - Branch: `backend-live-metadata-foundation` (or approved release branch).
 - CI green for lint, API tests, and build.
 - Required secrets configured in Firebase App Hosting:
@@ -19,6 +21,7 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 - Firestore rules and indexes deployed for v2 schema compatibility.
 
 ## Pre-Deploy Checklist
+
 1. Confirm base-path assumptions are removed (`/hearthMVP` should not be required).
 2. Confirm service worker bypasses `/api/*` and `version.json` cache behavior is safe.
 3. Smoke test endpoints locally or in preview:
@@ -34,6 +37,7 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
    - movie details still render bottom status CTA and can toggle status
 
 ## Deploy Steps
+
 1. Merge approved release commit to deploy branch.
 2. Trigger Firebase App Hosting deploy for preview.
 3. Run smoke checks against preview URL.
@@ -41,6 +45,7 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 5. Verify production smoke checks and primary user journey.
 
 ## Post-Deploy Validation
+
 - App loads at root path (`/`).
 - Search latency and error rate within expected bounds.
 - Add flow writes v2 records successfully.
@@ -51,19 +56,24 @@ Runbook for Hearth runtime deployment on Firebase App Hosting with live `/api/*`
 - No stale UI caused by service worker cache.
 
 ## Rollback Plan
+
 Trigger rollback if any of these occur:
+
 - Persistent 5xx from API routes.
 - Add flow cannot save items.
 - Firestore rules reject expected writes.
 
 Rollback steps:
+
 1. Re-deploy last known good release in Firebase App Hosting.
 2. Confirm `GET /api/health` and add flow behavior.
 3. Keep current release disabled while root cause is investigated.
 4. Document incident with request IDs and failing route details.
 
 ## Observability Minimum
+
 Track at minimum:
+
 - API availability
 - p95 latency for `/api/search` and `/api/media/*`
 - 4xx/5xx rates by route
@@ -71,7 +81,15 @@ Track at minimum:
 - Metadata refresh failures
 
 ## Cutover Sign-Off
+
 Production cutover is complete when:
+
 - Pre-deploy and post-deploy checklists are fully green.
 - Rollback path validated in a controlled test.
 - On-call owner confirms monitoring and alert routing.
+
+## Classification
+
+Optional Gemini classification remains gated on the rollout checks in the [implementation record](open/issue-020-implementation-record.md) and #21. `GEMINI_DAILY_REQUEST_LIMIT` defaults to 20 provider attempts per day, includes retries, and has a hard ceiling of 100; setting it to 0 disables calls. This budget does not cap Firebase charges.
+
+Firebase App Hosting requires Blaze billing. Firestore's free quota for one eligible database is 50,000 document reads and 20,000 writes per day, shared with other app traffic. Cache, lease, catalog and budget transactions consume that quota. Hosting, build, storage and other services have separate allowances. Configure project billing budget alerts and monitor actual usage; alerts do not enforce a spending cap. See the implementation record for the recorded cost references and rollout controls.

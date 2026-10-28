@@ -205,6 +205,8 @@ const TonightView = ({
   showUtilityMenu = true,
   showSignOut = true,
   isTemplateSession = false,
+  loadTemplateScenario,
+  templateScenario,
 }) => {
   const currentlyWatchingShows = useMemo(
     () =>
@@ -463,6 +465,8 @@ const TonightView = ({
             showUtilityMenu={showUtilityMenu}
             showSignOut={showSignOut}
             isTemplateSession={isTemplateSession}
+            loadTemplateScenario={loadTemplateScenario}
+            templateScenario={templateScenario}
           />
           {/* Clears the fixed header, which itself sits below the cutout. */}
           <div className="h-[calc(68px+var(--safe-top))]" />

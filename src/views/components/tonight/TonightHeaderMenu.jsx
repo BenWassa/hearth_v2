@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
   LogOut,
   MoreHorizontal,
@@ -7,9 +7,13 @@ import {
   Download,
   Trash2,
   Wrench,
+  Sparkles,
 } from 'lucide-react';
 import { APP_VERSION } from '../../../version';
 import hearthVector from '../../../assets/hearth_vector_up.webp';
+const TemplateScenarioModal = lazy(() =>
+  import('../../../template/TemplateScenarioModal.jsx'),
+);
 
 const iconButtonBase =
   'flex h-11 w-11 items-center justify-center rounded-xl transition-[opacity,transform] duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950 active:scale-95 motion-reduce:active:scale-100';
@@ -63,8 +67,11 @@ const TonightHeaderMenu = ({
   showUtilityMenu = true,
   showSignOut = true,
   isTemplateSession = false,
+  loadTemplateScenario,
+  templateScenario,
 }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isScenarioOpen, setIsScenarioOpen] = useState(false);
   const [isDataOpen, setIsDataOpen] = useState(false);
   const dataTriggerRef = useRef(null);
   const profileRef = useRef(null);
@@ -156,6 +163,19 @@ const TonightHeaderMenu = ({
 
   return (
     <>
+      {isScenarioOpen && (
+        <Suspense fallback={null}>
+          <TemplateScenarioModal
+            activeScenario={templateScenario}
+            onClose={() => setIsScenarioOpen(false)}
+            onSelect={(scenarioId) => {
+              loadTemplateScenario?.(scenarioId);
+              setIsScenarioOpen(false);
+              setIsProfileOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
       <header className="fixed top-safe-t inset-x-0 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-md pl-[calc(0.75rem+var(--safe-left))] pr-[calc(0.75rem+var(--safe-right))] sm:pl-[calc(1rem+var(--safe-left))] sm:pr-[calc(1rem+var(--safe-right))] py-2.5 flex items-center justify-between z-40 border-b border-stone-800/70 bg-stone-950/95 shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
         <div ref={utilityRef} className="relative z-10 w-11 flex justify-start">
           {showUtilityMenu ? (
@@ -444,6 +464,22 @@ const TonightHeaderMenu = ({
                 >
                   <Plus className="w-4 h-4 shrink-0" />
                   Add space
+                </button>
+              )}
+
+              {isTemplateSession && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    setIsScenarioOpen(true);
+                  }}
+                  className={`${menuItemBase} text-amber-300 hover:bg-amber-950/20 hover:text-amber-200`}
+                  role="menuitem"
+                  tabIndex={-1}
+                >
+                  <Sparkles className="h-4 w-4 shrink-0" />
+                  Choose demo data
                 </button>
               )}
 

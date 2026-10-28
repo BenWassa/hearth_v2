@@ -19,6 +19,11 @@ import {
   TEMPLATE_SPACE_ID,
   TEMPLATE_SPACE_NAME,
 } from './seedLibrary.js';
+import {
+  buildTemplateScenario,
+  DEFAULT_TEMPLATE_SCENARIO,
+  getTemplateScenario,
+} from './templateScenarios.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 import { createRequestPacer } from '../services/mediaApi/requestPacer.js';
 import { buildMetadataAuditReport as buildSharedMetadataAuditReport } from '../domain/media/metadata.js';
@@ -469,6 +474,9 @@ const applyTemplateUpdates = (currentItem, updates) => {
 export const useTemplateAppState = () => {
   const [authResolved, setAuthResolved] = useState(false);
   const [authUser, setAuthUser] = useState(null);
+  const [templateScenario, setTemplateScenario] = useState(
+    DEFAULT_TEMPLATE_SCENARIO,
+  );
   const [allItems, setItems] = useState(() =>
     (new URLSearchParams(window.location.search).has('collectionsFixture')
       ? buildCollectionFixture({
@@ -484,6 +492,17 @@ export const useTemplateAppState = () => {
       : buildTemplateSeedItems()
     ).map((item) => normalizeTemplateItem(item, item.id, item.createdAt)),
   );
+  const loadTemplateScenario = useCallback((scenarioId) => {
+    const scenario = getTemplateScenario(scenarioId);
+    setTemplateScenario(scenario.id);
+    setItems(
+      buildTemplateScenario(scenario.id).map((item) =>
+        normalizeTemplateItem(item, item.id, item.createdAt),
+      ),
+    );
+    setView('tonight');
+    setUpdateMessage(`Loaded ${scenario.label} demo.`);
+  }, []);
   const items = useMemo(
     () => allItems.filter((item) => !isRemoved(item)),
     [allItems],
@@ -849,6 +868,7 @@ export const useTemplateAppState = () => {
     setIsWipingSpace(true);
     try {
       setItems([]);
+      setTemplateScenario('empty');
       setContextItems([]);
       setDecisionResult(null);
       setDecisionContext(null);
@@ -916,6 +936,7 @@ export const useTemplateAppState = () => {
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRefreshAll,
+    loadTemplateScenario,
     handleRefreshMetadata: async () => {},
     handleReloadNow,
     handleLoadUserSpaces: async () => {},
@@ -943,6 +964,7 @@ export const useTemplateAppState = () => {
     spaceId: TEMPLATE_SPACE_ID,
     spaceName: TEMPLATE_SPACE_NAME,
     startDecision,
+    templateScenario,
     updateMessage: resolvedUpdateMessage,
     user:
       authUser && authUser.uid

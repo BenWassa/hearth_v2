@@ -601,7 +601,6 @@ export const useAppState = () => {
       setAuthResolved(true);
     }
 
-    setLoading(false);
     return undefined;
   }, [auth, firebaseInitResolved, forceRedirectToDemoMode]);
 

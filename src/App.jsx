@@ -63,6 +63,7 @@ export function HearthAppView({ appState }) {
     handleMarkWatched,
     handleMetadataAudit,
     handleMetadataRefreshAll,
+    loadTemplateScenario,
     backgroundAuditReport,
     handleReloadNow,
     handleSignIn,
@@ -88,6 +89,7 @@ export function HearthAppView({ appState }) {
     spaceName,
     startDecision,
     updateMessage,
+    templateScenario,
     user,
     userSpaces,
     view,
@@ -248,6 +250,8 @@ export function HearthAppView({ appState }) {
             showUtilityMenu={!isTemplateMode || allowTemplateDevMenu}
             showSignOut={!isTemplateMode}
             isTemplateSession={isTemplateMode}
+            loadTemplateScenario={loadTemplateScenario}
+            templateScenario={templateScenario}
           />
         )}
 

@@ -3,6 +3,7 @@ import seedMediaMap from './seed-media-map.json';
 const MOVIE_SEEDS = [
   {
     title: 'Paddington 2',
+    keywords: ['heartwarming'],
     providerId: '346648',
     year: '2017',
     vibe: 'comfort',
@@ -12,6 +13,7 @@ const MOVIE_SEEDS = [
   },
   {
     title: 'The Intern',
+    keywords: ['heartwarming'],
     providerId: '257211',
     year: '2015',
     vibe: 'comfort',
@@ -48,6 +50,7 @@ const MOVIE_SEEDS = [
   },
   {
     title: 'Knives Out',
+    keywords: ['whodunit', 'complex'],
     providerId: '546554',
     year: '2019',
     vibe: 'easy',
@@ -57,6 +60,7 @@ const MOVIE_SEEDS = [
   },
   {
     title: "Ocean's Eleven",
+    keywords: ['heist'],
     providerId: '161',
     year: '2001',
     vibe: 'gripping',
@@ -66,6 +70,7 @@ const MOVIE_SEEDS = [
   },
   {
     title: 'Gone Girl',
+    keywords: ['unreliable narrator'],
     providerId: '210577',
     year: '2014',
     vibe: 'gripping',
@@ -141,6 +146,7 @@ const MOVIE_SEEDS = [
 const SHOW_SEEDS = [
   {
     title: 'Ted Lasso',
+    keywords: ['heartwarming'],
     providerId: '97546',
     year: '2020',
     vibe: 'comfort',
@@ -148,6 +154,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Gilmore Girls',
+    keywords: ['comforting'],
     providerId: '4586',
     year: '2000',
     vibe: 'comfort',
@@ -155,6 +162,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Friday Night Lights',
+    keywords: ['heartwarming'],
     providerId: '4278',
     year: '2006',
     vibe: 'comfort',
@@ -162,6 +170,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Abbott Elementary',
+    keywords: ['sitcom'],
     providerId: '125935',
     year: '2021',
     vibe: 'easy',
@@ -169,6 +178,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Brooklyn Nine-Nine',
+    keywords: ['sitcom'],
     providerId: '48891',
     year: '2013',
     vibe: 'easy',
@@ -176,6 +186,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'The Great British Bake Off',
+    keywords: ['relaxing'],
     providerId: '34549',
     year: '2010',
     vibe: 'easy',
@@ -183,6 +194,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Only Murders in the Building',
+    keywords: ['investigation'],
     providerId: '107113',
     year: '2021',
     vibe: 'gripping',
@@ -197,6 +209,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Severance',
+    keywords: ['mind-bending'],
     providerId: '95396',
     year: '2022',
     vibe: 'gripping',
@@ -204,6 +217,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'Planet Earth II',
+    keywords: ['nature documentary'],
     providerId: '68595',
     year: '2016',
     vibe: 'visual',
@@ -225,6 +239,7 @@ const SHOW_SEEDS = [
   },
   {
     title: 'I Love Lucy',
+    keywords: ['sitcom'],
     providerId: '2730',
     year: '1951',
     vibe: 'classic',
@@ -297,6 +312,7 @@ const createTemplateItem = (seed, index, type) => {
       ? seed.runtimeMinutes
       : null,
     overview: '',
+    keywords: [...(seed.keywords || [])],
     genres: Array.isArray(seed.genres) ? [...seed.genres] : [],
     actors: [],
     director: '',
@@ -359,6 +375,8 @@ const mergeSeedWithMappedMedia = (baseItem) => {
     ...mapped,
     id: baseItem.id,
     type: baseItem.type,
+    keywords: baseItem.keywords,
+    media: { ...mapped.media, keywords: baseItem.keywords },
     vibe: baseItem.vibe,
     energy: baseItem.energy,
     status: baseItem.status,

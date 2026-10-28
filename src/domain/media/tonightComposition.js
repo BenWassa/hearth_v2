@@ -6,6 +6,7 @@
 const THEME_ORDER = [
   'comfort',
   'comedy',
+  'hooked',
   'quick',
   'focused',
   'visual',
@@ -15,17 +16,16 @@ const THEME_ORDER = [
 const THEME_TITLES = {
   comfort: 'Easy & Comforting',
   comedy: 'Need a Laugh',
+  hooked: 'Get Hooked',
   quick: 'Quick Bites',
   focused: 'Deep Dives',
   visual: 'Spectacles',
   classic: 'The Classics',
 };
 
-// OPEN PRODUCT DECISION: both titles below are placeholders. `unknown`
-// (unclassified) titles and titles from rows too small to stand alone are
-// folded into the fallback row; the final name has not been chosen.
+// Unclassified titles and undersized themes share a neutral fallback row.
 export const FALLBACK_ROW_KEY = 'unknown';
-export const FALLBACK_ROW_TITLE = 'More to Watch';
+export const FALLBACK_ROW_TITLE = 'Also on the shelf';
 export const MIXED_ROW_KEY = 'mixed';
 export const MIXED_ROW_TITLE = "Tonight's picks";
 
@@ -34,7 +34,7 @@ export const MAX_ROW_ITEMS = 12;
 // UX test parameters from issue #7, not final policy. The first tier whose
 // `maxEligible` is >= the eligible count applies.
 //   compact: one mixed row instead of thematic rows
-//   maxRows: most rows shown   minItems: fewest cards a thematic row may have
+//   maxRows: most mood/fallback rows shown (Quick Bites is extra)   minItems: fewest cards a thematic row may have
 export const TONIGHT_TIERS = Object.freeze([
   Object.freeze({ maxEligible: 0, maxRows: 0, minItems: 0, compact: false }),
   Object.freeze({ maxEligible: 5, maxRows: 1, minItems: 1, compact: true }),
@@ -125,6 +125,7 @@ const publicRow = ({ key, title, items }) => ({ key, title, items });
  *
  * Tiers (TONIGHT_TIERS): 0 -> empty; 1-5 -> one compact mixed row; 6-12 -> up to
  * 2 rows of >=2; 13-30 -> up to 4 rows of >=3; 31+ -> up to 5 rows of >=3.
+ * Quick Bites is an extra optional row; qualifying Classics always gets a mood slot.
  * Thematic rows below the tier minimum are merged with `unknown` titles into
  * one fallback row, shown only if it meets the minimum and a slot is free.
  * Titles not shown stay on the Shelf. No row ever holds a title twice, and
@@ -186,11 +187,20 @@ export const composeTonightRows = (
     }
   });
 
-  themed.sort(
-    (a, b) => b.strength - a.strength || b.size - a.size || a.order - b.order,
-  );
-  const rows = themed.slice(0, tier.maxRows);
-  if (rows.length < tier.maxRows && fallbackPool.length >= tier.minItems) {
+  const byStrength = (a, b) =>
+    b.strength - a.strength || b.size - a.size || a.order - b.order;
+  themed.sort(byStrength);
+  const moods = themed.filter((row) => row.key !== 'quick');
+  const rows = moods.slice(0, tier.maxRows);
+  const classic = moods.find((row) => row.key === 'classic');
+  if (classic && !rows.includes(classic)) rows[rows.length - 1] = classic;
+  const quick = themed.find((row) => row.key === 'quick');
+  if (quick) rows.push(quick);
+  rows.sort(byStrength);
+  if (
+    rows.filter((row) => row.key !== 'quick').length < tier.maxRows &&
+    fallbackPool.length >= tier.minItems
+  ) {
     rows.push(
       buildRow(
         FALLBACK_ROW_KEY,

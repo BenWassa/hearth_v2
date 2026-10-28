@@ -25,6 +25,22 @@ describe('effective Shelf groups', () => {
     ).toBe('comfort');
   });
 
+  it('maps Get Hooked to gripping', () => {
+    expect(
+      getEffectiveShelfVibe({
+        media: {
+          classificationOverride: {
+            attributes: {
+              plotMomentum: 'high',
+              narrativeComplexity: 'medium',
+              attentionDemand: 'low',
+            },
+          },
+        },
+      }),
+    ).toBe('gripping');
+  });
+
   it('preserves explicit and legacy vibe tags', () => {
     expect(getEffectiveShelfVibe({ vibe: 'visual' })).toBe('visual');
     expect(

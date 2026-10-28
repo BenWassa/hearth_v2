@@ -9,7 +9,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Armchair, Coffee, Eye, Smile, Clock, Zap, Moon } from 'lucide-react';
+import {
+  Armchair,
+  Coffee,
+  Eye,
+  Smile,
+  Clock,
+  Zap,
+  Moon,
+  Flame,
+} from 'lucide-react';
 import { isShowFullyWatched } from '../components/ItemDetailsModal/utils/showProgress.js';
 import BottomNav from './components/tonight/BottomNav.jsx';
 import CollectionsRail from './components/tonight/CollectionsRail.jsx';
@@ -78,6 +87,11 @@ const ROW_CONFIG = {
     emptyLabel: 'Nothing light queued right now.',
   },
   comedy: { Icon: Smile, size: 'md', emptyLabel: 'No comedies queued up.' },
+  hooked: {
+    Icon: Flame,
+    size: 'lg',
+    emptyLabel: 'No plot-driven watches queued.',
+  },
   quick: {
     Icon: Clock,
     size: 'sm',

@@ -1,3 +1,5 @@
+import { buildTemplateSeedItems } from '../../template/seedLibrary.js';
+import { composeTonightRows } from './tonightComposition.js';
 import {
   QUICK_BITES_MAX_MINUTES,
   allocateTonightThemes,
@@ -150,32 +152,29 @@ describe('Tonight classification policy', () => {
     });
   });
 
-  describe('classics are movie-only (current explicit policy)', () => {
-    // Policy: The Classics row is for films only. Classic TV is deliberately
-    // not routed there; changing this is an open product decision.
+  describe('classics include explicitly curated TV', () => {
     const classicEvidence = override({ curatedClassic: 'high' });
     it('classifies a movie with strong curatedClassic evidence as classic', () => {
       expect(primaryTheme(movie(30, classicEvidence))).toBe('classic');
     });
-    it('does not classify a show with strong curatedClassic evidence as classic', () => {
+    it('classifies a show with strong curatedClassic evidence as classic', () => {
       const item = show(31, classicEvidence);
-      expect(primaryTheme(item)).not.toBe('classic');
-      expect(primaryTheme(item)).toBe('unknown');
+      expect(primaryTheme(item)).toBe('classic');
     });
-    it('ignores an explicit classic vibe on a show', () => {
+    it('respects an explicit classic vibe on a show', () => {
       expect(
         primaryTheme(
           show(32, { ...classicEvidence, userState: { vibe: 'classic' } }),
         ),
-      ).not.toBe('classic');
+      ).toBe('classic');
       expect(primaryTheme(movie(33, { vibe: 'classic' }))).toBe('classic');
     });
-    it('never places a classic show in the classic row', () => {
+    it('places a curated classic show in the classic row', () => {
       const item = show(34, classicEvidence);
       for (const quickBites of [true, false]) {
         const rows = allocateTonightThemes([item], { quickBites, now: NOW });
-        expect(rows.classic).toHaveLength(0);
-        expect(rowOf(rows, item)).toEqual(['unknown']);
+        expect(rows.classic).toEqual([item]);
+        expect(rowOf(rows, item)).toEqual(['classic']);
       }
     });
   });
@@ -244,5 +243,133 @@ describe('Tonight classification policy', () => {
       expect(off.comfort).toEqual([item]);
       expect(off.quick).toHaveLength(0);
     });
+  });
+});
+
+describe('bounded weak comedy signal', () => {
+  it.each(['easy', 'comfort'])(
+    'uses first-listed Comedy with legacy %s',
+    (vibe) => {
+      expect(
+        primaryTheme(movie(60, { vibe, genres: ['Comedy', 'Drama'] })),
+      ).toBe('comedy');
+    },
+  );
+  it('uses original media genre order as fallback', () => {
+    expect(
+      primaryTheme(
+        movie(60, { vibe: 'easy', media: { genres: ['Comedy', 'Drama'] } }),
+      ),
+    ).toBe('comedy');
+  });
+  it.each(['gripping', 'visual', undefined])('rejects vibe %s', (vibe) => {
+    expect(primaryTheme(movie(61, { vibe, genres: ['Comedy'] }))).not.toBe(
+      'comedy',
+    );
+  });
+  it('rejects automatic tags, non-first Comedy and explicit facet answers', () => {
+    for (const values of [
+      { tagProvenance: { vibe: 'automatic' } },
+      { genres: ['Drama', 'Comedy'] },
+      override({ comedyFirst: 'low' }),
+      override({ comedyFirst: 'medium' }),
+    ])
+      expect(
+        primaryTheme(
+          movie(62, { vibe: 'easy', genres: ['Comedy'], ...values }),
+        ),
+      ).not.toBe('comedy');
+  });
+});
+describe('Get Hooked', () => {
+  it.each(['low', 'medium'])(
+    'accepts accessible high momentum with %s demand',
+    (level) => {
+      const item = movie(
+        70,
+        override({
+          plotMomentum: 'high',
+          narrativeComplexity: level,
+          attentionDemand: level,
+        }),
+      );
+      expect(primaryTheme(item)).toBe('hooked');
+      expect(allocateTonightThemes([item]).hooked).toEqual([item]);
+    },
+  );
+  it.each(['narrativeComplexity', 'attentionDemand'])(
+    'keeps high %s in Deep Dives',
+    (facet) => {
+      expect(
+        primaryTheme(
+          movie(
+            71,
+            override({
+              plotMomentum: 'high',
+              narrativeComplexity: 'medium',
+              attentionDemand: 'medium',
+              [facet]: 'high',
+            }),
+          ),
+        ),
+      ).toBe('focused');
+    },
+  );
+  it('requires known accessible demand and high momentum', () => {
+    expect(
+      primaryTheme(movie(72, override({ plotMomentum: 'high' }))),
+    ).not.toBe('hooked');
+    expect(
+      primaryTheme(
+        movie(
+          73,
+          override({
+            plotMomentum: 'medium',
+            narrativeComplexity: 'low',
+            attentionDemand: 'low',
+          }),
+        ),
+      ),
+    ).not.toBe('hooked');
+  });
+  it('does not infer classic TV from age or automatic legacy tags', () => {
+    expect(primaryTheme(show(74, { year: '1951' }))).toBe('unknown');
+    expect(
+      primaryTheme(
+        show(75, { vibe: 'classic', tagProvenance: { vibe: 'automatic' } }),
+      ),
+    ).toBe('unknown');
+  });
+});
+
+describe('realistic demo seed', () => {
+  it('offers comedy and preserves five substantial rows without duplicates', () => {
+    const items = buildTemplateSeedItems();
+    const allocated = allocateTonightThemes(items, { now: NOW });
+    expect(allocated.comedy.length).toBeGreaterThan(0);
+    expect(
+      composeTonightRows(allocated)
+        .rows.map((r) => r.key)
+        .sort(),
+    ).toEqual(['classic', 'comfort', 'focused', 'quick', 'visual']);
+    expect(Object.values(allocated).flat()).toHaveLength(30);
+  });
+  it.each([
+    ['Paddington 2', 'comfort'],
+    ['Legally Blonde', 'comedy'],
+    ['School of Rock', 'comedy'],
+    ['Knives Out', 'focused'],
+    ['Only Murders in the Building', 'focused'],
+  ])('%s has one plausible home', (title, theme) => {
+    const item = buildTemplateSeedItems().find(
+      (entry) => entry.title === title,
+    );
+    expect(primaryTheme(item)).toBe(theme);
+    expect(
+      rowOf(
+        allocateTonightThemes([item], { quickBites: false, now: NOW }),
+        item,
+      ),
+    ).toEqual([theme]);
   });
 });

@@ -14,7 +14,12 @@ const weight = (value) =>
   ({ high: 3, medium: 1, low: 0, unknown: 0 }[value] || 0);
 export const primaryTheme = (item) => {
   const { attributes: a } = getEffectiveClassification(item);
+  const accessibleMomentum =
+    a.plotMomentum.value === 'high' &&
+    ['low', 'medium'].includes(a.narrativeComplexity.value) &&
+    ['low', 'medium'].includes(a.attentionDemand.value);
   const scores = {
+    hooked: accessibleMomentum ? 10 : 0,
     comfort: weight(a.comfort.value) * 2 - weight(a.attentionDemand.value),
     comedy:
       weight(a.comedyFirst.value) * 2 - weight(a.narrativeComplexity.value),
@@ -23,19 +28,27 @@ export const primaryTheme = (item) => {
       weight(a.attentionDemand.value) +
       weight(a.plotMomentum.value),
     visual: weight(a.visualDistinctiveness.value) * 3,
-    classic: item.type === 'movie' ? weight(a.curatedClassic.value) : 0,
+    classic: weight(a.curatedClassic.value),
   };
   const provenance = tagProvenance(item);
   const vibe = item.userState?.vibe || item.vibe;
   const energy = item.userState?.energy || item.energy;
+  const weakComedy =
+    a.comedyFirst.value === 'unknown' &&
+    provenance.vibe !== 'automatic' &&
+    ['easy', 'comfort'].includes(vibe) &&
+    (item.genres?.[0] ?? item.media?.genres?.[0]) === 'Comedy';
+  const comedyIntent =
+    a.comfort.value !== 'high' &&
+    (a.comedyFirst.value === 'high' || weakComedy);
   // Existing explicit/unknown-origin tags remain meaningful, facet by facet.
   if (provenance.vibe !== 'automatic') {
     const theme = {
-      comfort: 'comfort',
-      easy: 'comfort',
-      gripping: 'focused',
+      comfort: comedyIntent ? 'comedy' : 'comfort',
+      easy: comedyIntent ? 'comedy' : 'comfort',
+      gripping: accessibleMomentum ? 'hooked' : 'focused',
       visual: 'visual',
-      classic: item.type === 'movie' ? 'classic' : null,
+      classic: 'classic',
     }[vibe];
     if (theme) scores[theme] += 12;
   }
@@ -81,6 +94,7 @@ export const allocateTonightThemes = (
   const rows = {
     comfort: [],
     comedy: [],
+    hooked: [],
     quick: [],
     focused: [],
     visual: [],

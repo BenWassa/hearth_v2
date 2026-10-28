@@ -9,6 +9,7 @@ export const FALLBACK_SHELF_GROUP = 'ungrouped';
 const vibeByTheme = {
   comfort: 'comfort',
   comedy: 'easy',
+  hooked: 'gripping',
   focused: 'gripping',
   visual: 'visual',
   classic: 'classic',

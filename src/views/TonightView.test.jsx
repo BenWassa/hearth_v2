@@ -167,7 +167,15 @@ describe('TonightView thematic rows', () => {
     const mounted = await renderTonight(seed);
 
     const sections = thematicSections(mounted.container);
-    expect(sections.length).toBeGreaterThan(1);
+    expect(
+      sections.map((section) => section.getAttribute('data-title')).sort(),
+    ).toEqual([
+      'Deep Dives',
+      'Easy & Comforting',
+      'Quick Bites',
+      'Spectacles',
+      'The Classics',
+    ]);
     const ids = sections.flatMap((section) =>
       [...section.querySelectorAll('[data-item-id]')].map((node) =>
         node.getAttribute('data-item-id'),

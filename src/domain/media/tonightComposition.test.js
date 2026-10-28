@@ -76,7 +76,9 @@ describe('composeTonightRows sizes', () => {
 
   it('shows up to 2 rows of >=2 for 12 titles', () => {
     const result = composeTonightRows(spread(12));
-    expect(result.rows.length).toBeLessThanOrEqual(2);
+    expect(
+      result.rows.filter((r) => r.key !== 'quick').length,
+    ).toBeLessThanOrEqual(2);
     expect(result.rows.length).toBeGreaterThan(0);
     expectInvariants(result);
   });
@@ -103,7 +105,7 @@ describe('composeTonightRows sizes', () => {
         classic: 4,
       }),
     );
-    expect(result.rows).toHaveLength(5);
+    expect(result.rows).toHaveLength(6);
     expect(result.rows[0].items).toHaveLength(MAX_ROW_ITEMS);
     expectInvariants(result);
   });
@@ -140,7 +142,7 @@ describe('composeTonightRows skew and fallback', () => {
     expect(result.rows.map((r) => r.key)).not.toContain('visual');
   });
 
-  it('folds undersized themes and unknown titles into More to Watch', () => {
+  it('folds undersized themes and unknown titles into Also on the shelf', () => {
     const result = composeTonightRows(
       allocate({ comedy: 8, visual: 1, classic: 1, quick: 1, unknown: 2 }),
     );
@@ -170,9 +172,16 @@ describe('composeTonightRows skew and fallback', () => {
 
   it('puts the fallback last and only when a slot is free', () => {
     const result = composeTonightRows(
-      allocate({ comfort: 3, comedy: 3, quick: 3, focused: 3, unknown: 4 }),
+      allocate({
+        comfort: 3,
+        comedy: 3,
+        quick: 3,
+        focused: 3,
+        visual: 3,
+        unknown: 4,
+      }),
     );
-    expect(result.rows).toHaveLength(4);
+    expect(result.rows).toHaveLength(5);
     expect(result.rows.map((r) => r.key)).not.toContain('unknown');
   });
 
@@ -299,5 +308,43 @@ describe('stableOrder', () => {
 
   it('scales to large inputs', () => {
     expect(stableOrder(make('big', 20000), 'seed')).toHaveLength(20000);
+  });
+});
+
+describe('approved row slots', () => {
+  it('reserves Classics by displacing the weakest mood, with Quick Bites extra and ranked by strength', () => {
+    const result = composeTonightRows(
+      allocate({
+        comfort: 4,
+        comedy: 4,
+        focused: 4,
+        visual: 4,
+        classic: 3,
+        quick: 4,
+      }),
+      {
+        scoreItem: (item) =>
+          item.id.startsWith('quick')
+            ? 10
+            : item.id.startsWith('classic')
+            ? 0
+            : 1,
+      },
+    );
+    expect(result.rows.map((r) => r.key)).toEqual([
+      'quick',
+      'comfort',
+      'comedy',
+      'focused',
+      'classic',
+    ]);
+    expectInvariants(result);
+  });
+  it('orders Get Hooked after comedy on equal strength', () => {
+    expect(
+      composeTonightRows(allocate({ comedy: 3, hooked: 3 }), {
+        eligibleCount: 13,
+      }).rows.map((r) => r.title),
+    ).toEqual(['Need a Laugh', 'Get Hooked']);
   });
 });

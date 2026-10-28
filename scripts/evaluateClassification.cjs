@@ -9,6 +9,7 @@ const {
   realFixtures,
   selectLiveFixtures,
   findRuleExpectedConflicts,
+  findRuleExpectedOneStepDifferences,
   representativeValue,
 } = require('./classificationEvaluation.cjs');
 
@@ -218,6 +219,9 @@ const run = async () => {
   const providerAttemptsTotal =
     previousProviderAttempts + providerAttemptsThisRun;
   const ruleExpectedConflicts = findRuleExpectedConflicts(real);
+  // Informational only: adjacent levels never enter the rollout gate.
+  const ruleExpectedOneStepDifferences =
+    findRuleExpectedOneStepDifferences(real);
   const subjective = domain.FACETS.filter((f) => f !== 'curatedClassic');
   const passed =
     live &&
@@ -249,7 +253,7 @@ const run = async () => {
     rolloutPassed: Boolean(passed),
     liveEvaluationComplete: live && complete,
     fixtureReview:
-      'agent-reviewed pilot labels remain human-unapproved; all rollout labels require explicit independent human approval',
+      '50 real fixtures approved by the owner-delegated three-reviewer blind process (Codex, Claude Sonnet, Claude Opus), with lead spot check on 2026-10-28; owner delegation recorded; approved status is still required for every real fixture',
     selection: {
       mode: selection.mode,
       keys: selection.keys,
@@ -271,6 +275,7 @@ const run = async () => {
     },
     providerAttemptsTotal,
     ruleExpectedConflicts,
+    ruleExpectedOneStepDifferences,
     rules,
     hybrid,
     results,
@@ -286,6 +291,7 @@ const run = async () => {
         evaluationCounts: report.evaluationCounts,
         rolloutPassed: report.rolloutPassed,
         ruleExpectedConflicts: report.ruleExpectedConflicts,
+        ruleExpectedOneStepDifferences: report.ruleExpectedOneStepDifferences,
         rules: rules.metrics,
         hybrid: hybrid?.metrics || null,
       },

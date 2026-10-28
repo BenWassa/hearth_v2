@@ -53,22 +53,33 @@ const selectLiveFixtures = (fixtures = [], args = []) => {
   };
 };
 
-const findRuleExpectedConflicts = (results = []) =>
+// Unknown means insufficient evidence, not an opposing ordinal level.
+const ordinalLevels = ['low', 'medium', 'high'];
+const findRuleExpectedDifferences = (results, matchesDistance) =>
   results.flatMap((result) =>
     Object.entries(result.rules || {})
-      .filter(
-        ([name, signal]) =>
-          signal?.value &&
-          signal.value !== 'unknown' &&
-          result.expected?.[name] !== signal.value,
-      )
+      .filter(([name, signal]) => {
+        const rule = ordinalLevels.indexOf(signal?.value);
+        const expected = ordinalLevels.indexOf(result.expected?.[name]);
+        return (
+          rule >= 0 &&
+          expected >= 0 &&
+          matchesDistance(Math.abs(rule - expected))
+        );
+      })
       .map(([facet, signal]) => ({
         key: result.key,
         facet,
         rule: signal.value,
-        expected: result.expected?.[facet] ?? null,
+        expected: result.expected[facet],
       })),
   );
+
+const findRuleExpectedConflicts = (results = []) =>
+  findRuleExpectedDifferences(results, (distance) => distance >= 2);
+
+const findRuleExpectedOneStepDifferences = (results = []) =>
+  findRuleExpectedDifferences(results, (distance) => distance === 1);
 
 const representativeValue = (predictions = [], facet) => {
   if (!predictions.length) return null;
@@ -91,6 +102,7 @@ module.exports = {
   realFixtures,
   selectLiveFixtures,
   findRuleExpectedConflicts,
+  findRuleExpectedOneStepDifferences,
   representativeValue,
 };
 

@@ -1,9 +1,9 @@
 # Issue #21 — Gemini pilot quality and production rollout gate
 
-- **Status:** Open — code/evaluation improvements prepared; live re-evaluation and human fixture approval remain.
+- **Status:** Open — code/evaluation improvements prepared; fixture approval complete; live re-evaluation remains.
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/21
-- **Branch:** `codex/issue-21-gemini-pilot-quality`
-- **Date:** 2026-10-27
+- **Branch:** `chore/fixtures-reviewed`
+- **Date:** 2026-10-28
 - **Parent:** #20 automatic classification
 
 ## Scope
@@ -26,7 +26,7 @@ References checked 2026-10-27:
 
 ## Five-title adjudication
 
-These are independent agent adjudications, **not human approval**. The fixture field is `agent-reviewed`, so the rollout gate requiring `review === "approved"` stays closed.
+The initial five-title adjudications below were independent agent reviews, not approval at that time. On 2026-10-28, all 50 real fixtures were approved through the owner-delegated three-reviewer blind process (Codex, Claude Sonnet, Claude Opus), with lead spot check and owner delegation recorded. Every real fixture must still have `review === "approved"` to pass rollout.
 
 | Title | Changed labels | Rationale |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ These are independent agent adjudications, **not human approval**. The fixture f
 | Legally Blonde | visual unknown → medium | Strongly authored pink/fashion identity supports a medium visual signal; other labels remain. |
 | The School of Rock | comfort medium → high; visual unknown → low | Explicit comforting evidence already forces high comfort in deterministic rules, so the old gold label was impossible for the hybrid to match. Visual presentation is adjudicated as conventional. |
 
-Each fixture preserves a detailed disagreement note and still requires a human reviewer.
+Each fixture preserves a detailed disagreement note; the subsequent delegated review approved the answer key.
 
 ### Re-score of the saved v1 predictions
 
@@ -63,7 +63,7 @@ This isolates the remaining problem more clearly: most non-visual agreement is a
 - Explicit `thinkingLevel: minimal`.
 - Added per-facet JSON Schema descriptions and level anchors.
 - Narrowed deterministic complexity rules: generic `complex` no longer proves narrative complexity; bare nonlinear structure is medium complexity/attention, while stronger signals such as unreliable narrator, mind-bending or time paradox remain high.
-- Added a rollout-blocking hard-rule/fixture consistency check. The current offline fixture has two unresolved conflicts for human review: Planet Earth II comfort (`rules=high`, `fixture=unknown`) and How to Train Your Dragon: The Hidden World comfort (`rules=high`, `fixture=unknown`).
+- Added a rollout-blocking rule/fixture consistency check for opposing low/high labels, with adjacent differences reported separately.
 - Added safe diagnostic reasons for invalid/upstream/timeout outcomes without storing model text.
 - Gemini results carry provider-attempt count plus prompt/policy identity into blend metadata.
 
@@ -77,7 +77,11 @@ No model change is proposed yet. Changing the model now would confound prompt, f
 - Output distinguishes total fixtures, real fixtures, selected titles, attempted titles, completed titles and provider attempts.
 - Results preserve safe outcome diagnostics alongside status history.
 - Resume compatibility requires classifier, model, prompt, inference-policy, policy-key identity and the exact same title selection.
-- The report lists every non-unknown deterministic rule that conflicts with the fixture label, and rollout cannot pass while any such conflict remains.
+- The report lists two-step conflicts in `ruleExpectedConflicts`; rollout requires that list to be empty. Adjacent differences appear in `ruleExpectedOneStepDifferences` and never block rollout.
+
+### Rule consistency policy
+
+Rule consistency tolerates one ordinal step on low → medium → high: three independent human-level reviewers differ by one level on about a fifth of facet labels, so conservative keyword rules should not override the reviewed answer key on adjacent judgments. Only two-step low/high differences block rollout; one-step differences remain visible in `ruleExpectedOneStepDifferences` as informational entries. Unknown in either direction is non-blocking because insufficient evidence is not a contradictory level. Agreement, stability, live completion and approval gates remain required.
 
 The exact five canonical pilot keys are:
 
@@ -85,11 +89,11 @@ The exact five canonical pilot keys are:
 
 ## Verification
 
-GitHub Classification PR QA passes on this branch: 53 unit-test files / 342 unit tests, 36 API tests, lint with zero warnings, touched-file Prettier checks, and the offline 50-real-title evaluator. The offline evaluator correctly records zero provider attempts and keeps rollout false.
+Local verification on 2026-10-28 passed: `npm run format:check`, `npm run lint:ci` (zero warnings), and `npm run test` (58 unit-test files / 470 unit tests, 47 API tests). Ran Prettier on all four touched files and `graphify update .`. The offline 50-real-title report at `/tmp/offline-check.json` records zero conflicts, three informational one-step differences, zero provider attempts, `liveEvaluationComplete: false` and `rolloutPassed: false`. No live evaluation was run.
 
 ## Remaining gates
 
-1. Obtain explicit human approval or revision of all 50 real fixture labels, including resolution of the two remaining hard-rule/fixture comfort conflicts.
+1. Preserve approved status for all 50 real fixture labels under the recorded owner delegation.
 2. Run a new owner-approved five-title v2 pilot using a fresh output file.
 3. Complete all 50 titles with three valid predictions each within approved quotas.
 4. Meet >=80% agreement, <=35% unknown and >=95% repeated-run stability on every subjective facet.

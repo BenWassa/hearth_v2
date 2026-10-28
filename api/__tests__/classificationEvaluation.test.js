@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
   selectLiveFixtures,
   findRuleExpectedConflicts,
+  findRuleExpectedOneStepDifferences,
   representativeValue,
 } = require('../../scripts/classificationEvaluation.cjs');
 
@@ -61,26 +62,40 @@ test('classification evaluation uses majority predictions for agreement while le
   assert.equal(representativeValue([prediction('high')], 'comfort'), 'high');
 });
 
-test('classification evaluation exposes deterministic-rule conflicts with fixture labels', () => {
-  assert.deepEqual(
-    findRuleExpectedConflicts([
-      {
-        key: 'tmdb:movie:1',
-        rules: {
-          comfort: { value: 'high' },
-          comedyFirst: { value: 'unknown' },
+test('two-step rule differences block consistency; one-step differences are informational', () => {
+  for (const rule of ['low', 'medium', 'high', 'unknown']) {
+    for (const expected of ['low', 'medium', 'high', 'unknown']) {
+      const results = [
+        {
+          key: 'tmdb:movie:1',
+          rules: { comfort: { value: rule } },
+          expected: { comfort: expected },
         },
-        expected: { comfort: 'medium', comedyFirst: 'unknown' },
-      },
-    ]),
-    [
-      {
-        key: 'tmdb:movie:1',
-        facet: 'comfort',
-        rule: 'high',
-        expected: 'medium',
-      },
-    ],
+      ];
+      const levels = ['low', 'medium', 'high'];
+      const distance =
+        rule === 'unknown' || expected === 'unknown'
+          ? 0
+          : Math.abs(levels.indexOf(rule) - levels.indexOf(expected));
+      const entry = { key: 'tmdb:movie:1', facet: 'comfort', rule, expected };
+      const conflicts = findRuleExpectedConflicts(results);
+      assert.deepEqual(conflicts, distance === 2 ? [entry] : []);
+      assert.equal(
+        conflicts.length === 0,
+        distance !== 2,
+        'consistency gate only blocks two-step differences',
+      );
+      assert.deepEqual(
+        findRuleExpectedOneStepDifferences(results),
+        distance === 1 ? [entry] : [],
+      );
+    }
+  }
+  assert.deepEqual(findRuleExpectedConflicts(), []);
+  assert.deepEqual(findRuleExpectedOneStepDifferences(), []);
+  assert.deepEqual(
+    findRuleExpectedConflicts([{ rules: { comfort: { value: 'high' } } }]),
+    [],
   );
 });
 

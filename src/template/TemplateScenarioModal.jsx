@@ -34,7 +34,10 @@ export default function TemplateScenarioModal({
             <p className="text-label font-bold uppercase tracking-widest text-amber-400/80">
               Demo data
             </p>
-            <h2 id="template-scenario-title" className="mt-1 font-serif text-2xl text-stone-100">
+            <h2
+              id="template-scenario-title"
+              className="mt-1 font-serif text-2xl text-stone-100"
+            >
               Choose a starting shelf
             </h2>
           </div>

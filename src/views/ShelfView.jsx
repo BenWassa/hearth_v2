@@ -515,10 +515,10 @@ const ShelfView = ({
 
         {/* Sort + Type Filter Bar */}
         {hasTabItems && (
-          <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
+          <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex flex-wrap items-center gap-x-3 gap-y-1.5">
             {/* Sort pill group */}
             <div
-              className="flex gap-2 shrink-0"
+              className="grid grid-cols-3 gap-2 min-w-0 flex-[1_1_12rem] sm:flex-none"
               role="group"
               aria-label="Sort by"
             >
@@ -541,12 +541,9 @@ const ShelfView = ({
               ))}
             </div>
 
-            {/* Divider */}
-            <div className="w-px h-5 bg-stone-800 shrink-0" />
-
             {/* Type Filter Buttons */}
             <div
-              className="flex gap-2 shrink-0"
+              className="grid grid-cols-2 gap-2 min-w-0 flex-[1_1_12rem] sm:flex-none"
               role="group"
               aria-label="Filter by type"
             >

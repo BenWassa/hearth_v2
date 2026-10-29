@@ -92,3 +92,62 @@ describe('PosterCard energy accessibility', () => {
     container.remove();
   });
 });
+
+it('renders automatic energy after classification without writing legacy tags', async () => {
+  const { classifyMedia } = await import(
+    '../../domain/media/classification.mjs'
+  );
+  const { getEffectiveShelfEnergy, getEffectiveShelfVibe } = await import(
+    '../../domain/media/shelfGroups.js'
+  );
+  const { buildV2WatchlistPayload } = await import(
+    '../../domain/media/schema.js'
+  );
+  const { adaptWatchlistItem } = await import('../../domain/media/adapters.js');
+  const payload = buildV2WatchlistPayload(
+    {
+      type: 'movie',
+      source: { provider: 'tmdb', providerId: '123' },
+      media: { type: 'movie', title: 'New comedy', keywords: ['sitcom'] },
+      userState: { tagProvenance: { vibe: 'automatic', energy: 'automatic' } },
+    },
+    'test-user',
+  );
+  const item = adaptWatchlistItem({ ...payload, id: 'new-title' });
+  expect(item.energy).toBe('');
+  expect(getEffectiveShelfEnergy(item)).toBe('light');
+  expect(getEffectiveShelfVibe(item)).toBe('easy');
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const root = createRoot(container);
+  const render = async (value) =>
+    act(async () =>
+      root.render(<PosterCard item={value} onOpenDetails={() => {}} />),
+    );
+  try {
+    await render(item);
+    expect(container.querySelector('[title="Energy: Light"]')).toBeTruthy();
+    expect(container.querySelector('.h-1.bg-sky-400')).toBeTruthy();
+    // Background enrichment must update the band without populating old fields.
+    const classification = classifyMedia(item);
+    classification.attributes.attentionDemand = {
+      value: 'high',
+      confidence: 'high',
+      method: 'gemini',
+    };
+    await render({ ...item, media: { ...item.media, classification } });
+    expect(container.querySelector('[title="Energy: Focused"]')).toBeTruthy();
+    expect(container.querySelector('.h-1.bg-red-400')).toBeTruthy();
+    // Household tags still override automatic evidence.
+    await render({
+      ...item,
+      energy: 'balanced',
+      tagProvenance: { energy: 'user' },
+      userState: { energy: 'balanced', tagProvenance: { energy: 'user' } },
+    });
+    expect(container.querySelector('[title="Energy: Balanced"]')).toBeTruthy();
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+  }
+});

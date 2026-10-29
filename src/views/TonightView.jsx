@@ -74,7 +74,7 @@ const hasHeroBackdrop = (item) => Boolean(getBackdropSrc(item));
 
 // Presentation for each composed Tonight row key. Titles come from the
 // composition module; this only adds the icon, card size and empty label.
-// `mixed` (compact libraries) and `unknown` (fallback) share a neutral icon.
+// Compact libraries use a neutral icon.
 const DEFAULT_ROW_CONFIG = {
   Icon: Moon,
   size: 'md',
@@ -109,7 +109,6 @@ const ROW_CONFIG = {
     emptyLabel: 'No classics queued up.',
   },
   mixed: DEFAULT_ROW_CONFIG,
-  unknown: DEFAULT_ROW_CONFIG,
 };
 
 // Local-date seed (YYYYMMDD, changes at local midnight) for daily shuffled

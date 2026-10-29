@@ -56,6 +56,25 @@ describe('ItemDetailsModal dialogs', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('shows automatic vibe and energy without legacy personal tags', () => {
+    renderModal({
+      item: {
+        id: 'automatic-comedy',
+        title: 'Automatic comedy',
+        type: 'movie',
+        media: {
+          type: 'movie',
+          title: 'Automatic comedy',
+          keywords: ['sitcom'],
+        },
+        tagProvenance: { vibe: 'automatic', energy: 'automatic' },
+      },
+    });
+    expect(container.textContent).toContain('Easy');
+    expect(container.textContent).toContain('Light');
+    expect(container.querySelector('.text-sky-400')).toBeTruthy();
+  });
+
   it('hides missing metadata instead of showing bracketed placeholders', () => {
     renderModal({ item: { title: 'Heat', type: 'movie' } });
     expect(container.textContent).not.toContain('[add');

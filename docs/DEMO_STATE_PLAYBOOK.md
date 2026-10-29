@@ -19,9 +19,9 @@ This is a practical write-up of how Hearth v2 demo mode was built, plus a reusab
    - Demo mode: `useTemplateAppState`.
    - Triggers: `VITE_HEARTH_MODE=template`, `?mode=demo`, `?mode=template`, `?demo=1`.
 2. Seeds are deterministic and curated.
-   - 30 titles total.
+   - 30 base titles with varied viewing history and personal notes; eight scenarios include completed histories and film collections.
    - Stable IDs and timestamps.
-   - Includes user-state defaults (`status`, `vibe`, `energy`, `note`, `episodeProgress`).
+   - Includes consistent user-state values (`status`, `vibe`, `energy`, `note`, `episodeProgress`).
 3. Demo state contract mirrors real app-state contract.
    - Same high-level handlers and flags returned to UI.
    - This avoids mode-specific branching in view components.
@@ -146,3 +146,7 @@ Quality bar:
 - Refresh/session reset returns to baseline.
 - Durable operations are blocked/stubbed.
 - Auth/session isolation prevents real-account leakage.
+
+### Classification parity (October 28, 2026)
+
+New visitor additions use an in-memory classification queue through `/api/media/classify-demo`. That route accepts verified anonymous sessions and validates only public TMDB identities. It shares public cache/lease/budget infrastructure with the connected classifier while skipping every catalog/household access. Seeds never trigger live inference. Existing Gemini enablement and sharing gates apply. Poster colours, details, decision labels and Shelf grouping resolve the same effective classification rather than requiring legacy personal tags to be populated.

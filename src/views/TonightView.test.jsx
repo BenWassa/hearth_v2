@@ -191,7 +191,12 @@ describe('TonightView thematic rows', () => {
   });
 
   it('renders the capped demo row set with substantial rails and no duplicates', async () => {
-    const seed = buildTemplateSeedItems();
+    const seed = buildTemplateSeedItems().map((item) => ({
+      ...item,
+      status: 'unwatched',
+      episodeProgress: {},
+      startedAt: null,
+    }));
     expect(seed).toHaveLength(30);
     const mounted = await renderTonight(seed);
 
@@ -239,7 +244,14 @@ describe('TonightView thematic rows', () => {
   });
 
   it('keeps the Worlds rail after the first rail and Collections above The Classics', async () => {
-    const mounted = await renderTonight(buildTemplateSeedItems());
+    const mounted = await renderTonight(
+      buildTemplateSeedItems().map((item) => ({
+        ...item,
+        status: 'unwatched',
+        episodeProgress: {},
+        startedAt: null,
+      })),
+    );
     const html = mounted.container.innerHTML;
     const first = thematicSections(mounted.container)[0];
     const worlds = mounted.container.querySelector(
@@ -265,7 +277,11 @@ describe('TonightView thematic rows', () => {
   });
 
   it('shows one compact row and no 1-card themed rails for a library of 3', async () => {
-    const mounted = await renderTonight(buildTemplateSeedItems().slice(0, 3));
+    const mounted = await renderTonight(
+      buildTemplateSeedItems()
+        .filter((item) => item.status === 'unwatched')
+        .slice(0, 3),
+    );
 
     const sections = thematicSections(mounted.container);
     expect(sections).toHaveLength(1);

@@ -34,9 +34,8 @@ const THEME_TITLES = {
   classic: 'The Classics',
 };
 
-// Unclassified titles and undersized themes share a neutral fallback row.
-export const FALLBACK_ROW_KEY = 'unknown';
-export const FALLBACK_ROW_TITLE = 'Also on the shelf';
+// Unclassified titles can join compact picks, but never form their own row.
+const UNCLASSIFIED_KEY = 'unknown';
 export const MIXED_ROW_KEY = 'mixed';
 export const MIXED_ROW_TITLE = "Tonight's picks";
 
@@ -45,7 +44,7 @@ export const MAX_ROW_ITEMS = 12;
 // UX test parameters from issue #7, not final policy. The first tier whose
 // `maxEligible` is >= the eligible count applies.
 //   compact: one mixed row instead of thematic rows
-//   maxRows: most mood/fallback rows shown (Quick Bites is extra)   minItems: fewest cards a thematic row may have
+//   maxRows: most mood rows shown (Quick Bites is extra)   minItems: fewest cards a thematic row may have
 export const TONIGHT_TIERS = Object.freeze([
   Object.freeze({ maxEligible: 0, maxRows: 0, minItems: 0, compact: false }),
   Object.freeze({ maxEligible: 5, maxRows: 1, minItems: 1, compact: true }),
@@ -139,10 +138,10 @@ const publicRow = ({ key, title, items }) => ({ key, title, items });
  * 2 rows of >=2; 13-30 -> up to 5 rows of >=3; 31+ -> up to 6 rows of >=3.
  * Strength (then size and selection tie-break order) selects rows when the tier
  * is full; it never controls display order. Selected themes always display as
- * comfort, comedy, quick, hooked, focused, visual, classic; fallback stays last.
+ * comfort, comedy, quick, hooked, focused, visual, classic.
  * Quick Bites is an extra optional row; qualifying Classics always gets a mood slot.
- * Thematic rows below the tier minimum are merged with `unknown` titles into
- * one fallback row, shown only if it meets the minimum and a slot is free.
+ * Undersized themes and unclassified titles stay on the Shelf; there is no
+ * catch-all row outside the compact tier.
  * Titles not shown stay on the Shelf. No row ever holds a title twice, and
  * outside the compact tier no row has fewer than the tier minimum.
  */
@@ -152,13 +151,13 @@ export const composeTonightRows = (
 ) => {
   const seen = new Set();
   const groups = {};
-  const allKeys = [...THEME_ORDER, FALLBACK_ROW_KEY];
-  // Include any unexpected allocation keys in the fallback so nothing is lost.
+  const allKeys = [...THEME_ORDER, UNCLASSIFIED_KEY];
+  // Preserve unexpected allocation keys for compact picks only.
   const extraKeys = Object.keys(allocated || {}).filter(
     (key) => !allKeys.includes(key),
   );
   for (const key of [...allKeys, ...extraKeys]) {
-    const target = THEME_ORDER.includes(key) ? key : FALLBACK_ROW_KEY;
+    const target = THEME_ORDER.includes(key) ? key : UNCLASSIFIED_KEY;
     const list = Array.isArray(allocated?.[key]) ? allocated[key] : [];
     for (const item of list) {
       const id = itemKey(item);
@@ -189,7 +188,6 @@ export const composeTonightRows = (
   }
 
   const themed = [];
-  const fallbackPool = [...(groups[FALLBACK_ROW_KEY] || [])];
   THEME_ORDER.forEach((key, order) => {
     const list = groups[key] || [];
     if (list.length >= tier.minItems) {
@@ -197,8 +195,6 @@ export const composeTonightRows = (
         ...buildRow(key, THEME_TITLES[key], list, scoreItem, sessionSeed),
         order,
       });
-    } else {
-      fallbackPool.push(...list);
     }
   });
 
@@ -214,19 +210,5 @@ export const composeTonightRows = (
   rows.sort(
     (a, b) => DISPLAY_ORDER.indexOf(a.key) - DISPLAY_ORDER.indexOf(b.key),
   );
-  if (
-    rows.filter((row) => row.key !== 'quick').length < tier.maxRows &&
-    fallbackPool.length >= tier.minItems
-  ) {
-    rows.push(
-      buildRow(
-        FALLBACK_ROW_KEY,
-        FALLBACK_ROW_TITLE,
-        fallbackPool,
-        scoreItem,
-        sessionSeed,
-      ),
-    );
-  }
   return { rows: rows.map(publicRow), isEmpty: rows.length === 0 };
 };

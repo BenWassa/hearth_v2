@@ -20,18 +20,26 @@ export const requestClassification = async ({ id, type, token, signal }) => {
   return payload.data;
 };
 
-export const requestClassificationBatch = async ({ items, token, signal }) => {
-  const response = await fetch('/api/media/classify-batch', {
-    method: 'POST',
-    signal,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+export const requestClassificationBatch = async ({
+  items,
+  token,
+  signal,
+  demo = false,
+}) => {
+  const response = await fetch(
+    demo ? '/api/media/classify-demo' : '/api/media/classify-batch',
+    {
+      method: 'POST',
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        items: items.map(({ id, type }) => ({ id, type })),
+      }),
     },
-    body: JSON.stringify({
-      items: items.map(({ id, type }) => ({ id, type })),
-    }),
-  });
+  );
   // Check status before parsing: a missing Express route returns HTML.
   if (!response.ok) {
     const error = new Error('Classification unavailable');

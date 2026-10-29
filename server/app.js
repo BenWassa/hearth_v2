@@ -59,6 +59,7 @@ app.get(
   })),
 );
 app.post('/api/media/refresh', invoke(refreshHandler));
+app.post('/api/media/classify-demo', invoke(require('../api/media/classify-demo')));
 app.post('/api/media/classify', invoke(require('../api/media/classify')));
 app.post(
   '/api/media/classify-batch',

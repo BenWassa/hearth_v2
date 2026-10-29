@@ -90,6 +90,8 @@ Production cutover is complete when:
 
 ## Classification
 
+Demo visitor additions use `/api/media/classify-demo` with verified anonymous Firebase auth. The route shares the public classification cache and global Gemini budget, skips catalog and household writes, and uses the same Gemini configuration below. Curated seeds do not trigger inference.
+
 Optional Gemini classification remains gated on the rollout checks in the [implementation record](open/issue-020-implementation-record.md) and #21. `GEMINI_DAILY_REQUEST_LIMIT` defaults to 20 provider attempts per day, includes retries, and has a hard ceiling of 100; setting it to 0 disables calls. This budget does not cap Firebase charges.
 
 Firebase App Hosting requires Blaze billing. Firestore's free quota for one eligible database is 50,000 document reads and 20,000 writes per day, shared with other app traffic. Cache, lease, catalog and budget transactions consume that quota. Hosting, build, storage and other services have separate allowances. Configure project billing budget alerts and monitor actual usage; alerts do not enforce a spending cap. See the implementation record for the recorded cost references and rollout controls.

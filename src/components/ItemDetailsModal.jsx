@@ -1,3 +1,7 @@
+import {
+  getEffectiveShelfEnergy,
+  getEffectiveShelfVibe,
+} from '../domain/media/shelfGroups.js';
 import React, {
   useCallback,
   useEffect,
@@ -723,8 +727,9 @@ const ItemDetailsModal = ({
   const startedAtLabel = formatStartTime(item.startedAt);
   const hasRuntime = Boolean(runtimeLabel);
 
-  const vibeDef = VIBES.find((v) => v.id === item.vibe);
-  const energyDef = ENERGIES.find((e) => e.id === item.energy);
+  const vibeDef = VIBES.find((v) => v.id === getEffectiveShelfVibe(item));
+  const effectiveEnergy = getEffectiveShelfEnergy(item);
+  const energyDef = ENERGIES.find((e) => e.id === effectiveEnergy);
   const isShowComplete = (progress) => {
     if (!seasons.length) return false;
     return seasons.every(

@@ -13,6 +13,13 @@ const createHandler =
       return getAuth().verifyIdToken(token, true);
     },
     classify = service.classify,
+    isAllowedUser = async (user) => {
+      const { isWhitelistedUid } = await import('../../src/config/access.js');
+      return (
+        user.firebase?.sign_in_provider !== 'anonymous' &&
+        isWhitelistedUid(user.uid)
+      );
+    },
   } = {}) =>
   async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
@@ -27,11 +34,7 @@ const createHandler =
     } catch {
       return fail(req, res, 401, 'UNAUTHENTICATED', 'Sign in to continue.');
     }
-    const { isWhitelistedUid } = await import('../../src/config/access.js');
-    if (
-      user.firebase?.sign_in_provider === 'anonymous' ||
-      !isWhitelistedUid(user.uid)
-    )
+    if (!(await isAllowedUser(user)))
       return fail(req, res, 403, 'FORBIDDEN', 'Account not approved.');
     const rate = checkRateLimit(req, 'classification');
     setRateLimitHeaders(res, rate);

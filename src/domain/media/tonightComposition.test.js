@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
   composeTonightRows,
-  FALLBACK_ROW_TITLE,
   MAX_ROW_ITEMS,
   stableOrder,
   TONIGHT_TIERS,
@@ -160,7 +159,7 @@ describe('composeTonightRows sizes', () => {
   });
 });
 
-describe('composeTonightRows skew and fallback', () => {
+describe('composeTonightRows skew and unclassified titles', () => {
   it('keeps a comedy-heavy library led by comedy with no tiny rails', () => {
     const result = composeTonightRows(
       allocate({ comedy: 18, comfort: 2, visual: 1, focused: 1 }),
@@ -170,18 +169,16 @@ describe('composeTonightRows skew and fallback', () => {
     expect(result.rows.map((r) => r.key)).not.toContain('visual');
   });
 
-  it('folds undersized themes and unknown titles into Also on the shelf', () => {
+  it('omits undersized themes and unclassified titles without a catch-all row', () => {
     const result = composeTonightRows(
       allocate({ comedy: 8, visual: 1, classic: 1, quick: 1, unknown: 2 }),
     );
-    expect(result.rows.map((r) => r.key)).toEqual(['comedy', 'unknown']);
-    const fallback = result.rows[1];
-    expect(fallback.title).toBe(FALLBACK_ROW_TITLE);
-    expect(fallback.items).toHaveLength(5);
+    expect(result.rows.map((r) => r.key)).toEqual(['comedy']);
+    expect(result.rows[0].items).toHaveLength(8);
     expectInvariants(result);
   });
 
-  it('omits the fallback row when it would be below the minimum', () => {
+  it('keeps only qualifying themes', () => {
     const result = composeTonightRows(
       allocate({ comedy: 8, comfort: 4, visual: 1, unknown: 0 }),
     );
@@ -202,7 +199,7 @@ describe('composeTonightRows skew and fallback', () => {
     expectInvariants(result);
   });
 
-  it('puts the fallback last and only when a slot is free', () => {
+  it('never uses an available slot for an unclassified row', () => {
     const result = composeTonightRows(
       allocate({
         comfort: 3,
@@ -218,10 +215,12 @@ describe('composeTonightRows skew and fallback', () => {
     expect(result.rows.map((r) => r.key)).not.toContain('unknown');
   });
 
-  it('never strands everything: all-singletons fall back to one row', () => {
-    const result = composeTonightRows(spread(7));
-    expect(result.rows.map((r) => r.key)).toEqual(['unknown']);
-    expect(result.rows[0].items).toHaveLength(7);
+  it('does not invent a grouping when no themes qualify', () => {
+    expect(composeTonightRows(spread(7))).toEqual({ rows: [], isEmpty: true });
+    expect(composeTonightRows(allocate({ unknown: 20 }))).toEqual({
+      rows: [],
+      isEmpty: true,
+    });
   });
 
   it('drops a title that appears in two allocated rows', () => {
@@ -322,8 +321,6 @@ describe('composeTonightRows ordering and determinism', () => {
       const pool =
         row.key === 'mixed'
           ? Object.values(allocated).flat()
-          : row.key === 'unknown'
-          ? [...allocated.unknown, ...allocated.visual]
           : allocated[row.key];
       expect(row.items).toEqual(stableOrder(pool, '20261028').slice(0, 12));
       expect(b.rows.find(({ key }) => key === row.key).items).toEqual(

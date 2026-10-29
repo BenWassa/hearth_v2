@@ -1,3 +1,7 @@
+import {
+  getEffectiveShelfEnergy,
+  getEffectiveShelfVibe,
+} from '../domain/media/shelfGroups.js';
 import React, { useState } from 'react';
 import { Battery, ChevronLeft, Film, Sparkles, Tv } from 'lucide-react';
 import { ENERGIES, VIBES } from '../config/constants.js';
@@ -15,9 +19,11 @@ const DecisionView = ({
   decisionContext,
 }) => {
   const energyDef = result
-    ? ENERGIES.find((e) => e.id === result.energy)
+    ? ENERGIES.find((e) => e.id === getEffectiveShelfEnergy(result))
     : null;
-  const vibeDef = result ? VIBES.find((v) => v.id === result.vibe) : null;
+  const vibeDef = result
+    ? VIBES.find((v) => v.id === getEffectiveShelfVibe(result))
+    : null;
   const EnergyIcon = energyDef ? energyDef.icon : Battery;
   const [posterMissing, setPosterMissing] = useState(false);
   const posterSrc = result ? getPosterSrc(result) : null;

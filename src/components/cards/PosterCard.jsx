@@ -1,3 +1,4 @@
+import { getEffectiveShelfEnergy } from '../../domain/media/shelfGroups.js';
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import { Plus, Check, Trash2, CheckCircle2 } from 'lucide-react';
 import { ENERGIES } from '../../config/constants.js';
@@ -21,7 +22,8 @@ const PosterCard = ({
   const progressDescriptionId = useId();
   const posterSrc = getPosterSrc(item);
   const isWatched = item.status === 'watched';
-  const energyDef = ENERGIES.find((e) => e.id === item.energy);
+  const effectiveEnergy = getEffectiveShelfEnergy(item);
+  const energyDef = ENERGIES.find((e) => e.id === effectiveEnergy);
 
   const showProgress = useMemo(() => getShowWatchProgress(item), [item]);
   const progressPercentage = showProgress.percent;
@@ -30,7 +32,7 @@ const PosterCard = ({
     !isWatched && progressPercentage > 0 && item.type === 'show';
 
   // No band or badge for an unknown energy, so index the map directly.
-  const currentEnergyStyle = ENERGY_STYLES[item.energy];
+  const currentEnergyStyle = ENERGY_STYLES[effectiveEnergy];
 
   const progressBar = showProgressBar ? (
     <ProgressBar

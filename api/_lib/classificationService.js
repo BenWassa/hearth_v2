@@ -12,6 +12,7 @@ const createClassificationService = ({
   getDetails = provider.getMediaDetails,
   ai = gemini,
   now = Date.now,
+  persistCatalog = true,
 } = {}) => {
   const reserveAttempt = async () => {
     const store = db();
@@ -101,6 +102,9 @@ const createClassificationService = ({
         throw error;
       }
     }
+    // Demo classification shares only the public cache and request budget.
+    if (!persistCatalog) return classification;
+
     // Update only generated facets on matching existing catalog records. Never
     // touch a household's tags, note, progress or activity timestamp.
     for (const mediaId of [key, `tmdb:${id}`]) {
@@ -135,7 +139,9 @@ const createClassificationService = ({
   };
   return {
     classify: (args) => {
-      const key = `${args.appId}:${args.type}:${args.id}`;
+      const key = `${persistCatalog ? 'catalog' : 'demo'}:${args.appId}:${
+        args.type
+      }:${args.id}`;
       if (inFlight.has(key)) return inFlight.get(key);
       const promise = run(args).finally(() => inFlight.delete(key));
       inFlight.set(key, promise);

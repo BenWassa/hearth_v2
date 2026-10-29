@@ -356,23 +356,28 @@ describe('Get Hooked', () => {
 });
 
 describe('realistic demo seed', () => {
-  it('qualifies comedy and hooked while selecting five mood rows plus Quick Bites', () => {
+  it('excludes completed and active titles from the default demo mood rows', () => {
     const items = buildTemplateSeedItems();
     const allocated = allocateTonightThemes(items, { now: NOW });
     expect(items).toHaveLength(30);
-    expect(allocated.comedy).toHaveLength(3);
-    expect(allocated.hooked).toHaveLength(3);
-    expect(allocated.focused).toHaveLength(4);
+    expect(allocated.comedy).toHaveLength(1);
+    expect(allocated.hooked).toHaveLength(1);
+    expect(allocated.focused).toHaveLength(1);
     const ids = Object.values(allocated)
       .flat()
       .map((item) => item.id);
-    expect(new Set(ids).size).toBe(30);
+    expect(new Set(ids).size).toBe(16);
     expect(
       composeTonightRows(allocated)
         .rows.map((r) => r.key)
         .sort(),
-    ).toEqual(['classic', 'comedy', 'comfort', 'focused', 'quick', 'visual']);
-    expect(Object.values(allocated).flat()).toHaveLength(30);
+    ).toEqual(['classic', 'comfort', 'quick', 'visual']);
+    expect(Object.values(allocated).flat()).toHaveLength(16);
+    expect(
+      Object.values(allocated)
+        .flat()
+        .every((item) => item.status === 'unwatched'),
+    ).toBe(true);
   });
   it.each([
     ['Paddington 2', 'comfort'],
@@ -388,9 +393,11 @@ describe('realistic demo seed', () => {
     ['Stranger Things', 'focused'],
     ['Severance', 'focused'],
   ])('%s has one plausible home', (title, theme) => {
-    const item = buildTemplateSeedItems().find(
-      (entry) => entry.title === title,
-    );
+    const item = {
+      ...buildTemplateSeedItems().find((entry) => entry.title === title),
+      status: 'unwatched',
+      episodeProgress: {},
+    };
     expect(primaryTheme(item)).toBe(theme);
     expect(
       rowOf(

@@ -6,7 +6,15 @@ import {
   isPurgeable,
   clearedRemovalMarkers,
 } from '../domain/watchlist/removal.js';
-import { tagProvenance } from '../domain/media/classification.mjs';
+import {
+  canonicalMediaKey,
+  classificationRevision,
+  tagProvenance,
+} from '../domain/media/classification.mjs';
+import {
+  startClassificationBackfill,
+  requestClassificationBatch,
+} from '../services/mediaApi/classificationQueue.js';
 import {
   getExplicitWorldMetadata,
   normalizeWorldIds,
@@ -503,6 +511,52 @@ export const useTemplateAppState = () => {
     setView('tonight');
     setUpdateMessage(`Loaded ${scenario.label} demo.`);
   }, []);
+  const classificationItemsRef = useRef(allItems);
+  classificationItemsRef.current = allItems;
+  useEffect(() => {
+    if (!authUser?.isAnonymous || !authUser?.getIdToken) return undefined;
+    let active = true;
+    const stop = startClassificationBackfill({
+      scope: TEMPLATE_SPACE_ID,
+      // Curated seeds never consume the live demo budget. Only visitor additions
+      // need enrichment; all retry markers and results are session-local.
+      getItems: () =>
+        classificationItemsRef.current.filter(
+          (item) =>
+            item.id.startsWith('template-user-item-') && !isRemoved(item),
+        ),
+      getToken: () => authUser.getIdToken(),
+      storage: null,
+      request: (args) => requestClassificationBatch({ ...args, demo: true }),
+      onResult: async () => {},
+      onBatchResult: (results) => {
+        if (!active) return;
+        const byId = new Map(results.map((result) => [result.item.id, result]));
+        setItems((current) =>
+          current.map((item) => {
+            const result = byId.get(item.id);
+            if (
+              !result ||
+              canonicalMediaKey(item) !== result.classification.key ||
+              classificationRevision(item) !==
+                classificationRevision(result.item)
+            )
+              return item;
+            return {
+              ...item,
+              media: { ...item.media, classification: result.classification },
+            };
+          }),
+        );
+      },
+    });
+    return () => {
+      active = false;
+      stop();
+    };
+    // Restart after add/remove/reset so a new visitor title need not wait for
+    // the idle poll. Classification results do not change the item count.
+  }, [authUser, allItems.length]);
   const items = useMemo(
     () => allItems.filter((item) => !isRemoved(item)),
     [allItems],

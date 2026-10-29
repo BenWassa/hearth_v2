@@ -348,3 +348,46 @@ test('Gemini quota, budget, invalid JSON, semantic errors, timeout and retry exh
   });
   assert.equal(result.status, 'timeout');
 });
+
+test('demo classification reuses public cache and budget without reading or writing catalogs', async () => {
+  const catalogPath = 'artifacts/app/media_catalog/tmdb:603';
+  const original = {
+    source: { provider: 'tmdb', providerId: '603' },
+    media: { type: 'movie' },
+    note: 'private',
+  };
+  const store = fakeDb({ [catalogPath]: original });
+  const doc = store.doc;
+  store.doc = (path) => {
+    assert.ok(
+      !path.startsWith('artifacts/'),
+      'demo must never access household or catalog records',
+    );
+    return doc(path);
+  };
+  let calls = 0;
+  const service = createClassificationService({
+    db: () => store,
+    getDetails: details,
+    persistCatalog: false,
+    ai: {
+      ...disabled,
+      infer: async ({ reserveAttempt }) => {
+        calls++;
+        assert.equal(await reserveAttempt(), true);
+        return { status: 'disabled' };
+      },
+    },
+  });
+  const args = { id: '603', type: 'movie', appId: 'app' };
+  const first = await service.classify(args);
+  assert.deepEqual(await service.classify(args), first);
+  assert.equal(calls, 1);
+  assert.deepEqual(store.records.get(catalogPath), original);
+  assert.ok(store.records.has('classification_cache/tmdb:movie:603'));
+  assert.ok(
+    [...store.records.keys()].some((key) =>
+      key.startsWith('classification_budgets/'),
+    ),
+  );
+});

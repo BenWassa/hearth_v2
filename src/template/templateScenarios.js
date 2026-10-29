@@ -1,4 +1,6 @@
 import { buildTemplateSeedItems } from './seedLibrary.js';
+import { DEMO_ACTIVITY_TIME, withDemoWatchState } from './demoActivity.js';
+import { buildCollectionFixture } from './collectionFixtures.js';
 
 export const TEMPLATE_SCENARIOS = [
   {
@@ -27,6 +29,18 @@ export const TEMPLATE_SCENARIOS = [
     description: 'The complete curated demo library.',
   },
   {
+    id: 'completed',
+    label: 'Finished favourites',
+    description:
+      'Completed films and shows with fully watched episode histories.',
+  },
+  {
+    id: 'collections',
+    label: 'Film collections',
+    description:
+      'Five film series with a mix of completed and remaining films.',
+  },
+  {
     id: 'busy',
     label: 'Busy household',
     description: 'A dense mixed shelf with watched and active titles.',
@@ -40,15 +54,6 @@ const byProviderIds = (items, ids) => {
   return items.filter((item) => wanted.has(String(item?.source?.providerId)));
 };
 
-const withStatuses = (items, statuses) =>
-  items.map((item, index) => ({
-    ...item,
-    status: statuses[index % statuses.length],
-    ...(statuses[index % statuses.length] === 'watching'
-      ? { startedAt: item.startedAt || item.createdAt }
-      : {}),
-  }));
-
 export const buildTemplateScenario = (
   scenarioId = DEFAULT_TEMPLATE_SCENARIO,
 ) => {
@@ -60,7 +65,14 @@ export const buildTemplateScenario = (
     case 'empty':
       return [];
     case 'few':
-      return byProviderIds(seed, ['346648', '97546', '8835', '125935', '804', '4278']);
+      return byProviderIds(seed, [
+        '346648',
+        '97546',
+        '8835',
+        '125935',
+        '804',
+        '4278',
+      ]);
     case 'movies':
       return byProviderIds(movies, [
         '346648',
@@ -73,25 +85,30 @@ export const buildTemplateScenario = (
         '238',
       ]);
     case 'shows':
-      return shows.slice(0, 6).map((item, index) => ({
-        ...item,
-        status: index < 4 ? 'watching' : 'unwatched',
-        startedAt: index < 4 ? item.createdAt : null,
-        episodeProgress:
-          index < 4
-            ? {
-                [item.seasons?.[0]?.episodes?.[0]?.id || `${item.id}-s1e1`]: true,
-                ...(index % 2
-                  ? {}
-                  : {
-                      [item.seasons?.[0]?.episodes?.[1]?.id ||
-                      `${item.id}-s1e2`]: true,
-                    }),
-              }
-            : {},
-      }));
+      return shows.slice(0, 6).map((item, index) =>
+        withDemoWatchState(item, {
+          status: index < 4 ? 'watching' : 'unwatched',
+          watchedEpisodes: [2, 5, 22, 12][index],
+          index,
+        }),
+      );
+    case 'completed':
+      return [...movies.slice(0, 4), ...shows.slice(0, 2)].map((item, index) =>
+        withDemoWatchState(item, { status: 'watched', index }),
+      );
+    case 'collections':
+      return buildCollectionFixture({ count: 5, now: DEMO_ACTIVITY_TIME });
     case 'busy':
-      return withStatuses(seed, ['unwatched', 'watching', 'watched']);
+      return [
+        ...seed.map((item, index) =>
+          withDemoWatchState(item, {
+            status: ['unwatched', 'watching', 'watched'][index % 3],
+            watchedEpisodes: index + 1,
+            index,
+          }),
+        ),
+        ...buildCollectionFixture({ count: 5, now: DEMO_ACTIVITY_TIME }),
+      ];
     case 'full':
     default:
       return seed;

@@ -1,4 +1,5 @@
 import seedMediaMap from './seed-media-map.json';
+import { withDemoActivity } from './demoActivity.js';
 
 const MOVIE_SEEDS = [
   {
@@ -400,4 +401,4 @@ const TEMPLATE_SEED_ITEMS_WITH_MEDIA = TEMPLATE_SEED_ITEMS.map((item) =>
 );
 
 export const buildTemplateSeedItems = () =>
-  cloneDeep(TEMPLATE_SEED_ITEMS_WITH_MEDIA);
+  cloneDeep(TEMPLATE_SEED_ITEMS_WITH_MEDIA.map(withDemoActivity));

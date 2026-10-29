@@ -391,3 +391,27 @@ it.each([404, 405])(
     }
   },
 );
+
+it('sends demo classification to its isolated endpoint using only public identities', async () => {
+  const { requestClassificationBatch } = await import(
+    './classificationQueue.js'
+  );
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ ok: true, data: [] }),
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  try {
+    await requestClassificationBatch({
+      items: [{ id: '603', type: 'movie', note: 'private' }],
+      token: 'anonymous-token',
+      demo: true,
+    });
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/media/classify-demo');
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+      items: [{ id: '603', type: 'movie' }],
+    });
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});

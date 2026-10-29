@@ -633,9 +633,13 @@ const ShelfView = ({
             {isSearching ? (
               <div className={sectionGapClassName}>
                 {filteredItems.length === 0 ? (
-                  <div className="text-sm text-stone-400 text-center py-12">
-                    No matches yet. Try another title.
-                  </div>
+                  <ShelfEmptyState
+                    illustration="/assets/empty-states/search.webp"
+                    title="No titles match your search"
+                    description="Try another title."
+                    action="Clear search"
+                    onAction={() => setSearchQuery('')}
+                  />
                 ) : (
                   <div className={cardGridClassName}>
                     {filteredItems.map((item) =>
@@ -650,6 +654,7 @@ const ShelfView = ({
               <>
                 {items.length === 0 ? (
                   <ShelfEmptyState
+                    illustration="/assets/empty-states/library.png"
                     title="Your Library is empty"
                     description="Keep the movies and shows you want to watch here."
                     action="Add your first title"
@@ -657,6 +662,11 @@ const ShelfView = ({
                   />
                 ) : libraryItems.length === 0 ? (
                   <ShelfEmptyState
+                    illustration={
+                      watched.length === items.length
+                        ? '/assets/empty-states/library.png'
+                        : '/assets/empty-states/filters.webp'
+                    }
                     title={
                       watched.length === items.length
                         ? 'Everything is watched'
@@ -692,9 +702,13 @@ const ShelfView = ({
           <div className={sectionGapClassName}>
             {isSearching ? (
               filteredItems.length === 0 ? (
-                <div className="text-sm text-stone-400 text-center py-12">
-                  No matches yet. Try another title.
-                </div>
+                <ShelfEmptyState
+                  illustration="/assets/empty-states/search.webp"
+                  title="No titles match your search"
+                  description="Try another title."
+                  action="Clear search"
+                  onAction={() => setSearchQuery('')}
+                />
               ) : (
                 <div className={cardGridClassName}>
                   {filteredItems.map((item) =>
@@ -707,6 +721,7 @@ const ShelfView = ({
               )
             ) : watched.length === 0 ? (
               <ShelfEmptyState
+                illustration="/assets/empty-states/library.png"
                 title="Nothing watched yet"
                 description="Titles you mark as watched will appear here."
                 action={
@@ -717,9 +732,15 @@ const ShelfView = ({
                 }
               />
             ) : watchedFiltered.length === 0 ? (
-              <div className="text-sm text-stone-400 text-center py-12">
-                No memories match the current filters.
-              </div>
+              <ShelfEmptyState
+                illustration="/assets/empty-states/filters.webp"
+                title="No memories match these filters"
+                action="Show all titles"
+                onAction={() => {
+                  setShowMovies(true);
+                  setShowShows(true);
+                }}
+              />
             ) : (
               <>
                 {renderGroups(memoriesByGroup, {

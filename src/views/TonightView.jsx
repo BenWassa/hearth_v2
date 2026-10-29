@@ -544,15 +544,11 @@ const TonightView = ({
 
                 {showEmptyState && (
                   <ShelfEmptyState
+                    illustration="/assets/empty-states/tonight.png"
                     title={
                       items.length === 0
-                        ? 'Add something to watch'
+                        ? 'Nothing added yet'
                         : 'Nothing unwatched right now'
-                    }
-                    description={
-                      items.length === 0
-                        ? 'Your movies and shows will appear here.'
-                        : 'Add a movie or show to your Library.'
                     }
                     action={
                       items.length === 0

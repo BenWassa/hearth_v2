@@ -20,9 +20,18 @@ const enabled = () =>
   process.env.GEMINI_METADATA_SHARING_APPROVED === 'true' &&
   Boolean(process.env.GEMINI_MODEL) &&
   Boolean(process.env.GEMINI_API_KEY || process.env.GEMINI_API);
+// Some newer models reject 'minimal'; the default keeps the shipped policy.
+const thinkingLevel = () => {
+  const level = process.env.GEMINI_THINKING_LEVEL;
+  return ['low', 'medium', 'high'].includes(level) ? level : 'minimal';
+};
 const policyKey = () =>
   enabled()
-    ? `hybrid:${process.env.GEMINI_MODEL}:${PROMPT_VERSION}:${INFERENCE_POLICY_VERSION}`
+    ? `hybrid:${
+        process.env.GEMINI_MODEL
+      }:${PROMPT_VERSION}:${INFERENCE_POLICY_VERSION}${
+        thinkingLevel() === 'minimal' ? '' : `:think-${thinkingLevel()}`
+      }`
     : 'rules';
 const getSchema = (facets, levels) => ({
   type: 'object',
@@ -83,7 +92,7 @@ const buildRequestBody = (input, facets, levels) => {
     ],
     generationConfig: {
       maxOutputTokens: 2048,
-      thinkingConfig: { thinkingLevel: 'minimal' },
+      thinkingConfig: { thinkingLevel: thinkingLevel() },
       responseMimeType: 'application/json',
       responseJsonSchema: getSchema(facets, levels),
     },

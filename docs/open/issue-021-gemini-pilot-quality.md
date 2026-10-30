@@ -142,3 +142,47 @@ The 50-title three-run evaluation needs about 170 provider calls: about 9 UTC da
 
 ### Decision: daily call limit (2026-10-28)
 The owner approved raising the daily Gemini call limit for the testing phase only (hard ceiling in code stays 100; the evaluator reads `GEMINI_DAILY_REQUEST_LIMIT`). Production Gemini stays disabled and the default stays 20. Once the evaluation passes and the owner approves enabling, the limit goes back down to a small daily number.
+
+## 2026-10-29 update: full 50-title live evaluation (viewing-2 / gemini-3.5-flash-lite)
+
+Raw report: `issue-021-gemini-full-v2-2026-10-29.json`. All 50 real titles have three valid predictions each (151 provider calls in total). Production Gemini stays disabled. The Google API key was moved to a paid quota tier for this run after the free tier stopped at 18 calls; the code's own daily ceiling (100) was raised locally for one run and not committed.
+
+| Aspect | Majority-of-three agreement (bar 80%) | Single-run agreement (bar 75%) | Unknown (bar 35%) | Same answer in all runs |
+| --- | --- | --- | --- | --- |
+| Comfort | 88% pass | 88% pass | 0% | 100% |
+| Comedy first | 80% pass | 80% pass | 0% | 96% |
+| Plot momentum | 82% pass | 81% pass | 0% | 86% |
+| Narrative complexity | **78% fail** | 78% pass | 0% | 92% |
+| Visual distinctiveness | **74% fail** | **74% fail** | 4% | 84% |
+| Attention demand | 86% pass | 85% pass | 0% | 92% |
+
+`rolloutPassed` is false. Two aspects miss the bar:
+
+- **Narrative complexity** (2 points short): the model rates down; 5 medium titles came back low and 5 high came back medium.
+- **Visual distinctiveness** (6 points short, also below the single-run bar): the model over-rates; 7 titles the key marks low came back medium, and 3 medium came back high.
+
+The rules-only baseline scores 0% and 2% on these two aspects, so Gemini is a large improvement, but not enough to meet the agreed gates. The other four aspects pass.
+
+### Next options (owner decision)
+1. Prompt/policy v3 targeted at the two failing aspects, then re-run those aspects only on a fresh output file.
+2. Ship Gemini for the four passing aspects and leave narrative complexity and visual distinctiveness to rules, which return unknown when they cannot tell.
+3. Lower the bar for the two aspects (not recommended without owner approval).
+
+### Stronger model: gemini-3.8-flash (thinking level low) passes every gate
+
+Raw report: `issue-021-gemini-full-38flash-2026-10-30.json`. Same 50 titles, same answer key, same prompt (`viewing-prompt-2`) and three runs each; 152 provider calls. Gemini 3.8 Flash rejects the `minimal` thinking level, so the run used a new optional `GEMINI_THINKING_LEVEL` setting (default stays `minimal`; other allowed values low, medium, high; non-default values are part of the policy key). `rolloutPassed` is **true**.
+
+| Aspect | Majority-of-three agreement (bar 80%) | Single-run (bar 75%) | Unknown (bar 35%) |
+| --- | --- | --- | --- |
+| Comfort | 92% | 92% | 0% |
+| Comedy first | 92% | 91% | 0% |
+| Plot momentum | 84% | 84% | 0% |
+| Narrative complexity | 88% | 89% | 0% |
+| Visual distinctiveness | 80% (exactly at the bar) | 77% | 0% |
+| Attention demand | 86% | 86% | 0% |
+
+Notes:
+- Visual distinctiveness only just clears the bar; it over-rates 6 low titles as medium and 4 medium as high. Treat it as the weakest facet.
+- One title timed out twice at the production default of 5 seconds and completed with a 20-second timeout. Production would need a longer timeout (about 20 seconds) with this model, or occasional titles stay pending and retry.
+- Free tier lists Gemini 3.8 Flash and 3.6 Flash as available at no cost, while 3.1 Pro and Gemini 4 Argon have no free tier (Google pricing page, 2026-10-30). Run cost on the paid tier is a few cents; per-model free-tier request limits are only visible in AI Studio (aistudio.google.com/rate-limit).
+- Remaining rollout gates are unchanged and need the owner: metadata-sharing rights confirmation, project quota/billing choice, and a production smoke test. Production Gemini stays disabled.

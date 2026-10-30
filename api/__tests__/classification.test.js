@@ -391,3 +391,31 @@ test('demo classification reuses public cache and budget without reading or writ
     ),
   );
 });
+
+test('thinking level defaults to minimal and accepts an allowlisted override', () => {
+  const gemini = require('../_lib/geminiClassifier');
+  const saved = process.env.GEMINI_THINKING_LEVEL;
+  try {
+    delete process.env.GEMINI_THINKING_LEVEL;
+    assert.equal(
+      gemini.buildRequestBody({}, ['comfort'], ['low']).generationConfig
+        .thinkingConfig.thinkingLevel,
+      'minimal',
+    );
+    process.env.GEMINI_THINKING_LEVEL = 'low';
+    assert.equal(
+      gemini.buildRequestBody({}, ['comfort'], ['low']).generationConfig
+        .thinkingConfig.thinkingLevel,
+      'low',
+    );
+    process.env.GEMINI_THINKING_LEVEL = 'bogus';
+    assert.equal(
+      gemini.buildRequestBody({}, ['comfort'], ['low']).generationConfig
+        .thinkingConfig.thinkingLevel,
+      'minimal',
+    );
+  } finally {
+    if (saved === undefined) delete process.env.GEMINI_THINKING_LEVEL;
+    else process.env.GEMINI_THINKING_LEVEL = saved;
+  }
+});

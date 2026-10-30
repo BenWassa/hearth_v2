@@ -2,7 +2,6 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { ENERGIES, VIBES } from './config/constants.js';
 import { isTemplateMode } from './app/useConfiguredAppState.js';
-import { useAppState } from './app/useAppState.js';
 import { lazyWithPrefetch, prefetchOnIdle } from './app/lazyWithPrefetch.js';
 import OnboardingView from './views/OnboardingView.jsx';
 import TonightView from './views/TonightView.jsx';
@@ -31,14 +30,10 @@ export function AppLoadingScreen() {
 }
 
 /**
- * Real (Firebase-backed) app. Template mode renders HearthAppView from
- * src/template/TemplateApp.jsx with its own state hook, which is lazy-loaded
- * from src/index.jsx so the template code and seed data stay out of this chunk.
+ * Shared shell for the separately loaded Firebase and template routes.
+ * Keep route state hooks out of this module so the loading screen and demo
+ * cannot pull the real app and Firestore into their eager import graph.
  */
-export default function HearthApp() {
-  return <HearthAppView appState={useAppState()} />;
-}
-
 export function HearthAppView({ appState }) {
   const {
     autoReloadCountdown,

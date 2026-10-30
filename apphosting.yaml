@@ -75,34 +75,33 @@ env:
       - BUILD
       - RUNTIME
 
-# Optional Gemini pilot: create GEMINI_API_KEY in App Hosting's secret settings
-# (Cloud Secret Manager), then uncomment this runtime-only reference. Keep the
-# flags false until metadata sharing and the 50-title quality pilot are approved.
-#  - variable: GEMINI_API_KEY
-#    secret: GEMINI_API_KEY
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_MODEL
-#    value: gemini-3.8-flash # passed the 50-title evaluation (#21)
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_THINKING_LEVEL
-#    value: low # this model rejects the default, minimal
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_TIMEOUT_MS
-#    value: "20000" # one evaluated title needed more than the 5 s default
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_CLASSIFICATION_ENABLED
-#    value: "false"
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_METADATA_SHARING_APPROVED
-#    value: "false"
-#    availability:
-#      - RUNTIME
-#  - variable: GEMINI_DAILY_REQUEST_LIMIT
-#    value: "20"
-#    availability:
-#      - RUNTIME
+# Gemini classification (#21): gemini-3.8-flash passed the 50-title evaluation.
+# Key lives in App Hosting secrets. Set GEMINI_DAILY_REQUEST_LIMIT to 0 to switch it off.
+  - variable: GEMINI_API_KEY
+    secret: GEMINI_API_KEY
+    availability:
+      - RUNTIME
+  - variable: GEMINI_MODEL
+    value: gemini-3.8-flash # passed the 50-title evaluation (#21)
+    availability:
+      - RUNTIME
+  - variable: GEMINI_THINKING_LEVEL
+    value: low # this model rejects the default, minimal
+    availability:
+      - RUNTIME
+  - variable: GEMINI_TIMEOUT_MS
+    value: "20000" # one evaluated title needed more than the 5 s default
+    availability:
+      - RUNTIME
+  - variable: GEMINI_CLASSIFICATION_ENABLED
+    value: "true"
+    availability:
+      - RUNTIME
+  - variable: GEMINI_METADATA_SHARING_APPROVED
+    value: "true"
+    availability:
+      - RUNTIME
+  - variable: GEMINI_DAILY_REQUEST_LIMIT
+    value: "20"
+    availability:
+      - RUNTIME

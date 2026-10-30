@@ -58,7 +58,7 @@ const PosterCard = ({
   };
 
   return (
-    <div className="group flex flex-col h-full">
+    <div className="group relative flex flex-col h-full">
       {/* Poster Container with Energy Band */}
       <div className="relative flex-shrink-0 w-full">
         {/* Energy Color Band at Top */}

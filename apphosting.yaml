@@ -83,7 +83,15 @@ env:
 #    availability:
 #      - RUNTIME
 #  - variable: GEMINI_MODEL
-#    value: <free-tier-model-confirmed-in-AI-Studio>
+#    value: gemini-3.8-flash # passed the 50-title evaluation (#21)
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_THINKING_LEVEL
+#    value: low # this model rejects the default, minimal
+#    availability:
+#      - RUNTIME
+#  - variable: GEMINI_TIMEOUT_MS
+#    value: "20000" # one evaluated title needed more than the 5 s default
 #    availability:
 #      - RUNTIME
 #  - variable: GEMINI_CLASSIFICATION_ENABLED

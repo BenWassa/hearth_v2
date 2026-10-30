@@ -6,6 +6,7 @@ import {
   Upload,
   Download,
   Trash2,
+  History,
   Wrench,
   Sparkles,
 } from 'lucide-react';
@@ -63,6 +64,8 @@ const TonightHeaderMenu = ({
   openAuditModal,
   onDeleteAll,
   onOpenDeleteAll,
+  hasRemovedItems = false,
+  onOpenRemoved,
   onSignOut,
   showUtilityMenu = true,
   showSignOut = true,
@@ -251,6 +254,21 @@ const TonightHeaderMenu = ({
                     <Download className="w-4 h-4 text-stone-400 shrink-0" />
                     Export library
                   </button>
+                  {hasRemovedItems && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onOpenRemoved?.();
+                      }}
+                      className={`${menuItemBase} ${menuDivider} text-stone-300 hover:bg-stone-900/70 hover:text-stone-100`}
+                      role="menuitem"
+                      tabIndex={-1}
+                    >
+                      <History className="w-4 h-4 text-stone-400 shrink-0" />
+                      Recently removed
+                    </button>
+                  )}
                   {onDeleteAll && (
                     <>
                       <button

@@ -31,6 +31,7 @@ describe('Recently removed confirmation in the app shell', () => {
             ...updates,
             authResolved: true,
             items: [],
+            removedItems: [],
             userSpaces: [],
             view: 'tonight',
           }}

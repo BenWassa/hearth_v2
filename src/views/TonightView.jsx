@@ -183,6 +183,8 @@ const TonightView = ({
   onImport,
   onExport,
   onDeleteAll,
+  hasRemovedItems = false,
+  onOpenRemoved,
   onDelete,
   onToggleStatus,
   onUpdate,
@@ -459,6 +461,8 @@ const TonightView = ({
             showDevMetadataTools={showDevMetadataTools}
             openAuditModal={openAuditModal}
             onDeleteAll={onDeleteAll}
+            hasRemovedItems={hasRemovedItems}
+            onOpenRemoved={onOpenRemoved}
             onOpenDeleteAll={handleOpenDeleteAll}
             onSignOut={onSignOut}
             showUtilityMenu={showUtilityMenu}

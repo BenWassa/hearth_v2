@@ -126,7 +126,6 @@ const ShelfView = ({
   onPurgeRemoved,
   onBack,
   showRemoved = false,
-  onOpenRemoved,
 }) => {
   const [removalMessage, setRemovalMessage] = useState('');
   useEffect(() => {
@@ -515,10 +514,10 @@ const ShelfView = ({
 
         {/* Sort + Type Filter Bar */}
         {hasTabItems && (
-          <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <div className="px-4 sm:px-5 py-1.5 bg-stone-950/90 backdrop-blur-md border-b border-stone-800/40 flex items-center gap-3 overflow-x-auto no-scrollbar">
             {/* Sort pill group */}
             <div
-              className="grid grid-cols-3 gap-2 min-w-0 flex-[1_1_12rem] sm:flex-none"
+              className="flex gap-2 shrink-0"
               role="group"
               aria-label="Sort by"
             >
@@ -541,9 +540,12 @@ const ShelfView = ({
               ))}
             </div>
 
+            {/* Divider */}
+            <div className="w-px h-5 bg-stone-800 shrink-0" />
+
             {/* Type Filter Buttons */}
             <div
-              className="grid grid-cols-2 gap-2 min-w-0 flex-[1_1_12rem] sm:flex-none"
+              className="flex gap-2 shrink-0"
               role="group"
               aria-label="Filter by type"
             >
@@ -600,23 +602,17 @@ const ShelfView = ({
         )}
       </div>
       {/* ── End sticky header block ── */}
-      {viewTab === 'library' && (removedItems.length > 0 || removalMessage) && (
+      {viewTab === 'library' && (
         <div className="px-4 text-sm text-stone-300">
           <p
             role="status"
             aria-live="polite"
             aria-atomic="true"
-            className="min-h-8 pt-3"
+            className={removalMessage ? 'min-h-8 pt-3' : 'sr-only'}
           >
-            {removalMessage && `${removalMessage} Restore within 24 hours.`}
+            {removalMessage &&
+              `${removalMessage} Restore within 24 hours from the ⋯ menu on Tonight.`}
           </p>
-          <Button
-            variant="ghost"
-            className="min-h-11 !pl-0 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
-            onClick={onOpenRemoved}
-          >
-            Recently removed
-          </Button>
         </div>
       )}
 

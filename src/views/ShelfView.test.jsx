@@ -106,7 +106,6 @@ it('bulk removal copy, transient live status, selection clearing and Memories vi
     items: [{ id: 'one', title: 'One', type: 'movie', status: 'unwatched' }],
     onBulkDelete: async () => [{ itemId: 'one', status: 'removed' }],
     removedItems: [{ id: 'older', title: 'Older', removedAt: Date.now() }],
-    onOpenRemoved: vi.fn(),
     onBack: vi.fn(),
   };
   const click = async (label) => {
@@ -131,18 +130,13 @@ it('bulk removal copy, transient live status, selection clearing and Memories vi
   };
   try {
     await act(async () => root.render(<ShelfView {...props} />));
-    const link = [...container.querySelectorAll('button')].find(
-      (el) => el.textContent.trim() === 'Recently removed',
-    );
-    expect(link.className).toContain('!pl-0');
-    await click('Recently removed');
-    expect(props.onOpenRemoved).toHaveBeenCalledOnce();
+    expect(container.textContent).not.toContain('Recently removed');
     await remove();
     const status = container.querySelector('[role="status"]');
     expect(status.getAttribute('aria-live')).toBe('polite');
     expect(status.className).toContain('min-h-8');
     expect(status.textContent).toContain(
-      '1 title removed. Restore within 24 hours.',
+      '1 title removed. Restore within 24 hours from the ⋯ menu on Tonight.',
     );
     await act(async () => vi.advanceTimersByTime(8000));
     expect(status.textContent).toBe('');

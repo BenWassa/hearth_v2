@@ -461,7 +461,13 @@ export const useAppState = () => {
     };
   }, [user, db, spaceId]);
 
-  const [loading, setLoading] = useState(true);
+  const [spaceLoading, setLoading] = useState(true);
+  // The space record resolves before the first list of titles. Stay in the
+  // loading state until that first list (or its error) arrives, so Tonight
+  // never shows the empty shelf while titles are still on their way.
+  const [shelfReady, setShelfReady] = useState(false);
+  const loading =
+    spaceLoading || (Boolean(user && spaceId && db) && !shelfReady);
   const { view, setView, goBack } = useViewHistory(getInitialView, {
     canRestore: authResolved ? Boolean(user) : undefined,
   });
@@ -742,6 +748,9 @@ export const useAppState = () => {
 
     setRemovedItems([]);
     setLoading(true);
+    setShelfReady(false);
+    // If the first list never arrives (offline, blocked), stop waiting.
+    const readyFallback = setTimeout(() => setShelfReady(true), 10000);
     const unsubscribe = subscribeWatchlist({
       db,
       appId,
@@ -776,15 +785,20 @@ export const useAppState = () => {
         });
         setItems(fetchedItems);
         setLoading(false);
+        setShelfReady(true);
       },
       onError: (error) => {
         console.error('Error fetching items:', error);
         notifyError("Couldn't load the shelf. Try again.");
         setLoading(false);
+        setShelfReady(true);
       },
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(readyFallback);
+      unsubscribe();
+    };
   }, [db, firebaseInitResolved, spaceId, user]);
 
   const handleCreateSpace = async (name) => {

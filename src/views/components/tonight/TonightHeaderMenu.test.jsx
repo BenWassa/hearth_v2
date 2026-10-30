@@ -94,6 +94,30 @@ describe('TonightHeaderMenu', () => {
     },
   );
 
+  it('offers Recently removed in the library menu only when there is something to restore', async () => {
+    const onOpenRemoved = vi.fn();
+    const findItem = () =>
+      Array.from(container.querySelectorAll('[role="menuitem"]')).find((item) =>
+        item.textContent.includes('Recently removed'),
+      );
+    const open = () =>
+      click(
+        container.querySelector('button[aria-label="Open library options"]'),
+      );
+    await render({ onOpenRemoved });
+    await open();
+    expect(findItem()).toBeUndefined();
+    await click(
+      container.querySelector('button[aria-label="Open library options"]'),
+    );
+
+    await render({ onOpenRemoved, hasRemovedItems: true });
+    await open();
+    await click(findItem());
+    expect(onOpenRemoved).toHaveBeenCalledOnce();
+    expect(container.querySelector('[role="menu"]')).toBeNull();
+  });
+
   it('hides deletion behind Data and resets it when the menu closes', async () => {
     const onDeleteAll = vi.fn();
     const onOpenDeleteAll = vi.fn();

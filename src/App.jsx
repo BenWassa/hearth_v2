@@ -228,6 +228,8 @@ export function HearthAppView({ appState }) {
             onImport={() => setIsImportOpen(true)}
             onExport={handleExportItems}
             onDeleteAll={handleDeleteAll}
+            hasRemovedItems={removedItems.length > 0}
+            onOpenRemoved={() => setView('recently-removed')}
             onDecide={(pool, context) => startDecision(pool, context)}
             onToggleStatus={handleMarkWatched}
             onDelete={handleDelete}
@@ -265,7 +267,6 @@ export function HearthAppView({ appState }) {
               onDelete={handleDelete}
               onBulkDelete={handleBulkDelete}
               showRemoved={view === 'recently-removed'}
-              onOpenRemoved={() => setView('recently-removed')}
               removedItems={removedItems}
               onRestoreRemoved={handleRestoreRemoved}
               onPurgeRemoved={handlePurgeRemoved}

@@ -3,9 +3,9 @@
 // defaultVisible is a separate editorial decision, never a film-count heuristic.
 export const COLLECTION_CATALOG_VERSION = 2;
 
-// Editorial: big sagas that get their own poster rail on their World page.
-// Every other saga appears as a tile. Ranking and ownership still apply, so a
-// flagged saga with fewer than two owned films falls back to a tile.
+// Editorial: big sagas that always get their own poster rail on their World
+// page (with two or more owned films). Other sagas can earn a rail by size; see
+// buildWorlds in collectionWorlds.js.
 const RAIL_PROVIDER_IDS = new Set([
   '86311', // The Avengers
   '131296', // Thor

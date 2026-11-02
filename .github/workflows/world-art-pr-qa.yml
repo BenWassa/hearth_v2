@@ -18,7 +18,7 @@ concurrency:
 jobs:
   verify:
     name: Lint, format, tests, and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       # Nonfunctional build-time fixture values only. No credentials or deploy.

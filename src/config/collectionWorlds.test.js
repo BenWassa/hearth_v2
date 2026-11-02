@@ -184,13 +184,13 @@ describe('World rail and tile sagas', () => {
     const panther = saga('529892', films(1, 'bp'));
     const input = [ironMan, avengers, panther, thor];
     const world = marvelWorld(input);
-    expect(world.railSagas).toEqual([avengers, thor]);
-    expect(world.tileSagas).toEqual([ironMan, panther]);
+    expect(world.railSagas).toEqual([ironMan, avengers, thor]);
+    expect(world.tileSagas).toEqual([panther]);
     expect(world.sagas).toEqual(input);
     expect(world.cover).toBe('/assets/worlds/marvel/cover.webp');
     expect(world.collectionIds).toContain('86311');
   });
-  it('drops a flagged saga with fewer than two owned films into tiles', () => {
+  it('puts a saga with fewer than two owned films in the tiles', () => {
     const avengers = saga('86311', films(1, 'av'));
     const world = marvelWorld([avengers]);
     expect(world.railSagas).toEqual([]);
@@ -206,6 +206,47 @@ describe('World rail and tile sagas', () => {
     const world = marvelWorld([z, a, y, b, x, c]);
     expect(world.railSagas).toEqual([a, b, c]);
     expect(world.tileSagas).toEqual([z, y, x]);
+  });
+  it('fills up to the minimum rails with the largest unflagged sagas', () => {
+    const bigThor = saga('131296', films(4, 'th'));
+    const ironMan = saga('131292', films(3, 'im'));
+    const captain = saga('131295', films(2, 'ca'));
+    const panther = saga('529892', films(2, 'bp'));
+    const deadpool = saga('448150', films(1, 'dp'));
+    const world = marvelWorld([deadpool, panther, captain, ironMan, bigThor]);
+    expect(world.railSagas).toEqual([panther, ironMan, bigThor]);
+    expect(world.tileSagas).toEqual([deadpool, captain]);
+  });
+  it('promotes unflagged sagas with three or more films past the minimum', () => {
+    const sagas = [
+      saga('86311', films(4, 'av')),
+      saga('131296', films(4, 'th')),
+      saga('748', films(4, 'xm')),
+      saga('131292', films(3, 'im')),
+      saga('131295', films(2, 'ca')),
+    ];
+    const world = marvelWorld(sagas);
+    expect(world.railSagas).toEqual(sagas.slice(0, 4));
+    expect(world.tileSagas).toEqual([sagas[4]]);
+  });
+  it('caps the rails at the maximum, keeping the largest', () => {
+    const ids = [
+      '131292',
+      '131295',
+      '284433',
+      '529892',
+      '448150',
+      '453993',
+      '531241',
+    ];
+    const sagas = ids.map((id, i) =>
+      saga(id, films(3 + (i === 6 ? 2 : 0), id)),
+    );
+    const world = marvelWorld(sagas);
+    expect(world.railSagas).toHaveLength(6);
+    expect(world.railSagas).toContain(sagas[6]);
+    expect(world.railSagas).not.toContain(sagas[5]);
+    expect(world.tileSagas).toEqual([sagas[5]]);
   });
   it('leaves zero-item sagas out of both lists but in sagas', () => {
     const empty = saga('86311', []);

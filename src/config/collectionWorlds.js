@@ -86,7 +86,17 @@ const findWorld = (id) =>
 export const worldForSaga = (saga) =>
   findWorld(COLLECTION_CATALOG[getCollectionIdentity(saga)]?.worldId);
 
-// Editorial flag: a big saga that gets its own poster rail on its World page.
+// World pages show a finite number of poster rails and put the remaining sagas
+// in the tile index. Editorially flagged big sagas always get a rail. Others
+// earn one with RAIL_NATURAL_MIN or more owned films, up to WORLD_RAIL_MAX
+// rails. If that leaves fewer than WORLD_RAIL_MIN rails, the largest remaining
+// sagas with two or more owned films fill the gap, so a page is never one rail
+// above a wall of tiles.
+export const WORLD_RAIL_MIN = 3;
+export const WORLD_RAIL_MAX = 6;
+export const RAIL_NATURAL_MIN = 3;
+
+// Editorial flag: a big saga that always gets a poster rail on its World page.
 export const isRailSaga = (saga) =>
   COLLECTION_CATALOG[getCollectionIdentity(saga)]?.rail === true;
 
@@ -117,15 +127,25 @@ export const buildWorlds = (
     const children = sagas.filter(
       (saga) => worldForSaga(saga)?.id === world.id,
     );
-    // Incoming (ranked) order is kept. A rail needs two owned films to be worth
-    // a rail; a flagged saga with one falls back to a tile.
+    // Incoming (ranked) order is kept in both lists. A rail needs two owned
+    // films; larger sagas win the remaining rail slots.
     const ownedCount = (saga) => (saga.items || []).length;
-    const railSagas = children.filter(
-      (saga) => isRailSaga(saga) && ownedCount(saga) >= 2,
-    );
+    const eligible = children.filter((saga) => ownedCount(saga) >= 2);
+    const railSet = new Set(eligible.filter(isRailSaga));
+    [...eligible]
+      .filter((saga) => !railSet.has(saga))
+      .sort((a, b) => ownedCount(b) - ownedCount(a))
+      .forEach((saga) => {
+        if (railSet.size >= WORLD_RAIL_MAX) return;
+        if (
+          ownedCount(saga) >= RAIL_NATURAL_MIN ||
+          railSet.size < WORLD_RAIL_MIN
+        )
+          railSet.add(saga);
+      });
+    const railSagas = children.filter((saga) => railSet.has(saga));
     const tileSagas = children.filter(
-      (saga) =>
-        ownedCount(saga) >= 1 && !(isRailSaga(saga) && ownedCount(saga) >= 2),
+      (saga) => ownedCount(saga) >= 1 && !railSet.has(saga),
     );
     const childItems = distinctShelfItems(
       children.flatMap((saga) => saga.items || []),

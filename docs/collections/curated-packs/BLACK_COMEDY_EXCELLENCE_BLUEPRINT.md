@@ -176,3 +176,7 @@ Do not implement now. Reassess only when **several credible curated packs**, con
 ## 9. External artwork prompt handoff
 
 [Standalone production-ready asset briefs and generation prompts](ASSET_GENERATION_PROMPTS.md) cover the locked Comic Icons editorial-hybrid components and three unapproved options for the next chapter (Friends, Family & Community). Do not treat external generations as approved production assets without owner review.
+
+## 10. Mobile layout prototype review
+
+The [390px interactive page review](BE_MOBILE_LAYOUT_REVIEW.md) documents an independently rendered prototype, UX decisions, navigation assumptions, component sizing and the remaining design gates before Hearth implementation. The prototype has not been merged into the application; the conversation contains the self-contained HTML download and visual previews.

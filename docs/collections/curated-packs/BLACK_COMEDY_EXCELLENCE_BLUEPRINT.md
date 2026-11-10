@@ -172,3 +172,7 @@ Do not implement now. Reassess only when **several credible curated packs**, con
 - [x] Image generation explicitly deferred.
 - [ ] No content or chapter classification approved for distribution; no complete TMDB ID mapping or rights approval.
 - [ ] No implemented page, images, code changes, runtime validation or release.
+
+## 9. External artwork prompt handoff
+
+[Standalone production-ready asset briefs and generation prompts](ASSET_GENERATION_PROMPTS.md) cover the locked Comic Icons editorial-hybrid components and three unapproved options for the next chapter (Friends, Family & Community). Do not treat external generations as approved production assets without owner review.

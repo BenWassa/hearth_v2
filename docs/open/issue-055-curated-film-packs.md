@@ -85,7 +85,7 @@ Tonight
 - Featured titles also appear in All films; this is an intentional discovery shortcut, not duplicate membership among editorial chapters.
 
 ### C. Explore by theme
-- 3–5 succinct editorial chapters, each with a human-readable headline, one-line introduction and no more than ~6 posters initially. Use \`View all\` to jump to that chapter's full subsection when needed, rather than six long redundant rails.
+- 3–6 succinct editorial chapters, each with a human-readable headline, one-line introduction and no more than ~6 posters initially. Use \`View all\` to jump to that chapter's full subsection when needed, rather than six long redundant rails.
 - **Provisional chapters, pending film-by-film mapping and editorial review**:
   1. \`Comedy Icons\` — performer-led favorites and standouts; provisional examples: Harlem Nights, The Nutty Professor, Dolemite Is My Name.
   2. \`Friends & Community\` — buddy, family and ensemble films; provisional examples: Friday, Barbershop, Girls Trip.
@@ -94,7 +94,7 @@ Tonight
   5. \`Beyond Straight Comedy\` (optional) — genre-borderline works with **explicit inclusion explanation**, e.g. Do the Right Thing, Set It Off; require BE editorial decisions first.
 - Do not imply all examples are uncontroversially comedies. Do not mechanically import \`tags\` as finished editorial rationale.
 - Every published film receives **one primary chapter assignment** when chapters cover the full catalog; avoid duplication between primary chapter groups. Film-level secondary tags can exist internally.
-- No chapters should exist merely to pad the interface. At initial release it may be better to ship **3 mature chapters and All films** than 5 under-researched ones.
+- No chapters should exist merely to pad the interface. At initial release it may be better to foreground **3–4 mature chapters and All films** than 5 under-researched ones.
 
 ### D. All films
 - Complete published BE pack in a finite, poster-forward **two- or three-column grid** according to legibility tests at 390px. If labels and save affordances cannot fit at three across, default to two.

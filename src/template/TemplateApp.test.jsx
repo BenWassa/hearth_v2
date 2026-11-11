@@ -2,7 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../services/firebase/client.js', async (importOriginal) => ({
+vi.mock('../services/firebase/authClient.js', async (importOriginal) => ({
   ...(await importOriginal()),
   initializeFirebase: vi.fn((onReady) => onReady?.({ auth: null, db: null })),
 }));

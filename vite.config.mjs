@@ -64,8 +64,10 @@ export default defineConfig({
             },
             {
               name: 'vendor-firebase',
-              test: /node_modules[\\/](@firebase|firebase)[\\/]/,
-              priority: 20,
+              test: /node_modules[\\/](@firebase[\\/](app|component|logger|util|app-check-interop|auth-interop)|firebase[\\/]app)[\\/]/,
+              // Claim shared app/util modules before Auth or Firestore can
+              // absorb them and make demo Auth depend on the Firestore chunk.
+              priority: 35,
             },
             {
               name: 'vendor-lucide',

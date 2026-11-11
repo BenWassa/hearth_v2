@@ -271,3 +271,27 @@ See [BE content/design blueprint](../collections/curated-packs/BLACK_COMEDY_EXCE
 - [x] Generated-cover decision explicitly postponed.
 - [ ] Source attribution/rights and TMDB ID mapping not complete.
 - [ ] No code implementation, runtime tests, UI artwork or release.
+
+
+## 2026-11-10 dev integration: read-only shell
+
+On `dev/integration-review`, the first application slice is available at
+`http://localhost:5174/?demo=1&curatedPreview=1` (or omit `demo=1` for the signed-in app).
+Vite development mode **and** the explicit query are required; a production build
+ignores that query and excludes the draft pack from the registry results.
+
+- Text-first BE tile is pinned in the existing Collections rail, including an empty library.
+- All collections groups Curated collections separately from Sagas. World rendering is unchanged.
+- Dedicated full-page preview includes the draft six-film starting shelf, all six chapter destinations, a finite 50-film index and source note.
+- Browser Back/Forward, the visible back control and Escape share the pack history entry; the underlying Tonight/index scroller stays mounted and focus returns to the initiating tile.
+- All film entries are plain title/year previews. There are no provider calls, generated assets, detail buttons, save actions or household writes in this slice.
+- `src/config/curatedPacks.js` is explicitly a draft manifest with local editorial IDs, **not a verified TMDB identity or release-ready provenance ledger**.
+
+Validation: unit navigation tests exercise real History API traversal with the shared
+view-history hook, empty-library access, index return, focus/scroll retention, chapter navigation and preview gating.
+The full automated suite, lint and a direct Vite production bundle build passed during development.
+Browser automation was unavailable in this session, so visual checks at 320/360/390/448px and actual Pixel gestures remain manual review items.
+
+Next: review the shell on the dev server, verify film identities and content/rights records,
+then implement provider-backed previews and the strict voluntary-save boundary separately.
+This dev slice does not approve content publication or fulfill the full issue acceptance list.

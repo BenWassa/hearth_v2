@@ -11,7 +11,7 @@ const demoUser = vi.hoisted(() => ({
   isAnonymous: true,
   getIdToken: vi.fn(async () => 'demo-token'),
 }));
-vi.mock('../services/firebase/client.js', () => ({
+vi.mock('../services/firebase/authClient.js', () => ({
   initializeFirebase: (ready) =>
     ready({ auth: { app: {}, currentUser: demoUser } }),
 }));

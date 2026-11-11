@@ -1,6 +1,6 @@
 # Issue #20 — Automatic title classification, zero-friction Add
 
-- **Status:** Open — implemented; rollout/closure gated on #21 (2026-10-28). Original research and plan retained below.
+- **Status (reviewed 2026-11-10):** Open — implemented; #21 has a passing saved evaluation and production configuration was enabled in merged PR #49. Reconcile the acceptance checklist and production smoke evidence before closure. Original research and plan retained below.
 - **Implementation record:** [issue-020-implementation-record.md](issue-020-implementation-record.md) describes what was built (this document is the original research and plan).
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/20
 - **Research date:** 2026-10-26

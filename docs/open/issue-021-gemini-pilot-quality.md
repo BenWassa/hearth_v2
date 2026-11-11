@@ -1,6 +1,8 @@
 # Issue #21 — Gemini pilot quality and production rollout gate
 
-- **Status:** Open — code/evaluation improvements prepared; fixture approval complete; live re-evaluation remains.
+- **Status (reviewed 2026-11-10):** Open — the saved 50-title Gemini 3.8 Flash evaluation passed; PR #49 enabled the production configuration. Acceptance reconciliation and production smoke evidence remain to be recorded.
+
+The sections below preserve the historical sequence. Statements that production is disabled describe earlier stages and are superseded by merged PR #49 (`a0443dd`). This review checked committed configuration, not the live deployment, provider quota or billing. See [backlog review](backlog-review-2026-11-10.md).
 - **GitHub issue:** https://github.com/BenWassa/hearth_v2/issues/21
 - **Branch:** `chore/fixtures-reviewed`
 - **Date:** 2026-10-28

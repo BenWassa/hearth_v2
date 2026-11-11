@@ -17,14 +17,17 @@ The canonical task status is the **GitHub issue**. These files are durable resea
 - When backfilling old issues, preserve what was actually recorded. Distinguish original issue facts from new suggestions and note missing verification evidence.
 - A proposal document does **not** mean the application implementation has changed.
 
-## Current records (2026-10-28)
+## Current records (reviewed 2026-11-10)
+
+See the [prioritized backlog review](open/backlog-review-2026-11-10.md) for current evidence and the next implementation slices.
 
 | GitHub issue                                                                            | Status                                                                 | Record                                                                                                                                |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [#55 Curated film packs](https://github.com/BenWassa/hearth_v2/issues/55) | Open — planning draft #56; content/identity/rights gates remain | [Scope and blueprint on planning branch](https://github.com/BenWassa/hearth_v2/pull/56) |
 | Product decisions | Open · owner answers pending | [October 2026 decision briefs](open/product-decisions-2026-10.md) |
 | [#22 Android back navigation](https://github.com/BenWassa/hearth_v2/issues/22)          | Open — awaiting owner manual Pixel QA; #23 merged                      | [Android / Pixel back navigation](open/issue-022-android-back-navigation.md)                                                          |
-| [#21 Gemini pilot quality](https://github.com/BenWassa/hearth_v2/issues/21)             | Open — draft #24; owner fixture review and live runs pending           | [Gemini pilot quality gate](open/issue-021-gemini-pilot-quality.md)                                                                   |
-| [#20 Automatic classification](https://github.com/BenWassa/hearth_v2/issues/20)         | Open — implemented; rollout/closure gated on #21                       | [TMDB-first zero-friction Add + optional Gemini](open/issue-020-automatic-classification.md)                                          |
+| [#21 Gemini pilot quality](https://github.com/BenWassa/hearth_v2/issues/21)             | Open — evaluation passed; production config enabled in #49; closure audit remains           | [Gemini pilot quality gate](open/issue-021-gemini-pilot-quality.md)                                                                   |
+| [#20 Automatic classification](https://github.com/BenWassa/hearth_v2/issues/20)         | Open — implemented; reconcile acceptance evidence with #21                       | [TMDB-first zero-friction Add + optional Gemini](open/issue-020-automatic-classification.md)                                          |
 | [#14 World asset integration](https://github.com/BenWassa/hearth_v2/issues/14)          | Closed                                                                 | [Landscape Tonight + direct one-tap hero](closed/issue-014-world-art-integration.md)                                                  |
 | [#13 Galaxy / magic World art](https://github.com/BenWassa/hearth_v2/issues/13)         | Closed                                                                 | [Star Wars / Wizarding World / Ghibli pack](closed/issue-013-world-art-galaxy-magic.md)                                               |
 | [#12 Animation World art](https://github.com/BenWassa/hearth_v2/issues/12)              | Closed                                                                 | [Pixar / Disney / DreamWorks pack](closed/issue-012-world-art-animation.md)                                                           |

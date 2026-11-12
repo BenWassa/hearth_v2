@@ -17,10 +17,11 @@ The canonical task status is the **GitHub issue**. These files are durable resea
 - When backfilling old issues, preserve what was actually recorded. Distinguish original issue facts from new suggestions and note missing verification evidence.
 - A proposal document does **not** mean the application implementation has changed.
 
-## Current records (2026-10-28)
+## Current records (2026-11-12)
 
 | GitHub issue                                                                            | Status                                                                 | Record                                                                                                                                |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [#57 The Directors collection](https://github.com/BenWassa/hearth_v2/issues/57) | Open — draft implementation PR #58, awaiting review and QA | [The Directors scope and verification](open/issue-057-directors-collection.md); [research/UX blueprint](collections/directors/DIRECTORS_COLLECTION_BLUEPRINT.md) |
 | Product decisions | Open · owner answers pending | [October 2026 decision briefs](open/product-decisions-2026-10.md) |
 | [#22 Android back navigation](https://github.com/BenWassa/hearth_v2/issues/22)          | Open — awaiting owner manual Pixel QA; #23 merged                      | [Android / Pixel back navigation](open/issue-022-android-back-navigation.md)                                                          |
 | [#21 Gemini pilot quality](https://github.com/BenWassa/hearth_v2/issues/21)             | Open — draft #24; owner fixture review and live runs pending           | [Gemini pilot quality gate](open/issue-021-gemini-pilot-quality.md)                                                                   |

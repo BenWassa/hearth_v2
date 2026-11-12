@@ -268,11 +268,18 @@ const DirectorsCollectionView = ({
     try {
       if (typeof onAddItem !== 'function')
         throw new Error('Saving is unavailable.');
-      await onAddItem(toWatchlistPayload(preview));
-      // The Firebase watchlist listener, not this callback, confirms a save.
-      setSaveNotice(
-        'Save requested. Your shelf will show the result once synced.',
-      );
+      const outcome = await onAddItem(toWatchlistPayload(preview), {
+        allowRestore: false,
+      });
+      if (outcome?.status === 'added') {
+        setSaveNotice('Added to your shared shelf.');
+      } else if (outcome?.status === 'exists') {
+        setSaveNotice('Already on your shared shelf.');
+      } else if (outcome?.status === 'removed') {
+        setSaveNotice('This title is in Recently removed. Restore it there.');
+      } else {
+        setSaveNotice('Could not confirm the save. Check your shelf and try again.');
+      }
     } catch {
       setSaveNotice('Could not save this title. Try again.');
     } finally {

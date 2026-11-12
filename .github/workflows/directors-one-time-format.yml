@@ -1,0 +1,33 @@
+name: Directors feature one-time formatting
+on:
+  push:
+    branches: [feat/directors-collection-57]
+    paths:
+      - '.github/workflows/directors-one-time-format.yml'
+permissions:
+  contents: write
+jobs:
+  format:
+    if: github.repository == 'BenWassa/hearth_v2'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Format touched source files using locked Prettier
+        run: |
+          npx prettier --write src/config/directorCatalog.json src/views/CollectionsBrowseView.jsx src/views/components/tonight/CollectionsRail.jsx src/views/DirectorsCollectionView.jsx src/views/DirectorsCollectionView.test.jsx
+      - name: Commit exact formatting diff to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/config/directorCatalog.json src/views/CollectionsBrowseView.jsx src/views/components/tonight/CollectionsRail.jsx src/views/DirectorsCollectionView.jsx src/views/DirectorsCollectionView.test.jsx
+          if ! git diff --cached --quiet; then
+            git commit -m "style(directors): apply repository Prettier rules"
+            git push origin HEAD:feat/directors-collection-57
+          fi

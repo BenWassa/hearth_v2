@@ -278,7 +278,9 @@ const DirectorsCollectionView = ({
       } else if (outcome?.status === 'removed') {
         setSaveNotice('This title is in Recently removed. Restore it there.');
       } else {
-        setSaveNotice('Could not confirm the save. Check your shelf and try again.');
+        setSaveNotice(
+          'Could not confirm the save. Check your shelf and try again.',
+        );
       }
     } catch {
       setSaveNotice('Could not save this title. Try again.');

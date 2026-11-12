@@ -117,8 +117,13 @@ const CollectionsBrowseView = ({
           </h1>
         )}
         {!worldId && onOpenDirectors && (
-          <section aria-label="Curated collections" className="border-b border-stone-800 pb-4 pt-5">
-            <h2 className="mb-3 font-serif text-xl text-stone-100">Curated collections</h2>
+          <section
+            aria-label="Curated collections"
+            className="border-b border-stone-800 pb-4 pt-5"
+          >
+            <h2 className="mb-3 font-serif text-xl text-stone-100">
+              Curated collections
+            </h2>
             <button
               type="button"
               data-directors-index
@@ -126,10 +131,16 @@ const CollectionsBrowseView = ({
               className="flex min-h-16 w-full items-center justify-between rounded-xl border border-stone-800 bg-stone-900/60 px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400"
             >
               <span>
-                <span className="block font-serif text-lg text-stone-100">The Directors</span>
-                <span className="block text-xs text-stone-400">Explore twelve filmmakers and their films</span>
+                <span className="block font-serif text-lg text-stone-100">
+                  The Directors
+                </span>
+                <span className="block text-xs text-stone-400">
+                  Explore twelve filmmakers and their films
+                </span>
               </span>
-              <span aria-hidden="true" className="text-amber-300">→</span>
+              <span aria-hidden="true" className="text-amber-300">
+                →
+              </span>
             </button>
           </section>
         )}

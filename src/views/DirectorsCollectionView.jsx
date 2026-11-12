@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Film, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import Dialog from '../components/ui/Dialog.jsx';
 import catalog from '../config/directorCatalog.json';
 import {
@@ -323,7 +323,7 @@ const DirectorsCollectionView = ({
                 {directorData.startHere.length > 0 && (
                   <section aria-label="Start here" className="border-t border-stone-800/80 pt-6">
                     <h3 className="font-serif text-2xl text-stone-100">Start here</h3>
-                    <p className="mt-1 text-sm text-stone-400">Three films to explore first.</p>
+                    <p className="mt-1 text-sm text-stone-400">A few selected entry points.</p>
                     <div className="-mx-4 mt-4 flex snap-x gap-3 overflow-x-auto px-4 pb-3 no-scrollbar">
                       {directorData.startHere.map((film) => (
                         <div key={film.providerId} className="w-[8.4rem] shrink-0 snap-start">
@@ -393,9 +393,9 @@ const DirectorsCollectionView = ({
             )}
           </section>
         )}
-        <footer className="mt-10 flex items-center gap-2 border-t border-stone-800/60 pt-5 text-xs text-stone-500">
-          <Film className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>Film credits and imagery from TMDB. This collection is not endorsed by TMDB.</span>
+        <footer className="mt-10 flex items-start gap-3 border-t border-stone-800/60 pt-5 text-xs leading-relaxed text-stone-500">
+          <img src="/tmdb-logo.svg" alt="TMDB" className="mt-1 w-11 shrink-0" />
+          <span><span className="block font-semibold text-stone-400">Credits</span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
         </footer>
       </div>
     </Dialog>

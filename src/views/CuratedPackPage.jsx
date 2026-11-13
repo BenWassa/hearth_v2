@@ -2,18 +2,28 @@ import React, { useEffect, useRef } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
 
-const FilmList = ({ films, rail = false }) => (
+const FilmList = ({ films, label, rail = false }) => (
   <ul
+    aria-label={rail ? label : undefined}
+    tabIndex={rail ? 0 : undefined}
     className={
       rail
-        ? 'flex gap-3 overflow-x-auto pb-3'
+        ? 'no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400'
         : 'grid grid-cols-2 gap-x-4 gap-y-5'
     }
   >
     {films.map((film) => (
-      <li key={film.id} className={rail ? 'w-32 shrink-0' : 'min-w-0'}>
-        <div className="flex aspect-[2/3] items-end rounded-lg bg-stone-900 p-3">
-          <span className="break-words font-serif text-lg leading-snug text-stone-200">
+      <li
+        key={film.id}
+        className={
+          rail ? 'w-[clamp(7rem,38vw,8.5rem)] shrink-0 snap-start' : 'min-w-0'
+        }
+      >
+        <div
+          title={film.title}
+          className="flex aspect-[2/3] items-end overflow-hidden rounded-lg bg-stone-900 p-3"
+        >
+          <span className="line-clamp-4 break-words font-serif text-lg leading-snug text-stone-200">
             {film.title}
           </span>
         </div>
@@ -82,9 +92,16 @@ export default function CuratedPackPage({ pack, onClose }) {
           >
             Start here
           </h2>
-          <FilmList films={featured} rail />
+          <FilmList films={featured} label="Start here films" rail />
         </section>
-        <nav aria-label="Collection chapters" className="my-8">
+        <nav
+          aria-label="Collection chapters"
+          ref={(node) => {
+            sectionRefs.current.themes = node;
+          }}
+          tabIndex={-1}
+          className="my-8 scroll-mt-5 focus:outline-none"
+        >
           <h2 className="font-serif text-2xl text-stone-100">
             Explore by theme
           </h2>
@@ -127,7 +144,17 @@ export default function CuratedPackPage({ pack, onClose }) {
             <p className="mb-4 mt-2 text-sm leading-relaxed text-stone-400">
               {chapter.description}
             </p>
-            <FilmList films={chapter.films} rail />
+            <FilmList
+              films={chapter.films}
+              label={`${chapter.title} films`}
+              rail
+            />
+            <button
+              onClick={() => goToSection('themes')}
+              className="min-h-11 text-sm text-stone-400 underline underline-offset-4 hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+            >
+              Back to themes
+            </button>
           </section>
         ))}
         <section

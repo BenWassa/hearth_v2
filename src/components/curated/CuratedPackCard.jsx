@@ -10,7 +10,7 @@ const CuratedPackCard = ({ pack, onOpen }) => (
     <span className="text-label font-bold uppercase tracking-widest text-stone-400">
       Curated
     </span>
-    <span className="break-words font-serif text-xl leading-tight text-stone-100">
+    <span className="font-serif text-base leading-tight text-stone-100 [overflow-wrap:normal] min-[360px]:text-lg min-[400px]:text-xl">
       {pack.title}
     </span>
     <span className="text-xs text-stone-400">Explore the collection →</span>

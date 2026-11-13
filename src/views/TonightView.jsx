@@ -1,3 +1,6 @@
+import { getCuratedPacks } from '../config/curatedPacks.js';
+import useCuratedPackHistory from '../app/useCuratedPackHistory.js';
+import CuratedPackPage from './CuratedPackPage.jsx';
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
 import { composeTonightRows } from '../domain/media/tonightComposition.js';
 import React, {
@@ -47,6 +50,9 @@ const ItemDetailsModal = lazyWithPrefetch(() =>
   import('../components/ItemDetailsModal.jsx'),
 );
 const SagaPage = lazyWithPrefetch(() => import('../components/SagaPage.jsx'));
+const DirectorsCollectionView = lazyWithPrefetch(() =>
+  import('./DirectorsCollectionView.jsx'),
+);
 const MetadataAuditModal = lazyWithPrefetch(() =>
   import('./components/tonight/MetadataAuditModal.jsx'),
 );
@@ -184,6 +190,7 @@ const TonightView = ({
   onExport,
   onDeleteAll,
   hasRemovedItems = false,
+  removedItems = [],
   onOpenRemoved,
   onDelete,
   onToggleStatus,
@@ -209,6 +216,23 @@ const TonightView = ({
   loadTemplateScenario,
   templateScenario,
 }) => {
+  // Draft content shows only on the local dev server (hide with ?curatedPreview=0).
+  const packs = useMemo(
+    () =>
+      getCuratedPacks({
+        preview:
+          import.meta.env.DEV &&
+          new URLSearchParams(window.location.search).get('curatedPreview') !==
+            '0',
+      }),
+    [],
+  );
+  const {
+    pack: curatedPack,
+    openPack,
+    closePack,
+  } = useCuratedPackHistory(packs);
+
   const currentlyWatchingShows = useMemo(
     () =>
       items
@@ -260,6 +284,9 @@ const TonightView = ({
   const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
   const [browseWorldId, setBrowseWorldId] = useState(null);
   const collectionsOpener = useRef(null);
+  const directorsOpener = useRef(null);
+  const directorsFromBrowse = useRef(false);
+  const [isDirectorsOpen, setIsDirectorsOpen] = useState(false);
   const browseCollections = (event) => {
     collectionsOpener.current = event?.currentTarget || null;
     event?.currentTarget?.focus({ preventScroll: true });
@@ -270,6 +297,26 @@ const TonightView = ({
     collectionsOpener.current = opener;
     setBrowseWorldId(worldId);
     setIsCollectionsBrowseOpen(true);
+  };
+
+  const openDirectors = (opener = null) => {
+    directorsFromBrowse.current = isCollectionsBrowseOpen;
+    directorsOpener.current = isCollectionsBrowseOpen
+      ? collectionsOpener.current
+      : opener;
+    if (isCollectionsBrowseOpen) setIsCollectionsBrowseOpen(false);
+    setIsDirectorsOpen(true);
+  };
+  const closeDirectors = () => {
+    setIsDirectorsOpen(false);
+    if (directorsFromBrowse.current) {
+      setIsCollectionsBrowseOpen(true);
+    } else {
+      requestAnimationFrame(() => {
+        if (directorsOpener.current?.isConnected)
+          directorsOpener.current.focus({ preventScroll: true });
+      });
+    }
   };
 
   const closeCollectionsBrowse = () => {
@@ -420,9 +467,12 @@ const TonightView = ({
   const collectionsRail = (
     <CollectionsRail
       collections={collections}
+      packs={packs}
+      onOpenPack={openPack}
       items={items}
       onOpenCollection={openCollection}
       onBrowse={browseCollections}
+      onOpenDirectors={openDirectors}
     />
   );
   const hasClassicRow = tonightRows.some((row) => row.key === 'classic');
@@ -442,8 +492,17 @@ const TonightView = ({
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <div
-        aria-hidden={isCollectionsBrowseOpen || undefined}
-        inert={isCollectionsBrowseOpen ? '' : undefined}
+        aria-hidden={
+          isCollectionsBrowseOpen ||
+          isDirectorsOpen ||
+          Boolean(curatedPack) ||
+          undefined
+        }
+        inert={
+          isCollectionsBrowseOpen || isDirectorsOpen || curatedPack
+            ? ''
+            : undefined
+        }
         className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
@@ -641,11 +700,40 @@ const TonightView = ({
       {isCollectionsBrowseOpen && (
         <CollectionsBrowseView
           collections={collections}
+          packs={packs}
+          onOpenPack={openPack}
+          covered={Boolean(curatedPack)}
           items={items}
           initialWorldId={browseWorldId}
           onOpenItem={openDetails}
           onClose={closeCollectionsBrowse}
           onOpenCollection={openCollection}
+          onOpenDirectors={openDirectors}
+        />
+      )}
+
+      {isDirectorsOpen && (
+        <Suspense fallback={null}>
+          <DirectorsCollectionView
+            items={items}
+            removedItems={removedItems}
+            onClose={closeDirectors}
+            onOpenItem={openDetails}
+            onAddItem={onAddItem}
+            onOpenRemoved={onOpenRemoved}
+          />
+        </Suspense>
+      )}
+
+      {curatedPack && (
+        <CuratedPackPage
+          pack={curatedPack}
+          onClose={closePack}
+          items={items}
+          removedItems={removedItems}
+          onAddItem={onAddItem}
+          onOpenItem={openDetails}
+          onOpenRemoved={onOpenRemoved}
         />
       )}
 

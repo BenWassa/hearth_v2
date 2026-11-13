@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "title": "The Directors",
+  "subtitle": "Great films, seen through the people who made them.",
+  "directors": [
+    {
+      "id": "christopher-nolan",
+      "personId": 525,
+      "name": "Christopher Nolan",
+      "description": "Time, memory, and immense scale",
+      "entryFilmIds": [77, 27205, 157336]
+    },
+    {
+      "id": "steven-spielberg",
+      "personId": 488,
+      "name": "Steven Spielberg",
+      "description": "Suspense, wonder, and human stakes",
+      "entryFilmIds": [578, 329, 601]
+    },
+    {
+      "id": "martin-scorsese",
+      "personId": 1032,
+      "name": "Martin Scorsese",
+      "description": "Restless characters and moral consequence",
+      "entryFilmIds": [769, 103, 1422]
+    },
+    {
+      "id": "hayao-miyazaki",
+      "personId": 608,
+      "name": "Hayao Miyazaki",
+      "description": "Wonder, nature, and worlds worth revisiting",
+      "entryFilmIds": [129, 8392, 128]
+    },
+    {
+      "id": "spike-lee",
+      "personId": 5281,
+      "name": "Spike Lee",
+      "description": "Stories of community, tension, and history",
+      "entryFilmIds": [925, 10341, 487558]
+    },
+    {
+      "id": "sofia-coppola",
+      "personId": 1769,
+      "name": "Sofia Coppola",
+      "description": "Intimate lives and finely observed distance",
+      "entryFilmIds": [153, 1443, 1887]
+    },
+    {
+      "id": "quentin-tarantino",
+      "personId": 138,
+      "name": "Quentin Tarantino",
+      "description": "Dialogue, genre, and unexpected turns",
+      "entryFilmIds": [500, 680, 16869]
+    },
+    {
+      "id": "akira-kurosawa",
+      "personId": 5026,
+      "name": "Akira Kurosawa",
+      "description": "Epic dilemmas and deeply human choices",
+      "entryFilmIds": [346, 548, 11878]
+    },
+    {
+      "id": "wes-anderson",
+      "personId": 5655,
+      "name": "Wes Anderson",
+      "description": "Precise compositions and complicated families",
+      "entryFilmIds": [120467, 9428, 10315]
+    },
+    {
+      "id": "jane-campion",
+      "personId": 10757,
+      "name": "Jane Campion",
+      "description": "Power, intimacy, and complicated emotions",
+      "entryFilmIds": [713, 29963, 600583]
+    },
+    {
+      "id": "bong-joon-ho",
+      "personId": 21684,
+      "name": "Bong Joon-ho",
+      "description": "Social tension told through shifting genres",
+      "entryFilmIds": [496243, 11423, 1255]
+    },
+    {
+      "id": "stanley-kubrick",
+      "personId": 240,
+      "name": "Stanley Kubrick",
+      "description": "Precision, ambiguity, and unease",
+      "entryFilmIds": [62, 694, 185]
+    }
+  ]
+}

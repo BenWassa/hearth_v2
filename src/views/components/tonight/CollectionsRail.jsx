@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Library } from 'lucide-react';
 import LazyMediaImage from '../../../components/media/LazyMediaImage.jsx';
+import CuratedPackCard from '../../../components/curated/CuratedPackCard.jsx';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
 import useTonightWorlds from './useTonightWorlds.js';
 import { getPosterSrc } from '../../../utils/poster.js';
@@ -23,9 +24,12 @@ const focusRing =
 // Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
   collections = [],
+  packs = [],
+  onOpenPack,
   items = [],
   onOpenCollection,
   onBrowse,
+  onOpenDirectors,
   counts,
 }) => {
   const [clock] = useState(Date.now);
@@ -35,7 +39,7 @@ const CollectionsRail = ({
   const [order] = useState(() =>
     rankSagas(collections, { now: clock, counts }).map((saga) => saga.id),
   );
-  if (!collections.length) return null;
+  if (!collections.length && !packs.length && !onOpenDirectors) return null;
   const ranked = preserveSagaOrder(
     rankSagas(collections, { now: clock, counts }),
     order,
@@ -66,6 +70,47 @@ const CollectionsRail = ({
             aria-label="All collections"
             className="flex gap-2.5 min-w-max"
           >
+            {packs.map((pack) => (
+              <li
+                key={pack.id}
+                className={cell}
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <CuratedPackCard pack={pack} onOpen={onOpenPack} />
+              </li>
+            ))}
+            {onOpenDirectors && (
+              <li className={cell} style={{ scrollSnapAlign: 'start' }}>
+                <button
+                  type="button"
+                  data-directors-card
+                  aria-label="The Directors curated collection"
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    onOpenDirectors(event.currentTarget);
+                  }}
+                  className={`relative flex aspect-[2/3] w-full flex-col justify-between overflow-hidden rounded-lg border border-stone-700/80 bg-stone-900 p-3 text-left shadow-lg shadow-black/20 ${focusRing}`}
+                >
+                  <img
+                    src="/assets/collections/legendary-directors/cover.webp"
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.hidden = true;
+                    }}
+                  />
+                  <span className="text-[11px] font-bold uppercase leading-relaxed tracking-[0.15em] text-amber-300">
+                    Curated
+                  </span>
+                  <span className="font-serif text-[1.35rem] leading-tight text-stone-100">
+                    The Directors
+                  </span>
+                  <span className="text-[11px] leading-snug text-stone-400">
+                    A filmmaker collection
+                  </span>
+                </button>
+              </li>
+            )}
             {sagas.map((saga) => (
               <li
                 key={saga.id}
@@ -99,7 +144,7 @@ const CollectionsRail = ({
               </li>
             ))}
             {/* The row already shows everything when there are only a few. */}
-            {(sagas.length > 3 || hasHiddenSagas) && (
+            {(packs.length > 0 || sagas.length > 3 || hasHiddenSagas) && (
               <li className={cell} style={{ scrollSnapAlign: 'start' }}>
                 <WorldCover
                   neutral

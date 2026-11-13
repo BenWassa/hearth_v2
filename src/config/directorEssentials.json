@@ -1,0 +1,1906 @@
+{
+  "schemaVersion": 2,
+  "title": "The Directors",
+  "status": "draft",
+  "version": "0.2.0-draft",
+  "rankingMethod": "Ranked within each director by IMDb rating and Rotten Tomatoes critics score (average of the two ranks). Owner decision 2026-11-13.",
+  "scoresReadOn": "2026-11-13",
+  "sources": {
+    "imdb": "IMDb public non-commercial datasets",
+    "rt": "Rotten Tomatoes film pages"
+  },
+  "directors": [
+    {
+      "id": "akira-kurosawa",
+      "name": "Akira Kurosawa",
+      "tmdbPersonId": 5026,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Seven Samurai",
+          "year": 1954,
+          "tmdbId": 346,
+          "imdbId": "tt0047478",
+          "imdb": {
+            "rating": 8.6,
+            "votes": 407861
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 104
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "High and Low",
+          "year": 1963,
+          "tmdbId": 12493,
+          "imdbId": "tt0057565",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 74501
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 70
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Ikiru",
+          "year": 1952,
+          "tmdbId": 3782,
+          "imdbId": "tt0044741",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 104712
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 55
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Rashomon",
+          "year": 1950,
+          "tmdbId": 548,
+          "imdbId": "tt0042876",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 199721
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 61
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Stray Dog",
+          "year": 1949,
+          "tmdbId": 30368,
+          "imdbId": "tt0041699",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 21384
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Ran",
+          "year": 1985,
+          "tmdbId": 11645,
+          "imdbId": "tt0089881",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 155985
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 90
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Yojimbo",
+          "year": 1961,
+          "tmdbId": 11878,
+          "imdbId": "tt0055630",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 145466
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 49
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Red Beard",
+          "year": 1965,
+          "tmdbId": 3780,
+          "imdbId": "tt0058888",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 23951
+          },
+          "rt": {
+            "tomatometer": 73,
+            "reviews": 15
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "The Hidden Fortress",
+          "year": 1958,
+          "tmdbId": 1059,
+          "imdbId": "tt0051808",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 46646
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 53
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "Throne of Blood",
+          "year": 1957,
+          "tmdbId": 3777,
+          "imdbId": "tt0050613",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 61310
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 44
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "alfred-hitchcock",
+      "name": "Alfred Hitchcock",
+      "tmdbPersonId": 2636,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Rear Window",
+          "year": 1954,
+          "tmdbId": 567,
+          "imdbId": "tt0047396",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 576856
+          },
+          "rt": {
+            "tomatometer": 99,
+            "reviews": 138
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Psycho",
+          "year": 1960,
+          "tmdbId": 539,
+          "imdbId": "tt0054215",
+          "imdb": {
+            "rating": 8.5,
+            "votes": 799947
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 115
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "North by Northwest",
+          "year": 1959,
+          "tmdbId": 213,
+          "imdbId": "tt0053125",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 373357
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 118
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Strangers on a Train",
+          "year": 1951,
+          "tmdbId": 845,
+          "imdbId": "tt0044079",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 149827
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 56
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Shadow of a Doubt",
+          "year": 1943,
+          "tmdbId": 21734,
+          "imdbId": "tt0036342",
+          "imdb": {
+            "rating": 7.7,
+            "votes": 76449
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 54
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Vertigo",
+          "year": 1958,
+          "tmdbId": 426,
+          "imdbId": "tt0052357",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 464999
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 95
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Notorious",
+          "year": 1946,
+          "tmdbId": 303,
+          "imdbId": "tt0038787",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 113979
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 51
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Rope",
+          "year": 1948,
+          "tmdbId": 1580,
+          "imdbId": "tt0040746",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 167383
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 58
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "The Birds",
+          "year": 1963,
+          "tmdbId": 571,
+          "imdbId": "tt0056869",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 223459
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 70
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "The 39 Steps",
+          "year": 1935,
+          "tmdbId": 260,
+          "imdbId": "tt0026029",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 67337
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 53
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "stanley-kubrick",
+      "name": "Stanley Kubrick",
+      "tmdbPersonId": 240,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Paths of Glory",
+          "year": 1957,
+          "tmdbId": 975,
+          "imdbId": "tt0050825",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 244083
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 114
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+          "year": 1964,
+          "tmdbId": 935,
+          "imdbId": "tt0057012",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 557046
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 145
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "2001: A Space Odyssey",
+          "year": 1968,
+          "tmdbId": 62,
+          "imdbId": "tt0062622",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 797159
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 169
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "The Killing",
+          "year": 1956,
+          "tmdbId": 247,
+          "imdbId": "tt0049406",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 108178
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 74
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "The Shining",
+          "year": 1980,
+          "tmdbId": 694,
+          "imdbId": "tt0081505",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 1253919
+          },
+          "rt": {
+            "tomatometer": 75,
+            "reviews": 178
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Full Metal Jacket",
+          "year": 1987,
+          "tmdbId": 600,
+          "imdbId": "tt0093058",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 864363
+          },
+          "rt": {
+            "tomatometer": 84,
+            "reviews": 158
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "A Clockwork Orange",
+          "year": 1971,
+          "tmdbId": 185,
+          "imdbId": "tt0066921",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 949692
+          },
+          "rt": {
+            "tomatometer": 83,
+            "reviews": 129
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Spartacus",
+          "year": 1960,
+          "tmdbId": 967,
+          "imdbId": "tt0054331",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 153045
+          },
+          "rt": {
+            "tomatometer": 90,
+            "reviews": 107
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Barry Lyndon",
+          "year": 1975,
+          "tmdbId": 3175,
+          "imdbId": "tt0072684",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 210233
+          },
+          "rt": {
+            "tomatometer": 77,
+            "reviews": 159
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "Eyes Wide Shut",
+          "year": 1999,
+          "tmdbId": 345,
+          "imdbId": "tt0120663",
+          "imdb": {
+            "rating": 7.5,
+            "votes": 445052
+          },
+          "rt": {
+            "tomatometer": 79,
+            "reviews": 228
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "ingmar-bergman",
+      "name": "Ingmar Bergman",
+      "tmdbPersonId": 6648,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Fanny and Alexander",
+          "year": 1982,
+          "tmdbId": 5961,
+          "imdbId": "tt0083922",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 72111
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 45
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "The Seventh Seal",
+          "year": 1957,
+          "tmdbId": 490,
+          "imdbId": "tt0050976",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 219144
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 71
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Wild Strawberries",
+          "year": 1957,
+          "tmdbId": 614,
+          "imdbId": "tt0050986",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 126439
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 46
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Scenes from a Marriage",
+          "year": 1974,
+          "tmdbId": 133919,
+          "imdbId": "tt6725014",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 10783
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Through a Glass Darkly",
+          "year": 1961,
+          "tmdbId": 11602,
+          "imdbId": "tt0055499",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 29926
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 27
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Smiles of a Summer Night",
+          "year": 1955,
+          "tmdbId": 11700,
+          "imdbId": "tt0048641",
+          "imdb": {
+            "rating": 7.7,
+            "votes": 15952
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 16
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Cries and Whispers",
+          "year": 1972,
+          "tmdbId": 10238,
+          "imdbId": "tt0069467",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 40487
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 35
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Autumn Sonata",
+          "year": 1978,
+          "tmdbId": 12761,
+          "imdbId": "tt0077711",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 44012
+          },
+          "rt": {
+            "tomatometer": 84,
+            "reviews": 32
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Persona",
+          "year": 1966,
+          "tmdbId": 797,
+          "imdbId": "tt0060827",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 142942
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 54
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "The Virgin Spring",
+          "year": 1960,
+          "tmdbId": 11656,
+          "imdbId": "tt0053976",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 34313
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 23
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "federico-fellini",
+      "name": "Federico Fellini",
+      "tmdbPersonId": 4415,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Nights of Cabiria",
+          "year": 1957,
+          "tmdbId": 19426,
+          "imdbId": "tt0050783",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 57937
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 41
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "8½",
+          "year": 1963,
+          "tmdbId": 422,
+          "imdbId": "tt0056801",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 134310
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 60
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "I Vitelloni",
+          "year": 1953,
+          "tmdbId": 12548,
+          "imdbId": "tt0046521",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 23625
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 28
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "La Strada",
+          "year": 1954,
+          "tmdbId": 405,
+          "imdbId": "tt0047528",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 70763
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 77
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "La Dolce Vita",
+          "year": 1960,
+          "tmdbId": 439,
+          "imdbId": "tt0053779",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 86983
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 75
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "The White Sheik",
+          "year": 1952,
+          "tmdbId": 43361,
+          "imdbId": "tt0044000",
+          "imdb": {
+            "rating": 7.2,
+            "votes": 7667
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 13
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Amarcord",
+          "year": 1973,
+          "tmdbId": 7857,
+          "imdbId": "tt0071129",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 52138
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 47
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Juliet of the Spirits",
+          "year": 1965,
+          "tmdbId": 19120,
+          "imdbId": "tt0059229",
+          "imdb": {
+            "rating": 7.4,
+            "votes": 15982
+          },
+          "rt": {
+            "tomatometer": 78,
+            "reviews": 27
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Fellini Satyricon",
+          "year": 1969,
+          "tmdbId": 11163,
+          "imdbId": "tt0064940",
+          "imdb": {
+            "rating": 6.8,
+            "votes": 18413
+          },
+          "rt": {
+            "tomatometer": 74,
+            "reviews": 31
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "satyajit-ray",
+      "name": "Satyajit Ray",
+      "tmdbPersonId": 12160,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Nayak",
+          "year": 1966,
+          "tmdbId": 112999,
+          "imdbId": "tt0060742",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 6382
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 10
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "The World of Apu",
+          "year": 1959,
+          "tmdbId": 896,
+          "imdbId": "tt0052572",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 20935
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 26
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Mahanagar",
+          "year": 1963,
+          "tmdbId": 60567,
+          "imdbId": "tt0057277",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 5797
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 26
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Pather Panchali",
+          "year": 1955,
+          "tmdbId": 5801,
+          "imdbId": "tt0048473",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 42593
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 82
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Days and Nights in the Forest",
+          "year": 1970,
+          "tmdbId": 35867,
+          "imdbId": "tt0065417",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 3613
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Aparajito",
+          "year": 1956,
+          "tmdbId": 897,
+          "imdbId": "tt0048956",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 20539
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "The Music Room",
+          "year": 1958,
+          "tmdbId": 822,
+          "imdbId": "tt0051792",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 7515
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Devi",
+          "year": 1960,
+          "tmdbId": 43031,
+          "imdbId": "tt0053765",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 3606
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 15
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Charulata",
+          "year": 1964,
+          "tmdbId": 35790,
+          "imdbId": "tt0057935",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 8180
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 29
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "Distant Thunder",
+          "year": 1973,
+          "tmdbId": 113012,
+          "imdbId": "tt0069737",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 1918
+          },
+          "rt": {
+            "tomatometer": null,
+            "reviews": 5
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "agnes-varda",
+      "name": "Agnès Varda",
+      "tmdbPersonId": 6817,
+      "films": [
+        {
+          "rank": 1,
+          "title": "The Beaches of Agnès",
+          "year": 2008,
+          "tmdbId": 38879,
+          "imdbId": "tt1129435",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 5463
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 71
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Faces Places",
+          "year": 2017,
+          "tmdbId": 451995,
+          "imdbId": "tt5598102",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 14608
+          },
+          "rt": {
+            "tomatometer": 99,
+            "reviews": 143
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Vagabond",
+          "year": 1985,
+          "tmdbId": 44018,
+          "imdbId": "tt0089960",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 16290
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 26
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Daguerréotypes",
+          "year": 1975,
+          "tmdbId": 49650,
+          "imdbId": "tt0071384",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 2362
+          },
+          "rt": {
+            "tomatometer": 100,
+            "reviews": 11
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Cléo from 5 to 7",
+          "year": 1962,
+          "tmdbId": 499,
+          "imdbId": "tt0055852",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 32645
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 56
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "The Gleaners and I",
+          "year": 2000,
+          "tmdbId": 44379,
+          "imdbId": "tt0247380",
+          "imdb": {
+            "rating": 7.7,
+            "votes": 10476
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 44
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Le Bonheur",
+          "year": 1965,
+          "tmdbId": 53023,
+          "imdbId": "tt0058985",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 12290
+          },
+          "rt": {
+            "tomatometer": null,
+            "reviews": 8
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "One Sings, the Other Doesn't",
+          "year": 1977,
+          "tmdbId": 63318,
+          "imdbId": "tt0076855",
+          "imdb": {
+            "rating": 7.4,
+            "votes": 3371
+          },
+          "rt": {
+            "tomatometer": 65,
+            "reviews": 49
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "La Pointe Courte",
+          "year": 1955,
+          "tmdbId": 54436,
+          "imdbId": "tt0048499",
+          "imdb": {
+            "rating": 7.0,
+            "votes": 5030
+          },
+          "rt": {
+            "tomatometer": null,
+            "reviews": 4
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "martin-scorsese",
+      "name": "Martin Scorsese",
+      "tmdbPersonId": 1032,
+      "films": [
+        {
+          "rank": 1,
+          "title": "GoodFellas",
+          "year": 1990,
+          "tmdbId": 769,
+          "imdbId": "tt0099685",
+          "imdb": {
+            "rating": 8.7,
+            "votes": 1423581
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 169
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "The Last Waltz",
+          "year": 1978,
+          "tmdbId": 13963,
+          "imdbId": "tt0077838",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 22644
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 58
+          },
+          "flags": ["documentary"]
+        },
+        {
+          "rank": 3,
+          "title": "The Departed",
+          "year": 2006,
+          "tmdbId": 1422,
+          "imdbId": "tt0407887",
+          "imdb": {
+            "rating": 8.5,
+            "votes": 1590164
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 286
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Raging Bull",
+          "year": 1980,
+          "tmdbId": 1578,
+          "imdbId": "tt0081398",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 416403
+          },
+          "rt": {
+            "tomatometer": 92,
+            "reviews": 151
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Killers of the Flower Moon",
+          "year": 2023,
+          "tmdbId": 466420,
+          "imdbId": "tt5537002",
+          "imdb": {
+            "rating": 7.5,
+            "votes": 316591
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 476
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Taxi Driver",
+          "year": 1976,
+          "tmdbId": 103,
+          "imdbId": "tt0075314",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 1048567
+          },
+          "rt": {
+            "tomatometer": 89,
+            "reviews": 163
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Casino",
+          "year": 1995,
+          "tmdbId": 524,
+          "imdbId": "tt0112641",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 631744
+          },
+          "rt": {
+            "tomatometer": 78,
+            "reviews": 73
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Mean Streets",
+          "year": 1973,
+          "tmdbId": 203,
+          "imdbId": "tt0070379",
+          "imdb": {
+            "rating": 7.1,
+            "votes": 130484
+          },
+          "rt": {
+            "tomatometer": 92,
+            "reviews": 75
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "After Hours",
+          "year": 1985,
+          "tmdbId": 10843,
+          "imdbId": "tt0088680",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 102089
+          },
+          "rt": {
+            "tomatometer": 90,
+            "reviews": 67
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "The King of Comedy",
+          "year": 1982,
+          "tmdbId": 262,
+          "imdbId": "tt0085794",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 136588
+          },
+          "rt": {
+            "tomatometer": 89,
+            "reviews": 71
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "steven-spielberg",
+      "name": "Steven Spielberg",
+      "tmdbPersonId": 488,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Schindler's List",
+          "year": 1993,
+          "tmdbId": 424,
+          "imdbId": "tt0108052",
+          "imdb": {
+            "rating": 9.0,
+            "votes": 1613369
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 135
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Saving Private Ryan",
+          "year": 1998,
+          "tmdbId": 857,
+          "imdbId": "tt0120815",
+          "imdb": {
+            "rating": 8.6,
+            "votes": 1672798
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 147
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "E.T. the Extra-Terrestrial",
+          "year": 1982,
+          "tmdbId": 601,
+          "imdbId": "tt0083866",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 479403
+          },
+          "rt": {
+            "tomatometer": 99,
+            "reviews": 147
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Raiders of the Lost Ark",
+          "year": 1981,
+          "tmdbId": 85,
+          "imdbId": "tt0082971",
+          "imdb": {
+            "rating": 8.4,
+            "votes": 1125699
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 157
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Jaws",
+          "year": 1975,
+          "tmdbId": 578,
+          "imdbId": "tt0073195",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 754342
+          },
+          "rt": {
+            "tomatometer": 97,
+            "reviews": 178
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Catch Me If You Can",
+          "year": 2002,
+          "tmdbId": 640,
+          "imdbId": "tt0264464",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 1274186
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 203
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Jurassic Park",
+          "year": 1993,
+          "tmdbId": 329,
+          "imdbId": "tt0107290",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 1206398
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 203
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "Close Encounters of the Third Kind",
+          "year": 1977,
+          "tmdbId": 840,
+          "imdbId": "tt0075860",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 239993
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 118
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Minority Report",
+          "year": 2002,
+          "tmdbId": 180,
+          "imdbId": "tt0181689",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 630118
+          },
+          "rt": {
+            "tomatometer": 89,
+            "reviews": 261
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "Munich",
+          "year": 2005,
+          "tmdbId": 612,
+          "imdbId": "tt0408306",
+          "imdb": {
+            "rating": 7.5,
+            "votes": 257093
+          },
+          "rt": {
+            "tomatometer": 78,
+            "reviews": 209
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "hayao-miyazaki",
+      "name": "Hayao Miyazaki",
+      "tmdbPersonId": 608,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Spirited Away",
+          "year": 2001,
+          "tmdbId": 129,
+          "imdbId": "tt0245429",
+          "imdb": {
+            "rating": 8.6,
+            "votes": 993496
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 226
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Princess Mononoke",
+          "year": 1997,
+          "tmdbId": 128,
+          "imdbId": "tt0119698",
+          "imdb": {
+            "rating": 8.3,
+            "votes": 494423
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 124
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Kiki's Delivery Service",
+          "year": 1989,
+          "tmdbId": 16859,
+          "imdbId": "tt0097814",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 193692
+          },
+          "rt": {
+            "tomatometer": 98,
+            "reviews": 48
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Castle in the Sky",
+          "year": 1986,
+          "tmdbId": 10515,
+          "imdbId": "tt0092067",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 201764
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 28
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "My Neighbor Totoro",
+          "year": 1988,
+          "tmdbId": 8392,
+          "imdbId": "tt0096283",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 443270
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 64
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Howl's Moving Castle",
+          "year": 2004,
+          "tmdbId": 4935,
+          "imdbId": "tt0347149",
+          "imdb": {
+            "rating": 8.2,
+            "votes": 525711
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 183
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Porco Rosso",
+          "year": 1992,
+          "tmdbId": 11621,
+          "imdbId": "tt0104652",
+          "imdb": {
+            "rating": 7.7,
+            "votes": 119666
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "The Boy and the Heron",
+          "year": 2023,
+          "tmdbId": 508883,
+          "imdbId": "tt6587046",
+          "imdb": {
+            "rating": 7.3,
+            "votes": 152775
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 276
+          },
+          "flags": []
+        },
+        {
+          "rank": 9,
+          "title": "Nausicaä of the Valley of the Wind",
+          "year": 1984,
+          "tmdbId": 81,
+          "imdbId": "tt0087544",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 200328
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 23
+          },
+          "flags": []
+        },
+        {
+          "rank": 10,
+          "title": "The Wind Rises",
+          "year": 2013,
+          "tmdbId": 149870,
+          "imdbId": "tt2013293",
+          "imdb": {
+            "rating": 7.8,
+            "votes": 116131
+          },
+          "rt": {
+            "tomatometer": 89,
+            "reviews": 183
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "wong-kar-wai",
+      "name": "Wong Kar-wai",
+      "tmdbPersonId": 12453,
+      "films": [
+        {
+          "rank": 1,
+          "title": "In the Mood for Love",
+          "year": 2000,
+          "tmdbId": 843,
+          "imdbId": "tt0118694",
+          "imdb": {
+            "rating": 8.0,
+            "votes": 192928
+          },
+          "rt": {
+            "tomatometer": 92,
+            "reviews": 191
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Fallen Angels",
+          "year": 1995,
+          "tmdbId": 11220,
+          "imdbId": "tt0112913",
+          "imdb": {
+            "rating": 7.5,
+            "votes": 62011
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 22
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Chungking Express",
+          "year": 1994,
+          "tmdbId": 11104,
+          "imdbId": "tt0109424",
+          "imdb": {
+            "rating": 7.9,
+            "votes": 115106
+          },
+          "rt": {
+            "tomatometer": 88,
+            "reviews": 68
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Days of Being Wild",
+          "year": 1990,
+          "tmdbId": 18311,
+          "imdbId": "tt0101258",
+          "imdb": {
+            "rating": 7.4,
+            "votes": 29212
+          },
+          "rt": {
+            "tomatometer": 91,
+            "reviews": 32
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "Happy Together",
+          "year": 1997,
+          "tmdbId": 18329,
+          "imdbId": "tt0118845",
+          "imdb": {
+            "rating": 7.6,
+            "votes": 39173
+          },
+          "rt": {
+            "tomatometer": 83,
+            "reviews": 42
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "2046",
+          "year": 2004,
+          "tmdbId": 844,
+          "imdbId": "tt0212712",
+          "imdb": {
+            "rating": 7.4,
+            "votes": 65225
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 119
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Ashes of Time",
+          "year": 1994,
+          "tmdbId": 40751,
+          "imdbId": "tt0109688",
+          "imdb": {
+            "rating": 7.0,
+            "votes": 18532
+          },
+          "rt": {
+            "tomatometer": null,
+            "reviews": 3
+          },
+          "flags": []
+        },
+        {
+          "rank": 8,
+          "title": "The Grandmaster",
+          "year": 2013,
+          "tmdbId": 44865,
+          "imdbId": "tt1462900",
+          "imdb": {
+            "rating": 6.6,
+            "votes": 39181
+          },
+          "rt": {
+            "tomatometer": 78,
+            "reviews": 139
+          },
+          "flags": []
+        }
+      ]
+    },
+    {
+      "id": "bong-joon-ho",
+      "name": "Bong Joon-ho",
+      "tmdbPersonId": 21684,
+      "films": [
+        {
+          "rank": 1,
+          "title": "Parasite",
+          "year": 2019,
+          "tmdbId": 496243,
+          "imdbId": "tt6751668",
+          "imdb": {
+            "rating": 8.5,
+            "votes": 1208785
+          },
+          "rt": {
+            "tomatometer": 99,
+            "reviews": 484
+          },
+          "flags": []
+        },
+        {
+          "rank": 2,
+          "title": "Memories of Murder",
+          "year": 2003,
+          "tmdbId": 11423,
+          "imdbId": "tt0353969",
+          "imdb": {
+            "rating": 8.1,
+            "votes": 278761
+          },
+          "rt": {
+            "tomatometer": 95,
+            "reviews": 78
+          },
+          "flags": []
+        },
+        {
+          "rank": 3,
+          "title": "Mother",
+          "year": 2009,
+          "tmdbId": 30018,
+          "imdbId": "tt1216496",
+          "imdb": {
+            "rating": 7.7,
+            "votes": 82353
+          },
+          "rt": {
+            "tomatometer": 96,
+            "reviews": 120
+          },
+          "flags": []
+        },
+        {
+          "rank": 4,
+          "title": "Snowpiercer",
+          "year": 2013,
+          "tmdbId": 110415,
+          "imdbId": "tt1706620",
+          "imdb": {
+            "rating": 7.1,
+            "votes": 427503
+          },
+          "rt": {
+            "tomatometer": 94,
+            "reviews": 264
+          },
+          "flags": []
+        },
+        {
+          "rank": 5,
+          "title": "The Host",
+          "year": 2006,
+          "tmdbId": 1255,
+          "imdbId": "tt0468492",
+          "imdb": {
+            "rating": 7.1,
+            "votes": 145535
+          },
+          "rt": {
+            "tomatometer": 93,
+            "reviews": 154
+          },
+          "flags": []
+        },
+        {
+          "rank": 6,
+          "title": "Okja",
+          "year": 2017,
+          "tmdbId": 387426,
+          "imdbId": "tt3967856",
+          "imdb": {
+            "rating": 7.3,
+            "votes": 143941
+          },
+          "rt": {
+            "tomatometer": 87,
+            "reviews": 238
+          },
+          "flags": []
+        },
+        {
+          "rank": 7,
+          "title": "Barking Dogs Never Bite",
+          "year": 2000,
+          "tmdbId": 21531,
+          "imdbId": "tt0269743",
+          "imdb": {
+            "rating": 6.9,
+            "votes": 12295
+          },
+          "rt": {
+            "tomatometer": 88,
+            "reviews": 17
+          },
+          "flags": []
+        }
+      ]
+    }
+  ]
+}

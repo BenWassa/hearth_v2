@@ -347,9 +347,6 @@ const DirectorsCollectionView = ({
                 Twelve filmmakers. A considered selection of their essential
                 films.
               </p>
-              <p className="mt-3 text-xs text-stone-400">
-                A small, considered introduction to twelve filmmakers.
-              </p>
             </div>
             <section aria-label="Explore directors" className="pt-6">
               <div className="mb-4 flex items-end justify-between">

@@ -91,6 +91,14 @@ const CollectionsRail = ({
                   }}
                   className={`relative flex aspect-[2/3] w-full flex-col justify-between overflow-hidden rounded-lg border border-stone-700/80 bg-stone-900 p-3 text-left shadow-lg shadow-black/20 ${focusRing}`}
                 >
+                  <img
+                    src="/assets/collections/legendary-directors/cover.webp"
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.hidden = true;
+                    }}
+                  />
                   <span className="text-[10px] font-bold uppercase leading-relaxed tracking-[0.15em] text-amber-300">
                     Curated
                   </span>

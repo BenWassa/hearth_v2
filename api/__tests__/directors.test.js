@@ -40,10 +40,19 @@ test('director mapper includes only credited released directed titles', () => {
     },
   };
   const output = mapDirector(raw, director, new Date('2026-11-12T00:00:00Z'));
-  assert.deepEqual(output.films.map((film) => film.providerId), ['96', '77']);
-  assert.deepEqual(output.startHere.map((film) => film.providerId), ['77']);
+  assert.deepEqual(
+    output.films.map((film) => film.providerId),
+    ['96', '77'],
+  );
+  assert.deepEqual(
+    output.startHere.map((film) => film.providerId),
+    ['77'],
+  );
   assert.deepEqual(output.missingStarterIds, ['999']);
-  assert.equal(output.films[1].poster, 'https://image.tmdb.org/t/p/w342/poster.jpg');
+  assert.equal(
+    output.films[1].poster,
+    'https://image.tmdb.org/t/p/w342/poster.jpg',
+  );
   assert.equal(output.films[0].poster, '');
   assert.equal(output.filmographyLabel, 'Directed film credits');
 });
@@ -63,7 +72,9 @@ test.afterEach(() => {
 });
 
 test('director endpoint rejects catalog-unknown IDs without provider call', async () => {
-  global.fetch = () => { throw new Error('Provider should not be reached'); };
+  global.fetch = () => {
+    throw new Error('Provider should not be reached');
+  };
   const req = createMockReq({ query: { id: '123456789' } });
   const res = createMockRes();
   await directorHandler(req, res);
@@ -78,16 +89,18 @@ test('director endpoint returns only verified directorial credits', async () => 
     return {
       ok: true,
       json: async () => ({
-        id: 525,
-        name: 'Christopher Nolan',
-        movie_credits: { crew: [
-          release(77),
-          release(101, { job: 'Producer', department: 'Production' }),
-        ] },
+        id: 5026,
+        name: 'Akira Kurosawa',
+        movie_credits: {
+          crew: [
+            release(77),
+            release(101, { job: 'Producer', department: 'Production' }),
+          ],
+        },
       }),
     };
   };
-  const req = createMockReq({ query: { id: '525' } });
+  const req = createMockReq({ query: { id: '5026' } });
   const res = createMockRes();
   await directorHandler(req, res);
   assert.equal(res.output.statusCode, 200);
@@ -96,6 +109,6 @@ test('director endpoint returns only verified directorial credits', async () => 
     res.output.body.data.films.map((film) => film.providerId),
     ['77'],
   );
-  assert.match(requested, /\/person\/525\?/);
+  assert.match(requested, /\/person\/5026\?/);
   assert.match(requested, /append_to_response=movie_credits/);
 });

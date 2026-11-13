@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
+import useDirectorsHistory from '../app/useDirectorsHistory.js';
 import Dialog from '../components/ui/Dialog.jsx';
-import catalog from '../config/directorCatalog.json';
-import {
-  getDirectorDetails,
-  getMediaDetails,
-} from '../services/mediaApi/client.js';
+import catalog from '../config/directorEssentials.json';
+import { loadFilm } from '../components/directors/filmMedia.js';
+import { getMediaDetails } from '../services/mediaApi/client.js';
 
-const directorCache = new Map();
-const CACHE_MS = 30 * 60 * 1000;
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400';
 
@@ -68,63 +65,99 @@ const toWatchlistPayload = (film) => {
   };
 };
 
-const FilmCard = ({ film, owned, onOpen, compact = false }) => (
-  <button
-    type="button"
-    onClick={() => onOpen(film)}
-    className={`group flex min-w-0 flex-col gap-1.5 text-left ${focusRing}`}
-    aria-label={`${film.title} (${film.year || 'year unknown'})${
-      owned ? ', on your shelf' : ''
-    }`}
-  >
-    <span className="relative block aspect-[2/3] w-full overflow-hidden rounded-lg bg-stone-800">
-      {film.poster ? (
+const OptionalArt = ({ src, className }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  return (
+    !failed && (
+      <img
+        src={src}
+        alt=""
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={`${className} ${loaded ? '' : 'hidden'}`}
+      />
+    )
+  );
+};
+
+const FilmPoster = ({ film }) => {
+  const ref = useRef(null);
+  const [poster, setPoster] = useState('');
+  useEffect(() => {
+    let active = true;
+    const load = () =>
+      loadFilm(film).then((data) => {
+        if (active) setPoster(data?.posterUrl || data?.poster || '');
+      });
+    if (!window.IntersectionObserver) load();
+    const observer =
+      window.IntersectionObserver &&
+      new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            load();
+            observer.disconnect();
+          }
+        },
+        { rootMargin: '150px' },
+      );
+    if (observer && ref.current) observer.observe(ref.current);
+    return () => {
+      active = false;
+      observer?.disconnect();
+    };
+  }, [film]);
+  return (
+    <span
+      ref={ref}
+      className="block aspect-[2/3] w-full overflow-hidden rounded bg-stone-800"
+    >
+      {poster && (
         <img
-          src={film.poster}
+          src={poster}
           alt=""
-          className="h-full w-full object-cover"
           loading="lazy"
           decoding="async"
+          className="h-full w-full object-cover"
+          onError={() => setPoster('')}
         />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="flex h-full items-center justify-center p-2 text-center font-serif text-sm text-stone-300"
-        >
-          {film.title}
-        </span>
-      )}
-      {owned && (
-        <span className="absolute bottom-1.5 left-1.5 rounded bg-stone-950/90 px-1.5 py-1 text-[10px] font-semibold text-amber-200">
-          On shelf
-        </span>
       )}
     </span>
+  );
+};
+
+const Scores = ({ film }) => {
+  const imdb = film.imdb?.rating;
+  const rt = film.rt?.tomatometer;
+  return (
     <span
-      className={`line-clamp-2 font-medium text-stone-200 ${
-        compact ? 'text-xs' : 'text-sm'
+      className="ml-auto shrink-0 text-right text-xs leading-relaxed text-stone-300"
+      aria-label={`IMDb ${imdb ?? 'n/a'}, Rotten Tomatoes ${
+        rt == null ? 'n/a' : `${rt} percent`
       }`}
     >
-      {film.title}
+      <span aria-hidden="true" className="block">
+        IMDb {imdb == null ? 'n/a' : imdb.toFixed(1)}
+      </span>
+      <span aria-hidden="true" className="block">
+        RT {rt == null ? 'n/a' : `${rt}%`}
+      </span>
     </span>
-    <span className="text-xs text-stone-400">{film.year}</span>
-  </button>
-);
+  );
+};
 
 const DirectorsCollectionView = ({
   items = [],
   removedItems = [],
   onClose,
-  onOpenItem,
   onAddItem,
   onOpenRemoved,
 }) => {
-  const [selected, setSelected] = useState(null);
-  const [directorData, setDirectorData] = useState(null);
-  const [directorError, setDirectorError] = useState('');
-  const [directorLoading, setDirectorLoading] = useState(false);
-  const [retry, setRetry] = useState(0);
-  const [activeFilm, setActiveFilm] = useState(null);
+  const { stage, navigate, back } = useDirectorsHistory(onClose);
+  const selected = stage.director;
+  const activeFilm = stage.film;
+  const [expanded, setExpanded] = useState(false);
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState('');
@@ -133,6 +166,8 @@ const DirectorsCollectionView = ({
   const scrollRef = useRef(null);
   const headingRef = useRef(null);
   const directoryScroll = useRef(0);
+  const directoryRail = useRef(null);
+  const directoryRailScroll = useRef(0);
   const openerRef = useRef(null);
 
   const selectedDirector = catalog.directors.find(
@@ -146,45 +181,6 @@ const DirectorsCollectionView = ({
     () => new Set(removedItems.map(providerIdFor).filter(Boolean)),
     [removedItems],
   );
-
-  useEffect(() => {
-    if (!selectedDirector) {
-      setDirectorData(null);
-      setDirectorError('');
-      setDirectorLoading(false);
-      return undefined;
-    }
-    let active = true;
-    const key = String(selectedDirector.personId);
-    const cached = directorCache.get(key);
-    if (cached && Date.now() - cached.at < CACHE_MS) {
-      setDirectorData(cached.data);
-      setDirectorError('');
-      setDirectorLoading(false);
-      return undefined;
-    }
-    setDirectorData(null);
-    setDirectorError('');
-    setDirectorLoading(true);
-    getDirectorDetails(key)
-      .then((data) => {
-        if (!active) return;
-        directorCache.set(key, { data, at: Date.now() });
-        setDirectorData(data);
-      })
-      .catch(() => {
-        if (active)
-          setDirectorError(
-            'Film credits are unavailable right now. Try again.',
-          );
-      })
-      .finally(() => {
-        if (active) setDirectorLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [selectedDirector?.personId, retry]);
 
   useEffect(() => {
     if (!activeFilm) {
@@ -205,7 +201,8 @@ const DirectorsCollectionView = ({
         if (!active) return;
         if (
           data?.provider !== 'tmdb' ||
-          String(data.providerId) !== String(activeFilm.providerId)
+          String(data.providerId) !== String(activeFilm.providerId) ||
+          (data.type && data.type !== 'movie')
         ) {
           throw new Error('Provider identity mismatch');
         }
@@ -226,37 +223,26 @@ const DirectorsCollectionView = ({
   useEffect(() => {
     if (scrollRef.current)
       scrollRef.current.scrollTop = selected ? 0 : directoryScroll.current;
-    headingRef.current?.focus({ preventScroll: true });
-  }, [selected, activeFilm?.providerId]);
+    if (!selected && directoryRail.current)
+      directoryRail.current.scrollLeft = directoryRailScroll.current;
+    if (!selected && openerRef.current) {
+      requestAnimationFrame(() =>
+        document
+          .querySelector(`[data-director-card="${openerRef.current}"]`)
+          ?.focus({ preventScroll: true }),
+      );
+    } else headingRef.current?.focus({ preventScroll: true });
+  }, [selected]);
 
-  const openDirector = (entry, opener) => {
+  const openDirector = (entry) => {
     directoryScroll.current = scrollRef.current?.scrollTop || 0;
-    openerRef.current = opener;
-    setSelected(entry.id);
-    setActiveFilm(null);
-  };
-  const back = () => {
-    if (activeFilm) {
-      setActiveFilm(null);
-      setSaveNotice('');
-    } else if (selected) {
-      setSelected(null);
-      setDirectorData(null);
-      requestAnimationFrame(() => {
-        if (openerRef.current?.isConnected)
-          openerRef.current.focus({ preventScroll: true });
-      });
-    } else {
-      onClose?.();
-    }
+    directoryRailScroll.current = directoryRail.current?.scrollLeft || 0;
+    openerRef.current = entry.id;
+    setExpanded(false);
+    navigate({ director: entry.id, film: null });
   };
   const openFilm = (film) => {
-    const owned = findByFilmId(items, film.providerId);
-    if (owned) {
-      onOpenItem?.(owned);
-      return;
-    }
-    setActiveFilm(film);
+    navigate({ director: selected, film });
     setSaveNotice('');
   };
   const saveFilm = async () => {
@@ -273,6 +259,8 @@ const DirectorsCollectionView = ({
       });
       if (outcome?.status === 'added') {
         setSaveNotice('Added to your shared shelf.');
+      } else if (outcome?.status === 'restored') {
+        setSaveNotice('Restored to your shared shelf.');
       } else if (outcome?.status === 'exists') {
         setSaveNotice('Already on your shared shelf.');
       } else if (outcome?.status === 'removed') {
@@ -289,7 +277,21 @@ const DirectorsCollectionView = ({
     }
   };
 
-  const heading = activeFilm?.title || selectedDirector?.name || catalog.title;
+  const heading = selectedDirector?.name || catalog.title;
+  const films = useMemo(
+    () =>
+      (selectedDirector?.films || []).map((film) => ({
+        ...film,
+        providerId: String(film.tmdbId),
+      })),
+    [selectedDirector],
+  );
+  const watchNext = films
+    .filter((film) => {
+      const item = findByFilmId(items, film.providerId);
+      return (item?.userState?.status || item?.status) !== 'watched';
+    })
+    .slice(0, 3);
 
   return (
     <Dialog
@@ -342,9 +344,10 @@ const DirectorsCollectionView = ({
                 The Directors
               </h2>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-stone-400">
-                {catalog.subtitle}
+                Twelve filmmakers. A considered selection of their essential
+                films.
               </p>
-              <p className="mt-3 text-xs text-stone-500">
+              <p className="mt-3 text-xs text-stone-400">
                 A small, considered introduction to twelve filmmakers.
               </p>
             </div>
@@ -353,9 +356,38 @@ const DirectorsCollectionView = ({
                 <h3 className="font-serif text-2xl text-stone-100">
                   Explore filmmakers
                 </h3>
-                <span className="text-xs text-stone-500">12 profiles</span>
+                <span className="text-xs text-stone-400">12 profiles</span>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div
+                ref={directoryRail}
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4"
+                onKeyDown={(event) => {
+                  if (
+                    !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(
+                      event.key,
+                    )
+                  )
+                    return;
+                  const cards = [
+                    ...event.currentTarget.querySelectorAll('button'),
+                  ];
+                  const index = cards.indexOf(document.activeElement);
+                  const next =
+                    event.key === 'Home'
+                      ? 0
+                      : event.key === 'End'
+                      ? cards.length - 1
+                      : Math.max(
+                          0,
+                          Math.min(
+                            cards.length - 1,
+                            index + (event.key === 'ArrowRight' ? 1 : -1),
+                          ),
+                        );
+                  event.preventDefault();
+                  cards[next]?.focus();
+                }}
+              >
                 {catalog.directors.map((entry, index) => (
                   <button
                     key={entry.id}
@@ -364,10 +396,10 @@ const DirectorsCollectionView = ({
                     onClick={(event) =>
                       openDirector(entry, event.currentTarget)
                     }
-                    className={`group flex min-h-[10rem] flex-col justify-between rounded-xl border border-stone-800 bg-stone-900/65 p-3 text-left transition-colors hover:border-stone-600 ${focusRing}`}
+                    className={`group flex w-[75%] shrink-0 snap-start min-h-[10rem] flex-col justify-between rounded-xl border border-stone-800 bg-stone-900/65 p-3 text-left transition-colors hover:border-stone-600 ${focusRing}`}
                   >
                     <span className="flex items-start justify-between gap-2">
-                      <span className="text-[10px] tabular-nums tracking-widest text-stone-500">
+                      <span className="text-[11px] tabular-nums tracking-widest text-stone-400">
                         {String(index + 1).padStart(2, '0')}
                       </span>
                       <ArrowRight
@@ -389,189 +421,215 @@ const DirectorsCollectionView = ({
             </section>
           </>
         )}
-        {selected && !activeFilm && (
+        {selected && (
           <>
             <div className="pb-7 pt-7">
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
-                Filmmaker
-              </p>
-              <div className="flex items-start gap-4">
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-serif text-3xl leading-tight text-stone-100">
-                    {selectedDirector?.name}
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-stone-400">
-                    {selectedDirector?.description}
-                  </p>
-                </div>
-                {directorData?.portrait && (
-                  <img
-                    src={directorData.portrait}
-                    alt=""
-                    className="h-28 w-20 shrink-0 rounded-lg object-cover"
-                  />
-                )}
-              </div>
+              <OptionalArt
+                key={`${selected}-portrait`}
+                src={`/assets/collections/legendary-directors/directors/${selected}/portrait.webp`}
+                className="mb-5 max-h-72 w-full rounded-xl object-cover"
+              />
+              <h2 className="font-serif text-3xl leading-tight text-stone-100">
+                {selectedDirector.name}
+              </h2>
+              <OptionalArt
+                key={`${selected}-signature`}
+                src={`/assets/collections/legendary-directors/directors/${selected}/signature.svg`}
+                className="mt-3 h-16 max-w-full object-contain"
+              />
             </div>
-            {directorLoading && (
-              <p role="status" className="py-6 text-sm text-stone-400">
-                Loading directed film credits…
-              </p>
+            {watchNext.length > 0 && (
+              <section aria-label="Watch Next">
+                <h3 className="font-serif text-2xl text-stone-100">
+                  Watch Next
+                </h3>
+                <p className="mt-1 text-sm text-stone-400">
+                  Not marked watched on your shared shelf.
+                </p>
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {watchNext.map((film) => (
+                    <button
+                      key={film.tmdbId}
+                      type="button"
+                      onClick={(event) => {
+                        event.currentTarget.focus({ preventScroll: true });
+                        openFilm(film);
+                      }}
+                      className={`min-w-0 text-left ${focusRing}`}
+                    >
+                      <FilmPoster film={film} />
+                      <span className="mt-2 block font-serif text-sm text-stone-100">
+                        {film.title}
+                      </span>
+                      <span className="text-xs text-stone-400">
+                        {film.year}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
             )}
-            {directorError && (
-              <div
-                role="alert"
-                className="rounded-xl border border-stone-800 p-4"
+            <section
+              aria-label="Essential 10"
+              className="mt-8 border-t border-stone-800 pt-6"
+            >
+              <h3 className="font-serif text-2xl text-stone-100">
+                Essential 10
+              </h3>
+              <ol
+                id="director-essentials"
+                className="mt-4 divide-y divide-stone-800"
               >
-                <p className="text-sm text-stone-300">{directorError}</p>
+                {films.slice(0, expanded ? films.length : 5).map((film) => (
+                  <li
+                    key={film.tmdbId}
+                    value={film.rank}
+                    data-essential-rank={film.rank}
+                  >
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.currentTarget.focus({ preventScroll: true });
+                        openFilm(film);
+                      }}
+                      className={`flex min-h-20 w-full items-center gap-2 py-3 text-left ${focusRing}`}
+                    >
+                      <span className="w-9 shrink-0">
+                        <FilmPoster film={film} />
+                      </span>
+                      <span
+                        className={`w-5 shrink-0 text-center tabular-nums ${
+                          film.rank <= 3
+                            ? 'font-semibold text-amber-200'
+                            : 'text-stone-400'
+                        }`}
+                      >
+                        {film.rank}
+                        <span className="sr-only">
+                          {film.rank <= 3 ? ', signature film' : ''}
+                        </span>
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block font-serif text-base text-stone-100">
+                          {film.title}
+                        </span>
+                        <span className="text-xs text-stone-400">
+                          {film.year}
+                        </span>
+                      </span>
+                      <Scores film={film} />
+                    </button>
+                  </li>
+                ))}
+              </ol>
+              {films.length > 5 && (
                 <button
                   type="button"
-                  onClick={() => setRetry((value) => value + 1)}
-                  className={`mt-3 min-h-11 text-sm text-amber-300 ${focusRing}`}
+                  aria-expanded={expanded}
+                  aria-controls="director-essentials"
+                  onClick={() => setExpanded((value) => !value)}
+                  className={`mt-2 min-h-11 text-sm text-amber-200 ${focusRing}`}
                 >
-                  Retry
+                  {expanded ? 'Show fewer' : `View all ${films.length}`}
                 </button>
-              </div>
-            )}
-            {directorData && (
-              <>
-                {directorData.startHere.length > 0 && (
-                  <section
-                    aria-label="Start here"
-                    className="border-t border-stone-800/80 pt-6"
-                  >
-                    <h3 className="font-serif text-2xl text-stone-100">
-                      Start here
-                    </h3>
-                    <p className="mt-1 text-sm text-stone-400">
-                      A few selected entry points.
-                    </p>
-                    <div className="-mx-4 mt-4 flex snap-x gap-3 overflow-x-auto px-4 pb-3 no-scrollbar">
-                      {directorData.startHere.map((film) => (
-                        <div
-                          key={film.providerId}
-                          className="w-[8.4rem] shrink-0 snap-start"
-                        >
-                          <FilmCard
-                            film={film}
-                            owned={ownedIds.has(film.providerId)}
-                            onOpen={openFilm}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-                <section
-                  aria-label="Directed film credits"
-                  className="mt-8 border-t border-stone-800/80 pt-6"
-                >
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="font-serif text-2xl text-stone-100">
-                      Directed films
-                    </h3>
-                    <span className="text-xs text-stone-500">
-                      {directorData.films.length} credits
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-stone-400">
-                    Released titles in chronological order, from TMDB director
-                    credits. Includes shorts where credited.
-                  </p>
-                  {directorData.films.length ? (
-                    <div className="mt-5 grid grid-cols-3 gap-x-3 gap-y-5">
-                      {directorData.films.map((film) => (
-                        <FilmCard
-                          key={film.providerId}
-                          film={film}
-                          owned={ownedIds.has(film.providerId)}
-                          onOpen={openFilm}
-                          compact
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-5 text-sm text-stone-400">
-                      No released director credits found.
-                    </p>
-                  )}
-                </section>
-              </>
-            )}
+              )}
+              <p className="mt-5 text-xs text-stone-400">
+                Scores from IMDb and Rotten Tomatoes, read 13 Nov 2026
+              </p>
+            </section>
           </>
         )}
         {selected && activeFilm && (
-          <section className="pt-7" aria-label="Film details">
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
-              Directed by {selectedDirector?.name}
-            </p>
-            <h2 className="font-serif text-3xl text-stone-100">
-              {activeFilm.title}
-            </h2>
-            <p className="mt-2 text-sm text-stone-400">{activeFilm.year}</p>
-            {previewLoading && (
-              <p role="status" className="mt-6 text-sm text-stone-400">
-                Verifying film details…
+          <Dialog
+            onClose={back}
+            aria-labelledby="director-film-title"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/85 p-4"
+          >
+            <section
+              className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-700 bg-stone-900 p-5"
+              aria-label="Film details"
+            >
+              <button
+                type="button"
+                onClick={back}
+                className={`mb-4 min-h-11 text-sm text-stone-300 ${focusRing}`}
+              >
+                Close film details
+              </button>
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+                Directed by {selectedDirector?.name}
               </p>
-            )}
-            {previewError && (
-              <p role="alert" className="mt-6 text-sm text-stone-300">
-                {previewError}
-              </p>
-            )}
-            {preview && (
-              <>
-                <div className="mt-5 flex items-start gap-4">
-                  {preview.posterUrl && (
-                    <img
-                      src={preview.posterUrl}
-                      alt=""
-                      className="w-28 shrink-0 rounded-lg object-cover"
-                    />
-                  )}
-                  <p className="text-sm leading-relaxed text-stone-300">
-                    {preview.overview || 'No synopsis available.'}
-                  </p>
-                </div>
-                {ownedIds.has(activeFilm.providerId) ? (
-                  <p className="mt-6 text-sm text-amber-200">On your shelf</p>
-                ) : removedIds.has(activeFilm.providerId) ? (
-                  <div className="mt-6 rounded-xl border border-stone-800 bg-stone-900 p-3">
-                    <p className="text-sm text-stone-300">
-                      This title is in Recently removed. Restore it there to
-                      preserve your previous details.
-                    </p>
-                    {onOpenRemoved && (
-                      <button
-                        type="button"
-                        onClick={onOpenRemoved}
-                        className={`mt-2 min-h-11 text-sm text-amber-300 ${focusRing}`}
-                      >
-                        Open Recently removed
-                      </button>
+              <h2
+                id="director-film-title"
+                className="font-serif text-3xl text-stone-100"
+              >
+                {activeFilm.title}
+              </h2>
+              <p className="mt-2 text-sm text-stone-400">{activeFilm.year}</p>
+              {previewLoading && (
+                <p role="status" className="mt-6 text-sm text-stone-400">
+                  Verifying film details…
+                </p>
+              )}
+              {previewError && (
+                <p role="alert" className="mt-6 text-sm text-stone-300">
+                  {previewError}
+                </p>
+              )}
+              {preview && (
+                <>
+                  <div className="mt-5 flex items-start gap-4">
+                    {preview.posterUrl && (
+                      <img
+                        src={preview.posterUrl}
+                        alt=""
+                        className="w-28 shrink-0 rounded-lg object-cover"
+                      />
                     )}
+                    <p className="text-sm leading-relaxed text-stone-300">
+                      {preview.overview || 'No synopsis available.'}
+                    </p>
                   </div>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={saving || typeof onAddItem !== 'function'}
-                    onClick={saveFilm}
-                    className={`mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-stone-950 disabled:opacity-50 ${focusRing}`}
-                  >
-                    <Plus className="h-4 w-4" />
-                    {saving ? 'Saving…' : 'Add to shelf'}
-                  </button>
-                )}
-                {saveNotice && (
-                  <p role="status" className="mt-3 text-xs text-stone-400">
-                    {saveNotice}
-                  </p>
-                )}
-              </>
-            )}
-          </section>
+                  {ownedIds.has(activeFilm.providerId) ? (
+                    <p className="mt-6 text-sm text-amber-200">On your shelf</p>
+                  ) : removedIds.has(activeFilm.providerId) ? (
+                    <div className="mt-6 rounded-xl border border-stone-800 bg-stone-900 p-3">
+                      <p className="text-sm text-stone-300">
+                        This title is in Recently removed. Restore it there to
+                        preserve your previous details.
+                      </p>
+                      {onOpenRemoved && (
+                        <button
+                          type="button"
+                          onClick={onOpenRemoved}
+                          className={`mt-2 min-h-11 text-sm text-amber-300 ${focusRing}`}
+                        >
+                          Open Recently removed
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={saving || typeof onAddItem !== 'function'}
+                      onClick={saveFilm}
+                      className={`mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-stone-950 disabled:opacity-50 ${focusRing}`}
+                    >
+                      <Plus className="h-4 w-4" />
+                      {saving ? 'Saving…' : 'Add to shelf'}
+                    </button>
+                  )}
+                  {saveNotice && (
+                    <p role="status" className="mt-3 text-xs text-stone-400">
+                      {saveNotice}
+                    </p>
+                  )}
+                </>
+              )}
+            </section>
+          </Dialog>
         )}
-        <footer className="mt-10 flex items-start gap-3 border-t border-stone-800/60 pt-5 text-xs leading-relaxed text-stone-500">
+        <footer className="mt-10 flex items-start gap-3 border-t border-stone-800/60 pt-5 text-xs leading-relaxed text-stone-400">
           <img src="/tmdb-logo.svg" alt="TMDB" className="mt-1 w-11 shrink-0" />
           <span>
             <span className="block font-semibold text-stone-400">Credits</span>

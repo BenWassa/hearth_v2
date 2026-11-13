@@ -1,5 +1,8 @@
 # Black Comedy Excellence — Curated Collections content & design blueprint
 
+> **Artwork workflow update (2026-11-13):** Subsequent owner decisions approved the Print Heritage direction and iterative visual asset creation **in ChatGPT**, tracked by [#62](https://github.com/BenWassa/hearth_v2/issues/62) and [ARTWORK_STUDIO_STATUS.md](ARTWORK_STUDIO_STATUS.md). Historical instructions below that defer artwork indefinitely no longer govern the creative studio. **App implementation still awaits a final ZIP and will happen later in Workspace under #55.** The provisional 50-film editorial mapping and source/rights gates remain unresolved.
+
+
 **Linked issue:** https://github.com/BenWassa/hearth_v2/issues/55  
 **Status:** Working editorial and UX proposal only; **NOT approved film content, artwork, production UI or an implemented pack**  
 **Date:** 2026-11-10  

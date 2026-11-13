@@ -70,9 +70,15 @@ it('shows a pack with an empty library, closes via real Back and restores scroll
     expect(host.querySelector('[data-curated-scroller]').textContent).toContain(
       'All films',
     );
-    expect(host.querySelectorAll('[data-curated-scroller] img')).toHaveLength(
-      0,
-    );
+    // Only optional pack artwork may appear; no provider film posters yet.
+    const imageSources = [
+      ...host.querySelectorAll('[data-curated-scroller] img'),
+    ].map((image) => image.getAttribute('src'));
+    expect(
+      imageSources.every((src) =>
+        src.startsWith('/assets/packs/black-comedy-excellence/'),
+      ),
+    ).toBe(true);
     expect(
       host.querySelectorAll('[aria-labelledby="curated-all-heading"] li'),
     ).toHaveLength(50);

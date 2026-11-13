@@ -1,33 +1,39 @@
 import React, { useEffect, useRef } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
+import PackArt from '../components/curated/PackArt.jsx';
 
-const FilmList = ({ films, label, rail = false }) => (
+const SlotPlaceholder = ({ label, className = '' }) => (
+  <div
+    aria-hidden="true"
+    className={`flex items-center justify-center border border-dashed border-stone-700 text-center text-xs text-stone-500 ${className}`}
+  >
+    {label}
+  </div>
+);
+
+const FilmList = ({ films, label }) => (
   <ul
-    aria-label={rail ? label : undefined}
-    tabIndex={rail ? 0 : undefined}
-    className={
-      rail
-        ? 'no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400'
-        : 'grid grid-cols-2 gap-x-4 gap-y-5'
-    }
+    aria-label={label}
+    tabIndex={0}
+    className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
   >
     {films.map((film) => (
       <li
         key={film.id}
-        className={
-          rail ? 'w-[clamp(7rem,38vw,8.5rem)] shrink-0 snap-start' : 'min-w-0'
-        }
+        className="w-[clamp(7rem,38vw,8.5rem)] shrink-0 snap-start"
       >
         <div
           title={film.title}
-          className="flex aspect-[2/3] items-end overflow-hidden rounded-lg bg-stone-900 p-3"
+          className="flex aspect-[2/3] flex-col overflow-hidden rounded-lg border border-stone-800 bg-stone-900 p-3"
         >
-          <span className="line-clamp-4 break-words font-serif text-lg leading-snug text-stone-200">
+          <span className="text-label font-bold uppercase tracking-widest text-stone-400">
+            {film.year}
+          </span>
+          <span className="mt-2 line-clamp-5 break-words font-serif text-base leading-snug text-stone-100">
             {film.title}
           </span>
         </div>
-        <p className="mt-2 text-sm text-stone-400">{film.year}</p>
       </li>
     ))}
   </ul>
@@ -61,27 +67,42 @@ export default function CuratedPackPage({ pack, onClose }) {
         data-curated-scroller
         className="min-h-0 flex-1 overflow-y-auto px-5 pb-10"
       >
-        <header className="pb-8 pt-6">
-          <p className="text-label font-bold uppercase tracking-widest text-stone-400">
-            Curated collection
-          </p>
-          <h1
-            id="curated-pack-heading"
-            ref={heading}
-            tabIndex={-1}
-            className="mt-3 max-w-xs font-serif text-4xl leading-tight tracking-tight text-stone-100 focus:outline-none"
-          >
-            {pack.title}
-          </h1>
-          <p className="mt-4 max-w-prose text-sm leading-relaxed text-stone-300">
+        <header className="pb-8">
+          <div className="relative -mx-5 flex min-h-[13rem] items-end overflow-hidden bg-stone-900 px-5 pb-5 pt-6">
+            <PackArt
+              src={pack.art?.hero}
+              className="absolute inset-0 h-full w-full object-cover"
+              placeholder={
+                pack.status === 'draft' ? (
+                  <SlotPlaceholder
+                    label="Hero artwork 1600×900"
+                    className="absolute inset-y-4 right-4 w-1/3"
+                  />
+                ) : null
+              }
+            />
+            <div className="relative max-w-[62%]">
+              <p className="text-label font-bold uppercase tracking-widest text-stone-300">
+                Curated collection
+              </p>
+              <h1
+                id="curated-pack-heading"
+                ref={heading}
+                tabIndex={-1}
+                className="mt-3 font-serif text-3xl leading-tight tracking-tight text-stone-100 focus:outline-none min-[360px]:text-4xl"
+              >
+                {pack.title}
+              </h1>
+            </div>
+          </div>
+          <p className="mt-5 max-w-prose text-sm leading-relaxed text-stone-300">
             {pack.description}
           </p>
           <p className="mt-3 text-xs text-stone-400">{pack.credit}</p>
           {pack.status === 'draft' && (
-            <p className="mt-5 border-t border-stone-800 pt-4 text-sm leading-relaxed text-stone-400">
-              Collection preview. Film selections and chapters are still being
-              reviewed. Saving films will be available when the collection is
-              ready.
+            <p className="mt-3 text-xs text-stone-400">
+              Preview: selections are under review and saving isn't available
+              yet.
             </p>
           )}
         </header>
@@ -92,7 +113,7 @@ export default function CuratedPackPage({ pack, onClose }) {
           >
             Start here
           </h2>
-          <FilmList films={featured} label="Start here films" rail />
+          <FilmList films={featured} label="Start here films" />
         </section>
         <nav
           aria-label="Collection chapters"
@@ -141,14 +162,22 @@ export default function CuratedPackPage({ pack, onClose }) {
             >
               {chapter.title}
             </h2>
-            <p className="mb-4 mt-2 text-sm leading-relaxed text-stone-400">
+            <PackArt
+              src={chapter.art}
+              className="mt-3 aspect-[2/1] w-full rounded-lg object-cover"
+              placeholder={
+                pack.status === 'draft' ? (
+                  <SlotPlaceholder
+                    label="Chapter artwork 1200×600"
+                    className="mt-3 aspect-[2/1] w-full rounded-lg"
+                  />
+                ) : null
+              }
+            />
+            <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-400">
               {chapter.description}
             </p>
-            <FilmList
-              films={chapter.films}
-              label={`${chapter.title} films`}
-              rail
-            />
+            <FilmList films={chapter.films} label={`${chapter.title} films`} />
             <button
               onClick={() => goToSection('themes')}
               className="min-h-11 text-sm text-stone-400 underline underline-offset-4 hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
@@ -171,7 +200,28 @@ export default function CuratedPackPage({ pack, onClose }) {
           >
             All films
           </h2>
-          <FilmList films={films} />
+          {pack.chapters.map((chapter) => (
+            <div key={chapter.id} className="mb-6">
+              <h3 className="text-label font-bold uppercase tracking-widest text-stone-400">
+                {chapter.title}
+              </h3>
+              <ul className="mt-1 divide-y divide-stone-800">
+                {chapter.films.map((film) => (
+                  <li
+                    key={film.id}
+                    className="flex min-h-11 items-center justify-between gap-4 py-2"
+                  >
+                    <span className="font-serif text-base leading-snug text-stone-100">
+                      {film.title}
+                    </span>
+                    <span className="shrink-0 text-sm text-stone-400">
+                      {film.year}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </section>
         <details className="mt-10 border-t border-stone-800 pt-4 text-sm text-stone-400">
           <summary className="min-h-11 cursor-pointer py-3 text-stone-300">

@@ -96,7 +96,7 @@ export default function CuratedPackPage({
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,#0c0a09_0%,rgba(12,10,9,0.85)_75%,transparent_100%)]"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(12,10,9,0.9)_0%,rgba(12,10,9,0)_65%),linear-gradient(to_right,rgba(12,10,9,0.72)_0%,rgba(12,10,9,0)_72%)]"
             />
             <div className="relative max-w-[62%]">
               <p className="text-label font-bold uppercase tracking-widest text-stone-300">

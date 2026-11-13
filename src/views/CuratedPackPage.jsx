@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
+import FilmList from '../components/curated/FilmRail.jsx';
+import FilmPreview from '../components/curated/FilmPreview.jsx';
 import PackArt from '../components/curated/PackArt.jsx';
 
 const SlotPlaceholder = ({ label, className = '' }) => (
@@ -12,34 +14,36 @@ const SlotPlaceholder = ({ label, className = '' }) => (
   </div>
 );
 
-const FilmList = ({ films, label }) => (
-  <ul
-    aria-label={label}
-    tabIndex={0}
-    className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-  >
-    {films.map((film) => (
-      <li
-        key={film.id}
-        className="w-[clamp(7rem,38vw,8.5rem)] shrink-0 snap-start"
-      >
-        <div
-          title={film.title}
-          className="flex aspect-[2/3] flex-col overflow-hidden rounded-lg border border-stone-800 bg-stone-900 p-3"
-        >
-          <span className="text-label font-bold uppercase tracking-widest text-stone-400">
-            {film.year}
-          </span>
-          <span className="mt-2 line-clamp-5 break-words font-serif text-base leading-snug text-stone-100">
-            {film.title}
-          </span>
-        </div>
-      </li>
-    ))}
-  </ul>
-);
-
 export default function CuratedPackPage({ pack, onClose }) {
+  const [activeFilm, setActiveFilm] = useState(null);
+  const pendingBack = useRef(false);
+  useEffect(() => {
+    const onPop = (event) => {
+      pendingBack.current = false;
+      const id = event.state?.__hearthCuratedFilm;
+      setActiveFilm(
+        pack.chapters
+          .flatMap((chapter) => chapter.films)
+          .find((film) => film.id === id) || null,
+      );
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [pack]);
+  const openFilm = (film, opener) => {
+    if (pendingBack.current) return;
+    opener.focus({ preventScroll: true });
+    window.history.pushState(
+      { ...window.history.state, __hearthCuratedFilm: film.id },
+      '',
+    );
+    setActiveFilm(film);
+  };
+  const closeFilm = () => {
+    if (pendingBack.current) return;
+    pendingBack.current = true;
+    window.history.back();
+  };
   const heading = useRef(null);
   const sectionRefs = useRef({});
   const films = pack.chapters.flatMap((chapter) => chapter.films);
@@ -113,7 +117,11 @@ export default function CuratedPackPage({ pack, onClose }) {
           >
             Start here
           </h2>
-          <FilmList films={featured} label="Start here films" />
+          <FilmList
+            onOpen={openFilm}
+            films={featured}
+            label="Start here films"
+          />
         </section>
         <nav
           aria-label="Collection chapters"
@@ -177,7 +185,11 @@ export default function CuratedPackPage({ pack, onClose }) {
             <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-400">
               {chapter.description}
             </p>
-            <FilmList films={chapter.films} label={`${chapter.title} films`} />
+            <FilmList
+              onOpen={openFilm}
+              films={chapter.films}
+              label={`${chapter.title} films`}
+            />
             <button
               onClick={() => goToSection('themes')}
               className="min-h-11 text-sm text-stone-400 underline underline-offset-4 hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
@@ -207,16 +219,20 @@ export default function CuratedPackPage({ pack, onClose }) {
               </h3>
               <ul className="mt-1 divide-y divide-stone-800">
                 {chapter.films.map((film) => (
-                  <li
-                    key={film.id}
-                    className="flex min-h-11 items-center justify-between gap-4 py-2"
-                  >
-                    <span className="font-serif text-base leading-snug text-stone-100">
-                      {film.title}
-                    </span>
-                    <span className="shrink-0 text-sm text-stone-400">
-                      {film.year}
-                    </span>
+                  <li key={film.id}>
+                    <button
+                      type="button"
+                      aria-label={`${film.title} (${film.year})`}
+                      onClick={(event) => openFilm(film, event.currentTarget)}
+                      className="flex min-h-11 w-full items-center justify-between gap-4 py-2 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+                    >
+                      <span className="font-serif text-base leading-snug text-stone-100">
+                        {film.title}
+                      </span>
+                      <span className="shrink-0 text-sm text-stone-400">
+                        {film.year}
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -232,8 +248,27 @@ export default function CuratedPackPage({ pack, onClose }) {
             includes comedies and comedy-adjacent stories. Chapters and starting
             points are editorial suggestions, not rankings.
           </p>
+          <p className="mt-4 text-xs leading-relaxed">
+            This product uses the TMDB API but is not endorsed or certified by
+            TMDB.
+          </p>
+          <a
+            href="https://www.themoviedb.org"
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-11 items-center underline"
+          >
+            TMDB, movie metadata (opens in a new tab)
+          </a>
         </details>
       </div>
+      {activeFilm && (
+        <FilmPreview
+          key={activeFilm.id}
+          film={activeFilm}
+          onClose={closeFilm}
+        />
+      )}
     </Dialog>
   );
 }

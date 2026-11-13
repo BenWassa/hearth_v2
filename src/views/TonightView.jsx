@@ -212,14 +212,14 @@ const TonightView = ({
   loadTemplateScenario,
   templateScenario,
 }) => {
-  // Draft content is reachable only on the local dev server with an explicit preview URL.
+  // Draft content shows only on the local dev server (hide with ?curatedPreview=0).
   const packs = useMemo(
     () =>
       getCuratedPacks({
         preview:
           import.meta.env.DEV &&
-          new URLSearchParams(window.location.search).get('curatedPreview') ===
-            '1',
+          new URLSearchParams(window.location.search).get('curatedPreview') !==
+            '0',
       }),
     [],
   );

@@ -34,7 +34,7 @@ const travel = async (direction) =>
     await new Promise((resolve) => requestAnimationFrame(resolve));
   });
 const mount = async (preview = true) => {
-  window.history.replaceState(null, '', preview ? '/?curatedPreview=1' : '/');
+  window.history.replaceState(null, '', preview ? '/' : '/?curatedPreview=0');
   const host = document.createElement('div');
   document.body.appendChild(host);
   const root = createRoot(host);

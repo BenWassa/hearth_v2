@@ -1,5 +1,8 @@
 # Black Comedy Excellence — artwork studio status and future Workspace handoff
 
+> **LATEST CREATIVE DECISION — 2026-11-13:** All six Black Comedy Excellence chapter heroes are to be **remade as full-bleed, portrait-oriented film collages** with the **live serif title over a localized dark blur/fade**, without decorative lines or a reserved left-side green text block. The old green-space rules, including the Spoofs 42–45% requirement below, remain historical only and are **superseded for new hero artwork**. Preserve original locked PNGs as archives; the new full-bleed versions require separate approval. **Read [FULL_BLEED_CHAPTER_HERO_DIRECTION.md](FULL_BLEED_CHAPTER_HERO_DIRECTION.md) before generating.** Comic Icons' microphone-led identity must be retained or deliberately reviewed, not replaced with random people. This is creative design, **not app implementation**.
+
+
 **Status:** Creative asset production and review in ChatGPT; **no Hearth app implementation in this workstream**. Updated **2026-11-13**.
 
 **Tracking:** [Artwork-only issue #62](https://github.com/BenWassa/hearth_v2/issues/62) · [Parent product / future Workspace implementation #55](https://github.com/BenWassa/hearth_v2/issues/55) · [Draft planning PR #56](https://github.com/BenWassa/hearth_v2/pull/56).

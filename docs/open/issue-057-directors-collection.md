@@ -1,4 +1,4 @@
-# Issue #57 — The Directors collection
+> **CURRENT STATUS (2026-11-13): Technical foundation in draft PR #58, NOT the approved UX.** The owner later approved Legendary Directors with a static Essential 10, Watch Next, IMDb/RT in ranked rows, an in-centre details modal, individually sourced portraits and authentic signatures. See the [parent issue](https://github.com/BenWassa/hearth_v2/issues/57), [editorial issue #60](https://github.com/BenWassa/hearth_v2/issues/60), [art issue #61](https://github.com/BenWassa/hearth_v2/issues/61) and current [blueprint](../collections/directors/DIRECTORS_COLLECTION_BLUEPRINT.md). Earlier paragraphs below are a dated implementation ledger, not authorization to ship the older design. CI passed previously for the older implementation; full revalidation remains due. The BE editorial shell in draft PR #59 conflicts on Tonight/Collections shared files and needs coordination.\n\n# Issue #57 — The Directors collection
 
 **Issue:** https://github.com/BenWassa/hearth_v2/issues/57  
 **Branch:** `feat/directors-collection-57`  

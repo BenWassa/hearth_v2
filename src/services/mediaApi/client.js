@@ -176,6 +176,9 @@ export const getSeasonEpisodes = async ({
   return getJson(`/api/media/${provider}/${providerId}/season/${seasonNumber}`);
 };
 
+export const getDirectorDetails = async (personId) =>
+  getJson(`/api/directors/${encodeURIComponent(String(personId))}`);
+
 export const getCollectionDetails = async ({
   provider = 'tmdb',
   providerId,

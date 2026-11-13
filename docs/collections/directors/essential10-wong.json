@@ -8,10 +8,10 @@
     "tmdbPersonId": 12453,
     "imdbNameId": "nm0939182"
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "listLength": 8,
   "scoreSources": {
     "imdb": {
@@ -65,10 +65,52 @@
         "position": "5",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Two neighbours in 1962 Hong Kong, their restraint conveyed through repeated passages, slow motion and a recurring musical theme; fifth in the 2022 Sight and Sound poll and first on both IMDb (8.0 from 192,928 votes) and RT review count (191)."
+      "rationale": "Two neighbours in 1962 Hong Kong, their restraint conveyed through repeated passages, slow motion and a recurring musical theme; fifth in the 2022 Sight and Sound poll and first on both IMDb (8.0 from 192,928 votes) and RT review count (191).",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 2.0,
+        "combined": 1.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 2,
+      "signature": true,
+      "title": "Fallen Angels",
+      "originalTitle": "Do lok tin si",
+      "year": 1995,
+      "tmdbId": 11220,
+      "imdbId": "tt0112913",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.5,
+        "votes": 62011,
+        "url": "https://www.imdb.com/title/tt0112913/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 95,
+        "reviews": 22,
+        "url": "https://www.rottentomatoes.com/m/fallen_angels_hong_kong",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1995,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Originally conceived as a third story for Chungking Express, then made as a separate film, shot with ultra-wide lenses and neon, at 95% on RT (22 reviews) and 7.5 from 62,011 IMDb votes.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 4.0,
+        "rtRank": 1.0,
+        "combined": 3.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 3,
       "signature": true,
       "title": "Chungking Express",
       "originalTitle": "Chung Hing sam lam",
@@ -96,11 +138,18 @@
         "position": "=88",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Two interlocking stories of lovesick Hong Kong policemen shot in handheld bursts and step-printed colour, made quickly between larger projects; second on IMDb (7.9 from 115,106 votes) and the film that made his style widely imitated."
+      "rationale": "Two interlocking stories of lovesick Hong Kong policemen shot in handheld bursts and step-printed colour, made quickly between larger projects; second on IMDb (7.9 from 115,106 votes) and the film that made his style widely imitated.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 2.0,
+        "rtRank": 4.0,
+        "combined": 4.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 3,
-      "signature": true,
+      "rank": 4,
+      "signature": false,
       "title": "Days of Being Wild",
       "originalTitle": "Ah fei jing juen",
       "year": 1990,
@@ -126,10 +175,17 @@
         "rtYearNote": "RT page shows 1991."
       },
       "sightAndSound2022": null,
-      "rationale": "The first full statement of his themes and visual manner (1960s Hong Kong, missed connections, cinematography by Christopher Doyle) that In the Mood for Love later continues; 91% on RT from 32 reviews."
+      "rationale": "The first full statement of his themes and visual manner (1960s Hong Kong, missed connections, cinematography by Christopher Doyle) that In the Mood for Love later continues; 91% on RT from 32 reviews.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 3.0,
+        "combined": 4.5,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 4,
+      "rank": 5,
       "signature": false,
       "title": "Happy Together",
       "originalTitle": "Chun gwong ja sit",
@@ -159,10 +215,17 @@
         "position": "=225",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A volatile relationship between two Hong Kong men in Buenos Aires, filmed in saturated colour and black and white; Best Director at Cannes 1997."
+      "rationale": "A volatile relationship between two Hong Kong men in Buenos Aires, filmed in saturated colour and black and white; Best Director at Cannes 1997.",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 6.0,
+        "combined": 5.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 5,
+      "rank": 6,
       "signature": false,
       "title": "2046",
       "originalTitle": "2046",
@@ -187,35 +250,14 @@
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "A sequel in spirit to In the Mood for Love, folding a science-fiction story into the memory of a writer; 7.4 on IMDb from 65,225 votes and 87% from 119 RT reviews."
-    },
-    {
-      "rank": 6,
-      "signature": false,
-      "title": "Fallen Angels",
-      "originalTitle": "Do lok tin si",
-      "year": 1995,
-      "tmdbId": 11220,
-      "imdbId": "tt0112913",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.5,
-        "votes": 62011,
-        "url": "https://www.imdb.com/title/tt0112913/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 95,
-        "reviews": 22,
-        "url": "https://www.rottentomatoes.com/m/fallen_angels_hong_kong",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1995,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "Originally conceived as a third story for Chungking Express, then made as a separate film, shot with ultra-wide lenses and neon, at 95% on RT (22 reviews) and 7.5 from 62,011 IMDb votes."
+      "rationale": "A sequel in spirit to In the Mood for Love, folding a science-fiction story into the memory of a writer; 7.4 on IMDb from 65,225 votes and 87% from 119 RT reviews.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 5.0,
+        "combined": 2.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 7,
@@ -254,7 +296,14 @@
         }
       },
       "sightAndSound2022": null,
-      "rationale": "His wuxia anti-epic, a swordsman's tale of memory and regret that reinvented the genre's look; evidence for the original is thin on RT, so the 2008 Redux figure (78% from 78 reviews) is shown separately."
+      "rationale": "His wuxia anti-epic, a swordsman's tale of memory and regret that reinvented the genre's look; evidence for the original is thin on RT, so the 2008 Redux figure (78% from 78 reviews) is shown separately.",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 7.0,
+        "rtRank": null,
+        "combined": 7.0,
+        "rtUsed": false
+      }
     },
     {
       "rank": 8,
@@ -284,7 +333,14 @@
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "A kung fu film about Ip Man and the end of an era, with fight choreography treated as portraiture; Oscar-nominated for cinematography and 78% from 139 reviews. The weakest IMDb score in the list (6.6), kept as his one large-scale later film."
+      "rationale": "A kung fu film about Ip Man and the end of an era, with fight choreography treated as portraiture; Oscar-nominated for cinematography and 78% from 139 reviews. The weakest IMDb score in the list (6.6), kept as his one large-scale later film.",
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 8.0,
+        "rtRank": 7.0,
+        "combined": 7.5,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -329,5 +385,7 @@
     "Ashes of Time: 1994 original (TMDB 40751) is ranked with IMDb 7.0; its RT page has only 3 reviews so RT is null for the original and the 2008 Redux page (78% from 78) is recorded separately. They are different cuts.",
     "IMDb has one Ashes of Time entry (tt0109688) with no separate Redux title, so its 7.0 / 18,532 votes may blend both cuts.",
     "TMDB credits for Wong include shorts, commercials, an anthology segment and several 2021-2025 entries (for example 'In the Mood for Love 2001', TMDB 1430370, which looks like a re-release listing) that were not examined individually; none was treated as a separate feature."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

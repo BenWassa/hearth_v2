@@ -8,10 +8,10 @@
     "tmdbPersonId": 6817,
     "imdbNameId": "nm0889513"
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "listLength": 9,
   "scoreSources": {
     "imdb": {
@@ -37,6 +37,154 @@
     {
       "rank": 1,
       "signature": true,
+      "title": "The Beaches of Agnès",
+      "originalTitle": "Les plages d'Agnès",
+      "year": 2008,
+      "tmdbId": 38879,
+      "imdbId": "tt1129435",
+      "format": "documentary",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Documentary (autobiographical essay).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 5463,
+        "url": "https://www.imdb.com/title/tt1129435/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 71,
+        "url": "https://www.rottentomatoes.com/m/les-plages-dagnes",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2008,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A self-portrait told through mirrors, beaches and staged memories; the highest IMDb rating in the nine (8.0, from 5,463 votes), with 97% from 71 RT reviews.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 4.0,
+        "combined": 4.25,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Faces Places",
+      "originalTitle": "Visages villages",
+      "year": 2017,
+      "tmdbId": 451995,
+      "imdbId": "tt5598102",
+      "format": "documentary",
+      "directorCreditNote": "Co-directed: TMDB lists JR (person 226050) as a second director. Credited as director in the TMDB Directing section and on the film page (roles shown: Director, Writer). Documentary, co-directed with the artist JR (TMDB person 226050). TMDB, IMDb and RT all list both directors. Flagged: a joint credit.",
+      "alternateTitles": [
+        "Visages Villages"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 14608,
+        "url": "https://www.imdb.com/title/tt5598102/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 99,
+        "reviews": 143,
+        "url": "https://www.rottentomatoes.com/m/faces_places",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2017,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A road film in which Varda and JR paste portraits on village walls; Oscar-nominated for Best Documentary Feature and the strongest critic result of the list (99% from 143 reviews).",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 2.5,
+        "rtRank": 3.0,
+        "combined": 3.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Vagabond",
+      "originalTitle": "Sans toit ni loi",
+      "year": 1985,
+      "tmdbId": 44018,
+      "imdbId": "tt0089960",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 16290,
+        "url": "https://www.imdb.com/title/tt0089960/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 26,
+        "url": "https://www.rottentomatoes.com/m/vagabond",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1985,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=101",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "A young drifter's last weeks reconstructed from the testimony of people who met her; Golden Lion at Venice 1985 and 100% from 26 RT reviews.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 6.0,
+        "rtRank": 1.5,
+        "combined": 4.5,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Daguerréotypes",
+      "originalTitle": "Daguerréotypes",
+      "year": 1975,
+      "tmdbId": 49650,
+      "imdbId": "tt0071384",
+      "format": "documentary",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Documentary. Year conflict: TMDB 1978, RT 1976, IMDb 1975.",
+      "alternateTitles": [
+        "Daguerreotypes"
+      ],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 2362,
+        "url": "https://www.imdb.com/title/tt0071384/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 11,
+        "url": "https://www.rottentomatoes.com/m/daguerreotypes",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1976,
+        "rtYearNote": "RT page shows 1976 (US or festival release year); the ledger uses the original release year."
+      },
+      "sightAndSound2022": null,
+      "rationale": "A portrait of the shopkeepers on her own street, Rue Daguerre; the template for the observational documentary mode she returned to for forty years. Evidence is thin (2,362 IMDb votes, 11 RT reviews).",
+      "tmdbYear": 1978,
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 6.0,
+        "rtRank": 1.5,
+        "combined": 2.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
+      "signature": false,
       "title": "Cléo from 5 to 7",
       "originalTitle": "Cléo de 5 à 7",
       "year": 1962,
@@ -65,42 +213,18 @@
         "position": "14",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A singer awaits a medical result across ninety minutes of Paris afternoon, in near real time; the highest-placed Varda in the 2022 Sight and Sound poll (14th) and her most-watched film on IMDb (32,645 votes)."
+      "rationale": "A singer awaits a medical result across ninety minutes of Paris afternoon, in near real time; the highest-placed Varda in the 2022 Sight and Sound poll (14th) and her most-watched film on IMDb (32,645 votes).",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 2.5,
+        "rtRank": 6.0,
+        "combined": 6.0,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 2,
-      "signature": true,
-      "title": "Vagabond",
-      "originalTitle": "Sans toit ni loi",
-      "year": 1985,
-      "tmdbId": 44018,
-      "imdbId": "tt0089960",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.6,
-        "votes": 16290,
-        "url": "https://www.imdb.com/title/tt0089960/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 26,
-        "url": "https://www.rottentomatoes.com/m/vagabond",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1985,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": {
-        "position": "=101",
-        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
-      },
-      "rationale": "A young drifter's last weeks reconstructed from the testimony of people who met her; Golden Lion at Venice 1985 and 100% from 26 RT reviews."
-    },
-    {
-      "rank": 3,
-      "signature": true,
+      "rank": 6,
+      "signature": false,
       "title": "The Gleaners and I",
       "originalTitle": "Les glaneurs et la glaneuse",
       "year": 2000,
@@ -129,40 +253,17 @@
         "position": "=67",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A documentary essay on foragers and waste that made her own filming a subject; =67 in the 2022 Sight and Sound poll and 95% from 44 RT reviews."
+      "rationale": "A documentary essay on foragers and waste that made her own filming a subject; =67 in the 2022 Sight and Sound poll and 95% from 44 RT reviews.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 4.0,
+        "rtRank": 5.0,
+        "combined": 2.5,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 4,
-      "signature": false,
-      "title": "Faces Places",
-      "originalTitle": "Visages villages",
-      "year": 2017,
-      "tmdbId": 451995,
-      "imdbId": "tt5598102",
-      "format": "documentary",
-      "directorCreditNote": "Co-directed: TMDB lists JR (person 226050) as a second director. Credited as director in the TMDB Directing section and on the film page (roles shown: Director, Writer). Documentary, co-directed with the artist JR (TMDB person 226050). TMDB, IMDb and RT all list both directors. Flagged: a joint credit.",
-      "alternateTitles": [
-        "Visages Villages"
-      ],
-      "imdb": {
-        "rating": 7.8,
-        "votes": 14608,
-        "url": "https://www.imdb.com/title/tt5598102/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 99,
-        "reviews": 143,
-        "url": "https://www.rottentomatoes.com/m/faces_places",
-        "readOn": "2026-11-13",
-        "rtListedYear": 2017,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "A road film in which Varda and JR paste portraits on village walls; Oscar-nominated for Best Documentary Feature and the strongest critic result of the list (99% from 143 reviews)."
-    },
-    {
-      "rank": 5,
+      "rank": 7,
       "signature": false,
       "title": "Le Bonheur",
       "originalTitle": "Le bonheur",
@@ -192,99 +293,17 @@
         "position": "=152",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A sunlit story of a happy marriage that turns disturbing by form alone; =152 in the 2022 Sight and Sound poll and the best-known of her 1960s fiction after Cléo."
-    },
-    {
-      "rank": 6,
-      "signature": false,
-      "title": "The Beaches of Agnès",
-      "originalTitle": "Les plages d'Agnès",
-      "year": 2008,
-      "tmdbId": 38879,
-      "imdbId": "tt1129435",
-      "format": "documentary",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Documentary (autobiographical essay).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.0,
-        "votes": 5463,
-        "url": "https://www.imdb.com/title/tt1129435/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 97,
-        "reviews": 71,
-        "url": "https://www.rottentomatoes.com/m/les-plages-dagnes",
-        "readOn": "2026-11-13",
-        "rtListedYear": 2008,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "A self-portrait told through mirrors, beaches and staged memories; the highest IMDb rating in the nine (8.0, from 5,463 votes), with 97% from 71 RT reviews."
-    },
-    {
-      "rank": 7,
-      "signature": false,
-      "title": "La Pointe Courte",
-      "originalTitle": "La Pointe-Courte",
-      "year": 1955,
-      "tmdbId": 54436,
-      "imdbId": "tt0048499",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.0,
-        "votes": 5030,
-        "url": "https://www.imdb.com/title/tt0048499/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": null,
-        "reviews": 4,
-        "url": "https://www.rottentomatoes.com/m/la_pointe_courte_1955",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1956,
-        "rtYearNote": "RT shows 4 reviews and no Tomatometer yet. TMDB and RT list 1956; IMDb and the roster proposal list 1955.",
-        "reason": "RT has not published a Tomatometer for this page (only 4 reviews read)."
-      },
-      "sightAndSound2022": null,
-      "rationale": "Her debut, a married couple's quarrel set against a fishing village, edited by Alain Resnais and widely seen as an advance sign of the French New Wave.",
-      "tmdbYear": 1956
+      "rationale": "A sunlit story of a happy marriage that turns disturbing by form alone; =152 in the 2022 Sight and Sound poll and the best-known of her 1960s fiction after Cléo.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 6.0,
+        "rtRank": null,
+        "combined": 9.0,
+        "rtUsed": false
+      }
     },
     {
       "rank": 8,
-      "signature": false,
-      "title": "Daguerréotypes",
-      "originalTitle": "Daguerréotypes",
-      "year": 1975,
-      "tmdbId": 49650,
-      "imdbId": "tt0071384",
-      "format": "documentary",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Documentary. Year conflict: TMDB 1978, RT 1976, IMDb 1975.",
-      "alternateTitles": [
-        "Daguerreotypes"
-      ],
-      "imdb": {
-        "rating": 7.6,
-        "votes": 2362,
-        "url": "https://www.imdb.com/title/tt0071384/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 11,
-        "url": "https://www.rottentomatoes.com/m/daguerreotypes",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1976,
-        "rtYearNote": "RT page shows 1976 (US or festival release year); the ledger uses the original release year."
-      },
-      "sightAndSound2022": null,
-      "rationale": "A portrait of the shopkeepers on her own street, Rue Daguerre; the template for the observational documentary mode she returned to for forty years. Evidence is thin (2,362 IMDb votes, 11 RT reviews).",
-      "tmdbYear": 1978
-    },
-    {
-      "rank": 9,
       "signature": false,
       "title": "One Sings, the Other Doesn't",
       "originalTitle": "L'une chante, l'autre pas",
@@ -311,7 +330,51 @@
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "Two women's friendship over some fifteen years, linked to the women's movement and abortion rights; the clearest statement of her political fiction, though only 65% on RT."
+      "rationale": "Two women's friendship over some fifteen years, linked to the women's movement and abortion rights; the clearest statement of her political fiction, though only 65% on RT.",
+      "editorialRank": 9,
+      "scoreRanks": {
+        "imdbRank": 8.0,
+        "rtRank": 7.0,
+        "combined": 3.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "La Pointe Courte",
+      "originalTitle": "La Pointe-Courte",
+      "year": 1955,
+      "tmdbId": 54436,
+      "imdbId": "tt0048499",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.0,
+        "votes": 5030,
+        "url": "https://www.imdb.com/title/tt0048499/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": null,
+        "reviews": 4,
+        "url": "https://www.rottentomatoes.com/m/la_pointe_courte_1955",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1956,
+        "rtYearNote": "RT shows 4 reviews and no Tomatometer yet. TMDB and RT list 1956; IMDb and the roster proposal list 1955.",
+        "reason": "RT has not published a Tomatometer for this page (only 4 reviews read)."
+      },
+      "sightAndSound2022": null,
+      "rationale": "Her debut, a married couple's quarrel set against a fishing village, edited by Alain Resnais and widely seen as an advance sign of the French New Wave.",
+      "tmdbYear": 1956,
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 9.0,
+        "rtRank": null,
+        "combined": 7.5,
+        "rtUsed": false
+      }
     }
   ],
   "nearMisses": [
@@ -364,5 +427,7 @@
     "La Pointe Courte has no Tomatometer on RT (4 reviews): null with reason, not zero.",
     "Varda by Agnès (2019) could not be cleanly tied to an IMDb feature entry (IMDb lists it as a miniseries, tt9530198, 7.8 from 2,872 votes, plus a separate tt43684922 'Causerie' entry), so it is a reserve rather than a ranked film.",
     "The IMDb dataset marks The Gleaners and I as the 2000 film; the two-years-later follow-up (TMDB 84026) is a separate short film."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

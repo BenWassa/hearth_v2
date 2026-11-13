@@ -7,10 +7,10 @@
     "name": "Martin Scorsese",
     "tmdbPersonId": 1032
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "scoreSources": {
     "imdb": {
       "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
@@ -52,167 +52,18 @@
         "rtListedYear": 1990,
         "rtYearNote": null
       },
-      "rationale": "A gangster life told from inside, with voice-over, freeze-frames and the Copacabana tracking shot turned into a method of narration; the highest IMDb rating in his filmography and the most-cited example of his editing with Thelma Schoonmaker."
+      "rationale": "A gangster life told from inside, with voice-over, freeze-frames and the Copacabana tracking shot turned into a method of narration; the highest IMDb rating in his filmography and the most-cited example of his editing with Thelma Schoonmaker.",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 2.5,
+        "combined": 1.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 2,
       "signature": true,
-      "title": "Taxi Driver",
-      "originalTitle": "Taxi Driver",
-      "year": 1976,
-      "tmdbId": 103,
-      "imdbId": "tt0075314",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.2,
-        "votes": 1048567,
-        "url": "https://www.imdb.com/title/tt0075314/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 89,
-        "reviews": 163,
-        "url": "https://www.rottentomatoes.com/m/taxi_driver",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1976,
-        "rtYearNote": null
-      },
-      "rationale": "Palme d'Or winner that turns a city at night into a character's mental state; defining 1970s American film and the template for the alienated urban protagonist."
-    },
-    {
-      "rank": 3,
-      "signature": true,
-      "title": "Raging Bull",
-      "originalTitle": "Raging Bull",
-      "year": 1980,
-      "tmdbId": 1578,
-      "imdbId": "tt0081398",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.1,
-        "votes": 416403,
-        "url": "https://www.imdb.com/title/tt0081398/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 92,
-        "reviews": 151,
-        "url": "https://www.rottentomatoes.com/m/raging_bull",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1980,
-        "rtYearNote": null
-      },
-      "rationale": "Boxing biography staged as the self-destruction of a man and filmed in black and white with subjective, stylised fight sequences; regularly named among the best American films of the 1980s."
-    },
-    {
-      "rank": 4,
-      "signature": false,
-      "title": "Mean Streets",
-      "originalTitle": "Mean Streets",
-      "year": 1973,
-      "tmdbId": 203,
-      "imdbId": "tt0070379",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.1,
-        "votes": 130484,
-        "url": "https://www.imdb.com/title/tt0070379/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 92,
-        "reviews": 75,
-        "url": "https://www.rottentomatoes.com/m/mean_streets",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1973,
-        "rtYearNote": null
-      },
-      "rationale": "The breakthrough film: a personal, hand-held, rock-scored view of small-time criminals and Catholic guilt that fixed his themes and style; strong Tomatometer but the lowest IMDb rating in the ten (7.1)."
-    },
-    {
-      "rank": 5,
-      "signature": false,
-      "title": "The Departed",
-      "originalTitle": "The Departed",
-      "year": 2006,
-      "tmdbId": 1422,
-      "imdbId": "tt0407887",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.5,
-        "votes": 1590164,
-        "url": "https://www.imdb.com/title/tt0407887/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 91,
-        "reviews": 286,
-        "url": "https://www.rottentomatoes.com/m/departed",
-        "readOn": "2026-11-13",
-        "rtListedYear": 2006,
-        "rtYearNote": null
-      },
-      "rationale": "A tightly plotted crime thriller adapted from a Hong Kong film, and the work that brought him the Best Director and Best Picture Oscars; very high on both evidence lines."
-    },
-    {
-      "rank": 6,
-      "signature": false,
-      "title": "The King of Comedy",
-      "originalTitle": "The King of Comedy",
-      "year": 1982,
-      "tmdbId": 262,
-      "imdbId": "tt0085794",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.8,
-        "votes": 136588,
-        "url": "https://www.imdb.com/title/tt0085794/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 89,
-        "reviews": 71,
-        "url": "https://www.rottentomatoes.com/m/1011623-king_of_comedy",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1983,
-        "rtYearNote": "RT lists 1983 (US release); TMDB and the original release are 1982. WARNING: RT /m/1099397-king_of_comedy is a different 2007 film."
-      },
-      "rationale": "A discomforting comedy of fame and obsession, misunderstood at release and now widely seen as prescient; a formal departure from his crime films."
-    },
-    {
-      "rank": 7,
-      "signature": false,
-      "title": "Casino",
-      "originalTitle": "Casino",
-      "year": 1995,
-      "tmdbId": 524,
-      "imdbId": "tt0112641",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.2,
-        "votes": 631744,
-        "url": "https://www.imdb.com/title/tt0112641/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 78,
-        "reviews": 73,
-        "url": "https://www.rottentomatoes.com/m/1067987-casino",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1995,
-        "rtYearNote": null
-      },
-      "rationale": "Three-hour Las Vegas epic that pushes his GoodFellas methods (voice-over, montage, fast editing) toward operatic scale; high audience standing, mixed critic score, so kept below the films that score on both lines."
-    },
-    {
-      "rank": 8,
-      "signature": false,
       "title": "The Last Waltz",
       "originalTitle": "The Last Waltz",
       "year": 1978,
@@ -239,7 +90,212 @@
       "rationale": "Concert documentary of The Band's farewell show, shot by a team of leading cinematographers and treated as a feature with staged interviews; the closest thing in his work to a pure formal experiment in capturing performance.",
       "flags": [
         "documentary"
-      ]
+      ],
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 1.0,
+        "combined": 6.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "The Departed",
+      "originalTitle": "The Departed",
+      "year": 2006,
+      "tmdbId": 1422,
+      "imdbId": "tt0407887",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.5,
+        "votes": 1590164,
+        "url": "https://www.imdb.com/title/tt0407887/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 286,
+        "url": "https://www.rottentomatoes.com/m/departed",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2006,
+        "rtYearNote": null
+      },
+      "rationale": "A tightly plotted crime thriller adapted from a Hong Kong film, and the work that brought him the Best Director and Best Picture Oscars; very high on both evidence lines.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 2.0,
+        "rtRank": 6.0,
+        "combined": 5.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Raging Bull",
+      "originalTitle": "Raging Bull",
+      "year": 1980,
+      "tmdbId": 1578,
+      "imdbId": "tt0081398",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 416403,
+        "url": "https://www.imdb.com/title/tt0081398/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 92,
+        "reviews": 151,
+        "url": "https://www.rottentomatoes.com/m/raging_bull",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1980,
+        "rtYearNote": null
+      },
+      "rationale": "Boxing biography staged as the self-destruction of a man and filmed in black and white with subjective, stylised fight sequences; regularly named among the best American films of the 1980s.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 4.5,
+        "combined": 7.25,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Killers of the Flower Moon",
+      "originalTitle": "Killers of the Flower Moon",
+      "year": 2023,
+      "tmdbId": 466420,
+      "imdbId": "tt5537002",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.5,
+        "votes": 316591,
+        "url": "https://www.imdb.com/title/tt5537002/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 93,
+        "reviews": 476,
+        "url": "https://www.rottentomatoes.com/m/killers_of_the_flower_moon",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2023,
+        "rtYearNote": null
+      },
+      "rationale": "A late-career crime film about the murders of Osage people in 1920s Oklahoma, told with a slow, moral pace and a collaboration with editor Thelma Schoonmaker; the strongest recent film and the closest call (see below).",
+      "editorialRank": 10,
+      "scoreRanks": {
+        "imdbRank": 9.0,
+        "rtRank": 2.5,
+        "combined": 4.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Taxi Driver",
+      "originalTitle": "Taxi Driver",
+      "year": 1976,
+      "tmdbId": 103,
+      "imdbId": "tt0075314",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 1048567,
+        "url": "https://www.imdb.com/title/tt0075314/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 89,
+        "reviews": 163,
+        "url": "https://www.rottentomatoes.com/m/taxi_driver",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1976,
+        "rtYearNote": null
+      },
+      "rationale": "Palme d'Or winner that turns a city at night into a character's mental state; defining 1970s American film and the template for the alienated urban protagonist.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 8.5,
+        "combined": 7.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Casino",
+      "originalTitle": "Casino",
+      "year": 1995,
+      "tmdbId": 524,
+      "imdbId": "tt0112641",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 631744,
+        "url": "https://www.imdb.com/title/tt0112641/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 78,
+        "reviews": 73,
+        "url": "https://www.rottentomatoes.com/m/1067987-casino",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1995,
+        "rtYearNote": null
+      },
+      "rationale": "Three-hour Las Vegas epic that pushes his GoodFellas methods (voice-over, montage, fast editing) toward operatic scale; high audience standing, mixed critic score, so kept below the films that score on both lines.",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 10.0,
+        "combined": 6.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "Mean Streets",
+      "originalTitle": "Mean Streets",
+      "year": 1973,
+      "tmdbId": 203,
+      "imdbId": "tt0070379",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.1,
+        "votes": 130484,
+        "url": "https://www.imdb.com/title/tt0070379/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 92,
+        "reviews": 75,
+        "url": "https://www.rottentomatoes.com/m/mean_streets",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1973,
+        "rtYearNote": null
+      },
+      "rationale": "The breakthrough film: a personal, hand-held, rock-scored view of small-time criminals and Catholic guilt that fixed his themes and style; strong Tomatometer but the lowest IMDb rating in the ten (7.1).",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 10.0,
+        "rtRank": 4.5,
+        "combined": 3.25,
+        "rtUsed": true
+      }
     },
     {
       "rank": 9,
@@ -265,33 +321,47 @@
         "rtListedYear": 1985,
         "rtYearNote": "WARNING: IMDb tt0086858 is an unrelated 1985 short with the same title; tt0088680 is Scorsese's film."
       },
-      "rationale": "A nightmare-comedy of one night downtown, made at speed on a low budget after a failed project; a showcase of invention in framing and pacing and a favourite of critics."
+      "rationale": "A nightmare-comedy of one night downtown, made at speed on a low budget after a failed project; a showcase of invention in framing and pacing and a favourite of critics.",
+      "editorialRank": 9,
+      "scoreRanks": {
+        "imdbRank": 8.0,
+        "rtRank": 7.0,
+        "combined": 7.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 10,
       "signature": false,
-      "title": "Killers of the Flower Moon",
-      "originalTitle": "Killers of the Flower Moon",
-      "year": 2023,
-      "tmdbId": 466420,
-      "imdbId": "tt5537002",
+      "title": "The King of Comedy",
+      "originalTitle": "The King of Comedy",
+      "year": 1982,
+      "tmdbId": 262,
+      "imdbId": "tt0085794",
       "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
       "alternateTitles": [],
       "imdb": {
-        "rating": 7.5,
-        "votes": 316591,
-        "url": "https://www.imdb.com/title/tt5537002/",
+        "rating": 7.8,
+        "votes": 136588,
+        "url": "https://www.imdb.com/title/tt0085794/",
         "readOn": "2026-11-13"
       },
       "rt": {
-        "tomatometer": 93,
-        "reviews": 476,
-        "url": "https://www.rottentomatoes.com/m/killers_of_the_flower_moon",
+        "tomatometer": 89,
+        "reviews": 71,
+        "url": "https://www.rottentomatoes.com/m/1011623-king_of_comedy",
         "readOn": "2026-11-13",
-        "rtListedYear": 2023,
-        "rtYearNote": null
+        "rtListedYear": 1983,
+        "rtYearNote": "RT lists 1983 (US release); TMDB and the original release are 1982. WARNING: RT /m/1099397-king_of_comedy is a different 2007 film."
       },
-      "rationale": "A late-career crime film about the murders of Osage people in 1920s Oklahoma, told with a slow, moral pace and a collaboration with editor Thelma Schoonmaker; the strongest recent film and the closest call (see below)."
+      "rationale": "A discomforting comedy of fame and obsession, misunderstood at release and now widely seen as prescient; a formal departure from his crime films.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 7.0,
+        "rtRank": 8.5,
+        "combined": 5.75,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -463,5 +533,7 @@
     "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
     "Shutter Island RT review count was 260 on the page read and 262 in a search-result snapshot the same day; 260 is recorded.",
     "RT numbers for The King of Comedy, After Hours, The Age of Innocence, Casino, The Last Waltz and Shutter Island matched the percentage and count shown in search-result summaries as well as the film page; the Scorsese celebrity page on RT only showed recent titles, so the celebrity-table cross-check used for Kubrick, Miyazaki and Bong was not possible for most of Scorsese's list."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

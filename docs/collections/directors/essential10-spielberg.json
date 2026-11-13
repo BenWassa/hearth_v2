@@ -7,10 +7,10 @@
     "name": "Steven Spielberg",
     "tmdbPersonId": 488
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "scoreSources": {
     "imdb": {
       "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
@@ -50,65 +50,51 @@
         "rtListedYear": 1993,
         "rtYearNote": null
       },
-      "rationale": "The Holocaust told in black and white with restraint and documentary-like images; won the Oscars for Best Picture and Best Director and the highest IMDb rating (9.0) in this lane."
+      "rationale": "The Holocaust told in black and white with restraint and documentary-like images; won the Oscars for Best Picture and Best Director and the highest IMDb rating (9.0) in this lane.",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 2.0,
+        "combined": 1.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 2,
       "signature": true,
-      "title": "Jaws",
-      "originalTitle": "Jaws",
-      "year": 1975,
-      "tmdbId": 578,
-      "imdbId": "tt0073195",
+      "title": "Saving Private Ryan",
+      "originalTitle": "Saving Private Ryan",
+      "year": 1998,
+      "tmdbId": 857,
+      "imdbId": "tt0120815",
       "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
       "alternateTitles": [],
       "imdb": {
-        "rating": 8.1,
-        "votes": 754342,
-        "url": "https://www.imdb.com/title/tt0073195/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 97,
-        "reviews": 178,
-        "url": "https://www.rottentomatoes.com/m/jaws",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1975,
-        "rtYearNote": null
-      },
-      "rationale": "A thriller built around the absence of the shark, with edited point of view and John Williams's score; widely credited as the first summer blockbuster and the clearest demonstration of his command of suspense."
-    },
-    {
-      "rank": 3,
-      "signature": true,
-      "title": "Raiders of the Lost Ark",
-      "originalTitle": "Raiders of the Lost Ark",
-      "year": 1981,
-      "tmdbId": 85,
-      "imdbId": "tt0082971",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [
-        "Indiana Jones and the Raiders of the Lost Ark"
-      ],
-      "imdb": {
-        "rating": 8.4,
-        "votes": 1125699,
-        "url": "https://www.imdb.com/title/tt0082971/",
+        "rating": 8.6,
+        "votes": 1672798,
+        "url": "https://www.imdb.com/title/tt0120815/",
         "readOn": "2026-11-13"
       },
       "rt": {
         "tomatometer": 94,
-        "reviews": 157,
-        "url": "https://www.rottentomatoes.com/m/raiders_of_the_lost_ark",
+        "reviews": 147,
+        "url": "https://www.rottentomatoes.com/m/saving_private_ryan",
         "readOn": "2026-11-13",
-        "rtListedYear": 1981,
+        "rtListedYear": 1998,
         "rtYearNote": null
       },
-      "rationale": "Serial adventure rebuilt with modern staging; the standard for action-adventure choreography and clarity, with strong scores on both sources."
+      "rationale": "The D-Day landing sequence changed how battle is filmed (handheld camera, desaturated colour, sound design); second-highest IMDb rating in the lane (8.6) and a Best Director Oscar.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 2.0,
+        "rtRank": 5.5,
+        "combined": 4.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 4,
-      "signature": false,
+      "rank": 3,
+      "signature": true,
       "title": "E.T. the Extra-Terrestrial",
       "originalTitle": "E.T. the Extra-Terrestrial",
       "year": 1982,
@@ -132,61 +118,115 @@
         "rtListedYear": 1982,
         "rtYearNote": null
       },
-      "rationale": "A suburban science-fiction fable told largely at a child's eye level; the highest Tomatometer in the lane (99%) and a defining popular film."
+      "rationale": "A suburban science-fiction fable told largely at a child's eye level; the highest Tomatometer in the lane (99%) and a defining popular film.",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 7.0,
+        "rtRank": 1.0,
+        "combined": 4.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 5,
+      "rank": 4,
       "signature": false,
-      "title": "Saving Private Ryan",
-      "originalTitle": "Saving Private Ryan",
-      "year": 1998,
-      "tmdbId": 857,
-      "imdbId": "tt0120815",
+      "title": "Raiders of the Lost Ark",
+      "originalTitle": "Raiders of the Lost Ark",
+      "year": 1981,
+      "tmdbId": 85,
+      "imdbId": "tt0082971",
       "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
+      "alternateTitles": [
+        "Indiana Jones and the Raiders of the Lost Ark"
+      ],
       "imdb": {
-        "rating": 8.6,
-        "votes": 1672798,
-        "url": "https://www.imdb.com/title/tt0120815/",
+        "rating": 8.4,
+        "votes": 1125699,
+        "url": "https://www.imdb.com/title/tt0082971/",
         "readOn": "2026-11-13"
       },
       "rt": {
         "tomatometer": 94,
-        "reviews": 147,
-        "url": "https://www.rottentomatoes.com/m/saving_private_ryan",
+        "reviews": 157,
+        "url": "https://www.rottentomatoes.com/m/raiders_of_the_lost_ark",
         "readOn": "2026-11-13",
-        "rtListedYear": 1998,
+        "rtListedYear": 1981,
         "rtYearNote": null
       },
-      "rationale": "The D-Day landing sequence changed how battle is filmed (handheld camera, desaturated colour, sound design); second-highest IMDb rating in the lane (8.6) and a Best Director Oscar."
+      "rationale": "Serial adventure rebuilt with modern staging; the standard for action-adventure choreography and clarity, with strong scores on both sources.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 5.5,
+        "combined": 4.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Jaws",
+      "originalTitle": "Jaws",
+      "year": 1975,
+      "tmdbId": 578,
+      "imdbId": "tt0073195",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 754342,
+        "url": "https://www.imdb.com/title/tt0073195/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 178,
+        "url": "https://www.rottentomatoes.com/m/jaws",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1975,
+        "rtYearNote": null
+      },
+      "rationale": "A thriller built around the absence of the shark, with edited point of view and John Williams's score; widely credited as the first summer blockbuster and the clearest demonstration of his command of suspense.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 3.0,
+        "combined": 3.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 6,
       "signature": false,
-      "title": "Close Encounters of the Third Kind",
-      "originalTitle": "Close Encounters of the Third Kind",
-      "year": 1977,
-      "tmdbId": 840,
-      "imdbId": "tt0075860",
+      "title": "Catch Me If You Can",
+      "originalTitle": "Catch Me If You Can",
+      "year": 2002,
+      "tmdbId": 640,
+      "imdbId": "tt0264464",
       "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [
-        "Close Encounters"
-      ],
+      "alternateTitles": [],
       "imdb": {
-        "rating": 7.6,
-        "votes": 239993,
-        "url": "https://www.imdb.com/title/tt0075860/",
+        "rating": 8.1,
+        "votes": 1274186,
+        "url": "https://www.imdb.com/title/tt0264464/",
         "readOn": "2026-11-13"
       },
       "rt": {
-        "tomatometer": 91,
-        "reviews": 118,
-        "url": "https://www.rottentomatoes.com/m/close_encounters_of_the_third_kind",
+        "tomatometer": 96,
+        "reviews": 203,
+        "url": "https://www.rottentomatoes.com/m/catch_me_if_you_can",
         "readOn": "2026-11-13",
-        "rtListedYear": 1977,
+        "rtListedYear": 2002,
         "rtYearNote": null
       },
-      "rationale": "Awe and obsession in suburban America, built on light, sound and a contact sequence scored as a musical conversation; his most personal science-fiction film."
+      "rationale": "A light, stylish caper with a 1960s design and title sequence; the strongest of his lighter films on both sources.",
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 4.0,
+        "combined": 8.0,
+        "rtUsed": true
+      }
     },
     {
       "rank": 7,
@@ -212,33 +252,49 @@
         "rtListedYear": 1993,
         "rtYearNote": null
       },
-      "rationale": "Joined animatronics and early digital effects in a way that reset the possibilities of spectacle cinema and set the model for the modern blockbuster."
+      "rationale": "Joined animatronics and early digital effects in a way that reset the possibilities of spectacle cinema and set the model for the modern blockbuster.",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 4.0,
+        "rtRank": 7.5,
+        "combined": 5.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 8,
       "signature": false,
-      "title": "Catch Me If You Can",
-      "originalTitle": "Catch Me If You Can",
-      "year": 2002,
-      "tmdbId": 640,
-      "imdbId": "tt0264464",
+      "title": "Close Encounters of the Third Kind",
+      "originalTitle": "Close Encounters of the Third Kind",
+      "year": 1977,
+      "tmdbId": 840,
+      "imdbId": "tt0075860",
       "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [],
+      "alternateTitles": [
+        "Close Encounters"
+      ],
       "imdb": {
-        "rating": 8.1,
-        "votes": 1274186,
-        "url": "https://www.imdb.com/title/tt0264464/",
+        "rating": 7.6,
+        "votes": 239993,
+        "url": "https://www.imdb.com/title/tt0075860/",
         "readOn": "2026-11-13"
       },
       "rt": {
-        "tomatometer": 96,
-        "reviews": 203,
-        "url": "https://www.rottentomatoes.com/m/catch_me_if_you_can",
+        "tomatometer": 91,
+        "reviews": 118,
+        "url": "https://www.rottentomatoes.com/m/close_encounters_of_the_third_kind",
         "readOn": "2026-11-13",
-        "rtListedYear": 2002,
+        "rtListedYear": 1977,
         "rtYearNote": null
       },
-      "rationale": "A light, stylish caper with a 1960s design and title sequence; the strongest of his lighter films on both sources."
+      "rationale": "Awe and obsession in suburban America, built on light, sound and a contact sequence scored as a musical conversation; his most personal science-fiction film.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 8.5,
+        "rtRank": 7.5,
+        "combined": 4.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 9,
@@ -264,7 +320,14 @@
         "rtListedYear": 2002,
         "rtYearNote": null
       },
-      "rationale": "A noir-inflected science-fiction thriller with detailed production design and one of the most imitated user-interface concepts in film; shows his range after Schindler's List."
+      "rationale": "A noir-inflected science-fiction thriller with detailed production design and one of the most imitated user-interface concepts in film; shows his range after Schindler's List.",
+      "editorialRank": 9,
+      "scoreRanks": {
+        "imdbRank": 8.5,
+        "rtRank": 9.0,
+        "combined": 8.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 10,
@@ -290,7 +353,14 @@
         "rtListedYear": 2006,
         "rtYearNote": "RT lists 2006 (US release); original release was 2005 (TMDB, IMDb)."
       },
-      "rationale": "A morally uneasy thriller about the aftermath of the 1972 Olympic killings; the weakest numbers in the ten, kept as the most serious entry among his later work (see below)."
+      "rationale": "A morally uneasy thriller about the aftermath of the 1972 Olympic killings; the weakest numbers in the ten, kept as the most serious entry among his later work (see below).",
+      "editorialRank": 10,
+      "scoreRanks": {
+        "imdbRank": 10.0,
+        "rtRank": 10.0,
+        "combined": 10.0,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -462,5 +532,10 @@
     "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
     "RT slug for Duel found by guess was a different 2013 film; its RT figures were not read and are shown as null.",
     "The TMDB person page displayed shifted years (see intro); the ledger uses original release years confirmed on IMDb dataset and RT pages."
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": [
+    "Bridge of Spies",
+    "Indiana Jones and the Last Crusade"
   ]
 }

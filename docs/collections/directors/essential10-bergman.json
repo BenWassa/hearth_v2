@@ -8,10 +8,10 @@
     "tmdbPersonId": 6648,
     "imdbNameId": "nm0000005"
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "listLength": 10,
   "scoreSources": {
     "imdb": {
@@ -37,33 +37,40 @@
     {
       "rank": 1,
       "signature": true,
-      "title": "Persona",
-      "originalTitle": "Persona",
-      "year": 1966,
-      "tmdbId": 797,
-      "imdbId": "tt0060827",
+      "title": "Fanny and Alexander",
+      "originalTitle": "Fanny och Alexander",
+      "year": 1982,
+      "tmdbId": 5961,
+      "imdbId": "tt0083922",
       "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). TMDB 5961 is the 188-minute theatrical version; the five-hour television version is a separate TMDB entry (TV 33153) and was not used.",
       "alternateTitles": [],
       "imdb": {
-        "rating": 8.0,
-        "votes": 142942,
-        "url": "https://www.imdb.com/title/tt0060827/",
+        "rating": 8.1,
+        "votes": 72111,
+        "url": "https://www.imdb.com/title/tt0083922/",
         "readOn": "2026-11-13"
       },
       "rt": {
-        "tomatometer": 91,
-        "reviews": 54,
-        "url": "https://www.rottentomatoes.com/m/persona",
+        "tomatometer": 100,
+        "reviews": 45,
+        "url": "https://www.rottentomatoes.com/m/fanny_and_alexander",
         "readOn": "2026-11-13",
-        "rtListedYear": 1966,
+        "rtListedYear": 1982,
         "rtYearNote": null
       },
       "sightAndSound2022": {
-        "position": "18",
+        "position": "=129",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Two women's identities blur until the film itself seems to tear and burn; the most formally radical film he made and the highest-placed Bergman in the 2022 Sight and Sound poll (18th)."
+      "rationale": "A late summation: a child's view of a wealthy theatrical family and a cruel stepfather, with 100% on RT and one of his three Foreign Language Oscar winners.",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 2.0,
+        "combined": 6.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 2,
@@ -94,7 +101,14 @@
         "position": "=136",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A knight plays chess with Death across a plague-ridden Sweden; its images became shorthand for art-house cinema, and it leads this list on IMDb (8.1 from 219,144 votes) and RT review count (71)."
+      "rationale": "A knight plays chess with Death across a plague-ridden Sweden; its images became shorthand for art-house cinema, and it leads this list on IMDb (8.1 from 219,144 votes) and RT review count (71).",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 5.5,
+        "combined": 4.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 3,
@@ -125,41 +139,124 @@
         "position": "=108",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "An old professor's road trip through memory and dream, carried by Victor Sjostrom; the humane counterweight to the austerity of the early canon."
+      "rationale": "An old professor's road trip through memory and dream, carried by Victor Sjostrom; the humane counterweight to the austerity of the early canon.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 5.5,
+        "combined": 4.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 4,
       "signature": false,
-      "title": "Fanny and Alexander",
-      "originalTitle": "Fanny och Alexander",
-      "year": 1982,
-      "tmdbId": 5961,
-      "imdbId": "tt0083922",
+      "title": "Scenes from a Marriage",
+      "originalTitle": "Scener ur ett äktenskap",
+      "year": 1974,
+      "tmdbId": 133919,
+      "imdbId": "tt6725014",
       "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). TMDB 5961 is the 188-minute theatrical version; the five-hour television version is a separate TMDB entry (TV 33153) and was not used.",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Theatrical (169 minute) cut of a six-part television series (TMDB TV 65170, 1973; IMDb tt0070644, 8.5 from 17,954 votes). The film version is ranked here; TMDB, IMDb and RT all list it as a separate film entry. Flagged as a television-origin work.",
       "alternateTitles": [],
       "imdb": {
-        "rating": 8.1,
-        "votes": 72111,
-        "url": "https://www.imdb.com/title/tt0083922/",
+        "rating": 8.3,
+        "votes": 10783,
+        "url": "https://www.imdb.com/title/tt6725014/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/scenes_from_a_marriage",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1973,
+        "rtYearNote": "RT page shows 1973 and a 2h 48m runtime, matching the theatrical cut."
+      },
+      "sightAndSound2022": null,
+      "rationale": "The disintegration of a marriage in close two-handed scenes, with an IMDb rating of 8.3; ranked low because of its television origin and the thin sample for this cut (10,783 votes, 23 RT reviews).",
+      "editorialRank": 9,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 8.5,
+        "combined": 2.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Through a Glass Darkly",
+      "originalTitle": "Såsom i en spegel",
+      "year": 1961,
+      "tmdbId": 11602,
+      "imdbId": "tt0055499",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "As in a Mirror"
+      ],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 29926,
+        "url": "https://www.imdb.com/title/tt0055499/",
         "readOn": "2026-11-13"
       },
       "rt": {
         "tomatometer": 100,
-        "reviews": 45,
-        "url": "https://www.rottentomatoes.com/m/fanny_and_alexander",
+        "reviews": 27,
+        "url": "https://www.rottentomatoes.com/m/through_a_glass_darkly",
         "readOn": "2026-11-13",
-        "rtListedYear": 1982,
+        "rtListedYear": 1961,
         "rtYearNote": null
       },
-      "sightAndSound2022": {
-        "position": "=129",
-        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
-      },
-      "rationale": "A late summation: a child's view of a wealthy theatrical family and a cruel stepfather, with 100% on RT and one of his three Foreign Language Oscar winners."
+      "sightAndSound2022": null,
+      "rationale": "A four-person chamber drama on a Baltic island that opened the faith trilogy and won the Foreign Language Oscar; 100% on RT from 27 reviews.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 8.5,
+        "rtRank": 2.0,
+        "combined": 6.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 5,
+      "rank": 6,
+      "signature": false,
+      "title": "Smiles of a Summer Night",
+      "originalTitle": "Sommarnattens leende",
+      "year": 1955,
+      "tmdbId": 11700,
+      "imdbId": "tt0048641",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.7,
+        "votes": 15952,
+        "url": "https://www.imdb.com/title/tt0048641/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 16,
+        "url": "https://www.rottentomatoes.com/m/smiles_of_a_summer_night",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1955,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "The comedy of manners that first brought him international attention and later became the basis of the musical A Little Night Music; shows the range of the filmography.",
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 10.0,
+        "rtRank": 2.0,
+        "combined": 5.25,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 7,
       "signature": false,
       "title": "Cries and Whispers",
       "originalTitle": "Viskningar och rop",
@@ -189,124 +286,17 @@
         "position": "=225",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Three sisters and a maid in a house drenched in red, with Sven Nykvist's colour photography the film's argument; its Oscar was for cinematography."
-    },
-    {
-      "rank": 6,
-      "signature": false,
-      "title": "Through a Glass Darkly",
-      "originalTitle": "Såsom i en spegel",
-      "year": 1961,
-      "tmdbId": 11602,
-      "imdbId": "tt0055499",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
-      "alternateTitles": [
-        "As in a Mirror"
-      ],
-      "imdb": {
-        "rating": 7.9,
-        "votes": 29926,
-        "url": "https://www.imdb.com/title/tt0055499/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 27,
-        "url": "https://www.rottentomatoes.com/m/through_a_glass_darkly",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1961,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "A four-person chamber drama on a Baltic island that opened the faith trilogy and won the Foreign Language Oscar; 100% on RT from 27 reviews."
-    },
-    {
-      "rank": 7,
-      "signature": false,
-      "title": "The Virgin Spring",
-      "originalTitle": "Jungfrukällan",
-      "year": 1960,
-      "tmdbId": 11656,
-      "imdbId": "tt0053976",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.0,
-        "votes": 34313,
-        "url": "https://www.imdb.com/title/tt0053976/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 87,
-        "reviews": 23,
-        "url": "https://www.rottentomatoes.com/m/virgin_spring",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1959,
-        "rtYearNote": "RT page shows 1959 release year."
-      },
-      "sightAndSound2022": null,
-      "rationale": "A medieval ballad of crime and revenge told with stark austerity; another of his three Foreign Language Oscar winners and 8.0 on IMDb."
+      "rationale": "Three sisters and a maid in a house drenched in red, with Sven Nykvist's colour photography the film's argument; its Oscar was for cinematography.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 8.5,
+        "rtRank": 4.0,
+        "combined": 7.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 8,
-      "signature": false,
-      "title": "Smiles of a Summer Night",
-      "originalTitle": "Sommarnattens leende",
-      "year": 1955,
-      "tmdbId": 11700,
-      "imdbId": "tt0048641",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.7,
-        "votes": 15952,
-        "url": "https://www.imdb.com/title/tt0048641/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 16,
-        "url": "https://www.rottentomatoes.com/m/smiles_of_a_summer_night",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1955,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "The comedy of manners that first brought him international attention and later became the basis of the musical A Little Night Music; shows the range of the filmography."
-    },
-    {
-      "rank": 9,
-      "signature": false,
-      "title": "Scenes from a Marriage",
-      "originalTitle": "Scener ur ett äktenskap",
-      "year": 1974,
-      "tmdbId": 133919,
-      "imdbId": "tt6725014",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Writer). Theatrical (169 minute) cut of a six-part television series (TMDB TV 65170, 1973; IMDb tt0070644, 8.5 from 17,954 votes). The film version is ranked here; TMDB, IMDb and RT all list it as a separate film entry. Flagged as a television-origin work.",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 8.3,
-        "votes": 10783,
-        "url": "https://www.imdb.com/title/tt6725014/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 87,
-        "reviews": 23,
-        "url": "https://www.rottentomatoes.com/m/scenes_from_a_marriage",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1973,
-        "rtYearNote": "RT page shows 1973 and a 2h 48m runtime, matching the theatrical cut."
-      },
-      "sightAndSound2022": null,
-      "rationale": "The disintegration of a marriage in close two-handed scenes, with an IMDb rating of 8.3; ranked low because of its television origin and the thin sample for this cut (10,783 votes, 23 RT reviews)."
-    },
-    {
-      "rank": 10,
       "signature": false,
       "title": "Autumn Sonata",
       "originalTitle": "Höstsonaten",
@@ -331,7 +321,87 @@
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "Ingrid Bergman and Liv Ullmann in a long mother-daughter reckoning, the only film to unite Ingrid Bergman with Ingmar Bergman; the closest call over Winter Light, Shame and Hour of the Wolf."
+      "rationale": "Ingrid Bergman and Liv Ullmann in a long mother-daughter reckoning, the only film to unite Ingrid Bergman with Ingmar Bergman; the closest call over Winter Light, Shame and Hour of the Wolf.",
+      "editorialRank": 10,
+      "scoreRanks": {
+        "imdbRank": 3.5,
+        "rtRank": 10.0,
+        "combined": 6.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "Persona",
+      "originalTitle": "Persona",
+      "year": 1966,
+      "tmdbId": 797,
+      "imdbId": "tt0060827",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 142942,
+        "url": "https://www.imdb.com/title/tt0060827/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 54,
+        "url": "https://www.rottentomatoes.com/m/persona",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1966,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "18",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Two women's identities blur until the film itself seems to tear and burn; the most formally radical film he made and the highest-placed Bergman in the 2022 Sight and Sound poll (18th).",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 6.5,
+        "rtRank": 7.0,
+        "combined": 4.75,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "The Virgin Spring",
+      "originalTitle": "Jungfrukällan",
+      "year": 1960,
+      "tmdbId": 11656,
+      "imdbId": "tt0053976",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 34313,
+        "url": "https://www.imdb.com/title/tt0053976/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/virgin_spring",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1959,
+        "rtYearNote": "RT page shows 1959 release year."
+      },
+      "sightAndSound2022": null,
+      "rationale": "A medieval ballad of crime and revenge told with stark austerity; another of his three Foreign Language Oscar winners and 8.0 on IMDb.",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 6.5,
+        "rtRank": 8.5,
+        "combined": 6.75,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -384,5 +454,7 @@
     "RT pages for The Virgin Spring (shown as 1959) and others show US release years; the ledger uses the original release year.",
     "RT pages for Summer with Monika, The Silence and The Magician were not read because those films are not in the ten; they were not needed for the decision.",
     "Runtime gaps between TMDB and IMDb: Autumn Sonata 93 vs 99 minutes, Cries and Whispers 95 vs 92; both are the same film (single entry each)."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

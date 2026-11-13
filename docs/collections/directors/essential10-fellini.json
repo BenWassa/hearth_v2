@@ -8,10 +8,10 @@
     "tmdbPersonId": 4415,
     "imdbNameId": "nm0000019"
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "listLength": 9,
   "scoreSources": {
     "imdb": {
@@ -36,6 +36,43 @@
   "films": [
     {
       "rank": 1,
+      "signature": true,
+      "title": "Nights of Cabiria",
+      "originalTitle": "Le notti di Cabiria",
+      "year": 1957,
+      "tmdbId": 19426,
+      "imdbId": "tt0050783",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "Cabiria"
+      ],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 57937,
+        "url": "https://www.imdb.com/title/tt0050783/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 41,
+        "url": "https://www.rottentomatoes.com/m/nights_of_cabiria",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1957,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Giulietta Masina's Rome prostitute whose faith survives repeated betrayal; Foreign Language Oscar winner with 100% from 41 reviews and 8.1 on IMDb.",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 2.0,
+        "combined": 3.5,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 2,
       "signature": true,
       "title": "8½",
       "originalTitle": "8½",
@@ -66,11 +103,92 @@
         "position": "=31",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "A film about a director's creative block that became the model for self-portrait cinema, with dream and memory moving freely through one man's day; 98% on RT and the highest-placed Fellini in the 2022 Sight and Sound poll (=31)."
+      "rationale": "A film about a director's creative block that became the model for self-portrait cinema, with dream and memory moving freely through one man's day; 98% on RT and the highest-placed Fellini in the 2022 Sight and Sound poll (=31).",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 4.0,
+        "combined": 4.5,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 2,
+      "rank": 3,
       "signature": true,
+      "title": "I Vitelloni",
+      "originalTitle": "I vitelloni",
+      "year": 1953,
+      "tmdbId": 12548,
+      "imdbId": "tt0046521",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "The Young and the Passionate"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 23625,
+        "url": "https://www.imdb.com/title/tt0046521/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 28,
+        "url": "https://www.rottentomatoes.com/m/i_vitelloni",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1953,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Five idle young men in a provincial town, the bridge from neorealism to his own autobiographical manner; 100% from 28 reviews.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 2.0,
+        "combined": 4.0,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "La Strada",
+      "originalTitle": "La strada",
+      "year": 1954,
+      "tmdbId": 405,
+      "imdbId": "tt0047528",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "The Road"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 70763,
+        "url": "https://www.imdb.com/title/tt0047528/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 77,
+        "url": "https://www.rottentomatoes.com/m/la_strada",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1954,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "The neorealist road tragedy of Gelsomina and Zampano with Nino Rota's score; the first of his Foreign Language Oscar winners and 97% from 77 reviews.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 5.0,
+        "combined": 1.5,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
+      "signature": false,
       "title": "La Dolce Vita",
       "originalTitle": "La dolce vita",
       "year": 1960,
@@ -99,70 +217,52 @@
         "position": "=60",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Seven nights and days of a journalist in Rome, the Palme d'Or winner (Cannes 1960) that put celebrity culture and the paparazzi on screen; 75 RT reviews at 95%."
+      "rationale": "Seven nights and days of a journalist in Rome, the Palme d'Or winner (Cannes 1960) that put celebrity culture and the paparazzi on screen; 75 RT reviews at 95%.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 6.0,
+        "combined": 6.25,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 3,
-      "signature": true,
-      "title": "La Strada",
-      "originalTitle": "La strada",
-      "year": 1954,
-      "tmdbId": 405,
-      "imdbId": "tt0047528",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
-      "alternateTitles": [
-        "The Road"
-      ],
-      "imdb": {
-        "rating": 8.0,
-        "votes": 70763,
-        "url": "https://www.imdb.com/title/tt0047528/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 97,
-        "reviews": 77,
-        "url": "https://www.rottentomatoes.com/m/la_strada",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1954,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "The neorealist road tragedy of Gelsomina and Zampano with Nino Rota's score; the first of his Foreign Language Oscar winners and 97% from 77 reviews."
-    },
-    {
-      "rank": 4,
+      "rank": 6,
       "signature": false,
-      "title": "Nights of Cabiria",
-      "originalTitle": "Le notti di Cabiria",
-      "year": 1957,
-      "tmdbId": 19426,
-      "imdbId": "tt0050783",
+      "title": "The White Sheik",
+      "originalTitle": "Lo sceicco bianco",
+      "year": 1952,
+      "tmdbId": 43361,
+      "imdbId": "tt0044000",
       "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
-      "alternateTitles": [
-        "Cabiria"
-      ],
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story). His first solo-credited feature; Variety Lights (1950, TMDB 43389) was co-directed with Alberto Lattuada and is not ranked.",
+      "alternateTitles": [],
       "imdb": {
-        "rating": 8.1,
-        "votes": 57937,
-        "url": "https://www.imdb.com/title/tt0050783/",
+        "rating": 7.2,
+        "votes": 7667,
+        "url": "https://www.imdb.com/title/tt0044000/",
         "readOn": "2026-11-13"
       },
       "rt": {
         "tomatometer": 100,
-        "reviews": 41,
-        "url": "https://www.rottentomatoes.com/m/nights_of_cabiria",
+        "reviews": 13,
+        "url": "https://www.rottentomatoes.com/m/the_white_sheik",
         "readOn": "2026-11-13",
-        "rtListedYear": 1957,
+        "rtListedYear": null,
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "Giulietta Masina's Rome prostitute whose faith survives repeated betrayal; Foreign Language Oscar winner with 100% from 41 reviews and 8.1 on IMDb."
+      "rationale": "A farce about a bride lost in Rome chasing a photo-romance idol, showing his comic gift before the major films; evidence is thin (7,667 IMDb votes, 13 RT reviews) so it is the closest call and the reason this list is nine long.",
+      "editorialRank": 9,
+      "scoreRanks": {
+        "imdbRank": 8.0,
+        "rtRank": 2.0,
+        "combined": 3.75,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 5,
+      "rank": 7,
       "signature": false,
       "title": "Amarcord",
       "originalTitle": "Amarcord",
@@ -190,40 +290,17 @@
         "position": "=157",
         "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
       },
-      "rationale": "Memory of a Romagna town living under fascism, comic and elegiac; Foreign Language Oscar winner and the clearest statement of his late autobiographical mode."
+      "rationale": "Memory of a Romagna town living under fascism, comic and elegiac; Foreign Language Oscar winner and the clearest statement of his late autobiographical mode.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 7.0,
+        "combined": 7.5,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 6,
-      "signature": false,
-      "title": "I Vitelloni",
-      "originalTitle": "I vitelloni",
-      "year": 1953,
-      "tmdbId": 12548,
-      "imdbId": "tt0046521",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
-      "alternateTitles": [
-        "The Young and the Passionate"
-      ],
-      "imdb": {
-        "rating": 7.8,
-        "votes": 23625,
-        "url": "https://www.imdb.com/title/tt0046521/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 28,
-        "url": "https://www.rottentomatoes.com/m/i_vitelloni",
-        "readOn": "2026-11-13",
-        "rtListedYear": 1953,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "Five idle young men in a provincial town, the bridge from neorealism to his own autobiographical manner; 100% from 28 reviews."
-    },
-    {
-      "rank": 7,
+      "rank": 8,
       "signature": false,
       "title": "Juliet of the Spirits",
       "originalTitle": "Giulietta degli spiriti",
@@ -248,10 +325,17 @@
         "rtYearNote": null
       },
       "sightAndSound2022": null,
-      "rationale": "His first full-length colour feature, a hallucinatory study of a wife's imagination with Giulietta Masina; the clearest case for his colour design."
+      "rationale": "His first full-length colour feature, a hallucinatory study of a wife's imagination with Giulietta Masina; the clearest case for his colour design.",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 7.0,
+        "rtRank": 8.0,
+        "combined": 9.0,
+        "rtUsed": true
+      }
     },
     {
-      "rank": 8,
+      "rank": 9,
       "signature": false,
       "title": "Fellini Satyricon",
       "originalTitle": "Fellini Satyricon",
@@ -278,35 +362,14 @@
         "rtYearNote": "TMDB lists it as 'Satyricon'; IMDb and RT as 'Fellini Satyricon'."
       },
       "sightAndSound2022": null,
-      "rationale": "A hallucinatory, stylised vision of ancient Rome built on constructed sets, among the most visually uncompromising films he made; mixed evidence (6.8 on IMDb, 74% on RT)."
-    },
-    {
-      "rank": 9,
-      "signature": false,
-      "title": "The White Sheik",
-      "originalTitle": "Lo sceicco bianco",
-      "year": 1952,
-      "tmdbId": 43361,
-      "imdbId": "tt0044000",
-      "format": "feature",
-      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story). His first solo-credited feature; Variety Lights (1950, TMDB 43389) was co-directed with Alberto Lattuada and is not ranked.",
-      "alternateTitles": [],
-      "imdb": {
-        "rating": 7.2,
-        "votes": 7667,
-        "url": "https://www.imdb.com/title/tt0044000/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 100,
-        "reviews": 13,
-        "url": "https://www.rottentomatoes.com/m/the_white_sheik",
-        "readOn": "2026-11-13",
-        "rtListedYear": null,
-        "rtYearNote": null
-      },
-      "sightAndSound2022": null,
-      "rationale": "A farce about a bride lost in Rome chasing a photo-romance idol, showing his comic gift before the major films; evidence is thin (7,667 IMDb votes, 13 RT reviews) so it is the closest call and the reason this list is nine long."
+      "rationale": "A hallucinatory, stylised vision of ancient Rome built on constructed sets, among the most visually uncompromising films he made; mixed evidence (6.8 on IMDb, 74% on RT).",
+      "editorialRank": 8,
+      "scoreRanks": {
+        "imdbRank": 9.0,
+        "rtRank": 9.0,
+        "combined": 5.0,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -358,5 +421,7 @@
     "Variety Lights (TMDB 43389) is co-directed with Alberto Lattuada and Boccaccio '70 / Spirits of the Dead contain Fellini segments; none is ranked.",
     "IMDb ids matched by title, year and runtime; 8½ is 139 minutes on TMDB and 138 on IMDb; La Dolce Vita 174 on both; Juliet of the Spirits is 148 on TMDB and 137 on IMDb (a single entry on both, so the gap is treated as a cut or listing difference).",
     "TMDB year for La Dolce Vita is 1960, Amarcord 1973; the BFI page lists Amarcord as 1972 and Sight and Sound's year therefore differs by one."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

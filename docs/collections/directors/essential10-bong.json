@@ -7,10 +7,10 @@
     "name": "Bong Joon-ho",
     "tmdbPersonId": 21684
   },
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "researchedOn": "2026-11-13",
   "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
-  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "methodSummary": "Owner decision 2026-11-13: films are ranked by IMDb and Rotten Tomatoes scores. Each film is ranked within this list by IMDb rating and by Tomatometer (ties share the average rank); the two ranks are averaged (ranks, never the raw scores); ties are broken by higher IMDb rating, then more IMDb votes. A Tomatometer with fewer than 10 reviews or no value is ignored and that film is ranked by IMDb alone (flagged rtUsed:false). The film selection is unchanged from the editorial research list; editorialRank keeps the earlier order. Scores are read online and dated, never estimated.",
   "scoreSources": {
     "imdb": {
       "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
@@ -52,7 +52,14 @@
         "rtListedYear": 2019,
         "rtYearNote": "A black-and-white version released in 2020 (Parasite: Black & White) exists as a separate entry; this ledger uses the original colour film."
       },
-      "rationale": "A tragicomic class thriller built on the precise layout of two houses and a mid-film change of genre; won the Palme d'Or and the Oscars for Best Picture and Best Director; top on both evidence lines (IMDb 8.5, RT 99% from 484 reviews)."
+      "rationale": "A tragicomic class thriller built on the precise layout of two houses and a mid-film change of genre; won the Palme d'Or and the Oscars for Best Picture and Best Director; top on both evidence lines (IMDb 8.5, RT 99% from 484 reviews).",
+      "editorialRank": 1,
+      "scoreRanks": {
+        "imdbRank": 1.0,
+        "rtRank": 1.0,
+        "combined": 1.0,
+        "rtUsed": true
+      }
     },
     {
       "rank": 2,
@@ -80,7 +87,14 @@
         "rtListedYear": 2003,
         "rtYearNote": "WARNING: RT /m/memories_of_murder is an unrelated 1990 TV film; use the _2003 slug."
       },
-      "rationale": "A serial-killer procedural that becomes a portrait of a country under dictatorship and of the failure of method; among the most acclaimed Korean films and strong on both evidence lines."
+      "rationale": "A serial-killer procedural that becomes a portrait of a country under dictatorship and of the failure of method; among the most acclaimed Korean films and strong on both evidence lines.",
+      "editorialRank": 2,
+      "scoreRanks": {
+        "imdbRank": 2.0,
+        "rtRank": 3.0,
+        "combined": 2.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 3,
@@ -108,10 +122,52 @@
         "rtListedYear": 2010,
         "rtYearNote": "RT lists 2010 (US release); original release was 2009. WARNING: IMDb tt1560161 and several shorts share the title 'Mother'; tt1216496 is Bong's film."
       },
-      "rationale": "A mystery in which a mother's devotion turns into something frightening; the most concentrated and compact film of his, with an RT score of 96% from 120 reviews."
+      "rationale": "A mystery in which a mother's devotion turns into something frightening; the most concentrated and compact film of his, with an RT score of 96% from 120 reviews.",
+      "editorialRank": 3,
+      "scoreRanks": {
+        "imdbRank": 3.0,
+        "rtRank": 2.0,
+        "combined": 2.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 4,
+      "signature": false,
+      "title": "Snowpiercer",
+      "originalTitle": "설국열차 (Seolguk-yeolcha)",
+      "year": 2013,
+      "tmdbId": 110415,
+      "imdbId": "tt1706620",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Seolguk-yeolcha"
+      ],
+      "imdb": {
+        "rating": 7.1,
+        "votes": 427503,
+        "url": "https://www.imdb.com/title/tt1706620/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 264,
+        "url": "https://www.rottentomatoes.com/m/snowpiercer",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2014,
+        "rtYearNote": "RT lists 2014 (US release); original release was 2013."
+      },
+      "rationale": "A science-fiction class allegory staged on one train; his first largely English-language film and strong critic standing, though lower on IMDb.",
+      "editorialRank": 5,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 4.0,
+        "combined": 5.25,
+        "rtUsed": true
+      }
+    },
+    {
+      "rank": 5,
       "signature": false,
       "title": "The Host",
       "originalTitle": "괴물 (Gwoemul)",
@@ -137,35 +193,14 @@
         "rtListedYear": 2007,
         "rtYearNote": "RT lists 2007 (US release); original release was 2006."
       },
-      "rationale": "A monster film with family comedy and political satire that became a major Korean box-office success and a model for his genre-mixing."
-    },
-    {
-      "rank": 5,
-      "signature": false,
-      "title": "Snowpiercer",
-      "originalTitle": "설국열차 (Seolguk-yeolcha)",
-      "year": 2013,
-      "tmdbId": 110415,
-      "imdbId": "tt1706620",
-      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
-      "alternateTitles": [
-        "Seolguk-yeolcha"
-      ],
-      "imdb": {
-        "rating": 7.1,
-        "votes": 427503,
-        "url": "https://www.imdb.com/title/tt1706620/",
-        "readOn": "2026-11-13"
-      },
-      "rt": {
-        "tomatometer": 94,
-        "reviews": 264,
-        "url": "https://www.rottentomatoes.com/m/snowpiercer",
-        "readOn": "2026-11-13",
-        "rtListedYear": 2014,
-        "rtYearNote": "RT lists 2014 (US release); original release was 2013."
-      },
-      "rationale": "A science-fiction class allegory staged on one train; his first largely English-language film and strong critic standing, though lower on IMDb."
+      "rationale": "A monster film with family comedy and political satire that became a major Korean box-office success and a model for his genre-mixing.",
+      "editorialRank": 4,
+      "scoreRanks": {
+        "imdbRank": 5.5,
+        "rtRank": 5.0,
+        "combined": 4.75,
+        "rtUsed": true
+      }
     },
     {
       "rank": 6,
@@ -191,7 +226,14 @@
         "rtListedYear": 2017,
         "rtYearNote": null
       },
-      "rationale": "A girl-and-animal adventure with a satire of corporate food systems; a film that shows his tonal range but is more uneven."
+      "rationale": "A girl-and-animal adventure with a satire of corporate food systems; a film that shows his tonal range but is more uneven.",
+      "editorialRank": 6,
+      "scoreRanks": {
+        "imdbRank": 4.0,
+        "rtRank": 7.0,
+        "combined": 5.5,
+        "rtUsed": true
+      }
     },
     {
       "rank": 7,
@@ -220,7 +262,14 @@
         "rtListedYear": 2000,
         "rtYearNote": "RT sample of 17 reviews is below the 20-review comfort threshold; IMDb votes (12,295) are just over the 10,000 floor."
       },
-      "rationale": "His debut, a black comedy about apartment-block neighbours; the earliest sign of his control of tone, included as the seventh and closest call (see below)."
+      "rationale": "His debut, a black comedy about apartment-block neighbours; the earliest sign of his control of tone, included as the seventh and closest call (see below).",
+      "editorialRank": 7,
+      "scoreRanks": {
+        "imdbRank": 7.0,
+        "rtRank": 6.0,
+        "combined": 6.5,
+        "rtUsed": true
+      }
     }
   ],
   "nearMisses": [
@@ -276,5 +325,7 @@
     "RT review counts are a single read on the stated date via a text fetcher.",
     "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
     "The IMDb id for the short Influenza was not looked up (null in the near-miss entry)."
-  ]
+  ],
+  "rankingMethod": "imdb-rt-rank-average",
+  "scoreChallengers": []
 }

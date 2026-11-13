@@ -164,12 +164,12 @@ export default function CuratedPackPage({ pack, onClose }) {
             </h2>
             <PackArt
               src={chapter.art}
-              className="mt-3 aspect-[2/1] w-full rounded-lg object-cover"
+              className="mt-3 aspect-[16/9] w-full rounded-lg object-cover"
               placeholder={
                 pack.status === 'draft' ? (
                   <SlotPlaceholder
-                    label="Chapter artwork 1200×600"
-                    className="mt-3 aspect-[2/1] w-full rounded-lg"
+                    label="Chapter artwork 1600×900"
+                    className="mt-3 aspect-[16/9] w-full rounded-lg"
                   />
                 ) : null
               }

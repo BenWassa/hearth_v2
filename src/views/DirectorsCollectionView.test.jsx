@@ -249,3 +249,55 @@ it('pushes one directory history entry under StrictMode and closes on directory 
   await pop(baseline);
   expect(onClose).toHaveBeenCalledOnce();
 });
+
+it.each(catalog.directors.filter((entry) => entry.films.length < 10))(
+  'uses the true essentials count for $name',
+  async (entry) => {
+    await mount();
+    await click(host.querySelector(`[data-director-card="${entry.id}"]`));
+    expect(section(`Essential ${entry.films.length}`)).toBeTruthy();
+    expect(button(`View all ${entry.films.length}`)).toBeTruthy();
+    await click(button('View all'));
+    expect(
+      section(`Essential ${entry.films.length}`).querySelectorAll('li'),
+    ).toHaveLength(entry.films.length);
+  },
+);
+
+it('clamps Watch Next titles while retaining their full text and accessible names', async () => {
+  await mount();
+  const entry = catalog.directors.find((entry) =>
+    entry.name.includes('Kubrick'),
+  );
+  await click(host.querySelector(`[data-director-card="${entry.id}"]`));
+  for (const tile of section('Watch Next').querySelectorAll('button')) {
+    const title = tile.querySelector('[title]');
+    expect(title.classList.contains('line-clamp-3')).toBe(true);
+    expect(title.title).toBe(title.textContent);
+    expect(tile.textContent).toContain(title.title);
+  }
+});
+
+it('retries failed details without adding and removes a broken modal poster', async () => {
+  const onAddItem = vi.fn();
+  await mount({ onAddItem });
+  await open();
+  getMediaDetails.mockRejectedValue(new Error('offline'));
+  await click(section('Essential 10').querySelector('button'));
+  expect(host.querySelector('[role="alert"]')).toBeTruthy();
+  getMediaDetails.mockClear();
+  getMediaDetails.mockImplementation(async ({ providerId }) => ({
+    provider: 'tmdb',
+    providerId,
+    type: 'movie',
+    posterUrl: '/broken-modal',
+    overview: 'Recovered synopsis',
+  }));
+  await click(button('Try again'));
+  expect(getMediaDetails).toHaveBeenCalledTimes(1);
+  expect(host.textContent).toContain('Recovered synopsis');
+  const poster = host.querySelector('img[src="/broken-modal"]');
+  await act(async () => poster.dispatchEvent(new Event('error')));
+  expect(poster.isConnected).toBe(false);
+  expect(onAddItem).not.toHaveBeenCalled();
+});

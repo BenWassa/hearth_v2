@@ -5,6 +5,7 @@ import { loadFilms } from './filmMedia.js';
 export default function FilmRail({ films, label, onOpen }) {
   const rail = useRef(null);
   const [media, setMedia] = useState([]);
+  const [loadedPosters, setLoadedPosters] = useState({});
   useEffect(() => {
     let active = true;
     let started = false;
@@ -39,8 +40,7 @@ export default function FilmRail({ films, label, onOpen }) {
     <ul
       ref={rail}
       aria-label={label}
-      tabIndex={0}
-      className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+      className="no-scrollbar -m-1 flex snap-x gap-3 overflow-x-auto p-1 pb-4"
     >
       {films.map((film, index) => (
         <li
@@ -63,17 +63,27 @@ export default function FilmRail({ films, label, onOpen }) {
               <PackArt
                 key={media[index]?.posterUrl || 'fallback'}
                 src={media[index]?.posterUrl}
+                onLoad={() =>
+                  setLoadedPosters((loaded) => ({
+                    ...loaded,
+                    [film.id]: media[index]?.posterUrl,
+                  }))
+                }
+                onError={() =>
+                  setLoadedPosters((loaded) => ({ ...loaded, [film.id]: null }))
+                }
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </span>
-            {media[index]?.posterUrl && (
-              <span
-                aria-hidden="true"
-                className="mt-2 line-clamp-2 block font-serif text-sm leading-snug text-stone-100"
-              >
-                {film.title}
-              </span>
-            )}
+            {media[index]?.posterUrl &&
+              loadedPosters[film.id] === media[index].posterUrl && (
+                <span
+                  aria-hidden="true"
+                  className="mt-2 line-clamp-2 block font-serif text-sm leading-snug text-stone-100"
+                >
+                  {film.title}
+                </span>
+              )}
           </button>
         </li>
       ))}

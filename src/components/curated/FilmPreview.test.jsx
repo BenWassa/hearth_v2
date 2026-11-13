@@ -220,3 +220,51 @@ it('shows an unavailable detail state and closes using the named close button', 
   expect(document.activeElement).toBe(row);
   expectNoWrites();
 });
+
+it('only shows rail captions after load and keeps every poster button focusable without a rail tab stop', async () => {
+  await mount();
+  await intersect(1);
+  for (const rail of host.querySelectorAll('ul[aria-label]')) {
+    expect(rail.hasAttribute('tabindex')).toBe(false);
+    expect(rail.getAttribute('aria-label')).toBeTruthy();
+    for (const tile of rail.querySelectorAll('button')) {
+      expect(tile.tabIndex).toBe(0);
+      tile.focus();
+      expect(document.activeElement).toBe(tile);
+    }
+  }
+  const tile = host
+    .querySelectorAll('ul[aria-label]')[1]
+    .querySelector('button');
+  const image = tile.querySelector('img');
+  expect(tile.querySelector('[aria-hidden="true"]')).toBeNull();
+  await act(async () => image.dispatchEvent(new Event('load')));
+  expect(tile.querySelector('[aria-hidden="true"]').textContent).toBe('Film 0');
+  await act(async () => image.dispatchEvent(new Event('error')));
+  expect(tile.querySelector('[aria-hidden="true"]')).toBeNull();
+  expect(tile.textContent.match(/Film 0/g)).toHaveLength(1);
+  expectNoWrites();
+});
+
+it('refetches unavailable details on Try again without household writes', async () => {
+  getMediaDetails.mockRejectedValue(new Error('offline'));
+  await mount();
+  await click(host.querySelector('ul button'));
+  expect(host.textContent).toContain('Film details are unavailable right now.');
+  getMediaDetails.mockImplementation(async ({ providerId }) => ({
+    provider: 'tmdb',
+    providerId,
+    type: 'movie',
+    overview: 'Recovered synopsis',
+  }));
+  const calls = getMediaDetails.mock.calls.length;
+  await click(
+    [...host.querySelectorAll('button')].find(
+      (el) => el.textContent === 'Try again',
+    ),
+  );
+  expect(getMediaDetails).toHaveBeenCalledTimes(calls + 1);
+  expect(host.textContent).toContain('Recovered synopsis');
+  expectNoWrites();
+  await back();
+});

@@ -29,7 +29,9 @@ export const loadFilm = (film) => {
           type: 'movie',
         });
         resolve(
-          data?.provider === 'tmdb' && String(data.providerId) === id
+          data?.provider === 'tmdb' &&
+            String(data.providerId) === id &&
+            (!data.type || data.type === 'movie')
             ? data
             : null,
         );
@@ -39,6 +41,9 @@ export const loadFilm = (film) => {
     });
   });
   cache.set(id, { promise, at: Date.now() });
+  promise.then((data) => {
+    if (!data && cache.get(id)?.promise === promise) cache.delete(id);
+  });
   drain();
   return promise;
 };

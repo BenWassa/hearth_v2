@@ -16,6 +16,7 @@ export default function FilmPreview({
   onOpenRemoved,
 }) {
   const [data, setData] = useState(undefined);
+  const [retry, setRetry] = useState(0);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState('');
   const savingRef = useRef(false);
@@ -56,13 +57,14 @@ export default function FilmPreview({
   };
   useEffect(() => {
     let active = true;
+    setData(undefined);
     loadFilm(film).then((value) => {
       if (active) setData(value);
     });
     return () => {
       active = false;
     };
-  }, [film]);
+  }, [film, retry]);
   return (
     <Dialog
       onClose={onClose}
@@ -116,6 +118,14 @@ export default function FilmPreview({
             ? 'Loading film details…'
             : data?.overview || 'Film details are unavailable right now.'}
         </p>
+        {data === null && (
+          <Button
+            variant="ghost"
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            Try again
+          </Button>
+        )}
         <div className="mt-6 text-sm text-stone-300">
           {owned || saved ? (
             <p>

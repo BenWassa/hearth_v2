@@ -1,0 +1,388 @@
+{
+  "$comment": "DRAFT ledger for issue #60, one director only (Alfred Hitchcock). Same schema as essential10-example.json (schemaVersion 1) with additive fields: format, tmdbYear, sightAndSound2022, rt.reason, rt.alternateCut. Not approved, not for app use until the owner signs off the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "alfred-hitchcock",
+    "name": "Alfred Hitchcock",
+    "tmdbPersonId": 2636,
+    "imdbNameId": "nm0000033"
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "listLength": 10,
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (averageRating, numVotes), matched on IMDb title id; title ids found through title.crew.tsv.gz (director nconst) and cross-checked against TMDB by title, year and runtime",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Live IMDb title pages were attempted first and did not return a usable page to an automated request (an empty response, not a human-readable page), so ratings come from the official daily dataset instead; this is the same fallback as the Kurosawa example. The dataset licence is personal / non-commercial use only; see licensing caveats in ESSENTIAL_10_EXAMPLE.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer (scorePercent) and critic review count (reviewCount) read from the page's embedded data",
+      "readOn": "2026-11-13",
+      "note": "Read directly from each film's rottentomatoes.com page with a command-line fetch, one request per page. Percentages and counts are live and change; treat as a dated snapshot. Where a page shows fewer than about 5 reviews no Tomatometer is published and the value is null."
+    },
+    "sightAndSound": {
+      "source": "BFI, The Greatest Films of All Time (2022 Sight and Sound poll), positions as listed on the page",
+      "sourceUrl": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time",
+      "readOn": "2026-11-13",
+      "note": "The page text was read in two halves; ranks 49-50 and the very bottom of the list were not visible in the extracted text. A film shown without a position was not seen in the portions read; that is not proof it is absent. '=' marks a tie. The page does not state 'critics' poll' in the extracted text, so the figure is labelled 'the 2022 Sight and Sound poll'."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Vertigo",
+      "originalTitle": "Vertigo",
+      "year": 1958,
+      "tmdbId": 426,
+      "imdbId": "tt0052357",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 464999,
+        "url": "https://www.imdb.com/title/tt0052357/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 95,
+        "reviews": 95,
+        "url": "https://www.rottentomatoes.com/m/vertigo",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1958,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "2",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Obsession, false identity and a film told almost entirely through one man's point of view, with the dolly-zoom and Bernard Herrmann's score; the highest-placed Hitchcock in the 2022 Sight and Sound poll (second overall) and the clearest case that his thrillers are also formal art."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Psycho",
+      "originalTitle": "Psycho",
+      "year": 1960,
+      "tmdbId": 539,
+      "imdbId": "tt0054215",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.5,
+        "votes": 799947,
+        "url": "https://www.imdb.com/title/tt0054215/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 115,
+        "url": "https://www.rottentomatoes.com/m/psycho",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1960,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=31",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Removed its star at the midpoint and rebuilt the thriller and the horror film around a cut-up shower sequence that is still taught; first on IMDb votes and rating in this list and near the top on RT."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Rear Window",
+      "originalTitle": "Rear Window",
+      "year": 1954,
+      "tmdbId": 567,
+      "imdbId": "tt0047396",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.4,
+        "votes": 576856,
+        "url": "https://www.imdb.com/title/tt0047396/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 99,
+        "reviews": 138,
+        "url": "https://www.rottentomatoes.com/m/1017289-rear_window",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1954,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=38",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "An entire film staged from one apartment, making the audience's looking the subject; the highest Tomatometer of his four best-known films and the most reviewed (99% from 138 reviews)."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "North by Northwest",
+      "originalTitle": "North by Northwest",
+      "year": 1959,
+      "tmdbId": 213,
+      "imdbId": "tt0053125",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 373357,
+        "url": "https://www.imdb.com/title/tt0053125/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 118,
+        "url": "https://www.rottentomatoes.com/m/north_by_northwest",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1959,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=45",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "The wrong-man chase scaled to a continent, with the crop-duster and Mount Rushmore set pieces; the template for the glossy international adventure thriller."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Notorious",
+      "originalTitle": "Notorious",
+      "year": 1946,
+      "tmdbId": 303,
+      "imdbId": "tt0038787",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 113979,
+        "url": "https://www.imdb.com/title/tt0038787/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 51,
+        "url": "https://www.rottentomatoes.com/m/1015287-notorious",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1946,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=133",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "A spy romance in which the camera does the storytelling, from the long crane shot down to the key in Ingrid Bergman's hand to the extended kiss shot around Production Code limits."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Strangers on a Train",
+      "originalTitle": "Strangers on a Train",
+      "year": 1951,
+      "tmdbId": 845,
+      "imdbId": "tt0044079",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 149827,
+        "url": "https://www.imdb.com/title/tt0044079/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 98,
+        "reviews": 56,
+        "url": "https://www.rottentomatoes.com/m/strangers_on_a_train",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1951,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "An exchange-of-murders premise built on visual doubling, ending in a fairground carousel climax; 98% on RT and one of his tightest constructions."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Shadow of a Doubt",
+      "originalTitle": "Shadow of a Doubt",
+      "year": 1943,
+      "tmdbId": 21734,
+      "imdbId": "tt0036342",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.7,
+        "votes": 76449,
+        "url": "https://www.imdb.com/title/tt0036342/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 54,
+        "url": "https://www.rottentomatoes.com/m/1018688-shadow_of_a_doubt",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1943,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Menace placed inside a small American town and a family home, with a charming uncle as the threat; the only film in this list with a 100% Tomatometer on a sample above 50 reviews."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "The 39 Steps",
+      "originalTitle": "The 39 Steps",
+      "year": 1935,
+      "tmdbId": 260,
+      "imdbId": "tt0026029",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [
+        "The Thirty-Nine Steps"
+      ],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 67337,
+        "url": "https://www.imdb.com/title/tt0026029/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 53,
+        "url": "https://www.rottentomatoes.com/m/1000121-39_steps",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1935,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "The British-period template for the innocent man on the run, cut for pace and wit; the blueprint he later rebuilt at scale as North by Northwest."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "The Birds",
+      "originalTitle": "The Birds",
+      "year": 1963,
+      "tmdbId": 571,
+      "imdbId": "tt0056869",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 223459,
+        "url": "https://www.imdb.com/title/tt0056869/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 70,
+        "url": "https://www.rottentomatoes.com/m/1002448-birds",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1963,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=185",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Unexplained natural horror with no conventional score, using electronic sound instead; a late-career formal risk with 223,000 IMDb votes and 96% on RT."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Rope",
+      "originalTitle": "Rope",
+      "year": 1948,
+      "tmdbId": 1580,
+      "imdbId": "tt0040746",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 167383,
+        "url": "https://www.imdb.com/title/tt0040746/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 93,
+        "reviews": 58,
+        "url": "https://www.rottentomatoes.com/m/rope",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1948,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Staged as apparently continuous takes in one apartment, a formal experiment that makes staging rather than cutting the drama; the closest call in the ten (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Rebecca",
+      "year": 1940,
+      "tmdbId": 223,
+      "imdbId": "tt0032976",
+      "reason": "Best Picture winner with strong evidence (IMDb 8.0 from 162,951 votes; RT 98% from 105 reviews), but a Selznick-shaped production and the least Hitchcock-specific of his top-rated films; the closest call against Rope."
+    },
+    {
+      "title": "The Lady Vanishes",
+      "year": 1938,
+      "tmdbId": 940,
+      "imdbId": "tt0030341",
+      "reason": "Best of the British run alongside The 39 Steps and overlaps it."
+    },
+    {
+      "title": "Dial M for Murder",
+      "year": 1954,
+      "tmdbId": 521,
+      "imdbId": "tt0046912",
+      "reason": "High audience standing (IMDb 8.1) but a filmed play with a weaker Tomatometer (89%)."
+    },
+    {
+      "title": "Lifeboat",
+      "year": 1944,
+      "tmdbId": 13321,
+      "imdbId": "tt0037017",
+      "reason": "Single-set formal exercise, overlaps Rope."
+    },
+    {
+      "title": "Spellbound",
+      "year": 1945,
+      "tmdbId": 4174,
+      "imdbId": "tt0038109",
+      "reason": "Dream sequence by Dali is notable, but the film as a whole is below the ten."
+    },
+    {
+      "title": "Frenzy",
+      "year": 1972,
+      "tmdbId": 573,
+      "imdbId": "tt0068611",
+      "reason": "Strong late return to form; not strong enough against the ten."
+    }
+  ],
+  "unverified": [
+    "Sight and Sound positions come from the BFI page (see sources); positions for Strangers on a Train, Shadow of a Doubt, The 39 Steps and Rope were not seen in the portions read.",
+    "Rope (#10) versus Rebecca is an editorial call against the scores (see above).",
+    "RT 'The 39 Steps' page is /m/1000121-39_steps (the plain /m/39_steps is a 2008 remake); 'The Birds' is /m/1002448-birds; 'Notorious' is /m/1015287-notorious (the plain slug is a 1992 TV film); /m/rebecca is the 2020 remake.",
+    "IMDb ids were matched from the dataset by title, year and runtime; every TMDB runtime agrees with IMDb to within 1 minute."
+  ]
+}

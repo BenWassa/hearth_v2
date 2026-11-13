@@ -1,0 +1,349 @@
+{
+  "$comment": "DRAFT ledger for issue #60: Stanley Kubrick only. Same schema as essential10-example.json (schemaVersion 1); extra optional fields: films[].flags, nearMisses[].imdb/rt. Not approved, not for app use until the owner signs off the roster, the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "stanley-kubrick",
+    "name": "Stanley Kubrick",
+    "tmdbPersonId": 240
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Dataset file run-date 2026-11-12, last-modified 2026-11-13 00:28 GMT. The live IMDb title page returned HTTP 403 to the fetch tool on 2026-11-13, so ratings were not cross-checked against live pages. Dataset licence is personal / non-commercial use only; see SCORE_SOURCING_NOTES.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer percentage and its critic review count",
+      "readOn": "2026-11-13",
+      "note": "Read through a text-extraction fetch tool, one film page at a time. Percentages were cross-checked against the RT celebrity filmography table where it listed them and, for some films, against search-result summaries of the same page. Review counts are live and change daily; each is a single dated read."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "2001: A Space Odyssey",
+      "originalTitle": "2001: A Space Odyssey",
+      "year": 1968,
+      "tmdbId": 62,
+      "imdbId": "tt0062622",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.3,
+        "votes": 797159,
+        "url": "https://www.imdb.com/title/tt0062622/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 169,
+        "url": "https://www.rottentomatoes.com/m/2001_a_space_odyssey",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1968,
+        "rtYearNote": null
+      },
+      "rationale": "Made the science-fiction film a vehicle for pure image and music, with almost no dialogue, a staged sense of scale and a vision of technology that still sets the terms for the genre; it carries the strongest combined evidence in his filmography."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+      "originalTitle": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+      "year": 1964,
+      "tmdbId": 935,
+      "imdbId": "tt0057012",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Dr. Strangelove"
+      ],
+      "imdb": {
+        "rating": 8.3,
+        "votes": 557046,
+        "url": "https://www.imdb.com/title/tt0057012/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 145,
+        "url": "https://www.rottentomatoes.com/m/dr_strangelove",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1964,
+        "rtYearNote": null
+      },
+      "rationale": "A Cold War nuclear-crisis thriller turned into black comedy, built from three rigorously separated spaces (war room, bomber, base) and a multi-role performance by Peter Sellers; the highest Tomatometer of his major films."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "A Clockwork Orange",
+      "originalTitle": "A Clockwork Orange",
+      "year": 1971,
+      "tmdbId": 185,
+      "imdbId": "tt0066921",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 949692,
+        "url": "https://www.imdb.com/title/tt0066921/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 83,
+        "reviews": 129,
+        "url": "https://www.rottentomatoes.com/m/clockwork_orange",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1971,
+        "rtYearNote": null
+      },
+      "rationale": "A violent satire of state and individual control whose visual design, ironic use of classical music and rigidly composed wide-angle images made it one of the most imitated and argued-over films of its decade; ranked above The Shining on influence even though the audience score is a little lower."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "The Shining",
+      "originalTitle": "The Shining",
+      "year": 1980,
+      "tmdbId": 694,
+      "imdbId": "tt0081505",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.4,
+        "votes": 1253919,
+        "url": "https://www.imdb.com/title/tt0081505/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 75,
+        "reviews": 178,
+        "url": "https://www.rottentomatoes.com/m/shining",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1980,
+        "rtYearNote": null
+      },
+      "rationale": "Early extended use of the Steadicam turns a hotel into a maze of unstable space and a horror film into a study of a family under pressure; first on IMDb among his films, lowest of the top five on the Tomatometer, a gap this ranking treats as a settled dispute about genre, not about craft."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Paths of Glory",
+      "originalTitle": "Paths of Glory",
+      "year": 1957,
+      "tmdbId": 975,
+      "imdbId": "tt0050825",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.4,
+        "votes": 244083,
+        "url": "https://www.imdb.com/title/tt0050825/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 114,
+        "url": "https://www.rottentomatoes.com/m/paths_of_glory",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1957,
+        "rtYearNote": null
+      },
+      "rationale": "First-World-War court-martial drama with long tracking shots through the trenches and a mercilessly clear structure; the film that established him as a major director and still scores near the top on both evidence lines."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Barry Lyndon",
+      "originalTitle": "Barry Lyndon",
+      "year": 1975,
+      "tmdbId": 3175,
+      "imdbId": "tt0072684",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 210233,
+        "url": "https://www.imdb.com/title/tt0072684/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 77,
+        "reviews": 159,
+        "url": "https://www.rottentomatoes.com/m/barry_lyndon",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1975,
+        "rtYearNote": null
+      },
+      "rationale": "Eighteenth-century picaresque shot largely by natural and candle light with very fast lenses; the film that most clearly shows his command of period image-making."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Full Metal Jacket",
+      "originalTitle": "Full Metal Jacket",
+      "year": 1987,
+      "tmdbId": 600,
+      "imdbId": "tt0093058",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 864363,
+        "url": "https://www.imdb.com/title/tt0093058/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 84,
+        "reviews": 158,
+        "url": "https://www.rottentomatoes.com/m/full_metal_jacket",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1987,
+        "rtYearNote": null
+      },
+      "rationale": "A two-part war film (boot camp, then Vietnam) that reads as a study of how violence is trained and then released; strong on both evidence lines."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "The Killing",
+      "originalTitle": "The Killing",
+      "year": 1956,
+      "tmdbId": 247,
+      "imdbId": "tt0049406",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 108178,
+        "url": "https://www.imdb.com/title/tt0049406/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 74,
+        "url": "https://www.rottentomatoes.com/m/killing",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1956,
+        "rtYearNote": null
+      },
+      "rationale": "Heist thriller told out of sequence from several viewpoints; the first fully realised Kubrick film and a formal model for later crime cinema."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "Spartacus",
+      "originalTitle": "Spartacus",
+      "year": 1960,
+      "tmdbId": 967,
+      "imdbId": "tt0054331",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 153045,
+        "url": "https://www.imdb.com/title/tt0054331/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 90,
+        "reviews": 107,
+        "url": "https://www.rottentomatoes.com/m/1019544-spartacus",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1960,
+        "rtYearNote": null
+      },
+      "rationale": "A large-scale epic directed after Kubrick replaced the original director and over which he had little creative control; included for the strength of the staging, the ensemble and the evidence, and flagged as the least personal film in the ten."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Eyes Wide Shut",
+      "originalTitle": "Eyes Wide Shut",
+      "year": 1999,
+      "tmdbId": 345,
+      "imdbId": "tt0120663",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.5,
+        "votes": 445052,
+        "url": "https://www.imdb.com/title/tt0120663/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 79,
+        "reviews": 228,
+        "url": "https://www.rottentomatoes.com/m/eyes_wide_shut",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1999,
+        "rtYearNote": null
+      },
+      "rationale": "His final film: a slow, dreamlike study of jealousy and desire in a stylised New York; the closest call in the ten (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Lolita",
+      "year": 1962,
+      "tmdbId": 802,
+      "imdbId": "tt0056193",
+      "reason": "Strong adaptation with an uneven tone; ranked just behind Eyes Wide Shut on audience standing and narrower influence.",
+      "imdb": {
+        "rating": 7.5,
+        "votes": 117843
+      },
+      "rt": {
+        "tomatometer": 83,
+        "reviews": 92,
+        "url": "https://www.rottentomatoes.com/m/1012611-lolita"
+      }
+    },
+    {
+      "title": "Killer's Kiss",
+      "year": 1955,
+      "tmdbId": 10056,
+      "imdbId": "tt0048254",
+      "reason": "Short, early noir that matters mainly as a step toward The Killing.",
+      "imdb": {
+        "rating": 6.5,
+        "votes": 28902
+      },
+      "rt": {
+        "tomatometer": 81,
+        "reviews": null,
+        "url": null
+      }
+    },
+    {
+      "title": "Fear and Desire",
+      "year": 1953,
+      "tmdbId": 10165,
+      "imdbId": "tt0045758",
+      "reason": "First feature, later withdrawn by Kubrick himself; historical interest only.",
+      "imdb": {
+        "rating": 5.3,
+        "votes": 15871
+      },
+      "rt": {
+        "tomatometer": 70,
+        "reviews": null,
+        "url": null
+      }
+    }
+  ],
+  "unverified": [
+    "TMDB film ids and Directing credits were read from the TMDB person page on 2026-11-13 (no TMDB API key was available), not from the API crew.job field; title-to-id pairs were taken from the page links. Co-director status was checked against the IMDb dataset crew file (title.crew), which lists a sole director for every film in the list.",
+    "IMDb ids were matched in the IMDb dataset by original title, year and runtime, not read from a TMDB external_ids field; confirm with the TMDB API external_ids at implementation.",
+    "RT review counts are a single read on the stated date via a text fetcher.",
+    "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
+    "TMDB person-page years displayed by the fetch tool were sometimes offset for other directors; for Kubrick all years match the original release years used here."
+  ]
+}

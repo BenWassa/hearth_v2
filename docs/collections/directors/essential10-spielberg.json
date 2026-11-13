@@ -1,0 +1,466 @@
+{
+  "$comment": "DRAFT ledger for issue #60: Steven Spielberg only. Same schema as essential10-example.json (schemaVersion 1); extra optional fields: films[].flags, nearMisses[].imdb/rt. Not approved, not for app use until the owner signs off the roster, the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "steven-spielberg",
+    "name": "Steven Spielberg",
+    "tmdbPersonId": 488
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Dataset file run-date 2026-11-12, last-modified 2026-11-13 00:28 GMT. The live IMDb title page returned HTTP 403 to the fetch tool on 2026-11-13, so ratings were not cross-checked against live pages. Dataset licence is personal / non-commercial use only; see SCORE_SOURCING_NOTES.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer percentage and its critic review count",
+      "readOn": "2026-11-13",
+      "note": "Read through a text-extraction fetch tool, one film page at a time. Percentages were cross-checked against the RT celebrity filmography table where it listed them and, for some films, against search-result summaries of the same page. Review counts are live and change daily; each is a single dated read."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Schindler's List",
+      "originalTitle": "Schindler's List",
+      "year": 1993,
+      "tmdbId": 424,
+      "imdbId": "tt0108052",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 9.0,
+        "votes": 1613369,
+        "url": "https://www.imdb.com/title/tt0108052/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 98,
+        "reviews": 135,
+        "url": "https://www.rottentomatoes.com/m/schindlers_list",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1993,
+        "rtYearNote": null
+      },
+      "rationale": "The Holocaust told in black and white with restraint and documentary-like images; won the Oscars for Best Picture and Best Director and the highest IMDb rating (9.0) in this lane."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Jaws",
+      "originalTitle": "Jaws",
+      "year": 1975,
+      "tmdbId": 578,
+      "imdbId": "tt0073195",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 754342,
+        "url": "https://www.imdb.com/title/tt0073195/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 178,
+        "url": "https://www.rottentomatoes.com/m/jaws",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1975,
+        "rtYearNote": null
+      },
+      "rationale": "A thriller built around the absence of the shark, with edited point of view and John Williams's score; widely credited as the first summer blockbuster and the clearest demonstration of his command of suspense."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Raiders of the Lost Ark",
+      "originalTitle": "Raiders of the Lost Ark",
+      "year": 1981,
+      "tmdbId": 85,
+      "imdbId": "tt0082971",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Indiana Jones and the Raiders of the Lost Ark"
+      ],
+      "imdb": {
+        "rating": 8.4,
+        "votes": 1125699,
+        "url": "https://www.imdb.com/title/tt0082971/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 157,
+        "url": "https://www.rottentomatoes.com/m/raiders_of_the_lost_ark",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1981,
+        "rtYearNote": null
+      },
+      "rationale": "Serial adventure rebuilt with modern staging; the standard for action-adventure choreography and clarity, with strong scores on both sources."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "E.T. the Extra-Terrestrial",
+      "originalTitle": "E.T. the Extra-Terrestrial",
+      "year": 1982,
+      "tmdbId": 601,
+      "imdbId": "tt0083866",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "E.T."
+      ],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 479403,
+        "url": "https://www.imdb.com/title/tt0083866/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 99,
+        "reviews": 147,
+        "url": "https://www.rottentomatoes.com/m/et_the_extraterrestrial",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1982,
+        "rtYearNote": null
+      },
+      "rationale": "A suburban science-fiction fable told largely at a child's eye level; the highest Tomatometer in the lane (99%) and a defining popular film."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Saving Private Ryan",
+      "originalTitle": "Saving Private Ryan",
+      "year": 1998,
+      "tmdbId": 857,
+      "imdbId": "tt0120815",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.6,
+        "votes": 1672798,
+        "url": "https://www.imdb.com/title/tt0120815/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 147,
+        "url": "https://www.rottentomatoes.com/m/saving_private_ryan",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1998,
+        "rtYearNote": null
+      },
+      "rationale": "The D-Day landing sequence changed how battle is filmed (handheld camera, desaturated colour, sound design); second-highest IMDb rating in the lane (8.6) and a Best Director Oscar."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Close Encounters of the Third Kind",
+      "originalTitle": "Close Encounters of the Third Kind",
+      "year": 1977,
+      "tmdbId": 840,
+      "imdbId": "tt0075860",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Close Encounters"
+      ],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 239993,
+        "url": "https://www.imdb.com/title/tt0075860/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 118,
+        "url": "https://www.rottentomatoes.com/m/close_encounters_of_the_third_kind",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1977,
+        "rtYearNote": null
+      },
+      "rationale": "Awe and obsession in suburban America, built on light, sound and a contact sequence scored as a musical conversation; his most personal science-fiction film."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Jurassic Park",
+      "originalTitle": "Jurassic Park",
+      "year": 1993,
+      "tmdbId": 329,
+      "imdbId": "tt0107290",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 1206398,
+        "url": "https://www.imdb.com/title/tt0107290/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 203,
+        "url": "https://www.rottentomatoes.com/m/jurassic_park",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1993,
+        "rtYearNote": null
+      },
+      "rationale": "Joined animatronics and early digital effects in a way that reset the possibilities of spectacle cinema and set the model for the modern blockbuster."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "Catch Me If You Can",
+      "originalTitle": "Catch Me If You Can",
+      "year": 2002,
+      "tmdbId": 640,
+      "imdbId": "tt0264464",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 1274186,
+        "url": "https://www.imdb.com/title/tt0264464/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 203,
+        "url": "https://www.rottentomatoes.com/m/catch_me_if_you_can",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2002,
+        "rtYearNote": null
+      },
+      "rationale": "A light, stylish caper with a 1960s design and title sequence; the strongest of his lighter films on both sources."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "Minority Report",
+      "originalTitle": "Minority Report",
+      "year": 2002,
+      "tmdbId": 180,
+      "imdbId": "tt0181689",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.6,
+        "votes": 630118,
+        "url": "https://www.imdb.com/title/tt0181689/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 89,
+        "reviews": 261,
+        "url": "https://www.rottentomatoes.com/m/minority_report",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2002,
+        "rtYearNote": null
+      },
+      "rationale": "A noir-inflected science-fiction thriller with detailed production design and one of the most imitated user-interface concepts in film; shows his range after Schindler's List."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Munich",
+      "originalTitle": "Munich",
+      "year": 2005,
+      "tmdbId": 612,
+      "imdbId": "tt0408306",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.5,
+        "votes": 257093,
+        "url": "https://www.imdb.com/title/tt0408306/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 78,
+        "reviews": 209,
+        "url": "https://www.rottentomatoes.com/m/munich",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2006,
+        "rtYearNote": "RT lists 2006 (US release); original release was 2005 (TMDB, IMDb)."
+      },
+      "rationale": "A morally uneasy thriller about the aftermath of the 1972 Olympic killings; the weakest numbers in the ten, kept as the most serious entry among his later work (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Lincoln",
+      "year": 2012,
+      "tmdbId": 72976,
+      "imdbId": "tt0443272",
+      "reason": "Strong critic score (90%) but IMDb 7.3; a talk-driven drama with fewer formal ideas than Munich.",
+      "imdb": {
+        "rating": 7.3,
+        "votes": 288091
+      },
+      "rt": {
+        "tomatometer": 90,
+        "reviews": 287,
+        "url": "https://www.rottentomatoes.com/m/lincoln_2012"
+      }
+    },
+    {
+      "title": "Bridge of Spies",
+      "year": 2015,
+      "tmdbId": 296098,
+      "imdbId": "tt3682448",
+      "reason": "IMDb 7.6, RT 91%; a polished Cold War drama, the closest alternate to Munich.",
+      "imdb": {
+        "rating": 7.6,
+        "votes": 348490
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 313,
+        "url": "https://www.rottentomatoes.com/m/bridge_of_spies"
+      }
+    },
+    {
+      "title": "Indiana Jones and the Last Crusade",
+      "year": 1989,
+      "tmdbId": 89,
+      "imdbId": "tt0097576",
+      "reason": "IMDb 8.2 (875,296 votes), RT 84%; overlaps with Raiders.",
+      "imdb": {
+        "rating": 8.2,
+        "votes": 875296
+      },
+      "rt": {
+        "tomatometer": 84,
+        "reviews": 139,
+        "url": "https://www.rottentomatoes.com/m/indiana_jones_and_the_last_crusade"
+      }
+    },
+    {
+      "title": "Indiana Jones and the Temple of Doom",
+      "year": 1984,
+      "tmdbId": 87,
+      "imdbId": "tt0087469",
+      "reason": "IMDb 7.5, RT 77%; weaker than Raiders and Last Crusade.",
+      "imdb": {
+        "rating": 7.5,
+        "votes": 576252
+      },
+      "rt": {
+        "tomatometer": 77,
+        "reviews": 138,
+        "url": "https://www.rottentomatoes.com/m/indiana_jones_and_the_temple_of_doom"
+      }
+    },
+    {
+      "title": "Empire of the Sun",
+      "year": 1987,
+      "tmdbId": 10110,
+      "imdbId": "tt0092965",
+      "reason": "IMDb 7.7, RT 75% from 64 reviews; ambitious but uneven.",
+      "imdb": {
+        "rating": 7.7,
+        "votes": 145626
+      },
+      "rt": {
+        "tomatometer": 75,
+        "reviews": 64,
+        "url": "https://www.rottentomatoes.com/m/empire_of_the_sun"
+      }
+    },
+    {
+      "title": "The Fabelmans",
+      "year": 2022,
+      "tmdbId": 804095,
+      "imdbId": "tt14208870",
+      "reason": "RT 92% but IMDb 7.5 and personal, not a broad influence.",
+      "imdb": {
+        "rating": 7.5,
+        "votes": 137995
+      },
+      "rt": {
+        "tomatometer": 92,
+        "reviews": 396,
+        "url": "https://www.rottentomatoes.com/m/the_fabelmans"
+      }
+    },
+    {
+      "title": "Duel",
+      "year": 1971,
+      "tmdbId": 839,
+      "imdbId": "tt0067023",
+      "reason": "Made for television (IMDb type: TV movie; a theatrical release outside the US). Excluded as a TV film; strong early work.",
+      "imdb": {
+        "rating": 7.6,
+        "votes": 87601
+      },
+      "rt": {
+        "tomatometer": null,
+        "reviews": null,
+        "reason": "RT page found under that slug was a different film; not read."
+      }
+    },
+    {
+      "title": "Disclosure Day",
+      "year": 2026,
+      "tmdbId": 1275779,
+      "imdbId": "tt15047880",
+      "reason": "Released June 2026; too recent for a fixed list, and IMDb 6.4 / RT 79% (444 reviews) do not support inclusion.",
+      "imdb": {
+        "rating": 6.4,
+        "votes": 183654
+      },
+      "rt": {
+        "tomatometer": 79,
+        "reviews": 444,
+        "url": "https://www.rottentomatoes.com/m/disclosure_day"
+      }
+    },
+    {
+      "title": "The Sugarland Express",
+      "year": 1973,
+      "tmdbId": 5121,
+      "imdbId": "tt0072226",
+      "reason": "IMDb 6.8; early work.",
+      "imdb": {
+        "rating": 6.8,
+        "votes": 22704
+      },
+      "rt": {
+        "tomatometer": null,
+        "reviews": null,
+        "reason": "Not read in this pass; not needed for the decision."
+      }
+    },
+    {
+      "title": "A.I. Artificial Intelligence",
+      "year": 2001,
+      "tmdbId": 644,
+      "imdbId": "tt0212720",
+      "reason": "Not read on RT; IMDb 7.2.",
+      "imdb": {
+        "rating": 7.2,
+        "votes": 344732
+      },
+      "rt": {
+        "tomatometer": null,
+        "reviews": null,
+        "reason": "Not read in this pass; not needed for the decision."
+      }
+    }
+  ],
+  "unverified": [
+    "TMDB film ids and Directing credits were read from the TMDB person page on 2026-11-13 (no TMDB API key was available), not from the API crew.job field; title-to-id pairs were taken from the page links. Co-director status was checked against the IMDb dataset crew file (title.crew), which lists a sole director for every film in the list.",
+    "IMDb ids were matched in the IMDb dataset by original title, year and runtime, not read from a TMDB external_ids field; confirm with the TMDB API external_ids at implementation.",
+    "RT review counts are a single read on the stated date via a text fetcher.",
+    "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
+    "RT slug for Duel found by guess was a different 2013 film; its RT figures were not read and are shown as null.",
+    "The TMDB person page displayed shifted years (see intro); the ledger uses original release years confirmed on IMDb dataset and RT pages."
+  ]
+}

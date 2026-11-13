@@ -1,0 +1,280 @@
+{
+  "$comment": "DRAFT ledger for issue #60: Bong Joon-ho only. Same schema as essential10-example.json (schemaVersion 1); extra optional fields: films[].flags, nearMisses[].imdb/rt. Not approved, not for app use until the owner signs off the roster, the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "bong-joon-ho",
+    "name": "Bong Joon-ho",
+    "tmdbPersonId": 21684
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Dataset file run-date 2026-11-12, last-modified 2026-11-13 00:28 GMT. The live IMDb title page returned HTTP 403 to the fetch tool on 2026-11-13, so ratings were not cross-checked against live pages. Dataset licence is personal / non-commercial use only; see SCORE_SOURCING_NOTES.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer percentage and its critic review count",
+      "readOn": "2026-11-13",
+      "note": "Read through a text-extraction fetch tool, one film page at a time. Percentages were cross-checked against the RT celebrity filmography table where it listed them and, for some films, against search-result summaries of the same page. Review counts are live and change daily; each is a single dated read."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Parasite",
+      "originalTitle": "기생충 (Gisaengchung)",
+      "year": 2019,
+      "tmdbId": 496243,
+      "imdbId": "tt6751668",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Gisaengchung"
+      ],
+      "imdb": {
+        "rating": 8.5,
+        "votes": 1208785,
+        "url": "https://www.imdb.com/title/tt6751668/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 99,
+        "reviews": 484,
+        "url": "https://www.rottentomatoes.com/m/parasite_2019",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2019,
+        "rtYearNote": "A black-and-white version released in 2020 (Parasite: Black & White) exists as a separate entry; this ledger uses the original colour film."
+      },
+      "rationale": "A tragicomic class thriller built on the precise layout of two houses and a mid-film change of genre; won the Palme d'Or and the Oscars for Best Picture and Best Director; top on both evidence lines (IMDb 8.5, RT 99% from 484 reviews)."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Memories of Murder",
+      "originalTitle": "살인의 추억 (Salinui chueok)",
+      "year": 2003,
+      "tmdbId": 11423,
+      "imdbId": "tt0353969",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Salinui chueok"
+      ],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 278761,
+        "url": "https://www.imdb.com/title/tt0353969/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 95,
+        "reviews": 78,
+        "url": "https://www.rottentomatoes.com/m/memories_of_murder_2003",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2003,
+        "rtYearNote": "WARNING: RT /m/memories_of_murder is an unrelated 1990 TV film; use the _2003 slug."
+      },
+      "rationale": "A serial-killer procedural that becomes a portrait of a country under dictatorship and of the failure of method; among the most acclaimed Korean films and strong on both evidence lines."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Mother",
+      "originalTitle": "마더 (Madeo)",
+      "year": 2009,
+      "tmdbId": 30018,
+      "imdbId": "tt1216496",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Madeo"
+      ],
+      "imdb": {
+        "rating": 7.7,
+        "votes": 82353,
+        "url": "https://www.imdb.com/title/tt1216496/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 120,
+        "url": "https://www.rottentomatoes.com/m/madeo",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2010,
+        "rtYearNote": "RT lists 2010 (US release); original release was 2009. WARNING: IMDb tt1560161 and several shorts share the title 'Mother'; tt1216496 is Bong's film."
+      },
+      "rationale": "A mystery in which a mother's devotion turns into something frightening; the most concentrated and compact film of his, with an RT score of 96% from 120 reviews."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "The Host",
+      "originalTitle": "괴물 (Gwoemul)",
+      "year": 2006,
+      "tmdbId": 1255,
+      "imdbId": "tt0468492",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Gwoemul",
+        "Goemool"
+      ],
+      "imdb": {
+        "rating": 7.1,
+        "votes": 145535,
+        "url": "https://www.imdb.com/title/tt0468492/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 93,
+        "reviews": 154,
+        "url": "https://www.rottentomatoes.com/m/the_host_2007",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2007,
+        "rtYearNote": "RT lists 2007 (US release); original release was 2006."
+      },
+      "rationale": "A monster film with family comedy and political satire that became a major Korean box-office success and a model for his genre-mixing."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Snowpiercer",
+      "originalTitle": "설국열차 (Seolguk-yeolcha)",
+      "year": 2013,
+      "tmdbId": 110415,
+      "imdbId": "tt1706620",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Seolguk-yeolcha"
+      ],
+      "imdb": {
+        "rating": 7.1,
+        "votes": 427503,
+        "url": "https://www.imdb.com/title/tt1706620/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 264,
+        "url": "https://www.rottentomatoes.com/m/snowpiercer",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2014,
+        "rtYearNote": "RT lists 2014 (US release); original release was 2013."
+      },
+      "rationale": "A science-fiction class allegory staged on one train; his first largely English-language film and strong critic standing, though lower on IMDb."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Okja",
+      "originalTitle": "옥자 (Okja)",
+      "year": 2017,
+      "tmdbId": 387426,
+      "imdbId": "tt3967856",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.3,
+        "votes": 143941,
+        "url": "https://www.imdb.com/title/tt3967856/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 238,
+        "url": "https://www.rottentomatoes.com/m/okja",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2017,
+        "rtYearNote": null
+      },
+      "rationale": "A girl-and-animal adventure with a satire of corporate food systems; a film that shows his tonal range but is more uneven."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Barking Dogs Never Bite",
+      "originalTitle": "플란다스의 개 (Peullandeoseu-ui gae)",
+      "year": 2000,
+      "tmdbId": 21531,
+      "imdbId": "tt0269743",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Flandersui gae",
+        "A Higher Animal"
+      ],
+      "imdb": {
+        "rating": 6.9,
+        "votes": 12295,
+        "url": "https://www.imdb.com/title/tt0269743/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 88,
+        "reviews": 17,
+        "url": "https://www.rottentomatoes.com/m/barking_dogs_never_bite",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2000,
+        "rtYearNote": "RT sample of 17 reviews is below the 20-review comfort threshold; IMDb votes (12,295) are just over the 10,000 floor."
+      },
+      "rationale": "His debut, a black comedy about apartment-block neighbours; the earliest sign of his control of tone, included as the seventh and closest call (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Mickey 17",
+      "year": 2025,
+      "tmdbId": 696506,
+      "imdbId": "tt12299608",
+      "reason": "A science-fiction satire; the weakest evidence in his filmography (IMDb 6.7, RT 77% from 363 reviews) and too recent for a fixed list. Owner could include it as an eighth film.",
+      "imdb": {
+        "rating": 6.7,
+        "votes": 271405
+      },
+      "rt": {
+        "tomatometer": 77,
+        "reviews": 363,
+        "url": "https://www.rottentomatoes.com/m/mickey_17"
+      }
+    },
+    {
+      "title": "Tokyo! (segment 'Shaking Tokyo')",
+      "year": 2008,
+      "tmdbId": 8938,
+      "imdbId": "tt0976060",
+      "reason": "Anthology film co-directed with Leos Carax and Michel Gondry; Bong directed one segment. Excluded as a segment; TMDB lists it as a movie credit.",
+      "imdb": {
+        "rating": 7.0,
+        "votes": 12824
+      },
+      "rt": {
+        "tomatometer": null,
+        "reviews": null,
+        "reason": "Not read in this pass; not needed for the decision."
+      }
+    },
+    {
+      "title": "Influenza",
+      "year": 2004,
+      "tmdbId": 118179,
+      "imdbId": null,
+      "reason": "Short film; excluded.",
+      "imdb": null,
+      "rt": {
+        "tomatometer": null,
+        "reviews": null,
+        "reason": "Not read in this pass; not needed for the decision."
+      }
+    }
+  ],
+  "unverified": [
+    "TMDB film ids and Directing credits were read from the TMDB person page on 2026-11-13 (no TMDB API key was available), not from the API crew.job field; title-to-id pairs were taken from the page links. Co-director status was checked against the IMDb dataset crew file (title.crew), which lists a sole director for every film in the list.",
+    "IMDb ids were matched in the IMDb dataset by original title, year and runtime, not read from a TMDB external_ids field; confirm with the TMDB API external_ids at implementation.",
+    "RT review counts are a single read on the stated date via a text fetcher.",
+    "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
+    "The IMDb id for the short Influenza was not looked up (null in the near-miss entry)."
+  ]
+}

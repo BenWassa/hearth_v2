@@ -1,0 +1,393 @@
+{
+  "$comment": "DRAFT ledger for issue #60, one director only (Satyajit Ray). Same schema as essential10-example.json (schemaVersion 1) with additive fields: format, tmdbYear, sightAndSound2022, rt.reason, rt.alternateCut. Not approved, not for app use until the owner signs off the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "satyajit-ray",
+    "name": "Satyajit Ray",
+    "tmdbPersonId": 12160,
+    "imdbNameId": "nm0006249"
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "listLength": 10,
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (averageRating, numVotes), matched on IMDb title id; title ids found through title.crew.tsv.gz (director nconst) and cross-checked against TMDB by title, year and runtime",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Live IMDb title pages were attempted first and did not return a usable page to an automated request (an empty response, not a human-readable page), so ratings come from the official daily dataset instead; this is the same fallback as the Kurosawa example. The dataset licence is personal / non-commercial use only; see licensing caveats in ESSENTIAL_10_EXAMPLE.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer (scorePercent) and critic review count (reviewCount) read from the page's embedded data",
+      "readOn": "2026-11-13",
+      "note": "Read directly from each film's rottentomatoes.com page with a command-line fetch, one request per page. Percentages and counts are live and change; treat as a dated snapshot. Where a page shows fewer than about 5 reviews no Tomatometer is published and the value is null."
+    },
+    "sightAndSound": {
+      "source": "BFI, The Greatest Films of All Time (2022 Sight and Sound poll), positions as listed on the page",
+      "sourceUrl": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time",
+      "readOn": "2026-11-13",
+      "note": "The page text was read in two halves; ranks 49-50 and the very bottom of the list were not visible in the extracted text. A film shown without a position was not seen in the portions read; that is not proof it is absent. '=' marks a tie. The page does not state 'critics' poll' in the extracted text, so the figure is labelled 'the 2022 Sight and Sound poll'."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Pather Panchali",
+      "originalTitle": "Pather Panchali",
+      "year": 1955,
+      "tmdbId": 5801,
+      "imdbId": "tt0048473",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "Song of the Little Road"
+      ],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 42593,
+        "url": "https://www.imdb.com/title/tt0048473/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 98,
+        "reviews": 82,
+        "url": "https://www.rottentomatoes.com/m/pather_panchali",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1955,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "35",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "His first film, made on a tiny budget with largely non-professional actors, that opened Indian cinema to the world; 98% from 82 reviews on RT and the highest-placed Ray in the 2022 Sight and Sound poll (35th)."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "The World of Apu",
+      "originalTitle": "Apur Sansar",
+      "year": 1959,
+      "tmdbId": 896,
+      "imdbId": "tt0052572",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "Apur Sansar"
+      ],
+      "imdb": {
+        "rating": 8.4,
+        "votes": 20935,
+        "url": "https://www.imdb.com/title/tt0052572/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 26,
+        "url": "https://www.rottentomatoes.com/m/apur_sansar",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1959,
+        "rtYearNote": "RT page shows a later US release year (1960)."
+      },
+      "sightAndSound2022": null,
+      "rationale": "The close of the Apu trilogy and the highest IMDb rating in the ten (8.4); marriage, fatherhood and grief told as Apu's coming-of-age ends."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Charulata",
+      "originalTitle": "Charulata",
+      "year": 1964,
+      "tmdbId": 35790,
+      "imdbId": "tt0057935",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "The Lonely Wife"
+      ],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 8180,
+        "url": "https://www.imdb.com/title/tt0057935/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 93,
+        "reviews": 29,
+        "url": "https://www.rottentomatoes.com/m/charulata",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1964,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=169",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "A bored wife in 1879 Calcutta and her husband's cousin, filmed with a restraint and fluid camera work that make it his most polished chamber piece; Silver Bear for Best Director at Berlin 1965."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Aparajito",
+      "originalTitle": "Aparajito",
+      "year": 1956,
+      "tmdbId": 897,
+      "imdbId": "tt0048956",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "The Unvanquished"
+      ],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 20539,
+        "url": "https://www.imdb.com/title/tt0048956/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/aparajito",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1956,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "The middle of the trilogy, following Apu from Benares to Calcutta; Golden Lion at Venice 1957, which confirmed his international standing."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "The Music Room",
+      "originalTitle": "Jalsaghar",
+      "year": 1958,
+      "tmdbId": 822,
+      "imdbId": "tt0051792",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "Jalsaghar"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 7515,
+        "url": "https://www.imdb.com/title/tt0051792/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/the_music_room",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1960,
+        "rtYearNote": "RT page is titled 'Jalsaghar' and shows 1960."
+      },
+      "sightAndSound2022": null,
+      "rationale": "A decaying zamindar's last devotion to music, with the film's music and décor doing the dramatic work; 100% on RT from 23 reviews."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "Mahanagar",
+      "originalTitle": "Mahanagar",
+      "year": 1963,
+      "tmdbId": 60567,
+      "imdbId": "tt0057277",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "The Big City"
+      ],
+      "imdb": {
+        "rating": 8.3,
+        "votes": 5797,
+        "url": "https://www.imdb.com/title/tt0057277/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 26,
+        "url": "https://www.rottentomatoes.com/m/mahanagar",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1963,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A Calcutta housewife takes a job and changes her household; an early film about women at work, with the Silver Bear for Best Director at Berlin 1964."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Devi",
+      "originalTitle": "Devi",
+      "year": 1960,
+      "tmdbId": 43031,
+      "imdbId": "tt0053765",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "The Goddess"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 3606,
+        "url": "https://www.imdb.com/title/tt0053765/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 15,
+        "url": "https://www.rottentomatoes.com/m/devi",
+        "readOn": "2026-11-13",
+        "rtListedYear": null,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A young wife is declared a goddess by her father-in-law, a quiet study of belief and its cost; 100% on RT from 15 reviews."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "Nayak",
+      "originalTitle": "Nayak",
+      "year": 1966,
+      "tmdbId": 112999,
+      "imdbId": "tt0060742",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
+      "alternateTitles": [
+        "The Hero"
+      ],
+      "imdb": {
+        "rating": 8.3,
+        "votes": 6382,
+        "url": "https://www.imdb.com/title/tt0060742/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 10,
+        "url": "https://www.rottentomatoes.com/m/nayak",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1966,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A film star and a journalist on an overnight train; a near two-hander played largely in one confined setting, with Uttam Kumar in the lead; RT 100% but from only 10 reviews."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "Days and Nights in the Forest",
+      "originalTitle": "Aranyer Din Ratri",
+      "year": 1970,
+      "tmdbId": 35867,
+      "imdbId": "tt0065417",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 3613,
+        "url": "https://www.imdb.com/title/tt0065417/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/days_and_nights_in_the_forest",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1970,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Four Calcutta friends on a forest holiday, an ensemble comedy of manners with 100% on RT from 23 reviews and a distinct late-period register."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Distant Thunder",
+      "originalTitle": "Ashani Sanket",
+      "year": 1973,
+      "tmdbId": 113012,
+      "imdbId": "tt0069737",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [
+        "Ashani Sanket"
+      ],
+      "imdb": {
+        "rating": 7.9,
+        "votes": 1918,
+        "url": "https://www.imdb.com/title/tt0069737/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 5,
+        "url": "https://www.rottentomatoes.com/m/ashani-sanket-distant-thunder",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1973,
+        "rtYearNote": "RT shows 100% from only 5 reviews: not a usable sample."
+      },
+      "sightAndSound2022": null,
+      "rationale": "The 1943 Bengal famine seen from one village, in colour; winner of the Golden Bear at Berlin 1973. The thinnest evidence in the ten (1,918 IMDb votes, 5 RT reviews), kept as the closest call (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Teen Kanya (Three Daughters)",
+      "year": 1961,
+      "tmdbId": 43027,
+      "imdbId": "tt0055508",
+      "reason": "Three Tagore stories; IMDb 7.9 from 1,868 votes, not stronger than Distant Thunder on available evidence."
+    },
+    {
+      "title": "The Adventures of Goopy and Bagha",
+      "year": 1969,
+      "tmdbId": 135092,
+      "imdbId": "tt0063023",
+      "reason": "IMDb 8.6 from 6,134 votes but only 4 RT reviews and a children's fantasy register; first reserve for a tenth place."
+    },
+    {
+      "title": "The Home and the World",
+      "year": 1984,
+      "tmdbId": 42092,
+      "imdbId": "tt0087328",
+      "reason": "RT 100% from 12 reviews and a major literary adaptation; very close to Distant Thunder."
+    },
+    {
+      "title": "The Adversary (Pratidwandi)",
+      "year": 1970,
+      "tmdbId": 42498,
+      "imdbId": "tt0066237",
+      "reason": "IMDb 8.1 from 2,147 votes; the first of the Calcutta trilogy."
+    },
+    {
+      "title": "Jana Aranya (The Middleman)",
+      "year": 1975,
+      "tmdbId": 122445,
+      "imdbId": "tt0074710",
+      "reason": "IMDb 8.3 from 2,028 votes; RT 88% from 8 reviews (listed as 'The Masses' Music')."
+    },
+    {
+      "title": "The Chess Players",
+      "year": 1977,
+      "tmdbId": 80556,
+      "imdbId": "tt0076696",
+      "reason": "His Hindi-language feature, 100% from 10 reviews; outside his core Bengali body of work."
+    }
+  ],
+  "unverified": [
+    "Evidence is thin for most of the ten (see above). Distant Thunder's 100% on RT is from 5 reviews and should not be treated as a Tomatometer in any display.",
+    "IMDb ids were matched by title, year and runtime; The Music Room is 100 minutes on TMDB and 95 on IMDb, Devi 99 and 99, all in a plausible range.",
+    "RT pages for Devi and Distant Thunder have US re-release years; the ledger uses the original release year.",
+    "The Berlin awards were verified in a web search (Wikipedia lists and satyajitray.org); a second search found one source dating Charulata's Silver Bear to 1964, the others to 1965. The ledger says 1965.",
+    "Ray's Golden Lion for Aparajito (Venice 1957) and the Golden Bear for Distant Thunder (Berlin 1973) were confirmed in the same search."
+  ]
+}

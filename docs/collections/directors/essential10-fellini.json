@@ -1,0 +1,362 @@
+{
+  "$comment": "DRAFT ledger for issue #60, one director only (Federico Fellini). Same schema as essential10-example.json (schemaVersion 1) with additive fields: format, tmdbYear, sightAndSound2022, rt.reason, rt.alternateCut. Not approved, not for app use until the owner signs off the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "federico-fellini",
+    "name": "Federico Fellini",
+    "tmdbPersonId": 4415,
+    "imdbNameId": "nm0000019"
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (TMDB crew job Director, feature film; documentaries and co-directed films allowed where essential and flagged) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined. Fewer than ten films where the work does not support ten.",
+  "listLength": 9,
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (averageRating, numVotes), matched on IMDb title id; title ids found through title.crew.tsv.gz (director nconst) and cross-checked against TMDB by title, year and runtime",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Live IMDb title pages were attempted first and did not return a usable page to an automated request (an empty response, not a human-readable page), so ratings come from the official daily dataset instead; this is the same fallback as the Kurosawa example. The dataset licence is personal / non-commercial use only; see licensing caveats in ESSENTIAL_10_EXAMPLE.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer (scorePercent) and critic review count (reviewCount) read from the page's embedded data",
+      "readOn": "2026-11-13",
+      "note": "Read directly from each film's rottentomatoes.com page with a command-line fetch, one request per page. Percentages and counts are live and change; treat as a dated snapshot. Where a page shows fewer than about 5 reviews no Tomatometer is published and the value is null."
+    },
+    "sightAndSound": {
+      "source": "BFI, The Greatest Films of All Time (2022 Sight and Sound poll), positions as listed on the page",
+      "sourceUrl": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time",
+      "readOn": "2026-11-13",
+      "note": "The page text was read in two halves; ranks 49-50 and the very bottom of the list were not visible in the extracted text. A film shown without a position was not seen in the portions read; that is not proof it is absent. '=' marks a tie. The page does not state 'critics' poll' in the extracted text, so the figure is labelled 'the 2022 Sight and Sound poll'."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "8½",
+      "originalTitle": "8½",
+      "year": 1963,
+      "tmdbId": 422,
+      "imdbId": "tt0056801",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "Otto e mezzo",
+        "8 1/2"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 134310,
+        "url": "https://www.imdb.com/title/tt0056801/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 98,
+        "reviews": 60,
+        "url": "https://www.rottentomatoes.com/m/8-12",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1963,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=31",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "A film about a director's creative block that became the model for self-portrait cinema, with dream and memory moving freely through one man's day; 98% on RT and the highest-placed Fellini in the 2022 Sight and Sound poll (=31)."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "La Dolce Vita",
+      "originalTitle": "La dolce vita",
+      "year": 1960,
+      "tmdbId": 439,
+      "imdbId": "tt0053779",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "The Sweet Life"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 86983,
+        "url": "https://www.imdb.com/title/tt0053779/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 95,
+        "reviews": 75,
+        "url": "https://www.rottentomatoes.com/m/la_dolce_vita",
+        "readOn": "2026-11-13",
+        "rtListedYear": null,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=60",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Seven nights and days of a journalist in Rome, the Palme d'Or winner (Cannes 1960) that put celebrity culture and the paparazzi on screen; 75 RT reviews at 95%."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "La Strada",
+      "originalTitle": "La strada",
+      "year": 1954,
+      "tmdbId": 405,
+      "imdbId": "tt0047528",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "The Road"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 70763,
+        "url": "https://www.imdb.com/title/tt0047528/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 97,
+        "reviews": 77,
+        "url": "https://www.rottentomatoes.com/m/la_strada",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1954,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "The neorealist road tragedy of Gelsomina and Zampano with Nino Rota's score; the first of his Foreign Language Oscar winners and 97% from 77 reviews."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Nights of Cabiria",
+      "originalTitle": "Le notti di Cabiria",
+      "year": 1957,
+      "tmdbId": 19426,
+      "imdbId": "tt0050783",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "Cabiria"
+      ],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 57937,
+        "url": "https://www.imdb.com/title/tt0050783/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 41,
+        "url": "https://www.rottentomatoes.com/m/nights_of_cabiria",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1957,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Giulietta Masina's Rome prostitute whose faith survives repeated betrayal; Foreign Language Oscar winner with 100% from 41 reviews and 8.1 on IMDb."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Amarcord",
+      "originalTitle": "Amarcord",
+      "year": 1973,
+      "tmdbId": 7857,
+      "imdbId": "tt0071129",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 52138,
+        "url": "https://www.imdb.com/title/tt0071129/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 47,
+        "url": "https://www.rottentomatoes.com/m/amarcord",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1973,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": {
+        "position": "=157",
+        "source": "https://www.bfi.org.uk/sight-and-sound/greatest-films-all-time"
+      },
+      "rationale": "Memory of a Romagna town living under fascism, comic and elegiac; Foreign Language Oscar winner and the clearest statement of his late autobiographical mode."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "I Vitelloni",
+      "originalTitle": "I vitelloni",
+      "year": 1953,
+      "tmdbId": 12548,
+      "imdbId": "tt0046521",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "The Young and the Passionate"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 23625,
+        "url": "https://www.imdb.com/title/tt0046521/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 28,
+        "url": "https://www.rottentomatoes.com/m/i_vitelloni",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1953,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "Five idle young men in a provincial town, the bridge from neorealism to his own autobiographical manner; 100% from 28 reviews."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Juliet of the Spirits",
+      "originalTitle": "Giulietta degli spiriti",
+      "year": 1965,
+      "tmdbId": 19120,
+      "imdbId": "tt0059229",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.4,
+        "votes": 15982,
+        "url": "https://www.imdb.com/title/tt0059229/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 78,
+        "reviews": 27,
+        "url": "https://www.rottentomatoes.com/m/juliet_of_the_spirits",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1965,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "His first full-length colour feature, a hallucinatory study of a wife's imagination with Giulietta Masina; the clearest case for his colour design."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "Fellini Satyricon",
+      "originalTitle": "Fellini Satyricon",
+      "year": 1969,
+      "tmdbId": 11163,
+      "imdbId": "tt0064940",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story).",
+      "alternateTitles": [
+        "Satyricon"
+      ],
+      "imdb": {
+        "rating": 6.8,
+        "votes": 18413,
+        "url": "https://www.imdb.com/title/tt0064940/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 74,
+        "reviews": 31,
+        "url": "https://www.rottentomatoes.com/m/fellini_satyricon",
+        "readOn": "2026-11-13",
+        "rtListedYear": null,
+        "rtYearNote": "TMDB lists it as 'Satyricon'; IMDb and RT as 'Fellini Satyricon'."
+      },
+      "sightAndSound2022": null,
+      "rationale": "A hallucinatory, stylised vision of ancient Rome built on constructed sets, among the most visually uncompromising films he made; mixed evidence (6.8 on IMDb, 74% on RT)."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "The White Sheik",
+      "originalTitle": "Lo sceicco bianco",
+      "year": 1952,
+      "tmdbId": 43361,
+      "imdbId": "tt0044000",
+      "format": "feature",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay, Story). His first solo-credited feature; Variety Lights (1950, TMDB 43389) was co-directed with Alberto Lattuada and is not ranked.",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.2,
+        "votes": 7667,
+        "url": "https://www.imdb.com/title/tt0044000/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 100,
+        "reviews": 13,
+        "url": "https://www.rottentomatoes.com/m/the_white_sheik",
+        "readOn": "2026-11-13",
+        "rtListedYear": null,
+        "rtYearNote": null
+      },
+      "sightAndSound2022": null,
+      "rationale": "A farce about a bride lost in Rome chasing a photo-romance idol, showing his comic gift before the major films; evidence is thin (7,667 IMDb votes, 13 RT reviews) so it is the closest call and the reason this list is nine long."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Fellini's Roma",
+      "year": 1972,
+      "tmdbId": 11035,
+      "imdbId": "tt0069191",
+      "reason": "A city portrait with strong passages, but RT 65% from 17 reviews and overlaps 8½'s autobiographical mode; first reserve for a tenth place."
+    },
+    {
+      "title": "Il Bidone (The Swindle)",
+      "year": 1955,
+      "tmdbId": 36102,
+      "imdbId": "tt0047876",
+      "reason": "Minor work between La Strada and Nights of Cabiria."
+    },
+    {
+      "title": "Variety Lights",
+      "year": 1950,
+      "tmdbId": 43389,
+      "imdbId": "tt0042692",
+      "reason": "Co-directed with Alberto Lattuada; excluded from ranking as a joint credit, and only 9 RT reviews."
+    },
+    {
+      "title": "Fellini's Casanova",
+      "year": 1976,
+      "tmdbId": 42236,
+      "imdbId": "tt0074291",
+      "reason": "Spectacular but RT 64% from 11 reviews."
+    },
+    {
+      "title": "And the Ship Sails On",
+      "year": 1983,
+      "tmdbId": 5622,
+      "imdbId": "tt0087188",
+      "reason": "Late fantasy, not stronger than the nine."
+    },
+    {
+      "title": "Boccaccio '70 / Spirits of the Dead (anthology segments)",
+      "year": null,
+      "tmdbId": 45267,
+      "imdbId": "tt0055805",
+      "reason": "Anthology segments (Toby Dammit, The Temptation of Dr. Antonio); excluded as non-features."
+    }
+  ],
+  "unverified": [
+    "The RT release year on the La Dolce Vita, Fellini Satyricon and The White Sheik pages could not be parsed by the extraction script, so rtListedYear is null for them.",
+    "Variety Lights (TMDB 43389) is co-directed with Alberto Lattuada and Boccaccio '70 / Spirits of the Dead contain Fellini segments; none is ranked.",
+    "IMDb ids matched by title, year and runtime; 8½ is 139 minutes on TMDB and 138 on IMDb; La Dolce Vita 174 on both; Juliet of the Spirits is 148 on TMDB and 137 on IMDb (a single entry on both, so the gap is treated as a cut or listing difference).",
+    "TMDB year for La Dolce Vita is 1960, Amarcord 1973; the BFI page lists Amarcord as 1972 and Sight and Sound's year therefore differs by one."
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "$comment": "DRAFT ledger for issue #60: Hayao Miyazaki only. Same schema as essential10-example.json (schemaVersion 1); extra optional fields: films[].flags, nearMisses[].imdb/rt. Not approved, not for app use until the owner signs off the roster, the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "hayao-miyazaki",
+    "name": "Hayao Miyazaki",
+    "tmdbPersonId": 608
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (sole or credited TMDB Directing credit, feature or, where flagged, feature-length documentary) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz (ratings and vote counts); title.basics and title.crew used to match ids and confirm sole directors",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "Dataset file run-date 2026-11-12, last-modified 2026-11-13 00:28 GMT. The live IMDb title page returned HTTP 403 to the fetch tool on 2026-11-13, so ratings were not cross-checked against live pages. Dataset licence is personal / non-commercial use only; see SCORE_SOURCING_NOTES.md."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer percentage and its critic review count",
+      "readOn": "2026-11-13",
+      "note": "Read through a text-extraction fetch tool, one film page at a time. Percentages were cross-checked against the RT celebrity filmography table where it listed them and, for some films, against search-result summaries of the same page. Review counts are live and change daily; each is a single dated read."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Spirited Away",
+      "originalTitle": "千と千尋の神隠し (Sen to Chihiro no kamikakushi)",
+      "year": 2001,
+      "tmdbId": 129,
+      "imdbId": "tt0245429",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Sen to Chihiro no kamikakushi"
+      ],
+      "imdb": {
+        "rating": 8.6,
+        "votes": 993496,
+        "url": "https://www.imdb.com/title/tt0245429/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 226,
+        "url": "https://www.rottentomatoes.com/m/spirited_away",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2002,
+        "rtYearNote": "RT lists 2002 (US release); original release was 2001 (TMDB, IMDb)."
+      },
+      "rationale": "Dreamlike bathhouse fantasy that became the highest-grossing film in Japanese history on its release and won the Oscar for Best Animated Feature; top on IMDb (8.6) and the strongest combined evidence."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "My Neighbor Totoro",
+      "originalTitle": "となりのトトロ (Tonari no Totoro)",
+      "year": 1988,
+      "tmdbId": 8392,
+      "imdbId": "tt0096283",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Tonari no Totoro"
+      ],
+      "imdb": {
+        "rating": 8.1,
+        "votes": 443270,
+        "url": "https://www.imdb.com/title/tt0096283/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 64,
+        "url": "https://www.rottentomatoes.com/m/my_neighbor_totoro",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1990,
+        "rtYearNote": "RT lists 1990 (limited US release); original release was 1988."
+      },
+      "rationale": "A film with almost no conflict, about two girls and nature spirits in a Japanese village; the most-loved Ghibli film and the clearest statement of his sensibility."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Princess Mononoke",
+      "originalTitle": "もののけ姫 (Mononoke-hime)",
+      "year": 1997,
+      "tmdbId": 128,
+      "imdbId": "tt0119698",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Mononoke-hime"
+      ],
+      "imdb": {
+        "rating": 8.3,
+        "votes": 494423,
+        "url": "https://www.imdb.com/title/tt0119698/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 94,
+        "reviews": 124,
+        "url": "https://www.rottentomatoes.com/m/princess_mononoke",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1997,
+        "rtYearNote": null
+      },
+      "rationale": "His epic of the conflict between industry and nature, with the deepest world-building and the biggest action; second-highest IMDb rating among his films (8.3) and a landmark of adult animation."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Kiki's Delivery Service",
+      "originalTitle": "魔女の宅急便 (Majo no takkyūbin)",
+      "year": 1989,
+      "tmdbId": 16859,
+      "imdbId": "tt0097814",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Majo no takkyuubin"
+      ],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 193692,
+        "url": "https://www.imdb.com/title/tt0097814/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 98,
+        "reviews": 48,
+        "url": "https://www.rottentomatoes.com/m/kikis_delivery_service",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1998,
+        "rtYearNote": "RT lists 1998 (US release); original release was 1989."
+      },
+      "rationale": "A gentle coming-of-age story about independence and burnout; the highest Tomatometer of his major films (98%)."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Castle in the Sky",
+      "originalTitle": "天空の城ラピュタ (Tenkū no shiro Rapyuta)",
+      "year": 1986,
+      "tmdbId": 10515,
+      "imdbId": "tt0092067",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Laputa: Castle in the Sky"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 201764,
+        "url": "https://www.imdb.com/title/tt0092067/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 28,
+        "url": "https://www.rottentomatoes.com/m/castle_in_the_sky",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1989,
+        "rtYearNote": "RT lists 1989 (US release); original release was 1986."
+      },
+      "rationale": "His first film for Studio Ghibli, a pure adventure of airships, pirates and a lost city; the model for much that followed (RT sample only 28 reviews)."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "The Wind Rises",
+      "originalTitle": "風立ちぬ (Kaze tachinu)",
+      "year": 2013,
+      "tmdbId": 149870,
+      "imdbId": "tt2013293",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [],
+      "imdb": {
+        "rating": 7.8,
+        "votes": 116131,
+        "url": "https://www.imdb.com/title/tt2013293/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 89,
+        "reviews": 183,
+        "url": "https://www.rottentomatoes.com/m/the_wind_rises",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2014,
+        "rtYearNote": "RT lists 2014 (US release); original release was 2013."
+      },
+      "rationale": "A biographical drama about the designer of the Zero fighter, treated as a meditation on creation and complicity; his most personal and most contested film, and an Oscar nominee for Best Animated Feature."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Howl's Moving Castle",
+      "originalTitle": "ハウルの動く城 (Hauru no ugoku shiro)",
+      "year": 2004,
+      "tmdbId": 4935,
+      "imdbId": "tt0347149",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Hauru no ugoku shiro"
+      ],
+      "imdb": {
+        "rating": 8.2,
+        "votes": 525711,
+        "url": "https://www.imdb.com/title/tt0347149/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 183,
+        "url": "https://www.rottentomatoes.com/m/howls_moving_castle",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2005,
+        "rtYearNote": "RT lists 2005 (US release); original release was 2004."
+      },
+      "rationale": "A romantic fantasy with flowing, hand-drawn invention and an anti-war undercurrent; higher on IMDb (8.2) than The Wind Rises but lower on the Tomatometer (87%)."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "Nausicaä of the Valley of the Wind",
+      "originalTitle": "風の谷のナウシカ (Kaze no tani no Naushika)",
+      "year": 1984,
+      "tmdbId": 81,
+      "imdbId": "tt0087544",
+      "directorCreditNote": "Sole director. NOTE: TMDB id 81 is shown on its page as \"Warriors of the Wind\" with a 1h35m runtime (the shortened US cut), original title Kaze no tani no Naushika. IMDb tt0087544 is the 117-minute original. Confirm which version the app should use.",
+      "alternateTitles": [
+        "Warriors of the Wind (US 95-minute cut)",
+        "Kaze no tani no Naushika"
+      ],
+      "imdb": {
+        "rating": 8.0,
+        "votes": 200328,
+        "url": "https://www.imdb.com/title/tt0087544/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 87,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/nausicaa_of_the_valley_of_the_wind",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1985,
+        "rtYearNote": "RT lists 1985; original release was 1984. The RT sample is only 23 reviews."
+      },
+      "rationale": "The post-apocalyptic ecological epic that made the Ghibli name and set up the themes of Mononoke; made before Ghibli was founded."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "The Boy and the Heron",
+      "originalTitle": "君たちはどう生きるか (Kimitachi wa dō ikiru ka)",
+      "year": 2023,
+      "tmdbId": 508883,
+      "imdbId": "tt6587046",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "How Do You Live?"
+      ],
+      "imdb": {
+        "rating": 7.3,
+        "votes": 152775,
+        "url": "https://www.imdb.com/title/tt6587046/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 276,
+        "url": "https://www.rottentomatoes.com/m/the_boy_and_the_heron",
+        "readOn": "2026-11-13",
+        "rtListedYear": 2023,
+        "rtYearNote": null
+      },
+      "rationale": "A late, enigmatic and dreamlike film with a different structure from his earlier work; won the Oscar for Best Animated Feature (2024) and has the largest critic sample in the ten (276 reviews); lowest IMDb rating among the ten (7.3)."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Porco Rosso",
+      "originalTitle": "紅の豚 (Kurenai no buta)",
+      "year": 1992,
+      "tmdbId": 11621,
+      "imdbId": "tt0104652",
+      "directorCreditNote": "Sole director (TMDB Directing credit; IMDb dataset lists the same sole director).",
+      "alternateTitles": [
+        "Kurenai no buta",
+        "The Crimson Pig"
+      ],
+      "imdb": {
+        "rating": 7.7,
+        "votes": 119666,
+        "url": "https://www.imdb.com/title/tt0104652/",
+        "readOn": "2026-11-13"
+      },
+      "rt": {
+        "tomatometer": 96,
+        "reviews": 23,
+        "url": "https://www.rottentomatoes.com/m/porco_rosso",
+        "readOn": "2026-11-13",
+        "rtListedYear": 1992,
+        "rtYearNote": null
+      },
+      "rationale": "A wry romantic adventure about a pilot cursed to look like a pig; the closest call in the ten (see below)."
+    }
+  ],
+  "nearMisses": [
+    {
+      "title": "Ponyo",
+      "year": 2008,
+      "tmdbId": 12429,
+      "imdbId": "tt0876563",
+      "reason": "IMDb 7.6 and RT 91% from 173 reviews; a charming film with the broadest audience but a simpler story than the ten.",
+      "imdb": {
+        "rating": 7.6,
+        "votes": 190585
+      },
+      "rt": {
+        "tomatometer": 91,
+        "reviews": 173,
+        "url": "https://www.rottentomatoes.com/m/ponyo"
+      }
+    },
+    {
+      "title": "The Castle of Cagliostro",
+      "year": 1979,
+      "tmdbId": 15371,
+      "imdbId": "tt0079833",
+      "reason": "His first feature (a Lupin III film); RT 95% from 21 reviews and IMDb 7.6. A reasonable alternate to Porco Rosso.",
+      "imdb": {
+        "rating": 7.6,
+        "votes": 36449
+      },
+      "rt": {
+        "tomatometer": 95,
+        "reviews": 21,
+        "url": "https://www.rottentomatoes.com/m/lupin_iii_the_castle_of_cagliostro"
+      }
+    }
+  ],
+  "unverified": [
+    "TMDB film ids and Directing credits were read from the TMDB person page on 2026-11-13 (no TMDB API key was available), not from the API crew.job field; title-to-id pairs were taken from the page links. Co-director status was checked against the IMDb dataset crew file (title.crew), which lists a sole director for every film in the list.",
+    "IMDb ids were matched in the IMDb dataset by original title, year and runtime, not read from a TMDB external_ids field; confirm with the TMDB API external_ids at implementation.",
+    "RT review counts are a single read on the stated date via a text fetcher.",
+    "IMDb title pages could not be read (HTTP 403); ratings and votes come from the official dataset (not cross-checked against the live pages), whose licence is non-commercial only.",
+    "TMDB id 81 (Nausicaä) page title/runtime reflect the US 'Warriors of the Wind' cut; the ledger keeps the id (it is the only Nausicaä id listed on his TMDB page) and flags the version question.",
+    "Year displayed on the TMDB person page was shifted for several films (for example Totoro shown as 1986); ids and titles were checked and the ledger uses original release years confirmed from IMDb."
+  ]
+}

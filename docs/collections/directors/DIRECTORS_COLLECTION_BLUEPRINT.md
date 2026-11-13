@@ -95,3 +95,34 @@ A film Save must happen only after `GET /api/media/tmdb/:id?type=movie` and iden
 6. No merge/deployment until approval. Runtime tests not executed in the current connector-only environment.
 
 **Owner-facing choices:** name (“The Directors” or “Legendary Directors”); original 12 roster; tone and shape of typographic tile; 3 vs 4 starter films; explicitly approve or reject a future visual hero art phase.
+
+
+---
+
+## Owner-aligned design direction — 2026-11-13 (supersedes earlier concepts)
+
+**Status:** Product/visual direction approved for continued design work; **not permission to merge or deploy**. This section takes precedence over the earlier prototype specifications above, which document the existing draft rather than the accepted target.
+
+### Collection architecture and editorial content
+
+- **One “Legendary Directors” collection** inside the existing Tonight → Collections rail; no new rail, bottom tab, or separate intermediate splash.
+- Approximately **12 filmmaker profiles**, with the final roster still to be researched and approved strictly for achievement in directing. Evaluate directing craft, film quality, influence, range and consistency on their merits; research world cinema comprehensively. The first-draft roster is **provisional**.
+- Each director receives a **static, curated Essential 10** ranked film list, based on researched IMDb and Rotten Tomatoes evidence plus documented editorial judgement. Ratings are not directly comparable; account for vote/review counts and evidence quality. The list and ordering do **not** change by household watch status. Permit fewer than ten only if the filmography does not support ten excellent candidates.
+- The **top three** remain permanently identifiable as the signature films within the fixed Essential 10.
+- The visible Essential 10 can initially show five rows with a **View all 10** affordance. Separate **Watch next** shows around three highest-ranked titles **not marked watched** in Hearth. A film absent from Hearth is *not recorded watched*, not conclusively unseen. If fewer than three unmarked-watched choices exist, show fewer rather than padding with watched titles by default. No numerical match ratings or personalized re-ranking of the static ten.
+- No automatic additions to the shared shelf and no silent restoration of removed items.
+
+### Individual director page — visual and interaction agreement
+
+- **Mobile-first at actual 390px viewport**, warm Hearth shell (#0c0a09), quiet cream serif, restrained amber accents, portrait-led, photographic, no generic projector art, minimal explanatory subtitles. Strong photography and intentional framing; source and verify real portraits before publication.
+- Director **autograph/signature may appear below/near the name** only if a genuine, rights-cleared source can be confirmed for that director. Research candidates; do not generate fake autographs or assume a Wikimedia file is automatically authentic/usable.
+- **Watch next** is visually distinct from **Essential 10**: approximately three film choices above a fixed ranked list. Never show a film marked watched as a personalized *Watch next* suggestion.
+- **Essential 10 rows:** thumbnail, stable editorial rank, film title and year, with **compact IMDb and Rotten Tomatoes scores at the far right**, preferably stacked with small recognizable icons. A potential Rotten Tomatoes SVG is a **design option**, not a license grant: verify actual permitted mark usage and legal score sources, attribution and snapshot date; never fabricate ratings or rely on unlicensed scraping. Show a graceful unavailable state where reliable scores cannot be sourced.
+- **Tap the entire film row or a Watch next card** to open a **centred film-detail modal**, reusing Hearth's existing `ItemDetailsModal` patterns rather than introducing a second incompatible modal. On an unsaved film, load/verify canonical TMDB film identity before displaying **Add to shelf**; saved films open existing details and preserve watched status; recently removed films retain their safe restore flow. Modal supports close/Escape/back and focus restoration.
+- Existing draft branch still implements a different profile/filmography UI. **Do not mistake the branch's current layout for approved production design**; a dedicated implementation pass is required following asset/rating provenance checks.
+
+### Directory and Tonight entry point
+
+- Directory: exploratory **depth/circular carousel** direction influenced by React Bits, but its gestures, accessibility, ability to jump to all twelve, motion reduction and usability are **not approved until hands-on mobile testing**. Do not infer approval merely from a static 3D render.
+- **Next design asset:** the 2:3 **Tonight Legendary Directors cover**, matching actual Collections rail dimensions (approximately 112–144px wide). Preserve legibility at real size; differentiate from surrounding poster covers; avoid film-camera/projector clichés and fake signatures. Bring options for owner review before production.
+- No source code changes or PR merge simply because this design note has been recorded.

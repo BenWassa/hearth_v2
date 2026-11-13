@@ -1,8 +1,11 @@
-# THE DIRECTORS — Product, content and visual specification
+# LEGENDARY DIRECTORS — Product, content and visual specification
 
-**Workstream:** Hearth #57 · **Revision:** 2026-11-12 · **Status:** Review candidate, unmerged
+**Workstream:** Hearth #57 · **Revision:** 2026-11-13 · **Status:** Owner-aligned design direction, technical draft unmerged
 
-## Executive decision
+
+> **Read the [Owner-aligned design direction](#owner-aligned-design-direction--2026-11-13-supersedes-earlier-concepts) before treating any initial branch prototype below as final.** The agreed target is **Legendary Directors**, a static **Essential 10** and separate **Watch Next**, IMDb/Rotten Tomatoes score columns subject to source permissions, a centred film modal, verified portraits/signatures and a Tonight cover. [#60](https://github.com/BenWassa/hearth_v2/issues/60) owns editorial evidence; [#61](https://github.com/BenWassa/hearth_v2/issues/61) owns isolated artwork. The current PR #58 implements an **older** profile/filmography draft, not the approved target.
+
+## Initial draft design (historical, superseded for profile structure)
 
 **Build one editorial collection titled “The Directors”, not a new home rail or a new World.** The user opens it once from Tonight's existing Collections shelf; its dedicated full-page directory contains individual filmmaker pages with a compact selection of starter films and a chronological filmography. The film collection is **authored by a real director**, never a TMDB franchise, mood category, popularity score or tracked challenge.
 

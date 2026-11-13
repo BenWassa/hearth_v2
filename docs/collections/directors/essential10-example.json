@@ -1,0 +1,182 @@
+{
+  "$comment": "DRAFT ledger schema + worked example for issue #60. One director only (Akira Kurosawa). Not approved, not for app use until the owner signs off the roster, the method and the score-display licensing decision.",
+  "schemaVersion": 1,
+  "status": "draft-for-owner-review",
+  "director": {
+    "id": "akira-kurosawa",
+    "name": "Akira Kurosawa",
+    "tmdbPersonId": 5026
+  },
+  "version": "0.1.0-draft",
+  "researchedOn": "2026-11-13",
+  "method": "docs/collections/directors/ESSENTIAL_10_EXAMPLE.md#ranking-method",
+  "methodSummary": "Eligibility (sole or credited TMDB crew job Director, feature film) -> longlist with evidence panel -> tier by directing achievement (craft, innovation, influence, canon) with IMDb and RT used only as within-source ordinal sanity checks -> order within tier by documented editorial judgement. IMDb /10 and Tomatometer % are never averaged or combined.",
+  "scoreSources": {
+    "imdb": {
+      "source": "IMDb non-commercial dataset title.ratings.tsv.gz",
+      "sourceUrl": "https://datasets.imdbws.com/title.ratings.tsv.gz",
+      "terms": "https://data.imdb.com/non-commercial-datasets",
+      "readOn": "2026-11-13",
+      "note": "IMDb title pages returned HTTP 403 to the research fetcher, so ratings come from the official daily dataset instead. Dataset licence is personal / non-commercial use only; see licensing caveats in the markdown."
+    },
+    "rt": {
+      "source": "Rotten Tomatoes film page, critics Tomatometer and its review count",
+      "readOn": "2026-11-13",
+      "note": "Read via an HTML-to-text fetcher, not by hand. Percentages for the ten films were cross-checked against the Kurosawa celebrity filmography table where it listed them. Review counts are live and change; treat as a dated snapshot."
+    }
+  },
+  "films": [
+    {
+      "rank": 1,
+      "signature": true,
+      "title": "Seven Samurai",
+      "originalTitle": "Shichinin no samurai",
+      "year": 1954,
+      "tmdbId": 346,
+      "imdbId": "tt0047478",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": ["The Seven Samurai"],
+      "imdb": { "rating": 8.6, "votes": 407861, "url": "https://www.imdb.com/title/tt0047478/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 100, "reviews": 104, "url": "https://www.rottentomatoes.com/m/seven_samurai_1956", "readOn": "2026-11-13", "rtListedYear": 1956, "rtYearNote": "RT lists the 1956 US release date." },
+      "rationale": "Kurosawa's synthesis of epic scale, ensemble characterisation and kinetic multi-camera action editing set the template for the modern ensemble adventure, and it tops both the audience and critic evidence."
+    },
+    {
+      "rank": 2,
+      "signature": true,
+      "title": "Rashomon",
+      "originalTitle": "Rashomon",
+      "year": 1950,
+      "tmdbId": 548,
+      "imdbId": "tt0042876",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": { "rating": 8.1, "votes": 199721, "url": "https://www.imdb.com/title/tt0042876/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 98, "reviews": 61, "url": "https://www.rottentomatoes.com/m/rashomon", "readOn": "2026-11-13", "rtListedYear": 1950, "rtYearNote": null },
+      "rationale": "Four irreconcilable testimonies of one crime made narrative subjectivity a formal subject and introduced Japanese cinema to the world (Golden Lion, Venice 1951); ranked above higher-scoring audience favourites because its directing innovation is the more consequential."
+    },
+    {
+      "rank": 3,
+      "signature": true,
+      "title": "Ikiru",
+      "originalTitle": "Ikiru",
+      "year": 1952,
+      "tmdbId": 3782,
+      "imdbId": "tt0044741",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": ["To Live"],
+      "imdb": { "rating": 8.3, "votes": 104712, "url": "https://www.imdb.com/title/tt0044741/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 98, "reviews": 55, "url": "https://www.rottentomatoes.com/m/ikiru", "readOn": "2026-11-13", "rtListedYear": 1956, "rtYearNote": "RT page showed 1956 (US release); its celebrity table and TMDB show 1952." },
+      "rationale": "The most humane film in the canon: a dying clerk's search for meaning, structured around a bold shift into his wake, and carried by Takashi Shimura's performance."
+    },
+    {
+      "rank": 4,
+      "signature": false,
+      "title": "Ran",
+      "originalTitle": "Ran",
+      "year": 1985,
+      "tmdbId": 11645,
+      "imdbId": "tt0089881",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": { "rating": 8.2, "votes": 155985, "url": "https://www.imdb.com/title/tt0089881/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 96, "reviews": 90, "url": "https://www.rottentomatoes.com/m/ran", "readOn": "2026-11-13", "rtListedYear": 1985, "rtYearNote": null },
+      "rationale": "King Lear transposed to warring-states Japan, with colour-coded armies and a battle scored without diegetic sound: a late-career summation of his scale and tragic vision."
+    },
+    {
+      "rank": 5,
+      "signature": false,
+      "title": "Yojimbo",
+      "originalTitle": "Yojimbo",
+      "year": 1961,
+      "tmdbId": 11878,
+      "imdbId": "tt0055630",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": ["Yojimbo: The Bodyguard"],
+      "imdb": { "rating": 8.2, "votes": 145466, "url": "https://www.imdb.com/title/tt0055630/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 96, "reviews": 49, "url": "https://www.rottentomatoes.com/m/yojimbo", "readOn": "2026-11-13", "rtListedYear": 1961, "rtYearNote": null },
+      "rationale": "A wry, widescreen-composed genre dismantling that fused samurai and western tropes and became the source for A Fistful of Dollars."
+    },
+    {
+      "rank": 6,
+      "signature": false,
+      "title": "High and Low",
+      "originalTitle": "Tengoku to jigoku",
+      "year": 1963,
+      "tmdbId": 12493,
+      "imdbId": "tt0057565",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": ["Heaven and Hell"],
+      "imdb": { "rating": 8.4, "votes": 74501, "url": "https://www.imdb.com/title/tt0057565/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 97, "reviews": 70, "url": "https://www.rottentomatoes.com/m/high_and_low", "readOn": "2026-11-13", "rtListedYear": 1963, "rtYearNote": null },
+      "rationale": "A kidnap drama staged almost entirely in one apartment that then breaks into a procedural through Yokohama, turning a crime thriller into a study of class and conscience."
+    },
+    {
+      "rank": 7,
+      "signature": false,
+      "title": "Throne of Blood",
+      "originalTitle": "Kumonosu-jo",
+      "year": 1957,
+      "tmdbId": 3777,
+      "imdbId": "tt0050613",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": ["Cobweb Castle"],
+      "imdb": { "rating": 8.0, "votes": 61310, "url": "https://www.imdb.com/title/tt0050613/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 95, "reviews": 44, "url": "https://www.rottentomatoes.com/m/throne_of_blood", "readOn": "2026-11-13", "rtListedYear": 1957, "rtYearNote": null },
+      "rationale": "Macbeth recast through Noh theatre, fog and stylised movement, ending in one of cinema's most celebrated death scenes."
+    },
+    {
+      "rank": 8,
+      "signature": false,
+      "title": "The Hidden Fortress",
+      "originalTitle": "Kakushi-toride no san-akunin",
+      "year": 1958,
+      "tmdbId": 1059,
+      "imdbId": "tt0051808",
+      "directorCreditNote": "Sole director per TMDB crew; screenplay credited to Hideo Oguni, Ryuzo Kikushima, Shinobu Hashimoto and Kurosawa.",
+      "alternateTitles": ["Three Bad Men in a Hidden Fortress"],
+      "imdb": { "rating": 8.0, "votes": 46646, "url": "https://www.imdb.com/title/tt0051808/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 96, "reviews": 53, "url": "https://www.rottentomatoes.com/m/the_hidden_fortress", "readOn": "2026-11-13", "rtListedYear": 1962, "rtYearNote": "RT page showed 1962 (US release); its celebrity table and TMDB show 1958." },
+      "rationale": "His first widescreen adventure: a brisk, funny chase told partly through two bickering peasants, and an acknowledged influence on Star Wars."
+    },
+    {
+      "rank": 9,
+      "signature": false,
+      "title": "Stray Dog",
+      "originalTitle": "Nora inu",
+      "year": 1949,
+      "tmdbId": 30368,
+      "imdbId": "tt0041699",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Writer).",
+      "alternateTitles": [],
+      "imdb": { "rating": 7.8, "votes": 21384, "url": "https://www.imdb.com/title/tt0041699/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 100, "reviews": 23, "url": "https://www.rottentomatoes.com/m/1020312-stray_dog", "readOn": "2026-11-13", "rtListedYear": 1963, "rtYearNote": "RT page showed 1963 (US release). WARNING: rottentomatoes.com/m/stray_dog is a different 2015 film; use the 1020312 slug." },
+      "rationale": "An early police procedural set in sweltering post-war Tokyo whose pairing of a young detective with an older mentor, played by Toshiro Mifune and Takashi Shimura, shaped later crime cinema."
+    },
+    {
+      "rank": 10,
+      "signature": false,
+      "title": "Red Beard",
+      "originalTitle": "Akahige",
+      "year": 1965,
+      "tmdbId": 3780,
+      "imdbId": "tt0058888",
+      "directorCreditNote": "Sole director per TMDB crew (Director, Screenplay).",
+      "alternateTitles": [],
+      "imdb": { "rating": 8.3, "votes": 23951, "url": "https://www.imdb.com/title/tt0058888/", "readOn": "2026-11-13" },
+      "rt": { "tomatometer": 73, "reviews": 15, "url": "https://www.rottentomatoes.com/m/red_beard", "readOn": "2026-11-13", "rtListedYear": 1965, "rtYearNote": "73% corroborated by the Kurosawa celebrity table; the review count of 15 comes from the film page only and is a thin sample. Dersu Uzala showed an identical 73% / 15 on the same fetcher: spot-check both by hand." },
+      "rationale": "A three-hour humanist capstone to the Mifune partnership, set in a rural clinic; the closest call in the ten, kept over Kagemusha and Sanjuro because its directing ambition and audience standing outweigh its thin and mixed critic sample."
+    }
+  ],
+  "nearMisses": [
+    { "title": "Kagemusha", "year": 1980, "tmdbId": 11953, "imdbId": "tt0080979", "reason": "Palme d'Or (shared) but weaker evidence than Red Beard and overlaps with Ran." },
+    { "title": "Sanjuro", "year": 1962, "tmdbId": 11712, "imdbId": "tt0056443", "reason": "Excellent but a sequel that restates Yojimbo." },
+    { "title": "Dersu Uzala", "year": 1975, "tmdbId": 9764, "imdbId": "tt0071411", "reason": "Oscar winner, but outside the core Japanese-language body of work and thin critic sample." },
+    { "title": "Drunken Angel", "year": 1948, "tmdbId": 25858, "imdbId": "tt0040979", "reason": "First Mifune collaboration; surpassed by Stray Dog." },
+    { "title": "The Bad Sleep Well", "year": 1960, "tmdbId": 31589, "imdbId": "tt0054460", "reason": "Strong; no clear case against the chosen ten." }
+  ],
+  "unverified": [
+    "IMDb ids were matched from the IMDb dataset by original title, year and runtime, not read from a TMDB external-ids field (TMDB film pages show no IMDb link). Hidden Fortress runtime differs (TMDB 139 min, IMDb 126 min, a known shorter cut) and High and Low / Throne of Blood differ by 1-2 minutes; the matches are still correct but should be confirmed against the TMDB API external_ids at implementation.",
+    "RT review counts are a single read on the stated date via a text fetcher; Red Beard (73% / 15) in particular should be confirmed by hand.",
+    "IMDb title pages could not be read (HTTP 403); ratings are from the official dataset (not cross-checked against the live title pages), whose licence is non-commercial only."
+  ]
+}

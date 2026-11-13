@@ -37,3 +37,25 @@ describe('curated packs config', () => {
     expect(getCuratedPacks({ preview: true })).toEqual([pack]);
   });
 });
+
+describe('curated pack identities and art slots', () => {
+  const pack = CURATED_PACKS[0];
+  const films = pack.chapters.flatMap((chapter) => chapter.films);
+
+  it('maps every film to a distinct TMDB movie id', () => {
+    const ids = films.map((film) => film.tmdbId);
+    expect(ids.every((id) => Number.isInteger(id) && id > 0)).toBe(true);
+    expect(new Set(ids).size).toBe(films.length);
+  });
+
+  it('exposes artwork paths for the card, hero and each chapter', () => {
+    const base = '/assets/packs/black-comedy-excellence';
+    expect(pack.art).toEqual({
+      card: `${base}/card.webp`,
+      hero: `${base}/hero.webp`,
+    });
+    pack.chapters.forEach((chapter) =>
+      expect(chapter.art).toBe(`${base}/chapters/${chapter.id}.webp`),
+    );
+  });
+});

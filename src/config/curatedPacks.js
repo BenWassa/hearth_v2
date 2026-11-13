@@ -1,4 +1,6 @@
-export const CURATED_PACKS = [
+import identities from './curatedPackIdentities.json';
+
+const PACKS = [
   {
     id: 'black-comedy-excellence',
     type: 'editorial-pack',
@@ -163,6 +165,28 @@ export const CURATED_PACKS = [
     ],
   },
 ];
+
+const ART_ROOT = '/assets/packs';
+
+// Artwork is optional: each file is looked up at these paths and the UI falls
+// back to a placeholder (or plain text) until the file exists.
+const withIdentityAndArt = (pack) => {
+  const base = `${ART_ROOT}/${pack.id}`;
+  return {
+    ...pack,
+    art: { card: `${base}/card.webp`, hero: `${base}/hero.webp` },
+    chapters: pack.chapters.map((chapter) => ({
+      ...chapter,
+      art: `${base}/chapters/${chapter.id}.webp`,
+      films: chapter.films.map((film) => ({
+        ...film,
+        tmdbId: identities.films[film.id]?.tmdbId ?? null,
+      })),
+    })),
+  };
+};
+
+export const CURATED_PACKS = PACKS.map(withIdentityAndArt);
 
 export function getCuratedPacks({ preview = false } = {}) {
   return preview

@@ -29,6 +29,7 @@ const CollectionsRail = ({
   items = [],
   onOpenCollection,
   onBrowse,
+  onOpenDirectors,
   counts,
 }) => {
   const [clock] = useState(Date.now);
@@ -38,7 +39,7 @@ const CollectionsRail = ({
   const [order] = useState(() =>
     rankSagas(collections, { now: clock, counts }).map((saga) => saga.id),
   );
-  if (!collections.length && !packs.length) return null;
+  if (!collections.length && !packs.length && !onOpenDirectors) return null;
   const ranked = preserveSagaOrder(
     rankSagas(collections, { now: clock, counts }),
     order,
@@ -78,6 +79,30 @@ const CollectionsRail = ({
                 <CuratedPackCard pack={pack} onOpen={onOpenPack} />
               </li>
             ))}
+            {onOpenDirectors && (
+              <li className={cell} style={{ scrollSnapAlign: 'start' }}>
+                <button
+                  type="button"
+                  data-directors-card
+                  aria-label="The Directors curated collection"
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    onOpenDirectors(event.currentTarget);
+                  }}
+                  className={`relative flex aspect-[2/3] w-full flex-col justify-between overflow-hidden rounded-lg border border-stone-700/80 bg-stone-900 p-3 text-left shadow-lg shadow-black/20 ${focusRing}`}
+                >
+                  <span className="text-[10px] font-bold uppercase leading-relaxed tracking-[0.15em] text-amber-300">
+                    Curated
+                  </span>
+                  <span className="font-serif text-[1.35rem] leading-tight text-stone-100">
+                    The Directors
+                  </span>
+                  <span className="text-[10px] leading-snug text-stone-400">
+                    A filmmaker collection
+                  </span>
+                </button>
+              </li>
+            )}
             {sagas.map((saga) => (
               <li
                 key={saga.id}

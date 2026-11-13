@@ -27,6 +27,7 @@ const CollectionsBrowseView = ({
   counts,
   onClose,
   onOpenCollection,
+  onOpenDirectors,
 }) => {
   const worldId = initialWorldId;
   const [clock] = useState(Date.now);
@@ -121,8 +122,11 @@ const CollectionsBrowseView = ({
             World
           </h1>
         )}
-        {!worldId && packs.length > 0 && (
-          <section aria-labelledby="curated-index-heading" className="py-5">
+        {!worldId && (onOpenDirectors || packs.length > 0) && (
+          <section
+            aria-labelledby="curated-index-heading"
+            className="border-b border-stone-800 pb-4 pt-5"
+          >
             <h2
               id="curated-index-heading"
               className="mb-3 font-serif text-xl text-stone-100"
@@ -136,13 +140,35 @@ const CollectionsBrowseView = ({
                 </li>
               ))}
             </ul>
+            {onOpenDirectors && (
+              <button
+                type="button"
+                data-directors-index
+                onClick={(event) => onOpenDirectors(event.currentTarget)}
+                className={`${
+                  packs.length ? 'mt-3 ' : ''
+                }flex min-h-16 w-full items-center justify-between rounded-xl border border-stone-800 bg-stone-900/60 px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400`}
+              >
+                <span>
+                  <span className="block font-serif text-lg text-stone-100">
+                    The Directors
+                  </span>
+                  <span className="block text-xs text-stone-400">
+                    Explore twelve filmmakers and their films
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-amber-300">
+                  →
+                </span>
+              </button>
+            )}
           </section>
         )}
         {!worldId && (
           <section aria-label="All sagas" className="pt-2">
             <h2
               className={
-                packs.length
+                packs.length || onOpenDirectors
                   ? 'py-3 font-serif text-xl text-stone-100'
                   : 'sr-only'
               }

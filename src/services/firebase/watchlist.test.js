@@ -224,6 +224,40 @@ describe('addWatchlistItem', () => {
   });
 });
 
+describe('director editorial add guard', () => {
+  it('does not restore a removed title if the curated save forbids restoration', async () => {
+    const transaction = {
+      get: vi.fn().mockResolvedValue({
+        exists: () => true,
+        data: () => ({
+          removedAt: Date.now(),
+          userState: { note: 'Keep this note', status: 'watched' },
+        }),
+      }),
+      set: vi.fn(),
+      update: vi.fn(),
+    };
+    runTransactionMock.mockImplementation(async (_db, action) =>
+      action(transaction),
+    );
+    const { addWatchlistItem } = await loadModule();
+    const result = await addWatchlistItem({
+      db: 'db',
+      appId: 'app',
+      spaceId: 'shared',
+      allowRestore: false,
+      payload: {
+        type: 'movie',
+        title: 'Saved before',
+        source: { provider: 'tmdb', providerId: '77' },
+      },
+    });
+    expect(result.status).toBe('removed');
+    expect(transaction.set).not.toHaveBeenCalled();
+    expect(transaction.update).not.toHaveBeenCalled();
+  });
+});
+
 describe('meaningful shared movie activity', () => {
   const update = vi.fn();
   let record;

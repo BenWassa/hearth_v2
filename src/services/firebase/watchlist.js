@@ -419,7 +419,13 @@ export const subscribeWatchlist = ({
   };
 };
 
-export const addWatchlistItem = async ({ db, appId, spaceId, payload }) => {
+export const addWatchlistItem = async ({
+  db,
+  appId,
+  spaceId,
+  payload,
+  allowRestore = true,
+}) => {
   const mediaId = deriveMediaId(payload);
   const watchRef = getWatchlistDocRef(db, appId, spaceId, mediaId);
   const mediaRef = getCatalogDocRef(db, appId, mediaId);
@@ -428,6 +434,8 @@ export const addWatchlistItem = async ({ db, appId, spaceId, payload }) => {
     const snapshot = await transaction.get(watchRef);
     const current = snapshot.data();
     if (snapshot.exists() && isRemoved(current)) {
+      // Curated single-film saves must never restore a removed title implicitly.
+      if (!allowRestore) return 'removed';
       if (isExpired(current)) throw new Error('Restore window has expired');
       const updates = { ...clearedRemovalMarkers };
       const retainedNote = current.userState?.note || current.note;

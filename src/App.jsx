@@ -224,6 +224,7 @@ export function HearthAppView({ appState }) {
             onExport={handleExportItems}
             onDeleteAll={handleDeleteAll}
             hasRemovedItems={removedItems.length > 0}
+            removedItems={removedItems}
             onOpenRemoved={() => setView('recently-removed')}
             onDecide={(pool, context) => startDecision(pool, context)}
             onToggleStatus={handleMarkWatched}

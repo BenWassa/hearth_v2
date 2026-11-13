@@ -55,7 +55,10 @@ describe('curated pack identities and art slots', () => {
       hero: `${base}/hero.webp`,
     });
     pack.chapters.forEach((chapter) =>
-      expect(chapter.art).toBe(`${base}/chapters/${chapter.id}.webp`),
+      expect([chapter.art, chapter.heroArt]).toEqual([
+        `${base}/chapters/${chapter.id}.webp`,
+        `${base}/chapters/${chapter.id}-hero.webp`,
+      ]),
     );
   });
 });

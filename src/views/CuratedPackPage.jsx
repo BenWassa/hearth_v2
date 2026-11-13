@@ -4,6 +4,7 @@ import IconButton from '../components/ui/IconButton.jsx';
 import FilmList from '../components/curated/FilmRail.jsx';
 import FilmPreview from '../components/curated/FilmPreview.jsx';
 import PackArt from '../components/curated/PackArt.jsx';
+import ChapterHero from '../components/curated/ChapterHero.jsx';
 
 const SlotPlaceholder = ({ label, className = '' }) => (
   <div
@@ -164,25 +165,8 @@ export default function CuratedPackPage({ pack, onClose }) {
             aria-labelledby={`chapter-${chapter.id}`}
             className="mb-9 scroll-mt-5 focus:outline-none"
           >
-            <h2
-              id={`chapter-${chapter.id}`}
-              className="font-serif text-2xl text-stone-100"
-            >
-              {chapter.title}
-            </h2>
-            <PackArt
-              src={chapter.art}
-              className="mt-3 aspect-[16/9] w-full rounded-lg object-cover"
-              placeholder={
-                pack.status === 'draft' ? (
-                  <SlotPlaceholder
-                    label="Chapter artwork 1600×900"
-                    className="mt-3 aspect-[16/9] w-full rounded-lg"
-                  />
-                ) : null
-              }
-            />
-            <p className="mb-4 mt-3 text-sm leading-relaxed text-stone-400">
+            <ChapterHero chapter={chapter} showSlot={pack.status === 'draft'} />
+            <p className="mb-4 text-sm leading-relaxed text-stone-400">
               {chapter.description}
             </p>
             <FilmList

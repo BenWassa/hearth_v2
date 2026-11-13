@@ -178,6 +178,7 @@ const withIdentityAndArt = (pack) => {
     chapters: pack.chapters.map((chapter) => ({
       ...chapter,
       art: `${base}/chapters/${chapter.id}.webp`,
+      heroArt: `${base}/chapters/${chapter.id}-hero.webp`,
       films: chapter.films.map((film) => ({
         ...film,
         tmdbId: identities.films[film.id]?.tmdbId ?? null,

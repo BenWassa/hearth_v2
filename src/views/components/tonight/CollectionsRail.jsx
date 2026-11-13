@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Library } from 'lucide-react';
 import LazyMediaImage from '../../../components/media/LazyMediaImage.jsx';
+import CuratedPackCard from '../../../components/curated/CuratedPackCard.jsx';
 import WorldCover from '../../../components/cards/WorldCover.jsx';
 import useTonightWorlds from './useTonightWorlds.js';
 import { getPosterSrc } from '../../../utils/poster.js';
@@ -23,6 +24,8 @@ const focusRing =
 // Order is fixed for the visit (like Worlds); nothing is fetched for it.
 const CollectionsRail = ({
   collections = [],
+  packs = [],
+  onOpenPack,
   items = [],
   onOpenCollection,
   onBrowse,
@@ -36,7 +39,7 @@ const CollectionsRail = ({
   const [order] = useState(() =>
     rankSagas(collections, { now: clock, counts }).map((saga) => saga.id),
   );
-  if (!collections.length && !onOpenDirectors) return null;
+  if (!collections.length && !packs.length && !onOpenDirectors) return null;
   const ranked = preserveSagaOrder(
     rankSagas(collections, { now: clock, counts }),
     order,
@@ -67,6 +70,15 @@ const CollectionsRail = ({
             aria-label="All collections"
             className="flex gap-2.5 min-w-max"
           >
+            {packs.map((pack) => (
+              <li
+                key={pack.id}
+                className={cell}
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <CuratedPackCard pack={pack} onOpen={onOpenPack} />
+              </li>
+            ))}
             {onOpenDirectors && (
               <li className={cell} style={{ scrollSnapAlign: 'start' }}>
                 <button
@@ -124,7 +136,7 @@ const CollectionsRail = ({
               </li>
             ))}
             {/* The row already shows everything when there are only a few. */}
-            {(sagas.length > 3 || hasHiddenSagas) && (
+            {(packs.length > 0 || sagas.length > 3 || hasHiddenSagas) && (
               <li className={cell} style={{ scrollSnapAlign: 'start' }}>
                 <WorldCover
                   neutral

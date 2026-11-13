@@ -1,3 +1,6 @@
+import { getCuratedPacks } from '../config/curatedPacks.js';
+import useCuratedPackHistory from '../app/useCuratedPackHistory.js';
+import CuratedPackPage from './CuratedPackPage.jsx';
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
 import { composeTonightRows } from '../domain/media/tonightComposition.js';
 import React, {
@@ -213,6 +216,23 @@ const TonightView = ({
   loadTemplateScenario,
   templateScenario,
 }) => {
+  // Draft content shows only on the local dev server (hide with ?curatedPreview=0).
+  const packs = useMemo(
+    () =>
+      getCuratedPacks({
+        preview:
+          import.meta.env.DEV &&
+          new URLSearchParams(window.location.search).get('curatedPreview') !==
+            '0',
+      }),
+    [],
+  );
+  const {
+    pack: curatedPack,
+    openPack,
+    closePack,
+  } = useCuratedPackHistory(packs);
+
   const currentlyWatchingShows = useMemo(
     () =>
       items
@@ -447,6 +467,8 @@ const TonightView = ({
   const collectionsRail = (
     <CollectionsRail
       collections={collections}
+      packs={packs}
+      onOpenPack={openPack}
       items={items}
       onOpenCollection={openCollection}
       onBrowse={browseCollections}
@@ -470,8 +492,17 @@ const TonightView = ({
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <div
-        aria-hidden={isCollectionsBrowseOpen || isDirectorsOpen || undefined}
-        inert={isCollectionsBrowseOpen || isDirectorsOpen ? '' : undefined}
+        aria-hidden={
+          isCollectionsBrowseOpen ||
+          isDirectorsOpen ||
+          Boolean(curatedPack) ||
+          undefined
+        }
+        inert={
+          isCollectionsBrowseOpen || isDirectorsOpen || curatedPack
+            ? ''
+            : undefined
+        }
         className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
@@ -669,6 +700,9 @@ const TonightView = ({
       {isCollectionsBrowseOpen && (
         <CollectionsBrowseView
           collections={collections}
+          packs={packs}
+          onOpenPack={openPack}
+          covered={Boolean(curatedPack)}
           items={items}
           initialWorldId={browseWorldId}
           onOpenItem={openDetails}
@@ -689,6 +723,10 @@ const TonightView = ({
             onOpenRemoved={onOpenRemoved}
           />
         </Suspense>
+      )}
+
+      {curatedPack && (
+        <CuratedPackPage pack={curatedPack} onClose={closePack} />
       )}
 
       {hasOpenedWipe && (

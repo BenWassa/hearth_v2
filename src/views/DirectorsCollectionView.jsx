@@ -2,68 +2,17 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import useDirectorsHistory from '../app/useDirectorsHistory.js';
 import Dialog from '../components/ui/Dialog.jsx';
+import {
+  providerIdFor,
+  findByFilmId,
+  toWatchlistPayload,
+} from '../components/curated/watchlistFilm.js';
 import catalog from '../config/directorEssentials.json';
 import { loadFilm } from '../components/directors/filmMedia.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400';
-
-const providerIdFor = (item) => {
-  const source = item?.source || {};
-  const provider = String(
-    source.provider || item?.media?.provider || item?.provider || '',
-  ).toLowerCase();
-  const id = String(
-    source.providerId || item?.media?.providerId || item?.providerId || '',
-  ).trim();
-  if (provider === 'tmdb' && id) return id;
-  const mediaId = String(item?.mediaId || item?.id || '');
-  return mediaId.startsWith('tmdb:') ? mediaId.slice(5) : '';
-};
-
-const findByFilmId = (items, id) =>
-  (items || []).find(
-    (item) => providerIdFor(item) === String(id) && item?.type !== 'show',
-  );
-
-const toWatchlistPayload = (film) => {
-  if (
-    film?.provider !== 'tmdb' ||
-    !/^\d+$/.test(String(film?.providerId || ''))
-  ) {
-    throw new Error('Film identity could not be verified.');
-  }
-  return {
-    schemaVersion: 2,
-    title: film.title,
-    type: 'movie',
-    status: 'unwatched',
-    source: {
-      provider: 'tmdb',
-      providerId: String(film.providerId),
-      fetchedAt: Date.now(),
-      locale: 'en-US',
-    },
-    media: {
-      ...film,
-      type: 'movie',
-      provider: 'tmdb',
-      providerId: String(film.providerId),
-      title: film.title,
-      poster: film.posterUrl || film.poster || '',
-      backdrop: film.backdropUrl || film.backdrop || '',
-      logo: film.logoUrl || film.logo || '',
-      directors: Array.isArray(film.directors) ? film.directors : [],
-    },
-    userState: {
-      status: 'unwatched',
-      note: '',
-      episodeProgress: {},
-      tagProvenance: { vibe: 'automatic', energy: 'automatic' },
-    },
-  };
-};
 
 const OptionalArt = ({ src, className }) => {
   const [loaded, setLoaded] = useState(false);
@@ -161,6 +110,8 @@ const DirectorsCollectionView = ({
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState('');
+  const [retry, setRetry] = useState(0);
+  const [posterFailed, setPosterFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveNotice, setSaveNotice] = useState('');
   const scrollRef = useRef(null);
@@ -192,6 +143,7 @@ const DirectorsCollectionView = ({
     setPreview(null);
     setPreviewError('');
     setPreviewLoading(true);
+    setPosterFailed(false);
     getMediaDetails({
       provider: 'tmdb',
       providerId: activeFilm.providerId,
@@ -218,7 +170,7 @@ const DirectorsCollectionView = ({
     return () => {
       active = false;
     };
-  }, [activeFilm?.providerId]);
+  }, [activeFilm?.providerId, retry]);
 
   useEffect(() => {
     if (scrollRef.current)
@@ -357,7 +309,7 @@ const DirectorsCollectionView = ({
               </div>
               <div
                 ref={directoryRail}
-                className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4"
+                className="-m-1 flex snap-x snap-mandatory gap-3 overflow-x-auto p-1 pb-5"
                 onKeyDown={(event) => {
                   if (
                     !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(
@@ -408,9 +360,11 @@ const DirectorsCollectionView = ({
                       <span className="mb-2 block font-serif text-xl leading-tight text-stone-100">
                         {entry.name}
                       </span>
-                      <span className="block text-xs leading-snug text-stone-400">
-                        {entry.description}
-                      </span>
+                      {entry.description && (
+                        <span className="block text-xs leading-snug text-stone-400">
+                          {entry.description}
+                        </span>
+                      )}
                     </span>
                   </button>
                 ))}
@@ -455,7 +409,10 @@ const DirectorsCollectionView = ({
                       className={`min-w-0 text-left ${focusRing}`}
                     >
                       <FilmPoster film={film} />
-                      <span className="mt-2 block font-serif text-sm text-stone-100">
+                      <span
+                        title={film.title}
+                        className="mt-2 line-clamp-3 font-serif text-sm text-stone-100"
+                      >
                         {film.title}
                       </span>
                       <span className="text-xs text-stone-400">
@@ -467,11 +424,11 @@ const DirectorsCollectionView = ({
               </section>
             )}
             <section
-              aria-label="Essential 10"
+              aria-label={`Essential ${films.length}`}
               className="mt-8 border-t border-stone-800 pt-6"
             >
               <h3 className="font-serif text-2xl text-stone-100">
-                Essential 10
+                Essential {films.length}
               </h3>
               <ol
                 id="director-essentials"
@@ -571,14 +528,22 @@ const DirectorsCollectionView = ({
               {previewError && (
                 <p role="alert" className="mt-6 text-sm text-stone-300">
                   {previewError}
+                  <button
+                    type="button"
+                    onClick={() => setRetry((value) => value + 1)}
+                    className={`mt-2 block min-h-11 text-sm text-amber-200 ${focusRing}`}
+                  >
+                    Try again
+                  </button>
                 </p>
               )}
               {preview && (
                 <>
                   <div className="mt-5 flex items-start gap-4">
-                    {preview.posterUrl && (
+                    {preview.posterUrl && !posterFailed && (
                       <img
                         src={preview.posterUrl}
+                        onError={() => setPosterFailed(true)}
                         alt=""
                         className="w-28 shrink-0 rounded-lg object-cover"
                       />

@@ -99,13 +99,13 @@ const CollectionsRail = ({
                       event.currentTarget.hidden = true;
                     }}
                   />
-                  <span className="text-[10px] font-bold uppercase leading-relaxed tracking-[0.15em] text-amber-300">
+                  <span className="text-[11px] font-bold uppercase leading-relaxed tracking-[0.15em] text-amber-300">
                     Curated
                   </span>
                   <span className="font-serif text-[1.35rem] leading-tight text-stone-100">
                     The Directors
                   </span>
-                  <span className="text-[10px] leading-snug text-stone-400">
+                  <span className="text-[11px] leading-snug text-stone-400">
                     A filmmaker collection
                   </span>
                 </button>

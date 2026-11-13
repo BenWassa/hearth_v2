@@ -15,7 +15,15 @@ const SlotPlaceholder = ({ label, className = '' }) => (
   </div>
 );
 
-export default function CuratedPackPage({ pack, onClose }) {
+export default function CuratedPackPage({
+  pack,
+  onClose,
+  items,
+  removedItems,
+  onAddItem,
+  onOpenItem,
+  onOpenRemoved,
+}) {
   const [activeFilm, setActiveFilm] = useState(null);
   const pendingBack = useRef(false);
   useEffect(() => {
@@ -250,6 +258,11 @@ export default function CuratedPackPage({ pack, onClose }) {
         <FilmPreview
           key={activeFilm.id}
           film={activeFilm}
+          items={items}
+          removedItems={removedItems}
+          onAddItem={onAddItem}
+          onOpenItem={onOpenItem}
+          onOpenRemoved={onOpenRemoved}
           onClose={closeFilm}
         />
       )}

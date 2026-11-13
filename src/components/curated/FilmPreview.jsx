@@ -1,11 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { findByFilmId, toWatchlistPayload } from './watchlistFilm.js';
+import Button from '../ui/Button.jsx';
 import Dialog from '../ui/Dialog.jsx';
 import IconButton from '../ui/IconButton.jsx';
 import PackArt from './PackArt.jsx';
 import { loadFilm } from './filmMedia.js';
 
-export default function FilmPreview({ film, onClose }) {
+export default function FilmPreview({
+  film,
+  onClose,
+  items = [],
+  removedItems = [],
+  onAddItem,
+  onOpenItem,
+  onOpenRemoved,
+}) {
   const [data, setData] = useState(undefined);
+  const [saving, setSaving] = useState(false);
+  const [result, setResult] = useState('');
+  const savingRef = useRef(false);
+  const owned = findByFilmId(items, film.tmdbId);
+  const removed =
+    findByFilmId(removedItems, film.tmdbId) || result === 'removed';
+  const saved = ['added', 'exists', 'restored'].includes(result);
+  const verified =
+    data?.provider === 'tmdb' &&
+    String(data.providerId) === String(film.tmdbId) &&
+    (!data.type || data.type === 'movie');
+  const save = async () => {
+    if (savingRef.current || owned || removed || saved || !verified) return;
+    savingRef.current = true;
+    setSaving(true);
+    setResult('');
+    try {
+      const outcome = await onAddItem(toWatchlistPayload(data), {
+        allowRestore: false,
+      });
+      setResult(
+        ['added', 'exists', 'restored', 'removed'].includes(outcome?.status)
+          ? outcome.status
+          : 'failed',
+      );
+    } catch {
+      setResult('failed');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  };
+  const notices = {
+    added: 'Added to your Library.',
+    exists: 'Already in your Library.',
+    restored: 'Restored to your Library.',
+    failed: 'Could not confirm the save. Check your Library and try again.',
+  };
   useEffect(() => {
     let active = true;
     loadFilm(film).then((value) => {
@@ -68,6 +116,48 @@ export default function FilmPreview({ film, onClose }) {
             ? 'Loading film details…'
             : data?.overview || 'Film details are unavailable right now.'}
         </p>
+        <div className="mt-6 text-sm text-stone-300">
+          {owned || saved ? (
+            <p>
+              {(owned?.userState?.status || owned?.status) === 'watched'
+                ? 'Watched'
+                : 'In Library'}
+            </p>
+          ) : removed ? (
+            <>
+              <p>
+                This title is in Recently removed. Restore it there to preserve
+                your previous details.
+              </p>
+              {onOpenRemoved && (
+                <Button variant="ghost" onClick={onOpenRemoved}>
+                  Open Recently removed
+                </Button>
+              )}
+            </>
+          ) : verified ? (
+            <Button
+              disabled={saving || typeof onAddItem !== 'function'}
+              onClick={save}
+            >
+              {saving
+                ? 'Saving…'
+                : result === 'failed'
+                ? 'Retry Add to Library'
+                : 'Add to Library'}
+            </Button>
+          ) : null}
+          {owned && onOpenItem && (
+            <Button variant="ghost" onClick={() => onOpenItem(owned)}>
+              Open Hearth details
+            </Button>
+          )}
+          {notices[result] && (
+            <p role="status" className="mt-3">
+              {notices[result]}
+            </p>
+          )}
+        </div>
       </section>
     </Dialog>
   );

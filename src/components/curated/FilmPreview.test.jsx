@@ -131,7 +131,12 @@ it('loads only near rails, deduplicates featured films and caches preview reques
   expect(host.textContent).toContain('Provider synopsis');
   expect(host.textContent).toContain('90 min');
   expect(host.textContent).toContain('Comedy');
-  expect(host.textContent).not.toContain('Add to Library');
+  expect(host.textContent).toContain('Add to Library');
+  await act(async () =>
+    host
+      .querySelector('[data-curated-scroller]')
+      .dispatchEvent(new Event('scroll')),
+  );
   expectNoWrites();
   await back();
 });

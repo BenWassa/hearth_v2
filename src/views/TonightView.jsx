@@ -726,7 +726,15 @@ const TonightView = ({
       )}
 
       {curatedPack && (
-        <CuratedPackPage pack={curatedPack} onClose={closePack} />
+        <CuratedPackPage
+          pack={curatedPack}
+          onClose={closePack}
+          items={items}
+          removedItems={removedItems}
+          onAddItem={onAddItem}
+          onOpenItem={openDetails}
+          onOpenRemoved={onOpenRemoved}
+        />
       )}
 
       {hasOpenedWipe && (

@@ -1,5 +1,8 @@
 # Black Comedy Excellence — Artwork generation prompts
 
+> **Current status (2026-11-13):** This file is a historical prompt handoff. Artwork production and approvals are now occurring in the ChatGPT asset-studio conversation under [#62](https://github.com/BenWassa/hearth_v2/issues/62), **not** in Workspace. The latest 29-image selections, unfinished Spoofs/Love variants, palette, and handoff gate are recorded in [ARTWORK_STUDIO_STATUS.md](ARTWORK_STUDIO_STATUS.md). Older statements below such as “next artwork round: Friends” are superseded. No UI implementation or images have been merged.
+
+
 **Status:** External-generation handoff, design concepts approved in conversation; **no generated image here is a final production asset**  
 **Last updated:** 2026-11-10  
 **Issue:** https://github.com/BenWassa/hearth_v2/issues/55  

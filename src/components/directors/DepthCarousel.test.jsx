@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import catalog from '../../config/directorEssentials.json';
 import DepthCarousel from './DepthCarousel.jsx';
+import { emblaCalls } from './__fixtures__/fakeEmbla.js';
+
+vi.mock('embla-carousel-react', () => import('./__fixtures__/fakeEmbla.js'));
 
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const { directors } = catalog;
@@ -107,67 +110,46 @@ it('does not schedule autoplay or advance on its own', async () => {
   expect(front()).toBe(card(0));
 });
 
-const swipe = async (moves) => {
-  const stage = card(0).parentElement.parentElement;
-  stage.setPointerCapture = vi.fn();
-  const pointer = (type, clientX, timeStamp) => {
-    const event = Object.assign(new Event(type, { bubbles: true }), {
-      isPrimary: true,
-      pointerId: 1,
-      pointerType: 'touch',
-      button: 0,
-      clientX,
-    });
-    // React substitutes Date.now() for a zero timeStamp, so offset the clock.
-    Object.defineProperty(event, 'timeStamp', { value: 1000 + timeStamp });
-    return event;
-  };
-  const [[x0, t0], ...rest] = moves;
-  const [xEnd, tEnd] = rest[rest.length - 1];
-  await act(async () => {
-    card(0).dispatchEvent(pointer('pointerdown', x0, t0));
-    for (const [x, t] of rest)
-      stage.dispatchEvent(pointer('pointermove', x, t));
-    stage.dispatchEvent(pointer('pointerup', xEnd, tEnd));
-    card(1).dispatchEvent(
-      new MouseEvent('click', { bubbles: true, detail: 1 }),
-    );
-  });
-};
-
-it('a slow drag moves one director without opening a card', async () => {
-  await swipe([
-    [300, 0],
-    [285, 200],
-    [270, 400],
-  ]);
-  expect(front()).toBe(card(1));
+it('a tap that lands while the wheel is moving only stops it', async () => {
+  const { lastApi } = await import('./__fixtures__/fakeEmbla.js');
+  await act(async () => lastApi().touchWhileMoving());
+  await click(card(0));
   expect(onOpen).not.toHaveBeenCalled();
+  await click(card(0));
+  expect(onOpen).toHaveBeenCalledOnce();
 });
 
-it('a quick flick spins on through several directors and stops on one', async () => {
-  await swipe([
-    [300, 0],
-    [285, 30],
-    [270, 60],
-  ]);
-  expect(front()).toBe(card(4));
-  expect(onOpen).not.toHaveBeenCalled();
+it('keeps keyboard focus on the front card when a swipe changes it', async () => {
+  const { lastApi } = await import('./__fixtures__/fakeEmbla.js');
+  card(0).focus();
+  await act(async () => lastApi().scrollTo(3));
+  expect(front()).toBe(card(3));
+  expect(document.activeElement).toBe(card(3));
 });
 
-it('a flick the other way spins backwards around the wheel', async () => {
-  await swipe([
-    [270, 0],
-    [285, 30],
-    [300, 60],
-  ]);
-  expect(front()).toBe(card(8));
+it('loops, lets a fling carry past several directors, and has no arrows', () => {
+  const options = emblaCalls.options.at(-1);
+  expect(options.loop).toBe(true);
+  expect(options.skipSnaps).toBe(true);
+  expect(host.querySelector('[aria-label^="Previous director"]')).toBeNull();
+  expect(host.querySelector('[aria-label^="Next director"]')).toBeNull();
 });
 
-it('updates immediately without animation when reduced motion is preferred', async () => {
+it('jumps without animation and settles one at a time when reduced motion is preferred', async () => {
   vi.stubGlobal('matchMedia', () => ({ matches: true }));
+  await act(async () =>
+    root.render(
+      <DepthCarousel
+        key="reduced"
+        items={directors}
+        renderItem={(director) => director.name}
+        onOpen={onOpen}
+      />,
+    ),
+  );
+  expect(emblaCalls.options.at(-1).skipSnaps).toBe(false);
   card(0).focus();
   await key('ArrowRight');
   expect(front()).toBe(card(1));
-  expect(card(1).style.opacity).toBe('1');
+  expect(emblaCalls.scrollTo.at(-1)).toEqual([1, true]);
 });

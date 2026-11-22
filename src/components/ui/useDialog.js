@@ -11,6 +11,8 @@ const openDialogs = [];
 // getClientRects(). Catches display:none from responsive classes like `sm:hidden`.
 const isVisible = (el) => {
   if (el.closest('[hidden], [inert]')) return false;
+  // Out of the tab order (for example carousel cards behind the front one).
+  if (el.getAttribute('tabindex') === '-1') return false;
   // Content of a closed <details> is skipped by the browser; only its summary is reachable.
   const details = el.closest('details:not([open])');
   if (details && !el.closest('summary')) return false;

@@ -67,8 +67,11 @@ it('shows a pack with an empty library, closes via real Back and restores scroll
     expect(host.querySelector('#curated-pack-heading').textContent).toBe(
       'Black Comedy Excellence',
     );
-    expect(host.querySelector('[data-curated-scroller]').textContent).toContain(
-      'All films',
+    expect(document.activeElement).toBe(
+      host.querySelector('#curated-pack-heading'),
+    );
+    expect(host.querySelector('#curated-all-heading').textContent).toBe(
+      'All 50 films',
     );
     // Only optional pack artwork may appear; no provider film posters yet.
     const imageSources = [
@@ -82,12 +85,25 @@ it('shows a pack with an empty library, closes via real Back and restores scroll
     expect(
       host.querySelectorAll('[aria-labelledby="curated-all-heading"] li'),
     ).toHaveLength(50);
-    const chapterButton = [...host.querySelectorAll('nav button')].find(
+    const themes = host.querySelector('nav[aria-label="Collection chapters"]');
+    const chapterButton = [...themes.querySelectorAll('button')].find(
       (button) => button.textContent.includes('Spoofs & Satire'),
     );
     await click(chapterButton);
     expect(document.activeElement.getAttribute('aria-labelledby')).toBe(
       'chapter-spoofs-satire',
+    );
+    await click(
+      [...document.activeElement.querySelectorAll('button')].find(
+        (button) => button.textContent === 'Back to themes',
+      ),
+    );
+    expect(document.activeElement).toBe(chapterButton);
+    const allFilmsTile = [...themes.querySelectorAll('button')].at(-1);
+    expect(allFilmsTile.textContent).toBe('All 50 films');
+    await click(allFilmsTile);
+    expect(document.activeElement.getAttribute('aria-labelledby')).toBe(
+      'curated-all-heading',
     );
     expect(window.history.state.__hearthNavigation).toEqual({
       view: 'tonight',

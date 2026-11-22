@@ -697,7 +697,7 @@ export const useTemplateAppState = () => {
     return `template-user-item-${next}`;
   };
 
-  const handleAddItem = async (itemData) => {
+  const handleAddItem = async (itemData, { allowRestore = true } = {}) => {
     const normalized = normalizeTemplateItem(
       { ...itemData, additionOrigin: 'manual', createdAt: Date.now() },
       createItemId(),
@@ -709,11 +709,15 @@ export const useTemplateAppState = () => {
     const duplicateExists = items.some(equivalent);
     if (duplicateExists) {
       notifyError('That title is already on your shelf.');
-      return;
+      return { status: 'exists' };
     }
 
     const retained = removedItems.find(equivalent);
     if (retained) {
+      if (!allowRestore) {
+        notifyError('This title is in Recently removed. Restore it there.');
+        return { status: 'removed' };
+      }
       const result = await handleRestoreRemoved(retained.id);
       if (result.status === 'restored') {
         if (!retained.note?.trim() && normalized.note?.trim())
@@ -727,11 +731,12 @@ export const useTemplateAppState = () => {
         setView('tonight');
         notifyUpdate(`Brought back ${retained.title} from Recently removed.`);
       } else notifyError('This title is no longer available to restore.');
-      return;
+      return result;
     }
     setItems((current) => [normalized, ...current]);
     setView('tonight');
     notifyUpdate('Title added to shelf.');
+    return { status: 'added', itemId: normalized.id };
   };
 
   const handleImportItems = async () => {

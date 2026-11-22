@@ -102,4 +102,47 @@ describe('useDialog', () => {
     press('Tab');
     expect(document.activeElement).toBe(buttons[0]);
   });
+
+  it('treats a closed <details> as its summary only when trapping Tab', () => {
+    const Closing = () => {
+      const dialogProps = useDialog({ onClose: () => {} });
+      return (
+        <div {...dialogProps} aria-label="details">
+          <button>first details</button>
+          <details>
+            <summary>About</summary>
+            <a href="https://example.com">hidden link</a>
+          </details>
+        </div>
+      );
+    };
+    act(() => root.render(<Closing />));
+    const first = container.querySelector('button');
+    const summary = container.querySelector('summary');
+    summary.focus();
+    press('Tab');
+    expect(document.activeElement).toBe(first);
+    press('Tab', { shiftKey: true });
+    expect(document.activeElement).toBe(summary);
+  });
+
+  it('ignores controls taken out of the tab order when trapping Tab', () => {
+    const Cards = () => {
+      const dialogProps = useDialog({ onClose: () => {} });
+      return (
+        <div {...dialogProps} aria-label="cards">
+          <button>front card</button>
+          <button>credits</button>
+          <button tabIndex={-1}>behind the front card</button>
+        </div>
+      );
+    };
+    act(() => root.render(<Cards />));
+    const [first, last] = container.querySelectorAll('button');
+    last.focus();
+    press('Tab');
+    expect(document.activeElement).toBe(first);
+    press('Tab', { shiftKey: true });
+    expect(document.activeElement).toBe(last);
+  });
 });

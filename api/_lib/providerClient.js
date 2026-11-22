@@ -562,6 +562,7 @@ const getCollection = async ({
 };
 
 module.exports = {
+  tmdbGet,
   getMediaDetails,
   getSeasonEpisodes,
   getShowSeasons,

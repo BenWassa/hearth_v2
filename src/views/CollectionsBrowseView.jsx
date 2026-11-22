@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import CuratedPackCard from '../components/curated/CuratedPackCard.jsx';
 import Dialog from '../components/ui/Dialog.jsx';
 import SagaRow from '../components/cards/SagaRow.jsx';
 import SagaTile from '../components/cards/SagaTile.jsx';
@@ -17,12 +18,16 @@ import {
 // World it is that World's page: artwork, then poster shelves.
 const CollectionsBrowseView = ({
   collections,
+  packs = [],
+  onOpenPack,
+  covered = false,
   items = [],
   initialWorldId = null,
   onOpenItem,
   counts,
   onClose,
   onOpenCollection,
+  onOpenDirectors,
 }) => {
   const worldId = initialWorldId;
   const [clock] = useState(Date.now);
@@ -63,6 +68,8 @@ const CollectionsBrowseView = ({
   return (
     <Dialog
       onClose={onClose}
+      inert={covered ? '' : undefined}
+      aria-hidden={covered || undefined}
       aria-labelledby="collections-heading"
       className={`fixed inset-0 z-40 bg-stone-950 flex flex-col max-w-md mx-auto pb-[var(--safe-bottom)] ${
         worldId ? '' : 'pt-[var(--safe-top)]'
@@ -115,9 +122,59 @@ const CollectionsBrowseView = ({
             World
           </h1>
         )}
+        {!worldId && (onOpenDirectors || packs.length > 0) && (
+          <section
+            aria-labelledby="curated-index-heading"
+            className="border-b border-stone-800 pb-4 pt-5"
+          >
+            <h2
+              id="curated-index-heading"
+              className="mb-3 font-serif text-xl text-stone-100"
+            >
+              Curated collections
+            </h2>
+            <ul className="grid grid-cols-2 gap-3">
+              {packs.map((pack) => (
+                <li key={pack.id}>
+                  <CuratedPackCard pack={pack} onOpen={onOpenPack} />
+                </li>
+              ))}
+            </ul>
+            {onOpenDirectors && (
+              <button
+                type="button"
+                data-directors-index
+                onClick={(event) => onOpenDirectors(event.currentTarget)}
+                className={`${
+                  packs.length ? 'mt-3 ' : ''
+                }flex min-h-16 w-full items-center justify-between rounded-xl border border-stone-800 bg-stone-900/60 px-4 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400`}
+              >
+                <span>
+                  <span className="block font-serif text-lg text-stone-100">
+                    The Directors
+                  </span>
+                  <span className="block text-xs text-stone-400">
+                    Explore twelve filmmakers and their films
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-amber-300">
+                  →
+                </span>
+              </button>
+            )}
+          </section>
+        )}
         {!worldId && (
           <section aria-label="All sagas" className="pt-2">
-            <h2 className="sr-only">All sagas</h2>
+            <h2
+              className={
+                packs.length || onOpenDirectors
+                  ? 'py-3 font-serif text-xl text-stone-100'
+                  : 'sr-only'
+              }
+            >
+              Sagas
+            </h2>
             {!ranked.length && (
               <p className="py-6 text-sm text-stone-400">
                 Add films from a saga to your shelf and find them together here.

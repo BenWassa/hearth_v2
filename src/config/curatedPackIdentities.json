@@ -1,0 +1,205 @@
+{
+  "_note": "Draft identity map: editorial film id to TMDB movie. Matched by exact title + release year via TMDB search on 2026-11-13; Life (1999) chosen by hand. Not yet editor-reviewed.",
+  "films": {
+    "cooley-high": {
+      "tmdbId": 35711,
+      "tmdbTitle": "Cooley High"
+    },
+    "hollywood-shuffle": {
+      "tmdbId": 34101,
+      "tmdbTitle": "Hollywood Shuffle"
+    },
+    "school-daze": {
+      "tmdbId": 36739,
+      "tmdbTitle": "School Daze"
+    },
+    "car-wash": {
+      "tmdbId": 15462,
+      "tmdbTitle": "Car Wash"
+    },
+    "stir-crazy": {
+      "tmdbId": 21629,
+      "tmdbTitle": "Stir Crazy"
+    },
+    "uptown-saturday-night": {
+      "tmdbId": 29464,
+      "tmdbTitle": "Uptown Saturday Night"
+    },
+    "breakin-2-electric-boogaloo": {
+      "tmdbId": 17464,
+      "tmdbTitle": "Breakin' 2: Electric Boogaloo"
+    },
+    "lets-do-it-again": {
+      "tmdbId": 29473,
+      "tmdbTitle": "Let's Do It Again"
+    },
+    "do-the-right-thing": {
+      "tmdbId": 925,
+      "tmdbTitle": "Do the Right Thing"
+    },
+    "dolemite": {
+      "tmdbId": 19174,
+      "tmdbTitle": "Dolemite"
+    },
+    "coming-to-america": {
+      "tmdbId": 9602,
+      "tmdbTitle": "Coming to America"
+    },
+    "harlem-nights": {
+      "tmdbId": 9085,
+      "tmdbTitle": "Harlem Nights"
+    },
+    "life": {
+      "tmdbId": 6522,
+      "tmdbTitle": "Life"
+    },
+    "the-nutty-professor": {
+      "tmdbId": 9327,
+      "tmdbTitle": "The Nutty Professor"
+    },
+    "soul-plane": {
+      "tmdbId": 12657,
+      "tmdbTitle": "Soul Plane"
+    },
+    "baps": {
+      "tmdbId": 18423,
+      "tmdbTitle": "B.A.P.S"
+    },
+    "the-original-kings-of-comedy": {
+      "tmdbId": 23618,
+      "tmdbTitle": "The Original Kings of Comedy"
+    },
+    "big-mommas-house": {
+      "tmdbId": 9600,
+      "tmdbTitle": "Big Momma's House"
+    },
+    "dolemite-is-my-name": {
+      "tmdbId": 528888,
+      "tmdbTitle": "Dolemite Is My Name"
+    },
+    "how-high": {
+      "tmdbId": 8386,
+      "tmdbTitle": "How High"
+    },
+    "friday": {
+      "tmdbId": 10634,
+      "tmdbTitle": "Friday"
+    },
+    "house-party": {
+      "tmdbId": 16094,
+      "tmdbTitle": "House Party"
+    },
+    "barbershop": {
+      "tmdbId": 10611,
+      "tmdbTitle": "Barbershop"
+    },
+    "girls-trip": {
+      "tmdbId": 417870,
+      "tmdbTitle": "Girls Trip"
+    },
+    "the-wood": {
+      "tmdbId": 16158,
+      "tmdbTitle": "The Wood"
+    },
+    "next-friday": {
+      "tmdbId": 10471,
+      "tmdbTitle": "Next Friday"
+    },
+    "set-it-off": {
+      "tmdbId": 9400,
+      "tmdbTitle": "Set It Off"
+    },
+    "dope": {
+      "tmdbId": 308639,
+      "tmdbTitle": "Dope"
+    },
+    "welcome-home-roscoe-jenkins": {
+      "tmdbId": 13490,
+      "tmdbTitle": "Welcome Home Roscoe Jenkins"
+    },
+    "white-chicks": {
+      "tmdbId": 12153,
+      "tmdbTitle": "White Chicks"
+    },
+    "undercover-brother": {
+      "tmdbId": 12277,
+      "tmdbTitle": "Undercover Brother"
+    },
+    "sorry-to-bother-you": {
+      "tmdbId": 424781,
+      "tmdbTitle": "Sorry to Bother You"
+    },
+    "im-gonna-git-you-sucka": {
+      "tmdbId": 17006,
+      "tmdbTitle": "I'm Gonna Git You Sucka"
+    },
+    "dont-be-a-menace": {
+      "tmdbId": 10607,
+      "tmdbTitle": "Don't Be a Menace to South Central While Drinking Your Juice in the Hood"
+    },
+    "pootie-tang": {
+      "tmdbId": 10615,
+      "tmdbTitle": "Pootie Tang"
+    },
+    "dear-white-people": {
+      "tmdbId": 114750,
+      "tmdbTitle": "Dear White People"
+    },
+    "black-dynamite": {
+      "tmdbId": 24804,
+      "tmdbTitle": "Black Dynamite"
+    },
+    "boomerang": {
+      "tmdbId": 11066,
+      "tmdbTitle": "Boomerang"
+    },
+    "think-like-a-man": {
+      "tmdbId": 67660,
+      "tmdbTitle": "Think Like a Man"
+    },
+    "a-thin-line-between-love-and-hate": {
+      "tmdbId": 28121,
+      "tmdbTitle": "A Thin Line Between Love and Hate"
+    },
+    "booty-call": {
+      "tmdbId": 21915,
+      "tmdbTitle": "Booty Call"
+    },
+    "diary-of-a-mad-black-woman": {
+      "tmdbId": 16186,
+      "tmdbTitle": "Diary of a Mad Black Woman"
+    },
+    "the-best-man": {
+      "tmdbId": 16162,
+      "tmdbTitle": "The Best Man"
+    },
+    "waiting-to-exhale": {
+      "tmdbId": 31357,
+      "tmdbTitle": "Waiting to Exhale"
+    },
+    "poetic-justice": {
+      "tmdbId": 8291,
+      "tmdbTitle": "Poetic Justice"
+    },
+    "bad-boys": {
+      "tmdbId": 9737,
+      "tmdbTitle": "Bad Boys"
+    },
+    "blue-streak": {
+      "tmdbId": 11001,
+      "tmdbTitle": "Blue Streak"
+    },
+    "ride-along": {
+      "tmdbId": 168530,
+      "tmdbTitle": "Ride Along"
+    },
+    "national-security": {
+      "tmdbId": 11078,
+      "tmdbTitle": "National Security"
+    },
+    "rush-hour": {
+      "tmdbId": 2109,
+      "tmdbTitle": "Rush Hour"
+    }
+  }
+}

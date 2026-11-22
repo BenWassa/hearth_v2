@@ -1,6 +1,7 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
+import { useViewHistory } from '../app/useViewHistory.js';
 import TonightView from './TonightView.jsx';
 import { buildCollectionFixture } from '../template/collectionFixtures.js';
 vi.mock('../hooks/useCollectionPartCounts.js', () => ({
@@ -31,6 +32,61 @@ vi.mock('../components/ItemDetailsModal.jsx', async () => {
   };
 });
 global.IS_REACT_ACT_ENVIRONMENT = true;
+afterEach(() => window.history.replaceState(null, '', '/'));
+
+const afterBack = async (trigger) => {
+  await act(async () => {
+    await new Promise((resolve) => {
+      window.addEventListener('popstate', resolve, { once: true });
+      trigger();
+    });
+  });
+  await act(
+    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
+  );
+};
+
+it.each(['system Back', 'in-app Back'])(
+  'returns from the Collections index to Tonight with %s',
+  async (method) => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    function Harness() {
+      const { view } = useViewHistory('tonight');
+      return (
+        <div data-view={view}>
+          <TonightView items={buildCollectionFixture({ count: 25 })} />
+        </div>
+      );
+    }
+
+    try {
+      await act(async () => root.render(<Harness />));
+      const tile = host.querySelector('[data-all-collections]');
+      await act(async () => tile.click());
+      expect(window.history.state.__hearthNavigation).toEqual({
+        view: 'tonight',
+        depth: 1,
+      });
+      expect(host.querySelector('#collections-heading').textContent).toBe(
+        'Collections',
+      );
+      await afterBack(() => {
+        if (method === 'system Back') window.history.back();
+        else host.querySelector('[aria-label="Back to Tonight"]').click();
+      });
+      expect(window.history.state.__hearthNavigation.depth).toBe(0);
+      expect(host.querySelector('#collections-heading')).toBeNull();
+      expect(host.querySelector('[data-view]').dataset.view).toBe('tonight');
+      expect(document.activeElement).toBe(tile);
+    } finally {
+      await act(async () => root.unmount());
+      host.remove();
+    }
+  },
+);
+
 it('opens any saga, preserves search and scroll through details, and reaches its next film', async () => {
   const host = document.createElement('div');
   document.body.appendChild(host);
@@ -72,25 +128,37 @@ it('opens any saga, preserves search and scroll through details, and reaches its
     await click(button('The Avengers'));
     expect(host.textContent).toMatch(/\d+ of \d+ watched/);
     expect(host.textContent).toContain('Full series details are unavailable');
-    await act(async () =>
-      document.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
-      ),
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
+    await afterBack(() => window.history.back());
+    expect(window.history.state.__hearthNavigation.depth).toBe(1);
+    expect(browserScroller.isConnected).toBe(true);
+    expect(host.textContent).not.toContain(
+      'Full series details are unavailable',
     );
     expect(browserScroller.scrollTop).toBe(52);
     expect(document.activeElement.textContent).toContain('The Avengers');
     await click(button('The Avengers'));
     await click(button('Next up'));
     expect(host.textContent).toContain('Film details: Avengers: Age of Ultron');
-    await click(button('Film details:'));
+    expect(window.history.state.__hearthNavigation.depth).toBe(3);
+    await afterBack(() => window.history.back());
+    expect(host.textContent).not.toContain('Film details:');
+    expect(host.textContent).toContain('Full series details are unavailable');
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
     expect(document.activeElement.textContent.toLowerCase()).toContain(
       'next up',
     );
+    await afterBack(() => window.history.forward());
+    expect(host.textContent).toContain('Film details: Avengers: Age of Ultron');
+    await afterBack(() => button('Film details:').click());
+    expect(host.textContent).not.toContain('Film details:');
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
     const closeSaga = [...host.querySelectorAll('button')].find(
       (node) => node.getAttribute('aria-label') === 'Close collection',
     );
-    if (closeSaga) await click(closeSaga);
-    await click(button('Back to Tonight'));
+    expect(closeSaga).toBeDefined();
+    await afterBack(() => closeSaga.click());
+    await afterBack(() => window.history.back());
     expect(
       host.querySelector('[aria-labelledby="collections-heading"]'),
     ).toBeNull();
@@ -127,6 +195,79 @@ it('uses Tonight World tiles as direct entry points even when there is one saga'
     );
     expect(host.querySelector('#collections-heading')).toBeNull();
     expect(document.activeElement).toBe(marvel);
+  } finally {
+    await act(async () => root.unmount());
+    host.remove();
+  }
+});
+
+it('restores the index on Forward while a rail World is open', async () => {
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  try {
+    await act(async () =>
+      root.render(<TonightView items={buildCollectionFixture({ count: 1 })} />),
+    );
+    await act(async () => host.querySelector('[data-all-collections]').click());
+    await afterBack(() => window.history.back());
+    await act(async () =>
+      host.querySelector('[data-world-id="marvel"]').click(),
+    );
+    expect(host.querySelector('#collections-heading').textContent).toBe(
+      'Marvel',
+    );
+    await afterBack(() => window.history.forward());
+    expect(host.querySelector('#collections-heading').textContent).toBe(
+      'Collections',
+    );
+    await afterBack(() =>
+      host.querySelector('[aria-label="Back to Tonight"]').click(),
+    );
+    expect(host.querySelector('#collections-heading')).toBeNull();
+  } finally {
+    await act(async () => root.unmount());
+    host.remove();
+  }
+});
+
+it('skips a restored saga that is no longer eligible', async () => {
+  window.history.replaceState(
+    { __hearthNavigation: { view: 'tonight', depth: 0 } },
+    '',
+  );
+  window.history.pushState(
+    {
+      __hearthNavigation: { view: 'tonight', depth: 1 },
+      __hearthCollectionsIndex: { collectionId: null },
+    },
+    '',
+  );
+  window.history.pushState(
+    {
+      __hearthNavigation: { view: 'tonight', depth: 2 },
+      __hearthCollectionsIndex: { collectionId: 'missing-saga' },
+    },
+    '',
+  );
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  try {
+    const skipped = new Promise((resolve) => {
+      window.addEventListener('popstate', resolve, { once: true });
+    });
+    await act(async () => root.render(<TonightView items={[]} />));
+    await act(async () => {
+      await skipped;
+    });
+    expect(host.querySelector('#collections-heading').textContent).toBe(
+      'Collections',
+    );
+    expect(window.history.state.__hearthNavigation.depth).toBe(1);
+    await afterBack(() => window.history.back());
+    expect(host.querySelector('#collections-heading')).toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(0);
   } finally {
     await act(async () => root.unmount());
     host.remove();

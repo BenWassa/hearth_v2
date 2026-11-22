@@ -872,10 +872,10 @@ export const useAppState = () => {
     }
   };
 
-  const handleAddItem = async (itemData) => {
+  const handleAddItem = async (itemData, { allowRestore = true } = {}) => {
     if (!user || !spaceId || !db) {
       notifyError('Database not available. Please check your connection.');
-      return;
+      return { status: 'failed' };
     }
     try {
       const payload = buildWatchlistPayload(
@@ -921,7 +921,7 @@ export const useAppState = () => {
 
         if (duplicateExists) {
           notifyError('That title is already on your shelf.');
-          return;
+          return { status: 'exists' };
         }
       }
 
@@ -930,13 +930,20 @@ export const useAppState = () => {
         appId,
         spaceId,
         payload: { ...payload, additionOrigin: 'manual' },
+        allowRestore,
       });
+      if (added.status === 'removed') {
+        notifyError('This title is in Recently removed. Restore it there.');
+        return added;
+      }
       if (added.status === 'restored')
         notifyUpdate(`Brought back ${payload.title} from Recently removed.`);
       setView('tonight');
+      return added;
     } catch (err) {
       console.error('Error adding item:', err);
       notifyError("Something didn't save. Try again.");
+      return { status: 'failed' };
     }
   };
 

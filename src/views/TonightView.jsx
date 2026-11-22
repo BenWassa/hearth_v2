@@ -1,3 +1,7 @@
+import { getCuratedPacks } from '../config/curatedPacks.js';
+import useCollectionsIndexHistory from '../app/useCollectionsIndexHistory.js';
+import useCuratedPackHistory from '../app/useCuratedPackHistory.js';
+import CuratedPackPage from './CuratedPackPage.jsx';
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
 import { composeTonightRows } from '../domain/media/tonightComposition.js';
 import React, {
@@ -47,6 +51,9 @@ const ItemDetailsModal = lazyWithPrefetch(() =>
   import('../components/ItemDetailsModal.jsx'),
 );
 const SagaPage = lazyWithPrefetch(() => import('../components/SagaPage.jsx'));
+const DirectorsCollectionView = lazyWithPrefetch(() =>
+  import('./DirectorsCollectionView.jsx'),
+);
 const MetadataAuditModal = lazyWithPrefetch(() =>
   import('./components/tonight/MetadataAuditModal.jsx'),
 );
@@ -184,6 +191,7 @@ const TonightView = ({
   onExport,
   onDeleteAll,
   hasRemovedItems = false,
+  removedItems = [],
   onOpenRemoved,
   onDelete,
   onToggleStatus,
@@ -209,6 +217,23 @@ const TonightView = ({
   loadTemplateScenario,
   templateScenario,
 }) => {
+  // Draft content shows only on the local dev server (hide with ?curatedPreview=0).
+  const packs = useMemo(
+    () =>
+      getCuratedPacks({
+        preview:
+          import.meta.env.DEV &&
+          new URLSearchParams(window.location.search).get('curatedPreview') !==
+            '0',
+      }),
+    [],
+  );
+  const {
+    pack: curatedPack,
+    openPack,
+    closePack,
+  } = useCuratedPackHistory(packs);
+
   const currentlyWatchingShows = useMemo(
     () =>
       items
@@ -257,28 +282,58 @@ const TonightView = ({
     () => filterEligibleCollections(rawCollections),
     [rawCollections],
   );
-  const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
+  const {
+    entry: collectionsIndex,
+    open: openCollectionsIndex,
+    openCollection: openIndexCollection,
+    openFilm: openIndexFilm,
+    back: backFromCollectionsIndex,
+  } = useCollectionsIndexHistory();
   const [browseWorldId, setBrowseWorldId] = useState(null);
-  const collectionsOpener = useRef(null);
+  const worldOpener = useRef(null);
+  const directorsOpener = useRef(null);
+  const [isDirectorsOpen, setIsDirectorsOpen] = useState(() =>
+    Boolean(window.history.state?.__hearthDirectors),
+  );
+
+  useEffect(() => {
+    const onPop = (event) => {
+      setIsDirectorsOpen(Boolean(event.state?.__hearthDirectors));
+      if (event.state?.__hearthCollectionsIndex) setBrowseWorldId(null);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+  const isCollectionsBrowseOpen =
+    !isDirectorsOpen && Boolean(collectionsIndex || browseWorldId);
+
   const browseCollections = (event) => {
-    collectionsOpener.current = event?.currentTarget || null;
-    event?.currentTarget?.focus({ preventScroll: true });
-    setBrowseWorldId(null);
-    setIsCollectionsBrowseOpen(true);
-  };
-  const openWorld = (worldId, opener) => {
-    collectionsOpener.current = opener;
-    setBrowseWorldId(worldId);
-    setIsCollectionsBrowseOpen(true);
+    openCollectionsIndex(event?.currentTarget);
   };
 
-  const closeCollectionsBrowse = () => {
-    setIsCollectionsBrowseOpen(false);
-    // The background becomes inert before Dialog's mount effect can capture its
-    // opener in real browsers. Restore the saved control after removing inert.
+  const openWorld = (worldId, opener) => {
+    worldOpener.current = opener;
+    setBrowseWorldId(worldId);
+  };
+
+  const openDirectors = (opener = null) => {
+    directorsOpener.current = collectionsIndex ? null : opener;
+    setIsDirectorsOpen(true);
+  };
+  const closeDirectors = () => {
+    setIsDirectorsOpen(false);
     requestAnimationFrame(() => {
-      if (collectionsOpener.current?.isConnected)
-        collectionsOpener.current.focus({ preventScroll: true });
+      if (directorsOpener.current?.isConnected)
+        directorsOpener.current.focus({ preventScroll: true });
+    });
+  };
+
+  const closeWorld = () => {
+    setBrowseWorldId(null);
+    // Restore the opener once the background is no longer inert.
+    requestAnimationFrame(() => {
+      if (worldOpener.current?.isConnected)
+        worldOpener.current.focus({ preventScroll: true });
     });
   };
 
@@ -294,10 +349,25 @@ const TonightView = ({
   const tonightRows = tonight.rows;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [detailItem, setDetailItem] = useState(null);
+  const [localDetailItem, setDetailItem] = useState(null);
   const [collectionDetail, setCollectionDetail] = useState(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const indexCollection = collections.find(
+    (entry) => entry.id === collectionsIndex?.collectionId,
+  );
+  const isCollectionOpen = Boolean(indexCollection || collectionDetail);
+  const indexFilm = indexCollection ? collectionsIndex.film : null;
+  const detailItem = indexFilm
+    ? items.find((item) => item.id === indexFilm.id) || indexFilm
+    : localDetailItem;
+  const isDetailOpen = Boolean(detailItem);
+
+  useEffect(() => {
+    // Skip the stale layer. Replacing it with an index marker would leave two
+    // consecutive index entries because the original index is still behind it.
+    if (!isLoading && collectionsIndex?.collectionId && !indexCollection) {
+      backFromCollectionsIndex();
+    }
+  }, [isLoading, collectionsIndex, indexCollection, backFromCollectionsIndex]);
   const [isWipeConfirmOpen, setIsWipeConfirmOpen] = useState(false);
   const [wipeConfirmText, setWipeConfirmText] = useState('');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -326,7 +396,6 @@ const TonightView = ({
 
   const openDetails = useCallback((item) => {
     setDetailItem(item);
-    setIsDetailOpen(true);
   }, []);
 
   // A card on Tonight passes itself so closing the saga returns focus to it
@@ -335,16 +404,13 @@ const TonightView = ({
   const openCollection = useCallback((collection, opener = null) => {
     collectionOpener.current = opener;
     setCollectionDetail(collection);
-    setIsCollectionOpen(true);
   }, []);
 
   const closeDetails = () => {
-    setIsDetailOpen(false);
     setDetailItem(null);
   };
 
   const closeCollection = () => {
-    setIsCollectionOpen(false);
     setCollectionDetail(null);
     requestAnimationFrame(() => {
       if (collectionOpener.current?.isConnected)
@@ -364,12 +430,12 @@ const TonightView = ({
   };
 
   useEffect(() => {
-    if (!detailItem) return;
-    const updated = items.find((current) => current.id === detailItem.id);
-    if (updated && updated !== detailItem) {
+    if (!localDetailItem) return;
+    const updated = items.find((current) => current.id === localDetailItem.id);
+    if (updated && updated !== localDetailItem) {
       setDetailItem(updated);
     }
-  }, [detailItem, items]);
+  }, [localDetailItem, items]);
 
   const heroItems = useMemo(() => {
     const candidates = unwatched;
@@ -420,9 +486,12 @@ const TonightView = ({
   const collectionsRail = (
     <CollectionsRail
       collections={collections}
+      packs={packs}
+      onOpenPack={openPack}
       items={items}
       onOpenCollection={openCollection}
       onBrowse={browseCollections}
+      onOpenDirectors={openDirectors}
     />
   );
   const hasClassicRow = tonightRows.some((row) => row.key === 'classic');
@@ -442,8 +511,17 @@ const TonightView = ({
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
       <div
-        aria-hidden={isCollectionsBrowseOpen || undefined}
-        inert={isCollectionsBrowseOpen ? '' : undefined}
+        aria-hidden={
+          isCollectionsBrowseOpen ||
+          isDirectorsOpen ||
+          Boolean(curatedPack) ||
+          undefined
+        }
+        inert={
+          isCollectionsBrowseOpen || isDirectorsOpen || curatedPack
+            ? ''
+            : undefined
+        }
         className="flex-1 min-h-0 pb-6 flex flex-col overflow-hidden"
       >
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
@@ -601,7 +679,7 @@ const TonightView = ({
           <ItemDetailsModal
             isOpen={isDetailOpen}
             item={detailItem}
-            onClose={closeDetails}
+            onClose={indexFilm ? backFromCollectionsIndex : closeDetails}
             onToggleStatus={onToggleStatus}
             onDelete={onDelete}
             onAddItem={onAddItem}
@@ -616,11 +694,14 @@ const TonightView = ({
             isOpen={isCollectionOpen}
             householdItems={items}
             collection={
+              indexCollection ||
               collections.find((entry) => entry.id === collectionDetail?.id) ||
               collectionDetail
             }
-            onClose={closeCollection}
-            onOpenItem={openDetails}
+            onClose={
+              indexCollection ? backFromCollectionsIndex : closeCollection
+            }
+            onOpenItem={indexCollection ? openIndexFilm : openDetails}
           />
         </Suspense>
       )}
@@ -641,11 +722,44 @@ const TonightView = ({
       {isCollectionsBrowseOpen && (
         <CollectionsBrowseView
           collections={collections}
+          packs={packs}
+          onOpenPack={openPack}
+          covered={Boolean(curatedPack)}
           items={items}
           initialWorldId={browseWorldId}
           onOpenItem={openDetails}
-          onClose={closeCollectionsBrowse}
-          onOpenCollection={openCollection}
+          onClose={collectionsIndex ? backFromCollectionsIndex : closeWorld}
+          onOpenCollection={
+            collectionsIndex
+              ? (collection) => openIndexCollection(collection.id)
+              : openCollection
+          }
+          onOpenDirectors={openDirectors}
+        />
+      )}
+
+      {isDirectorsOpen && (
+        <Suspense fallback={null}>
+          <DirectorsCollectionView
+            items={items}
+            removedItems={removedItems}
+            onClose={closeDirectors}
+            onOpenItem={openDetails}
+            onAddItem={onAddItem}
+            onOpenRemoved={onOpenRemoved}
+          />
+        </Suspense>
+      )}
+
+      {curatedPack && (
+        <CuratedPackPage
+          pack={curatedPack}
+          onClose={closePack}
+          items={items}
+          removedItems={removedItems}
+          onAddItem={onAddItem}
+          onOpenItem={openDetails}
+          onOpenRemoved={onOpenRemoved}
         />
       )}
 

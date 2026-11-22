@@ -102,13 +102,15 @@ try {
     await rail.scrollIntoViewIfNeeded();
     const railCells = await rail.locator('li').count();
     const cardCount = await rail.locator('[data-saga-card]').count();
+    const directorsCount = await rail.locator('[data-directors-card]').count();
     const hasAllTile = (await rail.locator('[data-all-collections]').count()) > 0;
     const worldTileCount = await cards.count();
     const sagaIds = await rail
       .locator('[data-saga-card]')
       .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-saga-card')));
     if (
-      railCells !== cardCount + (hasAllTile ? 1 : 0) ||
+      railCells !== cardCount + directorsCount + (hasAllTile ? 1 : 0) ||
+      directorsCount !== 1 ||
       new Set(sagaIds).size !== sagaIds.length ||
       (cardCount > 3 && !hasAllTile) ||
       (worldTileCount > 0 && !hasAllTile)
@@ -138,6 +140,23 @@ try {
       await page.keyboard.press('Escape');
       await page.locator('[aria-label="All sagas"]').waitFor({ state: 'detached' });
     }
+
+    const directorsTile = rail.locator('[data-directors-card]');
+    await directorsTile.click();
+    await page.locator('[aria-label="Explore directors"]').waitFor({ timeout: 10000 });
+    if (await page.locator('[data-director-card]').count() !== 12) {
+      throw new Error(`Directors directory does not have 12 curated entries at ${width}px`);
+    }
+    const directorWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    if (directorWidth > width + 1) {
+      throw new Error(`Directors directory overflows at ${width}px`);
+    }
+    await page.screenshot({
+      path: resolve(out, `directors-directory-${width}.png`),
+      animations: 'disabled',
+    });
+    await page.keyboard.press('Escape');
+    await page.locator('[aria-label="Explore directors"]').waitFor({ state: 'detached' });
 
     for (const id of ids) {
       const card = page.locator(`[data-world-id="${id}"]`).first();

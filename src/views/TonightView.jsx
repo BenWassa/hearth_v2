@@ -1,4 +1,5 @@
 import { getCuratedPacks } from '../config/curatedPacks.js';
+import useCollectionsIndexHistory from '../app/useCollectionsIndexHistory.js';
 import useCuratedPackHistory from '../app/useCuratedPackHistory.js';
 import CuratedPackPage from './CuratedPackPage.jsx';
 import { allocateTonightThemes } from '../domain/media/tonightClassification.js';
@@ -281,51 +282,58 @@ const TonightView = ({
     () => filterEligibleCollections(rawCollections),
     [rawCollections],
   );
-  const [isCollectionsBrowseOpen, setIsCollectionsBrowseOpen] = useState(false);
+  const {
+    entry: collectionsIndex,
+    open: openCollectionsIndex,
+    openCollection: openIndexCollection,
+    openFilm: openIndexFilm,
+    back: backFromCollectionsIndex,
+  } = useCollectionsIndexHistory();
   const [browseWorldId, setBrowseWorldId] = useState(null);
-  const collectionsOpener = useRef(null);
+  const worldOpener = useRef(null);
   const directorsOpener = useRef(null);
-  const directorsFromBrowse = useRef(false);
-  const [isDirectorsOpen, setIsDirectorsOpen] = useState(false);
+  const [isDirectorsOpen, setIsDirectorsOpen] = useState(() =>
+    Boolean(window.history.state?.__hearthDirectors),
+  );
+
+  useEffect(() => {
+    const onPop = (event) => {
+      setIsDirectorsOpen(Boolean(event.state?.__hearthDirectors));
+      if (event.state?.__hearthCollectionsIndex) setBrowseWorldId(null);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+  const isCollectionsBrowseOpen =
+    !isDirectorsOpen && Boolean(collectionsIndex || browseWorldId);
+
   const browseCollections = (event) => {
-    collectionsOpener.current = event?.currentTarget || null;
-    event?.currentTarget?.focus({ preventScroll: true });
-    setBrowseWorldId(null);
-    setIsCollectionsBrowseOpen(true);
+    openCollectionsIndex(event?.currentTarget);
   };
+
   const openWorld = (worldId, opener) => {
-    collectionsOpener.current = opener;
+    worldOpener.current = opener;
     setBrowseWorldId(worldId);
-    setIsCollectionsBrowseOpen(true);
   };
 
   const openDirectors = (opener = null) => {
-    directorsFromBrowse.current = isCollectionsBrowseOpen;
-    directorsOpener.current = isCollectionsBrowseOpen
-      ? collectionsOpener.current
-      : opener;
-    if (isCollectionsBrowseOpen) setIsCollectionsBrowseOpen(false);
+    directorsOpener.current = collectionsIndex ? null : opener;
     setIsDirectorsOpen(true);
   };
   const closeDirectors = () => {
     setIsDirectorsOpen(false);
-    if (directorsFromBrowse.current) {
-      setIsCollectionsBrowseOpen(true);
-    } else {
-      requestAnimationFrame(() => {
-        if (directorsOpener.current?.isConnected)
-          directorsOpener.current.focus({ preventScroll: true });
-      });
-    }
+    requestAnimationFrame(() => {
+      if (directorsOpener.current?.isConnected)
+        directorsOpener.current.focus({ preventScroll: true });
+    });
   };
 
-  const closeCollectionsBrowse = () => {
-    setIsCollectionsBrowseOpen(false);
-    // The background becomes inert before Dialog's mount effect can capture its
-    // opener in real browsers. Restore the saved control after removing inert.
+  const closeWorld = () => {
+    setBrowseWorldId(null);
+    // Restore the opener once the background is no longer inert.
     requestAnimationFrame(() => {
-      if (collectionsOpener.current?.isConnected)
-        collectionsOpener.current.focus({ preventScroll: true });
+      if (worldOpener.current?.isConnected)
+        worldOpener.current.focus({ preventScroll: true });
     });
   };
 
@@ -341,10 +349,25 @@ const TonightView = ({
   const tonightRows = tonight.rows;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [detailItem, setDetailItem] = useState(null);
+  const [localDetailItem, setDetailItem] = useState(null);
   const [collectionDetail, setCollectionDetail] = useState(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isCollectionOpen, setIsCollectionOpen] = useState(false);
+  const indexCollection = collections.find(
+    (entry) => entry.id === collectionsIndex?.collectionId,
+  );
+  const isCollectionOpen = Boolean(indexCollection || collectionDetail);
+  const indexFilm = indexCollection ? collectionsIndex.film : null;
+  const detailItem = indexFilm
+    ? items.find((item) => item.id === indexFilm.id) || indexFilm
+    : localDetailItem;
+  const isDetailOpen = Boolean(detailItem);
+
+  useEffect(() => {
+    // Skip the stale layer. Replacing it with an index marker would leave two
+    // consecutive index entries because the original index is still behind it.
+    if (!isLoading && collectionsIndex?.collectionId && !indexCollection) {
+      backFromCollectionsIndex();
+    }
+  }, [isLoading, collectionsIndex, indexCollection, backFromCollectionsIndex]);
   const [isWipeConfirmOpen, setIsWipeConfirmOpen] = useState(false);
   const [wipeConfirmText, setWipeConfirmText] = useState('');
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -373,7 +396,6 @@ const TonightView = ({
 
   const openDetails = useCallback((item) => {
     setDetailItem(item);
-    setIsDetailOpen(true);
   }, []);
 
   // A card on Tonight passes itself so closing the saga returns focus to it
@@ -382,16 +404,13 @@ const TonightView = ({
   const openCollection = useCallback((collection, opener = null) => {
     collectionOpener.current = opener;
     setCollectionDetail(collection);
-    setIsCollectionOpen(true);
   }, []);
 
   const closeDetails = () => {
-    setIsDetailOpen(false);
     setDetailItem(null);
   };
 
   const closeCollection = () => {
-    setIsCollectionOpen(false);
     setCollectionDetail(null);
     requestAnimationFrame(() => {
       if (collectionOpener.current?.isConnected)
@@ -411,12 +430,12 @@ const TonightView = ({
   };
 
   useEffect(() => {
-    if (!detailItem) return;
-    const updated = items.find((current) => current.id === detailItem.id);
-    if (updated && updated !== detailItem) {
+    if (!localDetailItem) return;
+    const updated = items.find((current) => current.id === localDetailItem.id);
+    if (updated && updated !== localDetailItem) {
       setDetailItem(updated);
     }
-  }, [detailItem, items]);
+  }, [localDetailItem, items]);
 
   const heroItems = useMemo(() => {
     const candidates = unwatched;
@@ -660,7 +679,7 @@ const TonightView = ({
           <ItemDetailsModal
             isOpen={isDetailOpen}
             item={detailItem}
-            onClose={closeDetails}
+            onClose={indexFilm ? backFromCollectionsIndex : closeDetails}
             onToggleStatus={onToggleStatus}
             onDelete={onDelete}
             onAddItem={onAddItem}
@@ -675,11 +694,14 @@ const TonightView = ({
             isOpen={isCollectionOpen}
             householdItems={items}
             collection={
+              indexCollection ||
               collections.find((entry) => entry.id === collectionDetail?.id) ||
               collectionDetail
             }
-            onClose={closeCollection}
-            onOpenItem={openDetails}
+            onClose={
+              indexCollection ? backFromCollectionsIndex : closeCollection
+            }
+            onOpenItem={indexCollection ? openIndexFilm : openDetails}
           />
         </Suspense>
       )}
@@ -706,8 +728,12 @@ const TonightView = ({
           items={items}
           initialWorldId={browseWorldId}
           onOpenItem={openDetails}
-          onClose={closeCollectionsBrowse}
-          onOpenCollection={openCollection}
+          onClose={collectionsIndex ? backFromCollectionsIndex : closeWorld}
+          onOpenCollection={
+            collectionsIndex
+              ? (collection) => openIndexCollection(collection.id)
+              : openCollection
+          }
           onOpenDirectors={openDirectors}
         />
       )}

@@ -4,15 +4,15 @@ const KEY = '__hearthDirectors';
 // Each layer shares Hearth's top-level view marker, so Back consumes only one
 // Directors layer while Tonight and its scroll container stay mounted.
 export default function useDirectorsHistory(onClose) {
-  const [stage, setStage] = useState({ director: null, film: null });
+  const [stage, setStage] = useState(
+    () => window.history.state?.[KEY] || { director: null, film: null },
+  );
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const pending = useRef(false);
-  const initialized = useRef(false);
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-      const current = window.history.state || {};
+    const current = window.history.state || {};
+    if (!current[KEY]) {
       const navigation = current.__hearthNavigation;
       window.history.pushState(
         {

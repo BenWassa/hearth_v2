@@ -26,6 +26,8 @@ export default function CuratedPackPage({
   onOpenRemoved,
 }) {
   const [activeFilm, setActiveFilm] = useState(null);
+  const [showBackScrim, setShowBackScrim] = useState(false);
+  const heroEnd = useRef(null);
   const pendingBack = useRef(false);
   const films = useMemo(() => {
     const byId = new Map();
@@ -68,10 +70,35 @@ export default function CuratedPackPage({
   const heading = useRef(null);
   const sectionRefs = useRef({});
   useEffect(() => heading.current?.focus({ preventScroll: true }), []);
+  useEffect(() => {
+    if (!window.IntersectionObserver) return undefined;
+    const marker = heroEnd.current;
+    const scroller = marker.closest('[data-curated-scroller]');
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.rootBounds) {
+          setShowBackScrim(
+            entry.boundingClientRect.bottom < entry.rootBounds.top,
+          );
+        }
+      },
+      { root: scroller },
+    );
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, []);
   const goToSection = (id) => {
     const section = sectionRefs.current[id];
     section?.scrollIntoView?.({ block: 'start' });
     section?.focus({ preventScroll: true });
+  };
+  const returnToThemes = (id) => {
+    const themes = sectionRefs.current.themes;
+    themes?.scrollIntoView?.({ block: 'start' });
+    const tile = Array.from(
+      themes?.querySelectorAll('[data-theme]') ?? [],
+    ).find((button) => button.dataset.theme === id);
+    tile?.focus({ preventScroll: true });
   };
   return (
     <Dialog
@@ -79,10 +106,16 @@ export default function CuratedPackPage({
       aria-labelledby="curated-pack-heading"
       className="fixed inset-0 z-50 mx-auto flex max-w-md flex-col bg-stone-950 pb-[var(--safe-bottom)]"
     >
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[calc(var(--safe-top)+4.5rem)] bg-gradient-to-b from-stone-950 via-stone-950/90 to-transparent transition-opacity motion-reduce:transition-none ${
+          showBackScrim ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
       <IconButton
         label="Back to collections"
         onClick={onClose}
-        className="absolute left-3 top-[calc(var(--safe-top)+0.75rem)] z-20 size-11 bg-stone-950/55 text-stone-100 ring-1 ring-stone-100/15 backdrop-blur"
+        className="absolute left-3 top-[calc(var(--safe-top)+0.75rem)] z-20 size-11 bg-stone-950/75 text-stone-100 ring-1 ring-stone-100/15 backdrop-blur"
       >
         <span aria-hidden="true">←</span>
       </IconButton>
@@ -92,6 +125,11 @@ export default function CuratedPackPage({
       >
         <header className="pb-6">
           <div className="relative -mx-4 flex h-[min(70svh,36rem)] min-h-[20rem] items-end overflow-hidden bg-stone-900 px-4 pb-6">
+            <span
+              ref={heroEnd}
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-20 left-0 top-0 w-px"
+            />
             <PackArt
               src={pack.art?.hero}
               className="absolute inset-0 h-full w-full object-cover object-[78%_center]"
@@ -147,7 +185,12 @@ export default function CuratedPackPage({
           />
         </section>
         <ThemeCarousel
+          navRef={(node) => {
+            sectionRefs.current.themes = node;
+          }}
           chapters={pack.chapters}
+          featured={featured}
+          heroArt={pack.art?.hero}
           allFilmsLabel={allFilmsLabel}
           onSelect={goToSection}
         />
@@ -170,6 +213,13 @@ export default function CuratedPackPage({
               films={chapter.films}
               label={`${chapter.title} films`}
             />
+            <button
+              type="button"
+              onClick={() => returnToThemes(chapter.id)}
+              className="sr-only focus:not-sr-only focus:mt-2 focus:min-h-11 focus:rounded-full focus:bg-stone-900 focus:px-3 focus:text-xs focus:text-stone-100 focus:outline focus:outline-2 focus:outline-amber-400"
+            >
+              Back to themes
+            </button>
           </section>
         ))}
         <section
@@ -186,7 +236,12 @@ export default function CuratedPackPage({
           >
             {allFilmsLabel}
           </h2>
-          <FilmRail films={allFilms} onOpen={openFilm} grid />
+          <FilmRail
+            films={allFilms}
+            onOpen={openFilm}
+            label={allFilmsLabel}
+            grid
+          />
         </section>
         <details className="mt-10 border-t border-stone-800 pt-4 text-sm text-stone-400">
           <summary className="min-h-11 cursor-pointer py-3 text-stone-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">

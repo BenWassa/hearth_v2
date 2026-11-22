@@ -93,6 +93,12 @@ it('shows a pack with an empty library, closes via real Back and restores scroll
     expect(document.activeElement.getAttribute('aria-labelledby')).toBe(
       'chapter-spoofs-satire',
     );
+    await click(
+      [...document.activeElement.querySelectorAll('button')].find(
+        (button) => button.textContent === 'Back to themes',
+      ),
+    );
+    expect(document.activeElement).toBe(chapterButton);
     const allFilmsTile = [...themes.querySelectorAll('button')].at(-1);
     expect(allFilmsTile.textContent).toBe('All 50 films');
     await click(allFilmsTile);

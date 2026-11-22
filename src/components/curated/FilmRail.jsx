@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { keepCardInView } from './keepCardInView.js';
 import PackArt from './PackArt.jsx';
 import { loadFilms, retryWhenOnline } from './filmMedia.js';
 
-function FilmPoster({ film, posterUrl, onOpen }) {
+function FilmPoster({ film, posterUrl, onOpen, onFocus }) {
   const [loadedUrl, setLoadedUrl] = useState(null);
   const loaded = Boolean(posterUrl && loadedUrl === posterUrl);
 
@@ -10,6 +11,7 @@ function FilmPoster({ film, posterUrl, onOpen }) {
     <button
       type="button"
       aria-label={`${film.title} (${film.year})`}
+      onFocus={onFocus}
       onClick={(event) => onOpen(film, event.currentTarget)}
       className="relative flex aspect-[2/3] min-h-11 min-w-11 w-full flex-col overflow-hidden rounded-md border border-stone-800 bg-stone-900 p-2.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
     >
@@ -46,25 +48,34 @@ export default function FilmRail({ films, label, onOpen, grid = false }) {
     const container = list.current;
     let active = true;
     const pendingRetries = new Set();
-    const fetchBatch = (batch) =>
-      loadFilms(batch).then((data) => {
-        if (!active) return;
-        setMedia((previous) => ({
-          ...previous,
-          ...Object.fromEntries(
-            batch.map((film, index) => [film.id, data[index]]),
-          ),
-        }));
+    let reconnects = 0;
+    const onOnline = () => {
+      reconnects += 1;
+    };
+    window.addEventListener('online', onOnline);
+    const fetchBatch = async (batch) => {
+      const reconnectsAtStart = reconnects;
+      const data = await loadFilms(batch);
+      if (!active) return;
+      setMedia((previous) => ({
+        ...previous,
+        ...Object.fromEntries(
+          batch.map((film, index) => [film.id, data[index]]),
+        ),
+      }));
 
-        const missing = batch.filter((_, index) => !data[index]);
-        if (missing.length) {
-          const stopRetry = retryWhenOnline(() => {
-            pendingRetries.delete(stopRetry);
-            fetchBatch(missing);
-          });
-          pendingRetries.add(stopRetry);
-        }
-      });
+      const missing = batch.filter((_, index) => !data[index]);
+      if (!missing.length) return;
+      if (reconnects > reconnectsAtStart) {
+        void fetchBatch(missing);
+      } else {
+        const stopRetry = retryWhenOnline(() => {
+          pendingRetries.delete(stopRetry);
+          fetchBatch(missing);
+        });
+        pendingRetries.add(stopRetry);
+      }
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -96,6 +107,7 @@ export default function FilmRail({ films, label, onOpen, grid = false }) {
     }
     return () => {
       active = false;
+      window.removeEventListener('online', onOnline);
       pendingRetries.forEach((stopRetry) => stopRetry());
       observer.disconnect();
     };
@@ -109,7 +121,7 @@ export default function FilmRail({ films, label, onOpen, grid = false }) {
       className={
         grid
           ? 'grid grid-cols-3 gap-2.5'
-          : 'no-scrollbar -mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 py-1 scroll-px-4'
+          : 'no-scrollbar -mx-4 flex snap-x snap-proximity gap-2.5 overflow-x-auto px-4 py-1 scroll-px-4'
       }
     >
       {films.map((film, index) => {
@@ -124,7 +136,12 @@ export default function FilmRail({ films, label, onOpen, grid = false }) {
                 : 'w-[clamp(6.53rem,26.8vw,8.55rem)] shrink-0 snap-start'
             }
           >
-            <FilmPoster film={film} posterUrl={posterUrl} onOpen={onOpen} />
+            <FilmPoster
+              film={film}
+              posterUrl={posterUrl}
+              onOpen={onOpen}
+              onFocus={grid ? undefined : keepCardInView}
+            />
           </li>
         );
       })}

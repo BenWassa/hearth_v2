@@ -4,12 +4,16 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import DirectorsCollectionView from './DirectorsCollectionView.jsx';
 import catalog from '../config/directorEssentials.json';
 import { getMediaDetails } from '../services/mediaApi/client.js';
+vi.mock('gsap', () => ({ default: { to: () => ({ kill: vi.fn() }) } }));
 vi.mock('../services/mediaApi/client.js', () => ({ getMediaDetails: vi.fn() }));
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const director = catalog.directors[0];
 const first = director.films[0];
 let root, host;
+const directoryPreference = 'hearth:dev:directorsDirectory';
+const carousel = () => host.querySelector('[aria-roledescription="carousel"]');
 beforeEach(() => {
+  window.localStorage.removeItem(directoryPreference);
   window.history.replaceState({}, '');
   getMediaDetails.mockImplementation(async ({ providerId }) => ({
     provider: 'tmdb',
@@ -21,6 +25,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root?.unmount());
   host?.remove();
+  window.localStorage.removeItem(directoryPreference);
   vi.clearAllMocks();
 });
 const mount = async (props) => {
@@ -72,6 +77,46 @@ it('shows exactly the approved twelve in an accessible swipeable directory witho
   expect(getMediaDetails).not.toHaveBeenCalled();
   expect(onAddItem).not.toHaveBeenCalled();
 });
+it('defaults to the row and switches to the trial and back', async () => {
+  await mount();
+  expect(carousel()).toBeNull();
+  expect(button('Row').getAttribute('aria-pressed')).toBe('true');
+
+  await click(button('Carousel (trial)'));
+  await act(async () => vi.dynamicImportSettled());
+  expect(carousel()).toBeTruthy();
+  expect(window.localStorage.getItem(directoryPreference)).toBe('carousel');
+
+  await click(button('Row'));
+  expect(carousel()).toBeNull();
+  expect(host.querySelectorAll('[data-director-card]')).toHaveLength(12);
+  expect(window.localStorage.getItem(directoryPreference)).toBe('row');
+});
+
+it('uses the saved trial and restores the opened director to the front on Back', async () => {
+  window.localStorage.setItem(directoryPreference, 'carousel');
+  await mount();
+  await act(async () => vi.dynamicImportSettled());
+  expect(carousel()).toBeTruthy();
+
+  const directoryState = window.history.state;
+  const entry = catalog.directors[1];
+  await click(
+    carousel().querySelector('[aria-label^="Go to Alfred Hitchcock"]'),
+  );
+  const opener = () =>
+    carousel().querySelector(`[data-director-card="${entry.id}"]`);
+  await click(opener());
+  expect(host.querySelector('h2').textContent).toBe(entry.name);
+
+  await pop(directoryState);
+  await act(
+    async () => new Promise((resolve) => requestAnimationFrame(resolve)),
+  );
+  expect(opener().tabIndex).toBe(0);
+  expect(document.activeElement).toBe(opener());
+});
+
 it('skips watched films, caps Watch Next at three, and preserves fixed ranks through View all and household changes', async () => {
   await mount({ items: [owned(first)] });
   await open();

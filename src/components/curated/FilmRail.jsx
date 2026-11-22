@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PackArt from './PackArt.jsx';
-import { loadFilms } from './filmMedia.js';
+import { loadFilms, retryWhenOnline } from './filmMedia.js';
 
 export default function FilmRail({ films, label, onOpen }) {
   const rail = useRef(null);
@@ -9,12 +9,17 @@ export default function FilmRail({ films, label, onOpen }) {
   useEffect(() => {
     let active = true;
     let started = false;
+    let stopRetry = () => {};
+    const fetchAll = () =>
+      loadFilms(films).then((data) => {
+        if (!active) return;
+        setMedia(data);
+        if (data.some((item) => !item)) stopRetry = retryWhenOnline(fetchAll);
+      });
     const load = () => {
       if (started) return;
       started = true;
-      loadFilms(films).then((data) => {
-        if (active) setMedia(data);
-      });
+      fetchAll();
     };
     // Without an observer retain the programme cards; opening one still loads details.
     if (!window.IntersectionObserver) return undefined;
@@ -33,6 +38,7 @@ export default function FilmRail({ films, label, onOpen }) {
     observer.observe(rail.current);
     return () => {
       active = false;
+      stopRetry();
       observer.disconnect();
     };
   }, [films]);

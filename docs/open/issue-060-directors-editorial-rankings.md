@@ -2,7 +2,7 @@
 
 **Issue:** https://github.com/BenWassa/hearth_v2/issues/60  
 **Parent:** [#57 Legendary Directors](https://github.com/BenWassa/hearth_v2/issues/57)  
-**Status:** Open — research, content review and source/rights checks outstanding  
+**Status (2026-11-22):** Roster approved; Essential 10 for all 12 drafted, sourced and ranked by score (see `RANKING_BY_SCORES.md`), encoded in the app and cross-checked. Open: display licences for IMDb / Rotten Tomatoes before any public release; owner decision on the listed score challengers.  
 **Date:** 2026-11-13
 
 ## Purpose
@@ -19,12 +19,12 @@ Produce a globally researched roster of approximately twelve filmmakers selected
 For every chosen film record director person ID, canonical film ID, alternate title/year, rank, film-specific rationale, IMDb ID/rating/vote count/retrieval date, Rotten Tomatoes film URL/critic score/review count/retrieval date, review methodology and provenance. Note unknown fields explicitly. Verify whether data and recognizable score/logo icons may be stored/distributed in this specific app.
 
 ## Review and tests
-- [ ] Research and propose a candidate shortlist plus alternatives for owner review
-- [ ] Validate 12 director identities and director credits
-- [ ] Present one full 10-film ranked example and review method for approval
-- [ ] Gather evidence and ranked selections for all approved directors
+- [x] Research and propose a candidate shortlist plus alternatives for owner review
+- [x] Validate 12 director identities and director credits
+- [x] Present one full 10-film ranked example and review method for approval
+- [x] Gather evidence and ranked selections for all approved directors
 - [ ] Verify ratings rights, source stability, attribution and permitted SVG/icon usage
-- [ ] Deliver catalog and rationale to #57 with no fabricated film metadata
+- [x] Deliver catalog and rationale to #57 with no fabricated film metadata
 - [ ] Do not merge to main until owner/editorial and technical QA signoff
 
 **Implementation:** [draft PR #58](https://github.com/BenWassa/hearth_v2/pull/58) currently has only 3 film starters and chronological credits; this issue authorizes research, **not** silently replacing app functionality.

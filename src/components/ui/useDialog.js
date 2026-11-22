@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'a[href], button:not([disabled]), details > summary, textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 // Open dialogs, oldest first. Only the last one reacts to Escape and Tab so a
 // nested picker closes before the modal underneath it.
@@ -11,6 +11,9 @@ const openDialogs = [];
 // getClientRects(). Catches display:none from responsive classes like `sm:hidden`.
 const isVisible = (el) => {
   if (el.closest('[hidden], [inert]')) return false;
+  // Content of a closed <details> is skipped by the browser; only its summary is reachable.
+  const details = el.closest('details:not([open])');
+  if (details && !el.closest('summary')) return false;
   for (
     let node = el;
     node && node !== document.body;

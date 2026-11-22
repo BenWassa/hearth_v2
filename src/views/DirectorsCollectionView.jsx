@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import useDirectorsHistory from '../app/useDirectorsHistory.js';
 import Dialog from '../components/ui/Dialog.jsx';
@@ -8,36 +15,76 @@ import {
   toWatchlistPayload,
 } from '../components/curated/watchlistFilm.js';
 import catalog from '../config/directorEssentials.json';
-import { loadFilm } from '../components/directors/filmMedia.js';
+import { loadFilm, retryWhenOnline } from '../components/curated/filmMedia.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400';
 
-const OptionalArt = ({ src, className }) => {
+const directoryPreference = 'hearth:dev:directorsDirectory';
+const DepthCarousel = import.meta.env.DEV
+  ? lazy(() => import('../components/directors/DepthCarousel.jsx'))
+  : null;
+
+const OptionalArt = ({ src, className, children }) => {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   return (
     !failed && (
-      <img
-        src={src}
-        alt=""
-        onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
-        className={`${className} ${loaded ? '' : 'hidden'}`}
-      />
+      <>
+        <img
+          src={src}
+          alt=""
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          className={`${className} ${loaded ? '' : 'hidden'}`}
+        />
+        {loaded && children}
+      </>
     )
   );
 };
+
+const renderDirectorCard = (entry, index) => (
+  <>
+    <OptionalArt
+      src={`/assets/collections/legendary-directors/directors/${entry.id}/portrait.webp`}
+      className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+    >
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/50" />
+    </OptionalArt>
+    <span className="relative flex h-full flex-col justify-between p-4">
+      <span className="flex items-start justify-between gap-2">
+        <span className="text-[0.6875rem] tabular-nums tracking-widest text-stone-400">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <ArrowRight className="h-4 w-4 text-amber-300" aria-hidden="true" />
+      </span>
+      <span>
+        <span className="mb-2 block font-serif text-xl leading-tight text-stone-100">
+          {entry.name}
+        </span>
+        {entry.description && (
+          <span className="block text-xs leading-snug text-stone-400">
+            {entry.description}
+          </span>
+        )}
+      </span>
+    </span>
+  </>
+);
 
 const FilmPoster = ({ film }) => {
   const ref = useRef(null);
   const [poster, setPoster] = useState('');
   useEffect(() => {
     let active = true;
+    let stopRetry = () => {};
     const load = () =>
       loadFilm(film).then((data) => {
-        if (active) setPoster(data?.posterUrl || data?.poster || '');
+        if (!active) return;
+        setPoster(data?.posterUrl || data?.poster || '');
+        if (!data) stopRetry = retryWhenOnline(load);
       });
     if (!window.IntersectionObserver) load();
     const observer =
@@ -54,6 +101,7 @@ const FilmPoster = ({ film }) => {
     if (observer && ref.current) observer.observe(ref.current);
     return () => {
       active = false;
+      stopRetry();
       observer?.disconnect();
     };
   }, [film]);
@@ -106,7 +154,20 @@ const DirectorsCollectionView = ({
   const { stage, navigate, back } = useDirectorsHistory(onClose);
   const selected = stage.director;
   const activeFilm = stage.film;
+  const [directoryMode, setDirectoryMode] = useState(() => {
+    if (import.meta.env.DEV) {
+      try {
+        if (window.localStorage.getItem(directoryPreference) === 'carousel')
+          return 'carousel';
+      } catch {
+        // The trial still works for this session when storage is unavailable.
+      }
+    }
+    return 'row';
+  });
+  const carouselIndex = useRef(0);
   const [expanded, setExpanded] = useState(false);
+  const focusFirstRevealed = useRef(false);
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState('');
@@ -161,8 +222,7 @@ const DirectorsCollectionView = ({
         setPreview(data);
       })
       .catch(() => {
-        if (active)
-          setPreviewError('Film details could not be verified. Try again.');
+        if (active) setPreviewError('Film details could not be verified.');
       })
       .finally(() => {
         if (active) setPreviewLoading(false);
@@ -186,7 +246,28 @@ const DirectorsCollectionView = ({
     } else headingRef.current?.focus({ preventScroll: true });
   }, [selected]);
 
+  useEffect(() => {
+    if (!expanded || !focusFirstRevealed.current) return;
+    focusFirstRevealed.current = false;
+    // Keep the keyboard user's place: the toggle has just moved below the new rows.
+    document
+      .querySelector('[data-essential-rank="6"] button')
+      ?.focus({ preventScroll: true });
+  }, [expanded]);
+
+  const changeDirectoryMode = (mode) => {
+    setDirectoryMode(mode);
+    try {
+      window.localStorage.setItem(directoryPreference, mode);
+    } catch {
+      // Keep the in-memory preference.
+    }
+  };
+
   const openDirector = (entry) => {
+    if (import.meta.env.DEV && directoryMode === 'carousel') {
+      carouselIndex.current = catalog.directors.indexOf(entry);
+    }
     directoryScroll.current = scrollRef.current?.scrollTop || 0;
     directoryRailScroll.current = directoryRail.current?.scrollLeft || 0;
     openerRef.current = entry.id;
@@ -245,6 +326,64 @@ const DirectorsCollectionView = ({
     })
     .slice(0, 3);
 
+  // The original row: the default layout and the Suspense fallback.
+  const directoryRow = (
+    <div
+      ref={directoryRail}
+      className="-m-1 flex snap-x snap-mandatory gap-3 overflow-x-auto p-1 pb-5"
+      onKeyDown={(event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key))
+          return;
+        const cards = [...event.currentTarget.querySelectorAll('button')];
+        const index = cards.indexOf(document.activeElement);
+        const next =
+          event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+            ? cards.length - 1
+            : Math.max(
+                0,
+                Math.min(
+                  cards.length - 1,
+                  index + (event.key === 'ArrowRight' ? 1 : -1),
+                ),
+              );
+        event.preventDefault();
+        cards[next]?.focus();
+      }}
+    >
+      {catalog.directors.map((entry, index) => (
+        <button
+          key={entry.id}
+          type="button"
+          data-director-card={entry.id}
+          onClick={(event) => openDirector(entry, event.currentTarget)}
+          className={`group flex w-[75%] shrink-0 snap-start min-h-[10rem] flex-col justify-between rounded-xl border border-stone-800 bg-stone-900/65 p-3 text-left transition-colors hover:border-stone-600 ${focusRing}`}
+        >
+          <span className="flex items-start justify-between gap-2">
+            <span className="text-[0.6875rem] tabular-nums tracking-widest text-stone-400">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <ArrowRight
+              className="h-4 w-4 text-amber-300/70"
+              aria-hidden="true"
+            />
+          </span>
+          <span>
+            <span className="mb-2 block font-serif text-xl leading-tight text-stone-100">
+              {entry.name}
+            </span>
+            {entry.description && (
+              <span className="block text-xs leading-snug text-stone-400">
+                {entry.description}
+              </span>
+            )}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <Dialog
       onClose={back}
@@ -289,7 +428,7 @@ const DirectorsCollectionView = ({
         {!selected && (
           <>
             <div className="border-b border-stone-800/80 pb-6 pt-9">
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+              <p className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-amber-300">
                 Curated collection
               </p>
               <h2 className="max-w-[18rem] font-serif text-4xl leading-tight tracking-tight text-stone-100">
@@ -301,74 +440,51 @@ const DirectorsCollectionView = ({
               </p>
             </div>
             <section aria-label="Explore directors" className="pt-6">
-              <div className="mb-4 flex items-end justify-between">
+              <div
+                className={
+                  import.meta.env.DEV
+                    ? 'mb-4 flex flex-wrap items-center justify-between gap-x-2'
+                    : 'mb-4 flex items-end justify-between'
+                }
+              >
                 <h3 className="font-serif text-2xl text-stone-100">
                   Explore filmmakers
                 </h3>
+                {import.meta.env.DEV && (
+                  <div
+                    role="group"
+                    aria-label="Directory layout"
+                    className="flex items-center text-xs text-stone-400"
+                  >
+                    {['row', 'carousel'].map((mode, index) => (
+                      <React.Fragment key={mode}>
+                        {index > 0 && <span aria-hidden="true">|</span>}
+                        <button
+                          type="button"
+                          aria-pressed={directoryMode === mode}
+                          onClick={() => changeDirectoryMode(mode)}
+                          className={`min-h-11 min-w-11 rounded px-1 hover:text-amber-300 aria-pressed:text-amber-300 ${focusRing}`}
+                        >
+                          {mode === 'row' ? 'Row' : 'Carousel (trial)'}
+                        </button>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                )}
                 <span className="text-xs text-stone-400">12 profiles</span>
               </div>
-              <div
-                ref={directoryRail}
-                className="-m-1 flex snap-x snap-mandatory gap-3 overflow-x-auto p-1 pb-5"
-                onKeyDown={(event) => {
-                  if (
-                    !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(
-                      event.key,
-                    )
-                  )
-                    return;
-                  const cards = [
-                    ...event.currentTarget.querySelectorAll('button'),
-                  ];
-                  const index = cards.indexOf(document.activeElement);
-                  const next =
-                    event.key === 'Home'
-                      ? 0
-                      : event.key === 'End'
-                      ? cards.length - 1
-                      : Math.max(
-                          0,
-                          Math.min(
-                            cards.length - 1,
-                            index + (event.key === 'ArrowRight' ? 1 : -1),
-                          ),
-                        );
-                  event.preventDefault();
-                  cards[next]?.focus();
-                }}
-              >
-                {catalog.directors.map((entry, index) => (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    data-director-card={entry.id}
-                    onClick={(event) =>
-                      openDirector(entry, event.currentTarget)
-                    }
-                    className={`group flex w-[75%] shrink-0 snap-start min-h-[10rem] flex-col justify-between rounded-xl border border-stone-800 bg-stone-900/65 p-3 text-left transition-colors hover:border-stone-600 ${focusRing}`}
-                  >
-                    <span className="flex items-start justify-between gap-2">
-                      <span className="text-[11px] tabular-nums tracking-widest text-stone-400">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <ArrowRight
-                        className="h-4 w-4 text-amber-300/70"
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span>
-                      <span className="mb-2 block font-serif text-xl leading-tight text-stone-100">
-                        {entry.name}
-                      </span>
-                      {entry.description && (
-                        <span className="block text-xs leading-snug text-stone-400">
-                          {entry.description}
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </div>
+              {import.meta.env.DEV && directoryMode === 'carousel' ? (
+                <Suspense fallback={directoryRow}>
+                  <DepthCarousel
+                    items={catalog.directors}
+                    initialIndex={carouselIndex.current}
+                    onOpen={openDirector}
+                    renderItem={renderDirectorCard}
+                  />
+                </Suspense>
+              ) : (
+                directoryRow
+              )}
             </section>
           </>
         )}
@@ -481,7 +597,10 @@ const DirectorsCollectionView = ({
                   type="button"
                   aria-expanded={expanded}
                   aria-controls="director-essentials"
-                  onClick={() => setExpanded((value) => !value)}
+                  onClick={() => {
+                    focusFirstRevealed.current = !expanded;
+                    setExpanded((value) => !value);
+                  }}
                   className={`mt-2 min-h-11 text-sm text-amber-200 ${focusRing}`}
                 >
                   {expanded ? 'Show fewer' : `View all ${films.length}`}
@@ -510,7 +629,7 @@ const DirectorsCollectionView = ({
               >
                 Close film details
               </button>
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+              <p className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-amber-300">
                 Directed by {selectedDirector?.name}
               </p>
               <h2

@@ -28,3 +28,6 @@ For every chosen film record director person ID, canonical film ID, alternate ti
 - [ ] Do not merge to main until owner/editorial and technical QA signoff
 
 **Implementation:** [draft PR #58](https://github.com/BenWassa/hearth_v2/pull/58) currently has only 3 film starters and chronological credits; this issue authorizes research, **not** silently replacing app functionality.
+
+## Owner-interest candidates (2026-11-22)
+The owner likes Christopher Nolan and Quentin Tarantino and has heard of Francis Ford Coppola. They are documented as reserves with owner interest in `docs/collections/directors/DIRECTORS_ROSTER_STATUS.md`, with the steps needed if any are added (ranked list, API allowlist, screen copy, photo). No research has been done for them yet and the app stays at the approved 12 until the owner decides.

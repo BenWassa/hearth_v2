@@ -2,6 +2,8 @@
 
 **Status:** Visual source shortlist and owner decisions updated 2026-11-22. **No authentic portraits or signatures have yet been delivered as independent production assets.** Current in-chat mockups are composite design references, not source files. Roster shown below is **provisional** and must be finalized under [#60](https://github.com/BenWassa/hearth_v2/issues/60) before production completion.
 
+> **Signatures (2026-11-22):** the owner approved sourcing signatures online instead of making them. Ten of twelve are in as dev-preview files (not committed), sources and credits in [ART_PROVENANCE.md](./ART_PROVENANCE.md). Fellini and Varda have none: issue #65.
+
 > **Roster (2026-11-22):** the table below follows the owner's photo picks, which mix the approved 12 with Nolan, Tarantino and Coppola (owner interest, not yet in the app). The full list of every director with photo status is in [DIRECTORS_ROSTER_STATUS.md](./DIRECTORS_ROSTER_STATUS.md). Bergman, Fellini and Varda still have no photo pick. Dev-preview crops exist for the nine photos the owner chose from free or private sources (Spielberg, Scorsese, Kubrick, Bong, Kurosawa, Hitchcock, Ray, plus Miyazaki and Wong Kar-wai for private use); provenance draft and originals are kept outside the repo in `art-source/legendary-directors/`. Nothing is committed.
 
 ## Asset convention
@@ -9,7 +11,7 @@
 - Portrait: `public/assets/collections/legendary-directors/directors/<slug>/portrait.webp`
 - Signature (only after authenticity/rights validation): `public/assets/collections/legendary-directors/directors/<slug>/signature.svg` or `.png`
 - Add a separate `hero.webp` only when a distinct 16:9 crop is justified; never upscale a small portrait.
-- Preserve external source URL, source creator/owner and permissions, license, original size, crop treatment and review date **for each delivered asset** in `ART_PROVENANCE.md` (not yet created).
+- Preserve external source URL, source creator/owner and permissions, license, original size, crop treatment and review date **for each delivered asset** in `ART_PROVENANCE.md` ([ART_PROVENANCE.md](./ART_PROVENANCE.md) for signatures and score logos; portraits still to add).
 - Validate portrait legibility at 320/360/390/448px and cover at 112–144px wide. The signature is ornamental: if unavailable, show the person's name with normal type, no fabricated handwriting.
 
 ## Current owner visual selections — 2026-11-22

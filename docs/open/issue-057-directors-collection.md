@@ -8,6 +8,8 @@ Built on combined draft PR #63 (`feat/curated-collections`), dev preview only. D
 
 **Directory:** owner chose a carousel on 2026-11-22, built on Embla Carousel (MIT) with depth styling adapted from React Bits: drag follows the finger, a fling carries through several directors and settles on one, it loops, a touch on a moving wheel only stops it, tap the front card to open. No dots and no arrows (owner request); keyboard Left/Right/Home/End remain. Replaces the swipe row.
 
+**Roster:** the app shows the 12 approved on 2026-11-13. Nolan, Tarantino and Coppola are documented reserves with owner interest (not in the app); see `docs/collections/directors/DIRECTORS_ROSTER_STATUS.md`.
+
 **Owner-side, blocking release:** portraits, signatures and Tonight cover (#61; owner makes them); IMDb / Rotten Tomatoes licences before any public release. Owner decision 2026-11-22: both curated collections stay dev-only until all art is approved, then release together.
 
 ---

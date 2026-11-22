@@ -1,5 +1,7 @@
 # Legendary Directors: proposed roster of 12
 
+**Current status of every director (2026-11-22):** see [DIRECTORS_ROSTER_STATUS.md](./DIRECTORS_ROSTER_STATUS.md). The owner approved the twelve below on 2026-11-13 and later said they like Nolan and Tarantino and know of Coppola; those three stay documented as reserves with owner interest.
+
 **Issue:** [#60](https://github.com/BenWassa/hearth_v2/issues/60) · **Status:** Draft for owner review (first review gate) · **Researched:** 2026-11-13
 **Companion:** [`ESSENTIAL_10_EXAMPLE.md`](./ESSENTIAL_10_EXAMPLE.md) (one complete worked list, Kurosawa)
 

@@ -34,7 +34,7 @@ const OptionalArt = ({ src, className, children }) => {
   );
 };
 
-const renderDirectorCard = (entry, index) => (
+const renderDirectorCard = (entry) => (
   <>
     <OptionalArt
       src={`/assets/collections/legendary-directors/directors/${entry.id}/portrait.webp`}
@@ -43,10 +43,7 @@ const renderDirectorCard = (entry, index) => (
       <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/50" />
     </OptionalArt>
     <span className="relative flex h-full flex-col justify-between p-4">
-      <span className="flex items-start justify-between gap-2">
-        <span className="text-[0.6875rem] tabular-nums tracking-widest text-stone-400">
-          {String(index + 1).padStart(2, '0')}
-        </span>
+      <span className="flex items-start justify-end gap-2">
         <ArrowRight className="h-4 w-4 text-amber-300" aria-hidden="true" />
       </span>
       <span>
@@ -62,6 +59,62 @@ const renderDirectorCard = (entry, index) => (
     </span>
   </>
 );
+
+// Directors whose signature is a PNG rather than an SVG.
+const SIGNATURE_FILE = {
+  'ingmar-bergman': 'signature.png',
+  'wong-kar-wai': 'signature.png',
+};
+// Signatures that need a credit (Creative Commons, from Wikimedia Commons).
+const SIGNATURE_CREDIT = {
+  'ingmar-bergman': {
+    by: 'Excreto',
+    licence: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Ingmar_Bergman_Signature.png',
+  },
+  'martin-scorsese': {
+    by: 'Machete kills',
+    licence: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Scorsese-signature_2.svg',
+  },
+};
+
+const DirectorHero = ({ id, name }) => {
+  const [portrait, setPortrait] = useState('pending');
+  const base = `/assets/collections/legendary-directors/directors/${id}`;
+  const hasPortrait = portrait === 'loaded';
+  return (
+    <div className="pb-7 pt-5">
+      <div className="relative overflow-hidden rounded-2xl bg-stone-900">
+        {portrait !== 'failed' && (
+          <img
+            src={`${base}/portrait.webp`}
+            alt=""
+            onLoad={() => setPortrait('loaded')}
+            onError={() => setPortrait('failed')}
+            className={`pointer-events-none aspect-[3/4] w-full object-cover object-top ${
+              hasPortrait ? '' : 'hidden'
+            }`}
+          />
+        )}
+        {hasPortrait && (
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-stone-950 via-stone-950/60 to-transparent" />
+        )}
+        <div
+          className={hasPortrait ? 'absolute inset-x-0 bottom-0 p-5' : 'p-5'}
+        >
+          <h2 className="font-serif text-3xl leading-tight text-stone-100">
+            {name}
+          </h2>
+          <OptionalArt
+            src={`${base}/${SIGNATURE_FILE[id] || 'signature.svg'}`}
+            className="mt-2 h-16 max-w-[65%] object-contain object-left opacity-95 mix-blend-screen [filter:invert(1)_drop-shadow(0_0_0.6px_rgb(255_255_255))]"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FilmPoster = ({ film }) => {
   const ref = useRef(null);
@@ -113,21 +166,39 @@ const FilmPoster = ({ film }) => {
   );
 };
 
+const RATINGS_PATH = '/assets/collections/legendary-directors/ratings';
+// Rotten Tomatoes' own rule: 60% or higher is Fresh, below 60% is Rotten.
+const FRESH_THRESHOLD = 60;
+
 const Scores = ({ film }) => {
   const imdb = film.imdb?.rating;
   const rt = film.rt?.tomatometer;
   return (
-    <span
-      className="ml-auto shrink-0 text-right text-xs leading-relaxed text-stone-300"
-      aria-label={`IMDb ${imdb ?? 'n/a'}, Rotten Tomatoes ${
-        rt == null ? 'n/a' : `${rt} percent`
-      }`}
-    >
-      <span aria-hidden="true" className="block">
-        IMDb {imdb == null ? 'n/a' : imdb.toFixed(1)}
+    <span className="ml-auto flex shrink-0 flex-col items-end gap-2 text-sm font-semibold tabular-nums text-stone-100">
+      <span className="sr-only">
+        {`IMDb ${imdb ?? 'n/a'}, Rotten Tomatoes ${
+          rt == null ? 'n/a' : `${rt} percent`
+        }`}
       </span>
-      <span aria-hidden="true" className="block">
-        RT {rt == null ? 'n/a' : `${rt}%`}
+      <span aria-hidden="true" className="flex items-center gap-2">
+        <img
+          src={`${RATINGS_PATH}/imdb.svg`}
+          alt=""
+          className="h-4 w-auto rounded-[2px]"
+        />
+        {imdb == null ? 'n/a' : imdb.toFixed(1)}
+      </span>
+      <span aria-hidden="true" className="flex items-center gap-2">
+        {rt != null && (
+          <img
+            src={`${RATINGS_PATH}/${
+              rt >= FRESH_THRESHOLD ? 'fresh' : 'rotten'
+            }.svg`}
+            alt=""
+            className="h-4 w-4"
+          />
+        )}
+        {rt == null ? 'n/a' : `${rt}%`}
       </span>
     </span>
   );
@@ -361,28 +432,18 @@ const DirectorsCollectionView = ({
         )}
         {selected && (
           <>
-            <div className="pb-7 pt-7">
-              <OptionalArt
-                key={`${selected}-portrait`}
-                src={`/assets/collections/legendary-directors/directors/${selected}/portrait.webp`}
-                className="mb-5 max-h-72 w-full rounded-xl object-cover"
-              />
-              <h2 className="font-serif text-3xl leading-tight text-stone-100">
-                {selectedDirector.name}
-              </h2>
-              <OptionalArt
-                key={`${selected}-signature`}
-                src={`/assets/collections/legendary-directors/directors/${selected}/signature.svg`}
-                className="mt-3 h-16 max-w-full object-contain"
-              />
-            </div>
+            <DirectorHero
+              key={selected}
+              id={selected}
+              name={selectedDirector.name}
+            />
             {watchNext.length > 0 && (
               <section aria-label="Watch Next">
                 <h3 className="font-serif text-2xl text-stone-100">
                   Watch Next
                 </h3>
                 <p className="mt-1 text-sm text-stone-400">
-                  Not marked watched on your shared shelf.
+                  Essentials you haven't watched yet.
                 </p>
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {watchNext.map((film) => (
@@ -393,7 +454,7 @@ const DirectorsCollectionView = ({
                         event.currentTarget.focus({ preventScroll: true });
                         openFilm(film);
                       }}
-                      className={`min-w-0 text-left ${focusRing}`}
+                      className={`flex min-w-0 flex-col justify-start text-left ${focusRing}`}
                     >
                       <FilmPoster film={film} />
                       <span
@@ -411,12 +472,10 @@ const DirectorsCollectionView = ({
               </section>
             )}
             <section
-              aria-label={`Essential ${films.length}`}
+              aria-label="Essentials"
               className="mt-8 border-t border-stone-800 pt-6"
             >
-              <h3 className="font-serif text-2xl text-stone-100">
-                Essential {films.length}
-              </h3>
+              <h3 className="font-serif text-2xl text-stone-100">Essentials</h3>
               <ol
                 id="director-essentials"
                 className="mt-4 divide-y divide-stone-800"
@@ -433,22 +492,16 @@ const DirectorsCollectionView = ({
                         event.currentTarget.focus({ preventScroll: true });
                         openFilm(film);
                       }}
-                      className={`flex min-h-20 w-full items-center gap-2 py-3 text-left ${focusRing}`}
+                      className={`flex w-full items-center gap-3 py-2 text-left ${focusRing}`}
                     >
-                      <span className="w-9 shrink-0">
-                        <FilmPoster film={film} />
-                      </span>
-                      <span
-                        className={`w-5 shrink-0 text-center tabular-nums ${
-                          film.rank <= 3
-                            ? 'font-semibold text-amber-200'
-                            : 'text-stone-400'
-                        }`}
-                      >
+                      <span className="w-11 shrink-0 text-center font-serif text-5xl font-semibold leading-none tabular-nums text-amber-300">
                         {film.rank}
                         <span className="sr-only">
                           {film.rank <= 3 ? ', signature film' : ''}
                         </span>
+                      </span>
+                      <span className="w-20 shrink-0">
+                        <FilmPoster film={film} />
                       </span>
                       <span className="min-w-0">
                         <span className="block font-serif text-base text-stone-100">
@@ -587,6 +640,20 @@ const DirectorsCollectionView = ({
             <span className="block font-semibold text-stone-400">Credits</span>
             This product uses the TMDB API but is not endorsed or certified by
             TMDB.
+            {SIGNATURE_CREDIT[selected] && (
+              <span className="mt-2 block text-[0.6875rem]">
+                Signature:{' '}
+                <a
+                  href={SIGNATURE_CREDIT[selected].url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  {SIGNATURE_CREDIT[selected].by}
+                </a>
+                , {SIGNATURE_CREDIT[selected].licence}, via Wikimedia Commons
+              </span>
+            )}
           </span>
         </footer>
       </div>

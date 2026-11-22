@@ -115,10 +115,10 @@ it('skips watched films, caps Watch Next at three, and preserves fixed ranks thr
       (el) => el.textContent,
     ),
   ).toEqual(director.films.slice(1, 4).map((f) => `${f.title}${f.year}`));
-  expect(section('Essential 10').querySelectorAll('li')).toHaveLength(5);
+  expect(section('Essentials').querySelectorAll('li')).toHaveLength(5);
   await click(button('View all'));
   const titles = () =>
-    [...section('Essential 10').querySelectorAll('li')].map(
+    [...section('Essentials').querySelectorAll('li')].map(
       (el) => el.querySelector('button').textContent,
     );
   director.films.forEach((f, i) =>
@@ -134,13 +134,13 @@ it('skips watched films, caps Watch Next at three, and preserves fixed ranks thr
   expect(section('Watch Next')).toBeNull();
   expect(titles()).toHaveLength(director.films.length);
   await click(button('Show fewer'));
-  expect(section('Essential 10').querySelectorAll('li')).toHaveLength(5);
+  expect(section('Essentials').querySelectorAll('li')).toHaveLength(5);
 });
 it('shows fewer available Watch Next choices and includes absent films without claiming unseen', async () => {
   await mount({ items: director.films.slice(0, -1).map((f) => owned(f)) });
   await open();
   expect(section('Watch Next').querySelectorAll('button')).toHaveLength(1);
-  expect(section('Watch Next').textContent).toContain('Not marked watched');
+  expect(section('Watch Next').textContent).toContain("haven't watched");
 });
 it('renders text scores, null fallback, dates and attribution', async () => {
   await mount();
@@ -149,10 +149,10 @@ it('renders text scores, null fallback, dates and attribution', async () => {
   );
   await openCard(d.id);
   if (button('View all')) await click(button('View all'));
-  expect(section('Essential 10').textContent).toContain('n/a');
-  expect(
-    section('Essential 10').querySelector('[aria-label^="IMDb"]'),
-  ).toBeTruthy();
+  expect(section('Essentials').textContent).toContain('n/a');
+  expect(section('Essentials').textContent).toMatch(
+    /IMDb [^,]+, Rotten Tomatoes/,
+  );
   expect(host.textContent).toContain(
     'Scores from IMDb and Rotten Tomatoes, read 13 Nov 2026',
   );
@@ -164,7 +164,7 @@ it('opens a nested modal, Escape closes only it, returns focus and retains profi
   const state = window.history.state;
   const scroller = host.querySelector('.overflow-y-auto');
   scroller.scrollTop = 123;
-  const opener = section('Essential 10').querySelector('button');
+  const opener = section('Essentials').querySelector('button');
   await click(opener);
   expect(host.querySelectorAll('[role="dialog"]')).toHaveLength(2);
   const back = vi.spyOn(window.history, 'back').mockImplementation(() => {});
@@ -186,7 +186,7 @@ it.each(['added', 'exists', 'restored', 'removed', undefined])(
     const onAddItem = vi.fn().mockResolvedValue({ status });
     await mount({ onAddItem });
     await open();
-    await click(section('Essential 10').querySelector('button'));
+    await click(section('Essentials').querySelector('button'));
     expect(onAddItem).not.toHaveBeenCalled();
     await click(button('Add to shelf'));
     expect(onAddItem).toHaveBeenCalledExactlyOnceWith(
@@ -225,7 +225,7 @@ it.each(['owned', 'removed', 'mismatch', 'failure'])(
       removedItems: scenario === 'removed' ? [owned(first)] : [],
     });
     await open();
-    await click(section('Essential 10').querySelector('button'));
+    await click(section('Essentials').querySelector('button'));
     expect(button('Add to shelf')).toBeUndefined();
     expect(onAddItem).not.toHaveBeenCalled();
   },
@@ -287,12 +287,12 @@ it.each(catalog.directors.filter((entry) => entry.films.length < 10))(
   async (entry) => {
     await mount();
     await openCard(entry.id);
-    expect(section(`Essential ${entry.films.length}`)).toBeTruthy();
+    expect(section('Essentials')).toBeTruthy();
     expect(button(`View all ${entry.films.length}`)).toBeTruthy();
     await click(button('View all'));
-    expect(
-      section(`Essential ${entry.films.length}`).querySelectorAll('li'),
-    ).toHaveLength(entry.films.length);
+    expect(section('Essentials').querySelectorAll('li')).toHaveLength(
+      entry.films.length,
+    );
   },
 );
 
@@ -315,7 +315,7 @@ it('retries failed details without adding and removes a broken modal poster', as
   await mount({ onAddItem });
   await open();
   getMediaDetails.mockRejectedValue(new Error('offline'));
-  await click(section('Essential 10').querySelector('button'));
+  await click(section('Essentials').querySelector('button'));
   expect(host.querySelector('[role="alert"]')).toBeTruthy();
   getMediaDetails.mockClear();
   getMediaDetails.mockImplementation(async ({ providerId }) => ({

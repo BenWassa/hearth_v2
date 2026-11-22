@@ -4,16 +4,13 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import DirectorsCollectionView from './DirectorsCollectionView.jsx';
 import catalog from '../config/directorEssentials.json';
 import { getMediaDetails } from '../services/mediaApi/client.js';
-vi.mock('gsap', () => ({ default: { to: () => ({ kill: vi.fn() }) } }));
 vi.mock('../services/mediaApi/client.js', () => ({ getMediaDetails: vi.fn() }));
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const director = catalog.directors[0];
 const first = director.films[0];
 let root, host;
-const directoryPreference = 'hearth:dev:directorsDirectory';
 const carousel = () => host.querySelector('[aria-roledescription="carousel"]');
 beforeEach(() => {
-  window.localStorage.removeItem(directoryPreference);
   window.history.replaceState({}, '');
   getMediaDetails.mockImplementation(async ({ providerId }) => ({
     provider: 'tmdb',
@@ -25,7 +22,6 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root?.unmount());
   host?.remove();
-  window.localStorage.removeItem(directoryPreference);
   vi.clearAllMocks();
 });
 const mount = async (props) => {
@@ -42,8 +38,13 @@ const button = (text) =>
   [...host.querySelectorAll('button')].find((el) =>
     el.textContent.includes(text),
   );
-const open = async () =>
-  click(host.querySelector(`[data-director-card="${director.id}"]`));
+// In the carousel a side card first spins to the front; tapping the front card opens it.
+const openCard = async (id) => {
+  const card = () => host.querySelector(`[data-director-card="${id}"]`);
+  if (card().tabIndex !== 0) await click(card());
+  await click(card());
+};
+const open = async () => openCard(director.id);
 const section = (name) => host.querySelector(`section[aria-label="${name}"]`);
 const owned = (film, status = 'watched') => ({
   type: 'movie',
@@ -77,33 +78,20 @@ it('shows exactly the approved twelve in an accessible swipeable directory witho
   expect(getMediaDetails).not.toHaveBeenCalled();
   expect(onAddItem).not.toHaveBeenCalled();
 });
-it('defaults to the row and switches to the trial and back', async () => {
+it('shows the carousel as the only directory, with no dots', async () => {
   await mount();
-  expect(carousel()).toBeNull();
-  expect(button('Row').getAttribute('aria-pressed')).toBe('true');
-
-  await click(button('Carousel (trial)'));
-  await act(async () => vi.dynamicImportSettled());
   expect(carousel()).toBeTruthy();
-  expect(window.localStorage.getItem(directoryPreference)).toBe('carousel');
-
-  await click(button('Row'));
-  expect(carousel()).toBeNull();
+  expect(button('Carousel (trial)')).toBeUndefined();
+  expect(host.querySelector('[aria-label="Choose a director"]')).toBeNull();
   expect(host.querySelectorAll('[data-director-card]')).toHaveLength(12);
-  expect(window.localStorage.getItem(directoryPreference)).toBe('row');
 });
 
-it('uses the saved trial and restores the opened director to the front on Back', async () => {
-  window.localStorage.setItem(directoryPreference, 'carousel');
+it('restores the opened director to the front on Back', async () => {
   await mount();
-  await act(async () => vi.dynamicImportSettled());
-  expect(carousel()).toBeTruthy();
 
   const directoryState = window.history.state;
   const entry = catalog.directors[1];
-  await click(
-    carousel().querySelector('[aria-label^="Go to Alfred Hitchcock"]'),
-  );
+  await click(carousel().querySelector('[aria-label^="Next director"]'));
   const opener = () =>
     carousel().querySelector(`[data-director-card="${entry.id}"]`);
   await click(opener());
@@ -157,7 +145,7 @@ it('renders text scores, null fallback, dates and attribution', async () => {
   const d = catalog.directors.find((d) =>
     d.films.some((f) => f.rt.tomatometer == null || f.imdb.rating == null),
   );
-  await click(host.querySelector(`[data-director-card="${d.id}"]`));
+  await openCard(d.id);
   if (button('View all')) await click(button('View all'));
   expect(section('Essential 10').textContent).toContain('n/a');
   expect(
@@ -253,12 +241,10 @@ it('falls back gracefully when optional portrait/signature fail', async () => {
   expect(host.querySelector('img[src$="signature.svg"]')).toBeNull();
 });
 
-it('restores directory focus and both scroll positions after profile Back', async () => {
+it('restores directory focus and scroll position after profile Back', async () => {
   await mount();
   const directoryState = window.history.state;
   const card = host.querySelector(`[data-director-card="${director.id}"]`);
-  const rail = card.parentElement;
-  rail.scrollLeft = 240;
   host.querySelector('.overflow-y-auto').scrollTop = 50;
   await click(card);
   const back = vi.spyOn(window.history, 'back').mockImplementation(() => {});
@@ -271,7 +257,6 @@ it('restores directory focus and both scroll positions after profile Back', asyn
   );
   const restored = host.querySelector(`[data-director-card="${director.id}"]`);
   expect(document.activeElement).toBe(restored);
-  expect(restored.parentElement.scrollLeft).toBe(240);
   expect(host.querySelector('.overflow-y-auto').scrollTop).toBe(50);
 });
 
@@ -299,7 +284,7 @@ it.each(catalog.directors.filter((entry) => entry.films.length < 10))(
   'uses the true essentials count for $name',
   async (entry) => {
     await mount();
-    await click(host.querySelector(`[data-director-card="${entry.id}"]`));
+    await openCard(entry.id);
     expect(section(`Essential ${entry.films.length}`)).toBeTruthy();
     expect(button(`View all ${entry.films.length}`)).toBeTruthy();
     await click(button('View all'));
@@ -314,7 +299,7 @@ it('clamps Watch Next titles while retaining their full text and accessible name
   const entry = catalog.directors.find((entry) =>
     entry.name.includes('Kubrick'),
   );
-  await click(host.querySelector(`[data-director-card="${entry.id}"]`));
+  await openCard(entry.id);
   for (const tile of section('Watch Next').querySelectorAll('button')) {
     const title = tile.querySelector('[title]');
     expect(title.classList.contains('line-clamp-3')).toBe(true);

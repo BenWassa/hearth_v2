@@ -6,7 +6,6 @@
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import gsap from 'gsap';
 
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-amber-400';
@@ -14,11 +13,17 @@ const controlClass = `grid h-11 min-w-11 place-items-center rounded-xl text-ston
 const reducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+// Exponential settle: a flick keeps its release speed and decays smoothly onto
+// a director. Larger constant = longer glide.
+const GLIDE_MS = 325;
+const STEP_MS = 140;
+
 const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
   const [active, setActive] = useState(initialIndex);
   const cards = useRef([]);
-  const position = useRef({ index: initialIndex });
-  const tween = useRef(null);
+  // Continuous, unwrapped position; whole numbers are directors.
+  const position = useRef(initialIndex);
+  const frame = useRef(0);
   const stage = useRef(null);
   const drag = useRef(null);
   const suppressClick = useRef(false);
@@ -32,23 +37,61 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
   const layout = () => {
     cards.current.forEach((card, index) => {
       if (!card) return;
-      const distance = distanceFrom(index, position.current.index);
+      const distance = distanceFrom(index, position.current);
       const depth = Math.abs(distance);
-      const opacity = Math.max(0, 1 - depth * 0.43);
+      // Near cards stay solid and dim with depth, so names never show through
+      // the card in front mid-spin; only cards beyond the neighbours fade out.
+      const opacity = depth <= 1 ? 1 : Math.max(0, 1 - (depth - 1) * 0.75);
       card.style.transform = `translate(-50%, -50%) translateX(${
         distance * 38
       }%) translateZ(${depth * -120}px) rotateY(${
         Math.max(-1, Math.min(1, distance)) * -18
       }deg)`;
       card.style.opacity = opacity;
+      card.style.filter =
+        depth < 0.01 ? '' : `brightness(${1 - Math.min(depth, 1.5) * 0.4})`;
       card.style.zIndex = String(100 - Math.round(depth * 20));
       card.style.pointerEvents = opacity > 0.05 ? 'auto' : 'none';
     });
   };
 
+  const stop = () => {
+    if (!frame.current) return false;
+    cancelAnimationFrame(frame.current);
+    frame.current = 0;
+    return true;
+  };
+
+  const settle = (target, timeConstant) => {
+    stop();
+    const finish = () => {
+      position.current = target;
+      layout();
+    };
+    if (reducedMotion() || typeof requestAnimationFrame !== 'function') {
+      finish();
+      return;
+    }
+    const amplitude = target - position.current;
+    const started = performance.now();
+    const tick = (now) => {
+      const remaining =
+        amplitude * Math.exp(-Math.max(0, now - started) / timeConstant);
+      if (Math.abs(remaining) < 0.002) {
+        frame.current = 0;
+        finish();
+        return;
+      }
+      position.current = target - remaining;
+      layout();
+      frame.current = requestAnimationFrame(tick);
+    };
+    frame.current = requestAnimationFrame(tick);
+  };
+
   useLayoutEffect(() => {
     layout();
-    return () => tween.current?.kill();
+    return () => stop();
   }, [count]);
 
   useLayoutEffect(() => {
@@ -58,26 +101,9 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
 
   const goTo = (index, moveFocus = false) => {
     const next = wrap(index);
-    const target =
-      position.current.index + distanceFrom(next, position.current.index);
-    tween.current?.kill();
     if (moveFocus && next !== active) focusTarget.current = cards.current[next];
     setActive(next);
-    if (reducedMotion()) {
-      position.current.index = next;
-      layout();
-      return;
-    }
-    tween.current = gsap.to(position.current, {
-      index: target,
-      duration: 0.45,
-      ease: 'power3.out',
-      onUpdate: layout,
-      onComplete: () => {
-        position.current.index = next;
-        layout();
-      },
-    });
+    settle(position.current + distanceFrom(next, position.current), STEP_MS);
   };
 
   const onKeyDown = (event) => {
@@ -94,8 +120,17 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
 
   const onPointerDown = (event) => {
     if (count < 2 || event.button !== 0 || !event.isPrimary) return;
-    suppressClick.current = false;
-    drag.current = { id: event.pointerId, x: event.clientX, moved: false };
+    // Touching a spinning carousel catches it, like a real wheel.
+    const caught = stop();
+    suppressClick.current = caught;
+    drag.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      moved: false,
+      caught,
+      start: position.current,
+      samples: [{ t: event.timeStamp, x: event.clientX }],
+    };
   };
 
   const onPointerMove = (event) => {
@@ -106,14 +141,14 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
       if (Math.abs(dx) < 8) return;
       gesture.moved = true;
       suppressClick.current = true;
-      gesture.start = position.current.index;
       gesture.step = Math.max(stage.current.clientWidth * 0.4, 44);
-      tween.current?.kill();
-      event.currentTarget.setPointerCapture(event.pointerId);
+      event.currentTarget.setPointerCapture?.(event.pointerId);
     }
+    gesture.samples.push({ t: event.timeStamp, x: event.clientX });
+    if (gesture.samples.length > 6) gesture.samples.shift();
     gesture.distance = dx / gesture.step;
     if (!reducedMotion()) {
-      position.current.index = gesture.start - gesture.distance;
+      position.current = gesture.start - gesture.distance;
       layout();
     }
   };
@@ -122,14 +157,43 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
     const gesture = drag.current;
     if (!gesture || gesture.id !== event.pointerId) return;
     drag.current = null;
-    if (!gesture.moved) return;
-    const target =
-      event.type === 'pointerup' && Math.abs(gesture.distance) >= 0.22
-        ? Math.round(gesture.start) -
-          Math.sign(gesture.distance) *
-            Math.max(1, Math.round(Math.abs(gesture.distance)))
-        : active;
-    goTo(target, cards.current.includes(document.activeElement));
+    if (!gesture.moved) {
+      if (gesture.caught) {
+        const nearest = Math.round(position.current);
+        setActive(wrap(nearest));
+        settle(nearest, STEP_MS);
+      }
+      return;
+    }
+    const current = gesture.start - gesture.distance;
+    let target = Math.round(current);
+    if (event.type === 'pointerup') {
+      // Release speed in directors per millisecond, from the last ~100ms.
+      const recent = gesture.samples.filter(
+        (sample) => event.timeStamp - sample.t <= 100,
+      );
+      const first = recent[0];
+      const last = recent[recent.length - 1];
+      const velocity =
+        first && last && last.t > first.t
+          ? -(last.x - first.x) / gesture.step / (last.t - first.t)
+          : 0;
+      const glide = Math.max(-count, Math.min(count, velocity * GLIDE_MS));
+      target = Math.round(current + glide);
+      // A short deliberate drag still moves one director.
+      if (
+        Math.round(target) === Math.round(gesture.start) &&
+        Math.abs(gesture.distance) >= 0.22
+      )
+        target = Math.round(gesture.start) - Math.sign(gesture.distance);
+    } else {
+      target = Math.round(gesture.start);
+    }
+    if (cards.current.includes(document.activeElement))
+      focusTarget.current = cards.current[wrap(target)];
+    setActive(wrap(target));
+    position.current = current;
+    settle(target, GLIDE_MS);
   };
 
   if (!count) return null;
@@ -175,49 +239,24 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
         </div>
       </div>
       {count > 1 && (
-        <>
-          <div className="flex justify-center gap-4">
-            <button
-              type="button"
-              aria-label={`Previous director: ${label(wrap(active - 1))}`}
-              onClick={() => goTo(active - 1)}
-              className={controlClass}
-            >
-              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              aria-label={`Next director: ${label(wrap(active + 1))}`}
-              onClick={() => goTo(active + 1)}
-              className={controlClass}
-            >
-              <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
-          <div
-            role="group"
-            aria-label="Choose a director"
-            className="mx-auto grid max-w-[18rem] grid-cols-6"
+        <div className="flex justify-center gap-4">
+          <button
+            type="button"
+            aria-label={`Previous director: ${label(wrap(active - 1))}`}
+            onClick={() => goTo(active - 1)}
+            className={controlClass}
           >
-            {items.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-label={`Go to ${label(index)}`}
-                aria-current={active === index ? 'true' : undefined}
-                onClick={() => goTo(index)}
-                className={controlClass}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-2 rounded-full ${
-                    active === index ? 'w-4 bg-amber-300' : 'w-2 bg-stone-500'
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
-        </>
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Next director: ${label(wrap(active + 1))}`}
+            onClick={() => goTo(active + 1)}
+            className={controlClass}
+          >
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
       )}
     </div>
   );

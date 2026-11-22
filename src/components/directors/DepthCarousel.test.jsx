@@ -1,20 +1,8 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import gsap from 'gsap';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import catalog from '../../config/directorEssentials.json';
 import DepthCarousel from './DepthCarousel.jsx';
-
-vi.mock('gsap', () => ({
-  default: {
-    to: vi.fn((position, { index, onUpdate, onComplete }) => {
-      position.index = index;
-      onUpdate();
-      onComplete();
-      return { kill: vi.fn() };
-    }),
-  },
-}));
 
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const { directors } = catalog;
@@ -86,13 +74,9 @@ it('moves the front card and keyboard focus with Right, Left, End and Home', asy
   }
 });
 
-it('jumps to a director via its dot and marks it current', async () => {
-  const dot = host.querySelector(
-    `[aria-label="Go to ${directors[7].name}, 8 of 12"]`,
-  );
-  await click(dot);
-  expect(front()).toBe(card(7));
-  expect(dot.getAttribute('aria-current')).toBe('true');
+it('has no dot indicators', () => {
+  expect(host.querySelector('[aria-label="Choose a director"]')).toBeNull();
+  expect(host.querySelector('[aria-label^="Go to "]')).toBeNull();
 });
 
 it('opens the front director with its card as the focus-return element', async () => {
@@ -123,36 +107,67 @@ it('does not schedule autoplay or advance on its own', async () => {
   expect(front()).toBe(card(0));
 });
 
-it('swipes to the next director without opening a card', async () => {
+const swipe = async (moves) => {
   const stage = card(0).parentElement.parentElement;
   stage.setPointerCapture = vi.fn();
-  const pointer = (type, clientX) =>
-    Object.assign(new Event(type, { bubbles: true }), {
+  const pointer = (type, clientX, timeStamp) => {
+    const event = Object.assign(new Event(type, { bubbles: true }), {
       isPrimary: true,
       pointerId: 1,
       pointerType: 'touch',
       button: 0,
       clientX,
     });
-
+    // React substitutes Date.now() for a zero timeStamp, so offset the clock.
+    Object.defineProperty(event, 'timeStamp', { value: 1000 + timeStamp });
+    return event;
+  };
+  const [[x0, t0], ...rest] = moves;
+  const [xEnd, tEnd] = rest[rest.length - 1];
   await act(async () => {
-    card(0).dispatchEvent(pointer('pointerdown', 150));
-    stage.dispatchEvent(pointer('pointermove', 120));
-    stage.dispatchEvent(pointer('pointerup', 120));
+    card(0).dispatchEvent(pointer('pointerdown', x0, t0));
+    for (const [x, t] of rest)
+      stage.dispatchEvent(pointer('pointermove', x, t));
+    stage.dispatchEvent(pointer('pointerup', xEnd, tEnd));
     card(1).dispatchEvent(
       new MouseEvent('click', { bubbles: true, detail: 1 }),
     );
   });
+};
 
+it('a slow drag moves one director without opening a card', async () => {
+  await swipe([
+    [300, 0],
+    [285, 200],
+    [270, 400],
+  ]);
   expect(front()).toBe(card(1));
   expect(onOpen).not.toHaveBeenCalled();
 });
 
-it('updates immediately without a tween when reduced motion is preferred', async () => {
+it('a quick flick spins on through several directors and stops on one', async () => {
+  await swipe([
+    [300, 0],
+    [285, 30],
+    [270, 60],
+  ]);
+  expect(front()).toBe(card(4));
+  expect(onOpen).not.toHaveBeenCalled();
+});
+
+it('a flick the other way spins backwards around the wheel', async () => {
+  await swipe([
+    [270, 0],
+    [285, 30],
+    [300, 60],
+  ]);
+  expect(front()).toBe(card(8));
+});
+
+it('updates immediately without animation when reduced motion is preferred', async () => {
   vi.stubGlobal('matchMedia', () => ({ matches: true }));
   card(0).focus();
   await key('ArrowRight');
   expect(front()).toBe(card(1));
   expect(card(1).style.opacity).toBe('1');
-  expect(gsap.to).not.toHaveBeenCalled();
 });

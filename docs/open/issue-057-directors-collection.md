@@ -6,7 +6,7 @@ Built on combined draft PR #63 (`feat/curated-collections`), dev preview only. D
 
 **Built:** directory of the 12 approved directors; per-director page with a fixed Essential 10 (ranked by IMDb + Rotten Tomatoes rank average, 10-review RT floor; five shown, view all), Watch Next (up to three not-marked-watched, never reorders the ten), compact text scores, centred film modal with the guarded explicit Add (no silent restore of Recently removed titles); optional portrait, signature and Tonight cover slots with text fallbacks; one shared Curated collections rail and index with Black Comedy Excellence. App data in `src/config/directorEssentials.json` was cross-checked against the sourced ledgers `docs/collections/directors/essential10-*.json` on 2026-11-22: all 12 directors and every film match (two RT scores with fewer than 10 reviews are intentionally hidden).
 
-**In progress:** dev-only trial of the React Bits DepthCarousel for the directory (owner asked to pick one component from reactbits.dev), beside the current swipe row, which stays the default.
+**Directory:** owner chose the carousel on 2026-11-22 (adapted from React Bits DepthCarousel, no gsap): swipe to spin with momentum that settles on a director, touch to catch a spinning wheel, tap the front card to open; no dot indicators; previous/next arrows and keyboard arrows/Home/End remain for accessibility. It replaces the swipe row.
 
 **Owner-side, blocking release:** portraits, signatures and Tonight cover (#61; owner makes them); IMDb / Rotten Tomatoes licences before any public release. Owner decision 2026-11-22: both curated collections stay dev-only until all art is approved, then release together.
 

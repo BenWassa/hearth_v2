@@ -51,7 +51,7 @@ const mount = async () => {
     featuredIds: [films[0].id],
     chapters: [
       { id: 'one', title: 'One', films: films.slice(0, 3) },
-      { id: 'two', title: 'Two', films: films.slice(3) },
+      { id: 'two', title: 'Two', films: [films[0], ...films.slice(3)] },
     ],
   };
   await act(async () =>
@@ -59,8 +59,10 @@ const mount = async () => {
   );
   return films;
 };
-const intersect = async (index) =>
-  act(async () => observers[index].callback([{ isIntersecting: true }]));
+const intersect = async (index, target) =>
+  act(async () =>
+    observers[index].callback([{ isIntersecting: true, target }]),
+  );
 const click = async (node) =>
   act(async () => {
     node.focus();
@@ -85,6 +87,7 @@ beforeEach(() => {
       }
       observe = vi.fn();
       disconnect = vi.fn();
+      unobserve = vi.fn();
     },
   );
   getMediaDetails.mockImplementation(async ({ providerId }) => ({
@@ -115,7 +118,7 @@ afterEach(async () => {
 it('loads only near rails, deduplicates featured films and caches preview requests', async () => {
   await mount();
   expect(getMediaDetails).not.toHaveBeenCalled();
-  expect(observers).toHaveLength(3);
+  expect(observers).toHaveLength(4);
   expect(observers[0].options.root).toBe(
     host.querySelector('[data-curated-scroller]'),
   );
@@ -162,12 +165,12 @@ it('retains programme cards on failure, missing posters and image errors', async
   await act(async () => image.dispatchEvent(new Event('error')));
   expect(image.isConnected).toBe(false);
 });
-it('opens from rows, traps focus, closes with Escape and Back, restores focus without closing the pack', async () => {
+it('opens from grid posters, traps focus, closes with Escape and Back, restores focus without closing the pack', async () => {
   await mount();
-  const row = host.querySelector(
+  const tile = host.querySelector(
     '[aria-labelledby="curated-all-heading"] button',
   );
-  await click(row);
+  await click(tile);
   const close = host.querySelector('[aria-label="Close film details"]');
   expect(document.activeElement).toBe(close);
   await act(async () =>
@@ -190,11 +193,11 @@ it('opens from rows, traps focus, closes with Escape and Back, restores focus wi
     await popped;
   });
   expect(host.querySelector('#curated-film-title')).toBeNull();
-  expect(document.activeElement).toBe(row);
+  expect(document.activeElement).toBe(tile);
   expect(host.querySelector('#curated-pack-heading')).not.toBeNull();
-  await click(row);
+  await click(tile);
   await back();
-  expect(document.activeElement).toBe(row);
+  expect(document.activeElement).toBe(tile);
   expect(window.history.state.__hearthCuratedPack).toBe(
     'black-comedy-excellence',
   );
@@ -204,10 +207,10 @@ it('opens from rows, traps focus, closes with Escape and Back, restores focus wi
 it('shows an unavailable detail state and closes using the named close button', async () => {
   getMediaDetails.mockRejectedValue(new Error('offline'));
   await mount();
-  const row = host.querySelector(
+  const tile = host.querySelector(
     '[aria-labelledby="curated-all-heading"] button',
   );
-  await click(row);
+  await click(tile);
   expect(host.textContent).toContain('Film details are unavailable right now.');
   await act(async () => {
     const popped = new Promise((resolve) =>
@@ -217,32 +220,62 @@ it('shows an unavailable detail state and closes using the named close button', 
     await popped;
   });
   expect(host.querySelector('#curated-film-title')).toBeNull();
-  expect(document.activeElement).toBe(row);
+  expect(document.activeElement).toBe(tile);
   expectNoWrites();
 });
 
-it('only shows rail captions after load and keeps every poster button focusable without a rail tab stop', async () => {
+it('shows text only as a poster fallback and keeps each rail button focusable', async () => {
   await mount();
+  const rails = host.querySelectorAll('ul[aria-label]');
+  const tile = rails[1].querySelector('button');
+  tile.focus();
   await intersect(1);
-  for (const rail of host.querySelectorAll('ul[aria-label]')) {
+  expect(document.activeElement).toBe(tile);
+  expect(tile.textContent).toContain('Film 0');
+  const image = tile.querySelector('img');
+  await act(async () => image.dispatchEvent(new Event('load')));
+  expect(tile.textContent).toBe('');
+  expect(tile.getAttribute('aria-label')).toBe('Film 0 (2000)');
+  await act(async () => image.dispatchEvent(new Event('error')));
+  expect(tile.textContent).toContain('2000');
+  expect(tile.textContent.match(/Film 0/g)).toHaveLength(1);
+
+  for (const rail of rails) {
     expect(rail.hasAttribute('tabindex')).toBe(false);
     expect(rail.getAttribute('aria-label')).toBeTruthy();
-    for (const tile of rail.querySelectorAll('button')) {
-      expect(tile.tabIndex).toBe(0);
-      tile.focus();
-      expect(document.activeElement).toBe(tile);
+    for (const button of rail.querySelectorAll('button')) {
+      expect(button.tabIndex).toBe(0);
+      button.focus();
+      expect(document.activeElement).toBe(button);
     }
   }
-  const tile = host
-    .querySelectorAll('ul[aria-label]')[1]
-    .querySelector('button');
-  const image = tile.querySelector('img');
-  expect(tile.querySelector('[aria-hidden="true"]')).toBeNull();
+  expectNoWrites();
+});
+
+it('deduplicates grid posters in chapter order and retries nearby cards online', async () => {
+  getMediaDetails.mockRejectedValueOnce(new Error('offline'));
+  const films = await mount();
+  const cards = [
+    ...host.querySelectorAll('[aria-labelledby="curated-all-heading"] li'),
+  ];
+  expect(cards.map((card) => card.querySelector('button').ariaLabel)).toEqual(
+    films.map((film) => `${film.title} (${film.year})`),
+  );
+  const card = cards[3];
+  expect(observers[3].observe).toHaveBeenCalledTimes(films.length);
+  await intersect(3, card);
+  expect(observers[3].unobserve).toHaveBeenCalledWith(card);
+  expect(getMediaDetails).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({ providerId: String(films[3].tmdbId) }),
+  );
+  expect(card.querySelector('img')).toBeNull();
+  await act(async () => window.dispatchEvent(new Event('online')));
+  expect(getMediaDetails).toHaveBeenCalledTimes(2);
+  const image = card.querySelector('img');
+  expect(image.alt).toBe('');
+  expect(cards[0].querySelector('img')).toBeNull();
   await act(async () => image.dispatchEvent(new Event('load')));
-  expect(tile.querySelector('[aria-hidden="true"]').textContent).toBe('Film 0');
-  await act(async () => image.dispatchEvent(new Event('error')));
-  expect(tile.querySelector('[aria-hidden="true"]')).toBeNull();
-  expect(tile.textContent.match(/Film 0/g)).toHaveLength(1);
+  expect(card.querySelector('button').textContent).toBe('');
   expectNoWrites();
 });
 

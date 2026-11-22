@@ -2,97 +2,132 @@ import React, { useEffect, useRef, useState } from 'react';
 import PackArt from './PackArt.jsx';
 import { loadFilms, retryWhenOnline } from './filmMedia.js';
 
-export default function FilmRail({ films, label, onOpen }) {
-  const rail = useRef(null);
-  const [media, setMedia] = useState([]);
-  const [loadedPosters, setLoadedPosters] = useState({});
+function FilmPoster({ film, posterUrl, onOpen }) {
+  const [loadedUrl, setLoadedUrl] = useState(null);
+  const loaded = Boolean(posterUrl && loadedUrl === posterUrl);
+
+  return (
+    <button
+      type="button"
+      aria-label={`${film.title} (${film.year})`}
+      onClick={(event) => onOpen(film, event.currentTarget)}
+      className="relative flex aspect-[2/3] min-h-11 min-w-11 w-full flex-col overflow-hidden rounded-md border border-stone-800 bg-stone-900 p-2.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+    >
+      {!loaded && (
+        <>
+          <span className="text-label font-bold uppercase tracking-widest text-stone-400">
+            {film.year}
+          </span>
+          <span className="mt-2 line-clamp-5 break-words font-serif text-base leading-snug text-stone-100">
+            {film.title}
+          </span>
+        </>
+      )}
+      <PackArt
+        key={posterUrl}
+        src={posterUrl}
+        onLoad={() => setLoadedUrl(posterUrl)}
+        onError={() => setLoadedUrl(null)}
+        className={`absolute inset-0 h-full w-full object-cover ${
+          loaded ? '' : 'opacity-0'
+        }`}
+      />
+    </button>
+  );
+}
+
+export default function FilmRail({ films, label, onOpen, grid = false }) {
+  const list = useRef(null);
+  const [media, setMedia] = useState({});
   useEffect(() => {
-    let active = true;
-    let started = false;
-    let stopRetry = () => {};
-    const fetchAll = () =>
-      loadFilms(films).then((data) => {
-        if (!active) return;
-        setMedia(data);
-        if (data.some((item) => !item)) stopRetry = retryWhenOnline(fetchAll);
-      });
-    const load = () => {
-      if (started) return;
-      started = true;
-      fetchAll();
-    };
     // Without an observer retain the programme cards; opening one still loads details.
     if (!window.IntersectionObserver) return undefined;
+
+    const container = list.current;
+    let active = true;
+    const pendingRetries = new Set();
+    const fetchBatch = (batch) =>
+      loadFilms(batch).then((data) => {
+        if (!active) return;
+        setMedia((previous) => ({
+          ...previous,
+          ...Object.fromEntries(
+            batch.map((film, index) => [film.id, data[index]]),
+          ),
+        }));
+
+        const missing = batch.filter((_, index) => !data[index]);
+        if (missing.length) {
+          const stopRetry = retryWhenOnline(() => {
+            pendingRetries.delete(stopRetry);
+            fetchBatch(missing);
+          });
+          pendingRetries.add(stopRetry);
+        }
+      });
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          load();
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (!visible.length) return;
+        if (!grid) {
           observer.disconnect();
+          fetchBatch(films);
+          return;
         }
+
+        // Load nearby grid rows as they come into view.
+        fetchBatch(
+          visible.map(({ target }) => {
+            observer.unobserve(target);
+            return films[Number(target.dataset.filmIndex)];
+          }),
+        );
       },
       {
-        root: rail.current.closest('[data-curated-scroller]'),
+        root: container.closest('[data-curated-scroller]'),
         rootMargin: '200px 0px',
       },
     );
-    observer.observe(rail.current);
+    if (grid) {
+      Array.from(container.children).forEach((card) => observer.observe(card));
+    } else {
+      observer.observe(container);
+    }
     return () => {
       active = false;
-      stopRetry();
+      pendingRetries.forEach((stopRetry) => stopRetry());
       observer.disconnect();
     };
-  }, [films]);
+  }, [films, grid]);
+
   return (
     <ul
-      ref={rail}
+      ref={list}
+      role="list"
       aria-label={label}
-      className="no-scrollbar -m-1 flex snap-x gap-3 overflow-x-auto p-1 pb-4"
+      className={
+        grid
+          ? 'grid grid-cols-3 gap-2.5'
+          : 'no-scrollbar -mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 py-1 scroll-px-4'
+      }
     >
-      {films.map((film, index) => (
-        <li
-          key={film.id}
-          className="w-[clamp(7rem,38vw,8.5rem)] shrink-0 snap-start"
-        >
-          <button
-            type="button"
-            aria-label={`${film.title} (${film.year})`}
-            onClick={(event) => onOpen(film, event.currentTarget)}
-            className="w-full text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+      {films.map((film, index) => {
+        const posterUrl = media[film.id]?.posterUrl;
+        return (
+          <li
+            key={film.id}
+            data-film-index={grid ? index : undefined}
+            className={
+              grid
+                ? 'min-w-0'
+                : 'w-[clamp(6.53rem,26.8vw,8.55rem)] shrink-0 snap-start'
+            }
           >
-            <span className="relative flex aspect-[2/3] flex-col overflow-hidden rounded-lg border border-stone-800 bg-stone-900 p-3">
-              <span className="text-label font-bold uppercase tracking-widest text-stone-400">
-                {film.year}
-              </span>
-              <span className="mt-2 line-clamp-5 break-words font-serif text-base leading-snug text-stone-100">
-                {film.title}
-              </span>
-              <PackArt
-                key={media[index]?.posterUrl || 'fallback'}
-                src={media[index]?.posterUrl}
-                onLoad={() =>
-                  setLoadedPosters((loaded) => ({
-                    ...loaded,
-                    [film.id]: media[index]?.posterUrl,
-                  }))
-                }
-                onError={() =>
-                  setLoadedPosters((loaded) => ({ ...loaded, [film.id]: null }))
-                }
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-            </span>
-            {media[index]?.posterUrl &&
-              loadedPosters[film.id] === media[index].posterUrl && (
-                <span
-                  aria-hidden="true"
-                  className="mt-2 line-clamp-2 block font-serif text-sm leading-snug text-stone-100"
-                >
-                  {film.title}
-                </span>
-              )}
-          </button>
-        </li>
-      ))}
+            <FilmPoster film={film} posterUrl={posterUrl} onOpen={onOpen} />
+          </li>
+        );
+      })}
     </ul>
   );
 }

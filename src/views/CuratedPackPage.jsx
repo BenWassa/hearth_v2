@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Dialog from '../components/ui/Dialog.jsx';
 import IconButton from '../components/ui/IconButton.jsx';
-import FilmList from '../components/curated/FilmRail.jsx';
+import FilmRail from '../components/curated/FilmRail.jsx';
 import FilmPreview from '../components/curated/FilmPreview.jsx';
 import PackArt from '../components/curated/PackArt.jsx';
 import ChapterHero from '../components/curated/ChapterHero.jsx';
+import ThemeCarousel from '../components/curated/ThemeCarousel.jsx';
 
 const SlotPlaceholder = ({ label, className = '' }) => (
   <div
@@ -25,20 +26,33 @@ export default function CuratedPackPage({
   onOpenRemoved,
 }) {
   const [activeFilm, setActiveFilm] = useState(null);
+  const [showBackScrim, setShowBackScrim] = useState(false);
+  const heroEnd = useRef(null);
   const pendingBack = useRef(false);
+  const films = useMemo(() => {
+    const byId = new Map();
+    for (const chapter of pack.chapters) {
+      for (const film of chapter.films) {
+        if (!byId.has(film.id)) byId.set(film.id, film);
+      }
+    }
+    return byId;
+  }, [pack.chapters]);
+  const featured = useMemo(
+    () => pack.featuredIds.map((id) => films.get(id)).filter(Boolean),
+    [pack.featuredIds, films],
+  );
+  const allFilms = useMemo(() => [...films.values()], [films]);
+  const allFilmsLabel = `All ${allFilms.length} films`;
   useEffect(() => {
     const onPop = (event) => {
       pendingBack.current = false;
       const id = event.state?.__hearthCuratedFilm;
-      setActiveFilm(
-        pack.chapters
-          .flatMap((chapter) => chapter.films)
-          .find((film) => film.id === id) || null,
-      );
+      setActiveFilm(films.get(id) || null);
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
-  }, [pack]);
+  }, [films]);
   const openFilm = (film, opener) => {
     if (pendingBack.current) return;
     opener.focus({ preventScroll: true });
@@ -55,36 +69,70 @@ export default function CuratedPackPage({
   };
   const heading = useRef(null);
   const sectionRefs = useRef({});
-  const films = pack.chapters.flatMap((chapter) => chapter.films);
-  const featured = pack.featuredIds
-    .map((id) => films.find((film) => film.id === id))
-    .filter(Boolean);
   useEffect(() => heading.current?.focus({ preventScroll: true }), []);
+  useEffect(() => {
+    if (!window.IntersectionObserver) return undefined;
+    const marker = heroEnd.current;
+    const scroller = marker.closest('[data-curated-scroller]');
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.rootBounds) {
+          setShowBackScrim(
+            entry.boundingClientRect.bottom < entry.rootBounds.top,
+          );
+        }
+      },
+      { root: scroller },
+    );
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, []);
   const goToSection = (id) => {
     const section = sectionRefs.current[id];
     section?.scrollIntoView?.({ block: 'start' });
     section?.focus({ preventScroll: true });
   };
+  const returnToThemes = (id) => {
+    const themes = sectionRefs.current.themes;
+    themes?.scrollIntoView?.({ block: 'start' });
+    const tile = Array.from(
+      themes?.querySelectorAll('[data-theme]') ?? [],
+    ).find((button) => button.dataset.theme === id);
+    tile?.focus({ preventScroll: true });
+  };
   return (
     <Dialog
       onClose={onClose}
       aria-labelledby="curated-pack-heading"
-      className="fixed inset-0 z-50 mx-auto flex max-w-md flex-col bg-stone-950 pt-[var(--safe-top)] pb-[var(--safe-bottom)]"
+      className="fixed inset-0 z-50 mx-auto flex max-w-md flex-col bg-stone-950 pb-[var(--safe-bottom)]"
     >
-      <header className="shrink-0 border-b border-stone-800 px-3 py-2">
-        <IconButton label="Back to collections" onClick={onClose}>
-          <span aria-hidden="true">←</span>
-        </IconButton>
-      </header>
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-[calc(var(--safe-top)+4.5rem)] bg-gradient-to-b from-stone-950 via-stone-950/90 to-transparent transition-opacity motion-reduce:transition-none ${
+          showBackScrim ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+      <IconButton
+        label="Back to collections"
+        onClick={onClose}
+        className="absolute left-3 top-[calc(var(--safe-top)+0.75rem)] z-20 size-11 bg-stone-950/75 text-stone-100 ring-1 ring-stone-100/15 backdrop-blur"
+      >
+        <span aria-hidden="true">←</span>
+      </IconButton>
       <div
         data-curated-scroller
-        className="min-h-0 flex-1 overflow-y-auto px-5 pb-10"
+        className="min-h-0 flex-1 overflow-y-auto px-4 pb-10"
       >
-        <header className="pb-8">
-          <div className="relative -mx-5 flex min-h-[13rem] items-end overflow-hidden bg-stone-900 px-5 pb-5 pt-6">
+        <header className="pb-6">
+          <div className="relative -mx-4 flex h-[min(70svh,36rem)] min-h-[20rem] items-end overflow-hidden bg-stone-900 px-4 pb-6">
+            <span
+              ref={heroEnd}
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-20 left-0 top-0 w-px"
+            />
             <PackArt
               src={pack.art?.hero}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover object-[78%_center]"
               placeholder={
                 pack.status === 'draft' ? (
                   <SlotPlaceholder
@@ -96,9 +144,9 @@ export default function CuratedPackPage({
             />
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(12,10,9,0.9)_0%,rgba(12,10,9,0)_65%),linear-gradient(to_right,rgba(12,10,9,0.72)_0%,rgba(12,10,9,0)_72%)]"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-transparent"
             />
-            <div className="relative max-w-[62%]">
+            <div className="relative w-full">
               <p className="text-label font-bold uppercase tracking-widest text-stone-300">
                 Curated collection
               </p>
@@ -110,11 +158,11 @@ export default function CuratedPackPage({
               >
                 {pack.title}
               </h1>
+              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-stone-300">
+                {pack.description}
+              </p>
             </div>
           </div>
-          <p className="mt-5 max-w-prose text-sm leading-relaxed text-stone-300">
-            {pack.description}
-          </p>
           <p className="mt-3 text-xs text-stone-400">{pack.credit}</p>
           {pack.status === 'draft' && (
             <p className="mt-3 text-xs text-stone-400">
@@ -126,47 +174,26 @@ export default function CuratedPackPage({
         <section aria-labelledby="curated-start-heading">
           <h2
             id="curated-start-heading"
-            className="mb-3 font-serif text-2xl text-stone-100"
+            className="mb-2 text-xs font-bold uppercase tracking-widest text-stone-400"
           >
             Start here
           </h2>
-          <FilmList
+          <FilmRail
             onOpen={openFilm}
             films={featured}
             label="Start here films"
           />
         </section>
-        <nav
-          aria-label="Collection chapters"
-          ref={(node) => {
+        <ThemeCarousel
+          navRef={(node) => {
             sectionRefs.current.themes = node;
           }}
-          tabIndex={-1}
-          className="my-8 scroll-mt-5 focus:outline-none"
-        >
-          <h2 className="font-serif text-2xl text-stone-100">
-            Explore by theme
-          </h2>
-          <ul className="mt-3 divide-y divide-stone-800">
-            {pack.chapters.map((chapter) => (
-              <li key={chapter.id}>
-                <button
-                  className="flex min-h-11 w-full items-center justify-between gap-4 py-3 text-left text-sm text-stone-300 hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-                  onClick={() => goToSection(chapter.id)}
-                >
-                  {chapter.title}
-                  <span aria-hidden="true">↓</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={() => goToSection('all-films')}
-            className="mt-2 min-h-11 text-sm text-stone-300 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-          >
-            Browse all films
-          </button>
-        </nav>
+          chapters={pack.chapters}
+          featured={featured}
+          heroArt={pack.art?.hero}
+          allFilmsLabel={allFilmsLabel}
+          onSelect={goToSection}
+        />
         {pack.chapters.map((chapter) => (
           <section
             key={chapter.id}
@@ -175,20 +202,21 @@ export default function CuratedPackPage({
             }}
             tabIndex={-1}
             aria-labelledby={`chapter-${chapter.id}`}
-            className="mb-9 scroll-mt-5 focus:outline-none"
+            className="mb-9 scroll-mt-[calc(var(--safe-top)+4.25rem)] focus:outline-none"
           >
             <ChapterHero chapter={chapter} showSlot={pack.status === 'draft'} />
-            <p className="mb-4 text-sm leading-relaxed text-stone-400">
+            <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-stone-400">
               {chapter.description}
             </p>
-            <FilmList
+            <FilmRail
               onOpen={openFilm}
               films={chapter.films}
               label={`${chapter.title} films`}
             />
             <button
-              onClick={() => goToSection('themes')}
-              className="min-h-11 text-sm text-stone-400 underline underline-offset-4 hover:text-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
+              type="button"
+              onClick={() => returnToThemes(chapter.id)}
+              className="sr-only focus:not-sr-only focus:mt-2 focus:min-h-11 focus:rounded-full focus:bg-stone-900 focus:px-3 focus:text-xs focus:text-stone-100 focus:outline focus:outline-2 focus:outline-amber-400"
             >
               Back to themes
             </button>
@@ -200,40 +228,20 @@ export default function CuratedPackPage({
           }}
           tabIndex={-1}
           aria-labelledby="curated-all-heading"
-          className="scroll-mt-5 focus:outline-none"
+          className="scroll-mt-[calc(var(--safe-top)+4.25rem)] focus:outline-none"
         >
           <h2
             id="curated-all-heading"
-            className="mb-4 font-serif text-2xl text-stone-100"
+            className="mb-3 text-xs font-bold uppercase tracking-widest text-stone-400"
           >
-            All films
+            {allFilmsLabel}
           </h2>
-          {pack.chapters.map((chapter) => (
-            <div key={chapter.id} className="mb-6">
-              <h3 className="text-label font-bold uppercase tracking-widest text-stone-400">
-                {chapter.title}
-              </h3>
-              <ul className="mt-1 divide-y divide-stone-800">
-                {chapter.films.map((film) => (
-                  <li key={film.id}>
-                    <button
-                      type="button"
-                      aria-label={`${film.title} (${film.year})`}
-                      onClick={(event) => openFilm(film, event.currentTarget)}
-                      className="flex min-h-11 w-full items-center justify-between gap-4 py-2 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-                    >
-                      <span className="font-serif text-base leading-snug text-stone-100">
-                        {film.title}
-                      </span>
-                      <span className="shrink-0 text-sm text-stone-400">
-                        {film.year}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <FilmRail
+            films={allFilms}
+            onOpen={openFilm}
+            label={allFilmsLabel}
+            grid
+          />
         </section>
         <details className="mt-10 border-t border-stone-800 pt-4 text-sm text-stone-400">
           <summary className="min-h-11 cursor-pointer py-3 text-stone-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">
@@ -252,7 +260,7 @@ export default function CuratedPackPage({
             href="https://www.themoviedb.org"
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-11 items-center underline"
+            className="flex min-h-11 items-center underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
           >
             TMDB, movie metadata (opens in a new tab)
           </a>

@@ -1,9 +1,6 @@
 import React from 'react';
 import PackArt from './PackArt.jsx';
 
-// Full-bleed chapter hero: portrait artwork edge to edge with the live title
-// over a soft, feathered dark fade that melts into the page. Falls back to the
-// older 16:9 banner, then to a text-only header while artwork is missing.
 const HERO_SLOT = 'Chapter hero artwork 4:5 · 1600×2000';
 
 export default function ChapterHero({ chapter, showSlot }) {
@@ -16,14 +13,14 @@ export default function ChapterHero({ chapter, showSlot }) {
     </div>
   ) : null;
   return (
-    <div className="relative -mx-5 mb-3 min-h-[11rem] overflow-hidden bg-stone-900">
+    <div className="relative -mx-4 mb-3 aspect-[16/9] overflow-hidden bg-stone-900">
       <PackArt
         src={chapter.heroArt}
-        className="block aspect-[4/5] w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
         placeholder={
           <PackArt
             src={chapter.art}
-            className="block aspect-[16/9] w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
             placeholder={textOnly}
           />
         }
@@ -38,7 +35,7 @@ export default function ChapterHero({ chapter, showSlot }) {
       />
       <h2
         id={`chapter-${chapter.id}`}
-        className="absolute inset-x-5 bottom-3 max-w-[85%] font-serif text-3xl leading-tight tracking-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
+        className="absolute inset-x-4 bottom-3 font-serif text-3xl leading-tight tracking-tight text-stone-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
       >
         {chapter.title}
       </h2>

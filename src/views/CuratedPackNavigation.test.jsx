@@ -14,6 +14,9 @@ vi.mock('./components/tonight/TonightHeaderMenu.jsx', () => ({
   default: () => null,
 }));
 vi.mock('./components/tonight/BottomNav.jsx', () => ({ default: () => null }));
+vi.mock('../components/directors/DepthCarousel.jsx', () => ({
+  default: () => null,
+}));
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 afterEach(() => {
@@ -33,8 +36,9 @@ const travel = async (direction) =>
     });
     await new Promise((resolve) => requestAnimationFrame(resolve));
   });
-const mount = async (preview = true) => {
-  window.history.replaceState(null, '', preview ? '/' : '/?curatedPreview=0');
+const mount = async (preview = true, restore = false) => {
+  if (!restore)
+    window.history.replaceState(null, '', preview ? '/' : '/?curatedPreview=0');
   const host = document.createElement('div');
   document.body.appendChild(host);
   const root = createRoot(host);
@@ -143,8 +147,47 @@ it('keeps the Collections index mounted behind a pack and returns to its tile', 
     expect(index.hasAttribute('inert')).toBe(false);
     expect(scroller.scrollTop).toBe(64);
     expect(document.activeElement).toBe(tile);
+    expect(window.history.state.__hearthNavigation.depth).toBe(1);
+    await travel('back');
+    expect(host.querySelector('#collections-heading')).toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(0);
   } finally {
     await close();
+  }
+});
+
+it('restores Directors from the index on Forward and reload', async () => {
+  let page = await mount();
+  const heading = () => page.host.querySelector('#directors-page-heading');
+  try {
+    await click(page.host.querySelector('[data-all-collections]'));
+    await click(page.host.querySelector('[data-directors-index]'));
+    await act(async () => vi.dynamicImportSettled());
+    expect(heading()).not.toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
+    await travel('back');
+    expect(heading()).toBeNull();
+    expect(page.host.querySelector('#collections-heading').textContent).toBe(
+      'Collections',
+    );
+    await travel('forward');
+    expect(heading()).not.toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
+
+    await page.close();
+    page = await mount(true, true);
+    expect(heading()).not.toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(2);
+    await travel('back');
+    expect(heading()).toBeNull();
+    expect(page.host.querySelector('#collections-heading').textContent).toBe(
+      'Collections',
+    );
+    await travel('back');
+    expect(page.host.querySelector('#collections-heading')).toBeNull();
+    expect(window.history.state.__hearthNavigation.depth).toBe(0);
+  } finally {
+    await page.close();
   }
 });
 

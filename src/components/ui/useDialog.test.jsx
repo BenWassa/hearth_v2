@@ -125,4 +125,24 @@ describe('useDialog', () => {
     press('Tab', { shiftKey: true });
     expect(document.activeElement).toBe(summary);
   });
+
+  it('ignores controls taken out of the tab order when trapping Tab', () => {
+    const Cards = () => {
+      const dialogProps = useDialog({ onClose: () => {} });
+      return (
+        <div {...dialogProps} aria-label="cards">
+          <button>front card</button>
+          <button>credits</button>
+          <button tabIndex={-1}>behind the front card</button>
+        </div>
+      );
+    };
+    act(() => root.render(<Cards />));
+    const [first, last] = container.querySelectorAll('button');
+    last.focus();
+    press('Tab');
+    expect(document.activeElement).toBe(first);
+    press('Tab', { shiftKey: true });
+    expect(document.activeElement).toBe(last);
+  });
 });

@@ -5,6 +5,9 @@ import DirectorsCollectionView from './DirectorsCollectionView.jsx';
 import catalog from '../config/directorEssentials.json';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 vi.mock('../services/mediaApi/client.js', () => ({ getMediaDetails: vi.fn() }));
+vi.mock('embla-carousel-react', () =>
+  import('../components/directors/__fixtures__/fakeEmbla.js'),
+);
 global.IS_REACT_ACT_ENVIRONMENT = true;
 const director = catalog.directors[0];
 const first = director.films[0];
@@ -91,10 +94,9 @@ it('restores the opened director to the front on Back', async () => {
 
   const directoryState = window.history.state;
   const entry = catalog.directors[1];
-  await click(carousel().querySelector('[aria-label^="Next director"]'));
   const opener = () =>
     carousel().querySelector(`[data-director-card="${entry.id}"]`);
-  await click(opener());
+  await openCard(entry.id);
   expect(host.querySelector('h2').textContent).toBe(entry.name);
 
   await pop(directoryState);

@@ -15,7 +15,7 @@ import {
   toWatchlistPayload,
 } from '../components/curated/watchlistFilm.js';
 import catalog from '../config/directorEssentials.json';
-import { loadFilm } from '../components/directors/filmMedia.js';
+import { loadFilm, retryWhenOnline } from '../components/curated/filmMedia.js';
 import { getMediaDetails } from '../services/mediaApi/client.js';
 
 const focusRing =
@@ -55,7 +55,7 @@ const renderDirectorCard = (entry, index) => (
     </OptionalArt>
     <span className="relative flex h-full flex-col justify-between p-4">
       <span className="flex items-start justify-between gap-2">
-        <span className="text-[11px] tabular-nums tracking-widest text-stone-400">
+        <span className="text-[0.6875rem] tabular-nums tracking-widest text-stone-400">
           {String(index + 1).padStart(2, '0')}
         </span>
         <ArrowRight className="h-4 w-4 text-amber-300" aria-hidden="true" />
@@ -79,9 +79,12 @@ const FilmPoster = ({ film }) => {
   const [poster, setPoster] = useState('');
   useEffect(() => {
     let active = true;
+    let stopRetry = () => {};
     const load = () =>
       loadFilm(film).then((data) => {
-        if (active) setPoster(data?.posterUrl || data?.poster || '');
+        if (!active) return;
+        setPoster(data?.posterUrl || data?.poster || '');
+        if (!data) stopRetry = retryWhenOnline(load);
       });
     if (!window.IntersectionObserver) load();
     const observer =
@@ -98,6 +101,7 @@ const FilmPoster = ({ film }) => {
     if (observer && ref.current) observer.observe(ref.current);
     return () => {
       active = false;
+      stopRetry();
       observer?.disconnect();
     };
   }, [film]);
@@ -163,6 +167,7 @@ const DirectorsCollectionView = ({
   });
   const carouselIndex = useRef(0);
   const [expanded, setExpanded] = useState(false);
+  const focusFirstRevealed = useRef(false);
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewError, setPreviewError] = useState('');
@@ -217,8 +222,7 @@ const DirectorsCollectionView = ({
         setPreview(data);
       })
       .catch(() => {
-        if (active)
-          setPreviewError('Film details could not be verified. Try again.');
+        if (active) setPreviewError('Film details could not be verified.');
       })
       .finally(() => {
         if (active) setPreviewLoading(false);
@@ -241,6 +245,15 @@ const DirectorsCollectionView = ({
       );
     } else headingRef.current?.focus({ preventScroll: true });
   }, [selected]);
+
+  useEffect(() => {
+    if (!expanded || !focusFirstRevealed.current) return;
+    focusFirstRevealed.current = false;
+    // Keep the keyboard user's place: the toggle has just moved below the new rows.
+    document
+      .querySelector('[data-essential-rank="6"] button')
+      ?.focus({ preventScroll: true });
+  }, [expanded]);
 
   const changeDirectoryMode = (mode) => {
     setDirectoryMode(mode);
@@ -348,7 +361,7 @@ const DirectorsCollectionView = ({
           className={`group flex w-[75%] shrink-0 snap-start min-h-[10rem] flex-col justify-between rounded-xl border border-stone-800 bg-stone-900/65 p-3 text-left transition-colors hover:border-stone-600 ${focusRing}`}
         >
           <span className="flex items-start justify-between gap-2">
-            <span className="text-[11px] tabular-nums tracking-widest text-stone-400">
+            <span className="text-[0.6875rem] tabular-nums tracking-widest text-stone-400">
               {String(index + 1).padStart(2, '0')}
             </span>
             <ArrowRight
@@ -415,7 +428,7 @@ const DirectorsCollectionView = ({
         {!selected && (
           <>
             <div className="border-b border-stone-800/80 pb-6 pt-9">
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+              <p className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-amber-300">
                 Curated collection
               </p>
               <h2 className="max-w-[18rem] font-serif text-4xl leading-tight tracking-tight text-stone-100">
@@ -584,7 +597,10 @@ const DirectorsCollectionView = ({
                   type="button"
                   aria-expanded={expanded}
                   aria-controls="director-essentials"
-                  onClick={() => setExpanded((value) => !value)}
+                  onClick={() => {
+                    focusFirstRevealed.current = !expanded;
+                    setExpanded((value) => !value);
+                  }}
                   className={`mt-2 min-h-11 text-sm text-amber-200 ${focusRing}`}
                 >
                   {expanded ? 'Show fewer' : `View all ${films.length}`}
@@ -613,7 +629,7 @@ const DirectorsCollectionView = ({
               >
                 Close film details
               </button>
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
+              <p className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-amber-300">
                 Directed by {selectedDirector?.name}
               </p>
               <h2

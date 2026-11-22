@@ -236,7 +236,7 @@ export default function CuratedPackPage({
           ))}
         </section>
         <details className="mt-10 border-t border-stone-800 pt-4 text-sm text-stone-400">
-          <summary className="min-h-11 cursor-pointer py-3 text-stone-300">
+          <summary className="min-h-11 cursor-pointer py-3 text-stone-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400">
             About this collection
           </summary>
           <p className="leading-relaxed">

@@ -48,3 +48,12 @@ export const loadFilm = (film) => {
   return promise;
 };
 export const loadFilms = (films) => Promise.all(films.map(loadFilm));
+
+// Failed lookups are not cached, so calling the loader again after the
+// connection returns fetches only what failed. Returns a cleanup function.
+export const retryWhenOnline = (retry) => {
+  if (typeof window === 'undefined') return () => {};
+  const handler = () => retry();
+  window.addEventListener('online', handler, { once: true });
+  return () => window.removeEventListener('online', handler);
+};

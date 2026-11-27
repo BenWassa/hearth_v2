@@ -89,6 +89,11 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
       setActive(emblaApi.selectedScrollSnap());
     };
     const onPaint = () => paint(emblaApi);
+    const onReInit = () => {
+      moving.current = false;
+      setActive(emblaApi.selectedScrollSnap());
+      onPaint();
+    };
     const onScroll = () => {
       moving.current = true;
       paint(emblaApi);
@@ -104,7 +109,7 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
     emblaApi
       .on('select', onSelect)
       .on('scroll', onScroll)
-      .on('reInit', onPaint)
+      .on('reInit', onReInit)
       .on('slideFocus', onPaint)
       .on('settle', onSettle)
       .on('pointerDown', onPointerDown);
@@ -112,7 +117,7 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
       emblaApi
         .off('select', onSelect)
         .off('scroll', onScroll)
-        .off('reInit', onPaint)
+        .off('reInit', onReInit)
         .off('slideFocus', onPaint)
         .off('settle', onSettle)
         .off('pointerDown', onPointerDown);
@@ -156,14 +161,18 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
       aria-roledescription="carousel"
       aria-label="Director directory"
       onKeyDown={onKeyDown}
+      className="flex min-h-0 flex-1 flex-col gap-2 [@media(min-height:721px)]:pt-2"
     >
       <div
         ref={emblaRef}
-        className="-mx-4 cursor-grab select-none overflow-hidden py-2 active:cursor-grabbing"
+        className="-mx-4 min-h-[22rem] flex-1 cursor-grab select-none overflow-hidden active:cursor-grabbing [container-type:size]"
       >
-        <div className="flex touch-pan-y">
+        <div className="flex h-full touch-pan-y">
           {items.map((item, index) => (
-            <div key={item.id} className="min-w-0 shrink-0 grow-0 basis-[62%]">
+            <div
+              key={item.id}
+              className="min-w-0 shrink-0 grow-0 basis-[min(72%,82cqh)]"
+            >
               <button
                 ref={(element) => {
                   cards.current[index] = element;
@@ -183,7 +192,7 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
                   if (index === active) onOpen(item, event.currentTarget);
                   else goTo(index, true);
                 }}
-                className={`relative block h-60 w-full overflow-hidden rounded-xl border border-stone-800 bg-stone-900 text-left shadow-xl will-change-transform ${focusRing}`}
+                className={`relative block h-full w-full overflow-hidden rounded-3xl border border-stone-800 bg-stone-900 text-left shadow-xl will-change-transform ${focusRing}`}
               >
                 {renderItem(item, index)}
               </button>
@@ -191,6 +200,12 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
           ))}
         </div>
       </div>
+      <p
+        aria-hidden="true"
+        className="shrink-0 pb-3 text-center text-xs tabular-nums tracking-widest text-stone-400"
+      >
+        {String(active + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
+      </p>
     </div>
   );
 };

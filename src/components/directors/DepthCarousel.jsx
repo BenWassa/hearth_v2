@@ -171,7 +171,7 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
           {items.map((item, index) => (
             <div
               key={item.id}
-              className="min-w-0 shrink-0 grow-0 basis-[min(78%,82cqh)]"
+              className="min-w-0 shrink-0 grow-0 basis-[min(72%,82cqh)]"
             >
               <button
                 ref={(element) => {
@@ -202,7 +202,7 @@ const DepthCarousel = ({ items, renderItem, onOpen, initialIndex = 0 }) => {
       </div>
       <p
         aria-hidden="true"
-        className="shrink-0 pb-1 text-center text-xs tabular-nums tracking-widest text-stone-400"
+        className="shrink-0 pb-3 text-center text-xs tabular-nums tracking-widest text-stone-400"
       >
         {String(active + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
       </p>

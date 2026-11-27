@@ -89,7 +89,7 @@ const renderDirectorCard = (entry) => {
 };
 
 const portraitMask =
-  'linear-gradient(to right, transparent, black 7%, black 93%, transparent), linear-gradient(to bottom, transparent, black 14%, black 52%, transparent 98%)';
+  'linear-gradient(to right, transparent, black 12%, black 88%, transparent), linear-gradient(to bottom, transparent, black 14%, black 52%, transparent 98%)';
 
 const DirectorHero = ({ id, name }) => {
   const [portrait, setPortrait] = useState('pending');
@@ -135,7 +135,9 @@ const DirectorHero = ({ id, name }) => {
           <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-stone-950 via-stone-950/65 to-transparent" />
         )}
         <div
-          className={hasPortrait ? 'absolute inset-x-4 bottom-0 p-5' : 'p-5'}
+          className={
+            hasPortrait ? 'absolute inset-x-0 bottom-0 px-4 pb-5' : 'p-5'
+          }
         >
           <h2 className="font-serif text-3xl leading-tight text-stone-100">
             {name}

@@ -230,6 +230,26 @@ it.each(['owned', 'removed', 'mismatch', 'failure'])(
     expect(onAddItem).not.toHaveBeenCalled();
   },
 );
+it('applies the warm monochrome filter only to the directory portrait', async () => {
+  await mount();
+  const portrait = () =>
+    host.querySelector(`img[src$="/${director.id}/portrait.webp"]`);
+  const loadPortrait = () =>
+    act(async () => portrait().dispatchEvent(new Event('load')));
+
+  await loadPortrait();
+  expect(portrait().classList.contains('hidden')).toBe(false);
+  expect(portrait().style.filter).toBe(
+    'grayscale(1) sepia(0.32) contrast(1.1) brightness(0.92)',
+  );
+
+  await open();
+  await loadPortrait();
+  expect(portrait().classList.contains('hidden')).toBe(false);
+  expect(portrait().style.filter).toBe('');
+  expect(portrait().style.maskImage).toContain('linear-gradient');
+});
+
 it('falls back gracefully when optional portrait/signature fail', async () => {
   await mount();
   await open();
@@ -240,6 +260,7 @@ it('falls back gracefully when optional portrait/signature fail', async () => {
     images.forEach((el) => el.dispatchEvent(new Event('error'))),
   );
   expect(host.querySelector('h2').textContent).toBe(director.name);
+  expect(host.querySelector('img[src$="portrait.webp"]')).toBeNull();
   expect(host.querySelector('img[src$="signature.svg"]')).toBeNull();
 });
 

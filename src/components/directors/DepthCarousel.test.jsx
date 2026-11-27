@@ -153,3 +153,19 @@ it('jumps without animation and settles one at a time when reduced motion is pre
   expect(front()).toBe(card(1));
   expect(emblaCalls.scrollTo.at(-1)).toEqual([1, true]);
 });
+
+it('wraps across the ends and updates the hidden position counter', async () => {
+  const counter = host.querySelector('p[aria-hidden="true"]');
+  expect(counter.textContent).toBe('01 / 12');
+  card(0).focus();
+
+  await key('ArrowLeft');
+  expect(front()).toBe(card(11));
+  expect(counter.textContent).toBe('12 / 12');
+  await click(front());
+  expect(onOpen).toHaveBeenCalledExactlyOnceWith(directors[11], card(11));
+
+  await key('ArrowRight');
+  expect(front()).toBe(card(0));
+  expect(counter.textContent).toBe('01 / 12');
+});

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import useDirectorsHistory from '../app/useDirectorsHistory.js';
 import Dialog from '../components/ui/Dialog.jsx';
 import {
@@ -15,7 +15,7 @@ import DepthCarousel from '../components/directors/DepthCarousel.jsx';
 const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400';
 
-const OptionalArt = ({ src, className, children }) => {
+const OptionalArt = ({ src, className, filter, children }) => {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   return (
@@ -24,6 +24,7 @@ const OptionalArt = ({ src, className, children }) => {
         <img
           src={src}
           alt=""
+          style={filter ? { filter } : undefined}
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
           className={`${className} ${loaded ? '' : 'hidden'}`}
@@ -33,32 +34,6 @@ const OptionalArt = ({ src, className, children }) => {
     )
   );
 };
-
-const renderDirectorCard = (entry) => (
-  <>
-    <OptionalArt
-      src={`/assets/collections/legendary-directors/directors/${entry.id}/portrait.webp`}
-      className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-    >
-      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/50" />
-    </OptionalArt>
-    <span className="relative flex h-full flex-col justify-between p-4">
-      <span className="flex items-start justify-end gap-2">
-        <ArrowRight className="h-4 w-4 text-amber-300" aria-hidden="true" />
-      </span>
-      <span>
-        <span className="mb-2 block font-serif text-xl leading-tight text-stone-100">
-          {entry.name}
-        </span>
-        {entry.description && (
-          <span className="block text-xs leading-snug text-stone-400">
-            {entry.description}
-          </span>
-        )}
-      </span>
-    </span>
-  </>
-);
 
 // Directors whose signature is a PNG rather than an SVG.
 const SIGNATURE_FILE = {
@@ -79,36 +54,95 @@ const SIGNATURE_CREDIT = {
   },
 };
 
+const signatureStyle =
+  'mt-2 object-contain object-left opacity-95 mix-blend-screen [filter:invert(1)_drop-shadow(0_0_0.6px_rgb(255_255_255))]';
+const landingPortraitFilter =
+  'grayscale(1) sepia(0.32) contrast(1.1) brightness(0.92)';
+
+const renderDirectorCard = (entry) => {
+  const base = `/assets/collections/legendary-directors/directors/${entry.id}`;
+  return (
+    <>
+      <OptionalArt
+        src={`${base}/portrait.webp`}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_20%]"
+        filter={landingPortraitFilter}
+      >
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-950 from-10% via-stone-950/80 via-35% to-transparent to-75%" />
+      </OptionalArt>
+      <span className="absolute inset-x-0 bottom-0 block p-5">
+        <span className="block font-serif text-3xl leading-tight tracking-tight text-stone-100">
+          {entry.name}
+        </span>
+        <OptionalArt
+          src={`${base}/${SIGNATURE_FILE[entry.id] || 'signature.svg'}`}
+          className={`h-12 max-w-[65%] ${signatureStyle}`}
+        />
+        {entry.description && (
+          <span className="mt-2 block text-xs leading-snug text-stone-300">
+            {entry.description}
+          </span>
+        )}
+      </span>
+    </>
+  );
+};
+
+const portraitMask =
+  'linear-gradient(to right, transparent, black 7%, black 93%, transparent), linear-gradient(to bottom, transparent, black 14%, black 52%, transparent 98%)';
+
 const DirectorHero = ({ id, name }) => {
   const [portrait, setPortrait] = useState('pending');
   const base = `/assets/collections/legendary-directors/directors/${id}`;
+  const portraitSrc = `${base}/portrait.webp`;
   const hasPortrait = portrait === 'loaded';
   return (
-    <div className="pb-7 pt-5">
-      <div className="relative overflow-hidden rounded-2xl bg-stone-900">
+    <div className={hasPortrait ? 'pb-7' : 'pb-7 pt-5'}>
+      <div
+        className={`relative overflow-hidden ${
+          hasPortrait ? '-mx-4' : 'rounded-2xl bg-stone-900'
+        }`}
+      >
+        {hasPortrait && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:radial-gradient(ellipse,black_30%,transparent_72%)]"
+          >
+            <span
+              className="absolute inset-0 scale-110 bg-cover bg-top opacity-40 blur-[48px] brightness-50"
+              style={{ backgroundImage: `url(${portraitSrc})` }}
+            />
+          </span>
+        )}
         {portrait !== 'failed' && (
           <img
-            src={`${base}/portrait.webp`}
+            src={portraitSrc}
             alt=""
             onLoad={() => setPortrait('loaded')}
             onError={() => setPortrait('failed')}
-            className={`pointer-events-none aspect-[3/4] w-full object-cover object-top ${
+            style={{
+              WebkitMaskImage: portraitMask,
+              WebkitMaskComposite: 'source-in',
+              maskImage: portraitMask,
+              maskComposite: 'intersect',
+            }}
+            className={`pointer-events-none relative aspect-[4/5] w-full object-cover object-top ${
               hasPortrait ? '' : 'hidden'
             }`}
           />
         )}
         {hasPortrait && (
-          <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-stone-950 via-stone-950/60 to-transparent" />
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-stone-950 via-stone-950/65 to-transparent" />
         )}
         <div
-          className={hasPortrait ? 'absolute inset-x-0 bottom-0 p-5' : 'p-5'}
+          className={hasPortrait ? 'absolute inset-x-4 bottom-0 p-5' : 'p-5'}
         >
           <h2 className="font-serif text-3xl leading-tight text-stone-100">
             {name}
           </h2>
           <OptionalArt
             src={`${base}/${SIGNATURE_FILE[id] || 'signature.svg'}`}
-            className="mt-2 h-16 max-w-[65%] object-contain object-left opacity-95 mix-blend-screen [filter:invert(1)_drop-shadow(0_0_0.6px_rgb(255_255_255))]"
+            className={`h-16 max-w-[65%] ${signatureStyle}`}
           />
         </div>
       </div>
@@ -390,7 +424,9 @@ const DirectorsCollectionView = ({
       </header>
       <div
         ref={scrollRef}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-12"
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 ${
+          selected ? 'pb-12' : ''
+        }`}
       >
         <h1
           ref={headingRef}
@@ -401,8 +437,8 @@ const DirectorsCollectionView = ({
           {heading}
         </h1>
         {!selected && (
-          <>
-            <div className="border-b border-stone-800/80 pb-6 pt-9">
+          <div className="flex h-full min-h-min flex-col">
+            <div className="shrink-0 border-b border-stone-800/80 pb-6 pt-9 [@media(max-height:720px)]:pb-3 [@media(max-height:720px)]:pt-4">
               <p className="mb-3 text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-amber-300">
                 Curated collection
               </p>
@@ -414,8 +450,11 @@ const DirectorsCollectionView = ({
                 films.
               </p>
             </div>
-            <section aria-label="Explore directors" className="pt-6">
-              <div className="mb-4 flex items-end justify-between">
+            <section
+              aria-label="Explore directors"
+              className="flex flex-1 flex-col pt-6 [@media(max-height:720px)]:pt-3"
+            >
+              <div className="mb-4 flex shrink-0 items-end justify-between [@media(max-height:720px)]:mb-2">
                 <h3 className="font-serif text-2xl text-stone-100">
                   Explore filmmakers
                 </h3>
@@ -428,7 +467,7 @@ const DirectorsCollectionView = ({
                 renderItem={renderDirectorCard}
               />
             </section>
-          </>
+          </div>
         )}
         {selected && (
           <>
@@ -634,7 +673,11 @@ const DirectorsCollectionView = ({
             </section>
           </Dialog>
         )}
-        <footer className="mt-10 flex items-start gap-3 border-t border-stone-800/60 pt-5 text-xs leading-relaxed text-stone-400">
+        <footer
+          className={`mt-10 flex items-start gap-3 border-t border-stone-800/60 pt-5 text-xs leading-relaxed text-stone-400 ${
+            selected ? '' : 'pb-12'
+          }`}
+        >
           <img src="/tmdb-logo.svg" alt="TMDB" className="mt-1 w-11 shrink-0" />
           <span>
             <span className="block font-semibold text-stone-400">Credits</span>
